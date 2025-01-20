@@ -1,0 +1,232 @@
+enum roleStatusEnum {
+    active
+    inactive
+
+    @@map("Role_Status_Enum")
+}
+
+enum permissionStatusEnum {
+    active
+    inactive
+
+    @@map("Permission_Status_Enum")
+}
+
+enum accountExternalStatusEnum {
+    active
+    verificationPending @map("verification_pending")
+    inactive
+
+    @@map("Account_External_Status_Enum")
+}
+
+enum userStatusEnum {
+    active
+    inactive
+
+    @@map("User_Status_Enum")
+}
+
+enum accountStatusEnum {
+    active
+    verificationPending @map("verification_pending")
+    locked
+
+    @@map("Account_Status_Enum")
+}
+
+enum verifyEmailStatusEnum {
+    active
+    used
+    overdue
+    inactive
+
+    @@map("Verify_Email_Status_Enum")
+}
+
+model role {
+    id          String         @id @default(cuid())
+    name        String
+    description String
+    createAt    DateTime       @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt    DateTime       @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?      @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status      roleStatusEnum @default(active)
+
+    infoPermission infoPermission[]
+    user           user[]
+
+    @@map("Role")
+}
+
+model permission {
+    id          String               @id @default(cuid())
+    name        String
+    description String
+    createAt    DateTime             @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt    DateTime             @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?            @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status      permissionStatusEnum @default(active)
+
+    infoPermission infoPermission[]
+
+    @@map("Permission")
+}
+
+model infoPermission {
+    id            String     @id @default(cuid())
+    role_id       String     @map("roleId")
+    Role          role       @relation(fields: [role_id], references: [id])
+    permission_id String     @map("permissionId")
+    Permission    permission @relation(fields: [permission_id], references: [id])
+    description   String
+    createAt      DateTime   @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt      DateTime   @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt     DateTime?  @map("deleted_at")
+
+    @@map("Info_Permission")
+}
+
+model user {
+    id          String         @id @default(cuid())
+    name        String
+    roleId      String         @map("role_id")
+    /// @DtoRelationCanConnectOnCreate
+    Role        role           @relation(fields: [roleId], references: [id])
+    image       String
+    gender      String
+    email       String         @unique
+    dateOfBirth DateTime       @map("date_of_birth")
+    phoneNumber String         @map("phone_number") @db.Char(10)
+    address     String
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    balance     Int            @default(0)
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    point       Int            @default(0)
+    createAt    DateTime       @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt    DateTime       @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?      @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status      userStatusEnum @default(active)
+
+    ///@DtoRelationCanCreateOnCreate
+    supplier supplier?
+
+    productRate     productRate[]
+    accountExternal accountExternal[]
+    account         account[]
+    bill            bill[]
+    Cacartrt        cart[]
+    discount        discount[]
+    boxChatMember   boxChatMember[]
+    message         message[]
+
+    @@map("User")
+}
+
+model accountExternal {
+    id                      String                      @id @default(cuid())
+    /// @DtoUpdateHidden
+    user_id                 String                      @map("userId")
+    /// @DtoRelationCanConnectOnCreate
+    User                    user                        @relation(fields: [user_id], references: [id])
+    providerAccountExternal providerAccountExternalEnum @map("provider_account_external")
+    providerToken           String                      @map("provider_token")
+    createAt                DateTime                    @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt                DateTime                    @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt               DateTime?                   @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status                  accountExternalStatusEnum   @default(active)
+
+    @@map("Account_External")
+}
+
+model account {
+    id          String            @id @default(cuid())
+    /// @DtoUpdateHidden
+    username    String
+    /// @DtoUpdateHidden
+    password    String
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    salt        String
+    /// @DtoUpdateHidden
+    userId      String            @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    User        user              @relation(fields: [userId], references: [id])
+    createAt    DateTime          @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt    DateTime          @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?         @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status      accountStatusEnum @default(active)
+    verifyEmail verifyEmail[]
+
+    @@map("Account")
+}
+
+model verifyEmail {
+    id        String                @id @default(cuid())
+    /// @DtoUpdateHidden
+    content   String
+    /// @DtoUpdateHidden
+    duration  DateTime
+    /// @DtoUpdateHidden
+    accountId String                @map("account_id")
+    /// @DtoRelationCanConnectOnCreate
+    Account   account               @relation(fields: [accountId], references: [id])
+    createAt  DateTime              @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status    verifyEmailStatusEnum @default(active)
+
+    @@map("Verify_Email")
+}
+
+model supplier {
+    id     String @id @default(cuid())
+    /// @DtoUpdateHidden
+    userId String @unique @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user   user   @relation(fields: [userId], references: [id])
+    taxId  String @map("tax_id") @db.VarChar(13)
+    /// @minimum 1
+    /// @maximum 14
+    fee    Int    @default(10)
+
+    product product[]
+
+    @@map("Supplier")
+}

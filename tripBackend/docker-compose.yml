@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+    trip-database:
+        image: postgres:17.2-bookworm
+        container_name: trip-database
+        restart: on-failure
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: root
+            POSTGRES_DB: trip
+        ports:
+            - '5434:5432'
+
+    trip-backend:
+        working_dir: /app
+        container_name: trip-backend
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: on-failure
+        ports:
+            - '3001:3000'
+        depends_on:
+            - trip-database
+        env_file:
+            - .env
+        command: ['node', 'dist/src/main.js']

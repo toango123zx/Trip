@@ -1,0 +1,48 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { RoleEntity } from '../../role/entities/role.entity';
+import { PermissionEntity } from '../../permission/entities/permission.entity';
+
+export class InfoPermissionEntity {
+	@ApiProperty({
+		type: 'string',
+	})
+	id: string;
+	@ApiProperty({
+		type: 'string',
+	})
+	role_id: string;
+	@ApiProperty({
+		type: () => RoleEntity,
+		required: false,
+	})
+	Role?: RoleEntity;
+	@ApiProperty({
+		type: 'string',
+	})
+	permission_id: string;
+	@ApiProperty({
+		type: () => PermissionEntity,
+		required: false,
+	})
+	Permission?: PermissionEntity;
+	@ApiProperty({
+		type: 'string',
+	})
+	description: string;
+	@ApiProperty({
+		type: 'string',
+		format: 'date-time',
+	})
+	createAt: Date;
+	@ApiProperty({
+		type: 'string',
+		format: 'date-time',
+	})
+	updateAt: Date;
+	@ApiProperty({
+		type: 'string',
+		format: 'date-time',
+		nullable: true,
+	})
+	deletedAt: Date | null;
+}

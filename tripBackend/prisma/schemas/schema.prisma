@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator nestjsDto {
+    provider                        = "prisma-generator-nestjs-dto"
+    output                          = "../../src/models"
+    outputToNestJsResourceStructure = "true"
+    exportRelationModifierClasses   = "true"
+    reExport                        = "true"
+    generateFileTypes               = "all"
+    createDtoPrefix                 = "Create"
+    updateDtoPrefix                 = "Update"
+    dtoSuffix                       = "Dto"
+    entityPrefix                    = ""
+    entitySuffix                    = "Entity"
+    fileNamingStyle                 = "snake"
+    flatResourceStructure           = "false"
+    classValidation                 = "true"
+    noDependencies                  = "false"
+    outputType                      = "class"
+    prettier                        = "true"
+    requiredResponseApiProperty     = "true"
+    outputApiPropertyType           = "true"
+}

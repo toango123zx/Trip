@@ -1,0 +1,54 @@
+import { productRateStatusEnum } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
+import { ProductEntity } from '../../product/entities/product.entity';
+import { UserEntity } from '../../user/entities/user.entity';
+
+export class ProductRateEntity {
+	@ApiProperty({
+		type: 'string',
+	})
+	id: string;
+	@ApiProperty({
+		type: 'string',
+	})
+	productId: string;
+	@ApiProperty({
+		type: () => ProductEntity,
+		required: false,
+	})
+	product?: ProductEntity;
+	@ApiProperty({
+		type: 'string',
+	})
+	userId: string;
+	@ApiProperty({
+		type: () => UserEntity,
+		required: false,
+	})
+	user?: UserEntity;
+	@ApiProperty({
+		type: 'integer',
+		format: 'int32',
+	})
+	star: number;
+	@ApiProperty({
+		type: 'string',
+		format: 'date-time',
+	})
+	createAt: Date;
+	@ApiProperty({
+		type: 'string',
+		format: 'date-time',
+	})
+	updateAt: Date;
+	@ApiProperty({
+		type: 'string',
+		format: 'date-time',
+		nullable: true,
+	})
+	deletedAt: Date | null;
+	@ApiProperty({
+		enum: productRateStatusEnum,
+	})
+	status: productRateStatusEnum;
+}

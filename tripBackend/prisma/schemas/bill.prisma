@@ -1,0 +1,156 @@
+enum paymentMethodStatusEnum {
+    active
+    error
+    inactive
+
+    @@map("Payment_Method_Status_Enum")
+}
+
+enum transactionTargetEnum {
+    deposit
+    withdrawal
+    pay
+    refund
+
+    @@map("Transaction_Target_Enum")
+}
+
+enum transactionStatusEnum {
+    completed
+    canceled
+
+    @@map("Transaction_Status_Enum")
+}
+
+enum billStatusEnum {
+    done
+    paided
+    pending
+    cancel
+    refunded
+
+    @@map("Bill_Status_Enum")
+}
+
+model paymentMethod {
+    id          String                  @id @default(cuid())
+    name        String
+    description String
+    createAt    DateTime                @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt    DateTime                @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?               @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status      paymentMethodStatusEnum @default(active)
+
+    bill bill[]
+
+    @@map("payment_Method")
+}
+
+model transaction {
+    id                String                @id @default(cuid())
+    /// @DtoUpdateHidden
+    code              String
+    description       String
+    transactionTarget transactionTargetEnum @map("transaction_target")
+    createAt          DateTime              @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt          DateTime              @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt         DateTime?             @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status            transactionStatusEnum @default(completed)
+
+    bill bill[]
+
+    @@map("Transaction")
+}
+
+model bill {
+    id                  String         @id @default(cuid())
+    /// @DtoUpdateHidden
+    userId              String         @map("userId")
+    /// @DtoRelationCanConnectOnCreate
+    user                user           @relation(fields: [userId], references: [id])
+    paymentMethodId     String         @map("payment_method_id")
+    paymentMethod       paymentMethod  @relation(fields: [paymentMethodId], references: [id])
+    transactionTargetId String         @map("transaction_id")
+    transaction         transaction    @relation(fields: [transactionTargetId], references: [id])
+    reductionPrice      Int            @map("reduction_price")
+    totalPrice          Int            @map("total_price")
+    createAt            DateTime       @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt            DateTime       @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt           DateTime?      @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status              billStatusEnum @default(pending)
+
+    infoBill         infoBill[]
+    infoBillDiscount infoBillDiscount[]
+    discountForBill  discountForBill[]
+
+    @@map("Bill")
+}
+
+model infoBill {
+    id                String          @id @default(cuid())
+    /// @DtoUpdateHidden
+    billId            String          @map("bill_id")
+    /// @DtoRelationCanConnectOnCreate
+    bill              bill            @relation(fields: [billId], references: [id])
+    productScheduleId String          @map("product_schedule_id")
+    /// @DtoRelationCanConnectOnCreate
+    Product_Schedule  productSchedule @relation(fields: [productScheduleId], references: [id])
+    quantity          Int
+
+    @@map("Info_Bill")
+}
+
+model infoBillDiscount {
+    id         String   @id @default(cuid())
+    billId     String   @map("bill_id")
+    /// @DtoRelationCanConnectOnCreate
+    bill       bill     @relation(fields: [billId], references: [id])
+    discountId String   @map("discount_id")
+    /// @DtoRelationCanConnectOnCreate
+    discount   discount @relation(fields: [discountId], references: [id])
+
+    @@map("Info_Bill_Discount")
+}
+
+model discountForBill {
+    id         String   @id @default(cuid())
+    billId     String   @map("bill_id")
+    /// @DtoRelationCanConnectOnCreate
+    bill       bill     @relation(fields: [billId], references: [id])
+    discountId String   @map("discount_id")
+    /// @DtoRelationCanConnectOnCreate
+    discount   discount @relation(fields: [discountId], references: [id])
+
+    @@map("Discount_For_Bill")
+}
+
+model cart {
+    id                String          @id @default(cuid())
+    /// @DtoUpdateHidden
+    userId            String          @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user              user            @relation(fields: [userId], references: [id])
+    productScheduleId String          @map("product_schedule_id")
+    /// @DtoRelationCanConnectOnCreate
+    productSchedule   productSchedule @relation(fields: [productScheduleId], references: [id])
+
+    @@map("Cart")
+}

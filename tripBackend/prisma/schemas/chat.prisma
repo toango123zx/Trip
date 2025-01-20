@@ -1,0 +1,47 @@
+model boxChat {
+    id   String @id @default(cuid())
+    name String
+
+    boxChatMember boxChatMember[]
+    message       message[]
+
+    @@map("Box_Chat")
+}
+
+model boxChatMember {
+    id        String    @id @default(cuid())
+    boxChatId String    @map("box_chat_id")
+    boxChat   boxChat   @relation(fields: [boxChatId], references: [id])
+    userId    String    @map("user_id")
+    user      user      @relation(fields: [userId], references: [id])
+    createAt  DateTime  @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt  DateTime  @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("Box_Chat_Member")
+}
+
+model message {
+    id        String    @id @default(cuid())
+    content   String
+    /// @DtoUpdateHidden
+    userId    String    @map("user_id")
+    User      user      @relation(fields: [userId], references: [id])
+    /// @DtoUpdateHidden
+    boxChatId String    @map("box_chat_id")
+    boxChat   boxChat   @relation(fields: [boxChatId], references: [id])
+    isRead    Boolean   @default(false) @map("is_read")
+    createAt  DateTime  @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt  DateTime  @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("Message")
+}

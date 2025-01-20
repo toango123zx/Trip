@@ -1,0 +1,168 @@
+enum discountTypeStatusEnum {
+    active
+    full
+    canceled
+
+    @@map("Discount_Type_Status_Enum")
+}
+
+enum discountProviderTypeEnum {
+    admin
+    supplier
+
+    @@map("Discount_Provider_Type_Enum")
+}
+
+enum discountEligibilityStatusEnum {
+    active
+    inactive
+
+    @@map("Discount_Eligibility_Status_Enum")
+}
+
+enum discountApplicationScopeStatusEnum {
+    active
+    inactive
+
+    @@map("Discount_Application_Scope_Status_Enum")
+}
+
+enum discountStatus {
+    active
+    full
+    canceled
+
+    @@map("Discount_Status_Enum")
+}
+
+enum infoDiscountStatusEnum {
+    active
+    inactive
+
+    @@map("Info_Discount_Status_Enum")
+}
+
+model discountType {
+    id          String                 @id @default(cuid())
+    name        String
+    description String
+    createAt    DateTime               @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt    DateTime               @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?              @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status      discountTypeStatusEnum @default(active)
+
+    discount discount[]
+
+    @@map("Discount_Type")
+}
+
+model discountEligibility {
+    id          String                        @id @default(cuid())
+    name        String
+    description String
+    createAt    DateTime                      @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt    DateTime                      @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?                     @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status      discountEligibilityStatusEnum @default(active)
+
+    discount discount[]
+
+    @@map("Discount_Eligibility")
+}
+
+model discountApplicationScope {
+    id          String                             @id @default(cuid())
+    name        String
+    description String
+    createAt    DateTime                           @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt    DateTime                           @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt   DateTime?                          @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status      discountApplicationScopeStatusEnum @default(active)
+
+    discount discount[]
+
+    @@map("Discount_Application_Scope")
+}
+
+model discount {
+    id                         String                   @id @default(cuid())
+    name                       String
+    discountProviderType       discountProviderTypeEnum @map("discount_provider_type")
+    userId                     String                   @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    User                       user                     @relation(fields: [userId], references: [id])
+    code                       String
+    description                String
+    startTime                  DateTime                 @map("start_time")
+    endTime                    DateTime                 @map("end_time")
+    value                      Int
+    quantity                   Int
+    /// @DtoCreateOptional
+    /// @DtoUpdateOptional
+    point                      Int                      @default(0)
+    applited                   Int                      @default(0)
+    stackable                  Boolean
+    discountTypeId             String                   @map("discount_type_id")
+    discountType               discountType             @relation(fields: [discountTypeId], references: [id])
+    discountEligibilityId      String                   @map("discount_eligibility_id")
+    discountEligibility        discountEligibility      @relation(fields: [discountEligibilityId], references: [id])
+    discountApplicationScopeId String                   @map("discount_application_scope_id")
+    discountApplicationScope   discountApplicationScope @relation(fields: [discountApplicationScopeId], references: [id])
+    createAt                   DateTime                 @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt                   DateTime                 @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt                  DateTime?                @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status                     discountStatus           @default(active)
+
+    infoBillDiscount infoBillDiscount[]
+    discountForBill  discountForBill[]
+    infoDiscount     infoDiscount[]
+
+    @@map("Discount")
+}
+
+model infoDiscount {
+    id                String                 @id @default(cuid())
+    /// @DtoUpdateHidden
+    discountId        String                 @map("discount_id")
+    /// @DtoRelationCanConnectOnCreate
+    discount          discount               @relation(fields: [discountId], references: [id])
+    productScheduleId String                 @map("product_schedule_id")
+    /// @DtoRelationCanConnectOnCreate
+    Product_Schedule  productSchedule        @relation(fields: [productScheduleId], references: [id])
+    createAt          DateTime               @default(now()) @map("create_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    updateAt          DateTime               @updatedAt @map("update_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    deletedAt         DateTime?              @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status            infoDiscountStatusEnum @default(active)
+
+    @@map("Info_Discount")
+}
