@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { ProductEntity } from '../../product/entities/product.entity';
 
 export class ProductImageEntity {
@@ -14,7 +15,7 @@ export class ProductImageEntity {
 		type: () => ProductEntity,
 		required: false,
 	})
-	Product?: ProductEntity;
+	product?: ProductEntity;
 	@ApiProperty({
 		type: 'string',
 	})

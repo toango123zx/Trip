@@ -1,6 +1,8 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
 import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
 import { ConnectProductDto } from '../../product/dto/connect-product.dto';
 
 export class CreateProductImageProductRelationInputDto {
@@ -21,7 +23,7 @@ export class CreateProductImageDto {
 	@IsNotEmpty()
 	@ValidateNested()
 	@Type(() => CreateProductImageProductRelationInputDto)
-	Product: CreateProductImageProductRelationInputDto;
+	product: CreateProductImageProductRelationInputDto;
 	@ApiProperty({
 		type: 'string',
 	})

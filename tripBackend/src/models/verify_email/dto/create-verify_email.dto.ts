@@ -1,6 +1,8 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
 import { Type } from 'class-transformer';
+import { IsDateString, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
 import { ConnectAccountDto } from '../../account/dto/connect-account.dto';
 
 export class CreateVerifyEmailAccountRelationInputDto {
@@ -34,5 +36,5 @@ export class CreateVerifyEmailDto {
 	@IsNotEmpty()
 	@ValidateNested()
 	@Type(() => CreateVerifyEmailAccountRelationInputDto)
-	Account: CreateVerifyEmailAccountRelationInputDto;
+	account: CreateVerifyEmailAccountRelationInputDto;
 }

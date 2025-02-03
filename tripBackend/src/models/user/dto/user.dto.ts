@@ -1,5 +1,6 @@
-import { userStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { genderUserEnum, userStatusEnum } from '@prisma/client';
 
 export class UserDto {
 	@ApiProperty({
@@ -13,11 +14,15 @@ export class UserDto {
 	@ApiProperty({
 		type: 'string',
 	})
-	image: string;
+	roleId: string;
 	@ApiProperty({
 		type: 'string',
 	})
-	gender: string;
+	image: string;
+	@ApiProperty({
+		enum: genderUserEnum,
+	})
+	gender: genderUserEnum;
 	@ApiProperty({
 		type: 'string',
 	})

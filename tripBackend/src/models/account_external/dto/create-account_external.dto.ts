@@ -1,7 +1,9 @@
-import { providerAccountExternalEnum } from '@prisma/client';
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
+import { providerAccountExternalEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
 import { ConnectUserDto } from '../../user/dto/connect-user.dto';
 
 export class CreateAccountExternalUserRelationInputDto {
@@ -22,7 +24,7 @@ export class CreateAccountExternalDto {
 	@IsNotEmpty()
 	@ValidateNested()
 	@Type(() => CreateAccountExternalUserRelationInputDto)
-	User: CreateAccountExternalUserRelationInputDto;
+	user: CreateAccountExternalUserRelationInputDto;
 	@ApiProperty({
 		enum: providerAccountExternalEnum,
 	})

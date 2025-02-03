@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { MapAddressEntity } from '../../map_address/entities/map_address.entity';
 
 export class ProviderMapEntity {

@@ -1,3 +1,11 @@
+enum genderUserEnum {
+    male
+    female
+    other
+
+    @@map("Gender_User_Enum")
+}
+
 enum roleStatusEnum {
     active
     inactive
@@ -88,9 +96,9 @@ model permission {
 model infoPermission {
     id            String     @id @default(cuid())
     role_id       String     @map("roleId")
-    Role          role       @relation(fields: [role_id], references: [id])
+    role          role       @relation(fields: [role_id], references: [id])
     permission_id String     @map("permissionId")
-    Permission    permission @relation(fields: [permission_id], references: [id])
+    permission    permission @relation(fields: [permission_id], references: [id])
     description   String
     createAt      DateTime   @default(now()) @map("create_at")
     /// @DtoCreateHidden
@@ -106,11 +114,13 @@ model infoPermission {
 model user {
     id          String         @id @default(cuid())
     name        String
+    /// @DtoRelationIncludeId
     roleId      String         @map("role_id")
-    /// @DtoRelationCanConnectOnCreate
-    Role        role           @relation(fields: [roleId], references: [id])
-    image       String
-    gender      String
+    role        role           @relation(fields: [roleId], references: [id])
+    /// @DtoCreateOptional
+    /// @DtoUpdateOptional
+    image       String         @default("https://11")
+    gender      genderUserEnum
     email       String         @unique
     dateOfBirth DateTime       @map("date_of_birth")
     phoneNumber String         @map("phone_number") @db.Char(10)
@@ -152,7 +162,7 @@ model accountExternal {
     /// @DtoUpdateHidden
     user_id                 String                      @map("userId")
     /// @DtoRelationCanConnectOnCreate
-    User                    user                        @relation(fields: [user_id], references: [id])
+    user                    user                        @relation(fields: [user_id], references: [id])
     providerAccountExternal providerAccountExternalEnum @map("provider_account_external")
     providerToken           String                      @map("provider_token")
     createAt                DateTime                    @default(now()) @map("create_at")
@@ -172,16 +182,15 @@ model accountExternal {
 model account {
     id          String            @id @default(cuid())
     /// @DtoUpdateHidden
-    username    String
+    username    String            @unique
     /// @DtoUpdateHidden
     password    String
-    /// @DtoCreateHidden
     /// @DtoUpdateHidden
     salt        String
     /// @DtoUpdateHidden
     userId      String            @map("user_id")
-    /// @DtoRelationCanConnectOnCreate
-    User        user              @relation(fields: [userId], references: [id])
+    /// @DtoRelationCanCreateOnCreate
+    user        user              @relation(fields: [userId], references: [id])
     createAt    DateTime          @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
@@ -206,7 +215,7 @@ model verifyEmail {
     /// @DtoUpdateHidden
     accountId String                @map("account_id")
     /// @DtoRelationCanConnectOnCreate
-    Account   account               @relation(fields: [accountId], references: [id])
+    account   account               @relation(fields: [accountId], references: [id])
     createAt  DateTime              @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden

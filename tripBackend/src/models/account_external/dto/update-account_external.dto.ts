@@ -1,5 +1,6 @@
-import { providerAccountExternalEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { providerAccountExternalEnum } from '@prisma/client';
 import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateAccountExternalDto {

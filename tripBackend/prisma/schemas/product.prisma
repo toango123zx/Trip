@@ -169,7 +169,7 @@ model productImage {
     /// @DtoUpdateHidden
     productId String   @map("product_id")
     /// @DtoRelationCanConnectOnCreate
-    Product   product  @relation(fields: [productId], references: [id])
+    product   product  @relation(fields: [productId], references: [id])
     url       String
     createdAt DateTime @default(now()) @map("create_at")
 

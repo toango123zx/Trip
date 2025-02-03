@@ -1,5 +1,6 @@
-import { roleStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { roleStatusEnum } from '@prisma/client';
 
 export class RoleDto {
 	@ApiProperty({

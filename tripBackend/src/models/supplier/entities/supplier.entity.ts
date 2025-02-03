@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UserEntity } from '../../user/entities/user.entity';
+
 import { ProductEntity } from '../../product/entities/product.entity';
+import { UserEntity } from '../../user/entities/user.entity';
 
 export class SupplierEntity {
 	@ApiProperty({

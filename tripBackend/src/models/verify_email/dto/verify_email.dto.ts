@@ -1,5 +1,6 @@
-import { verifyEmailStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { verifyEmailStatusEnum } from '@prisma/client';
 
 export class VerifyEmailDto {
 	@ApiProperty({

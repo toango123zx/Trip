@@ -1,5 +1,7 @@
-import { providerAccountExternalEnum, accountExternalStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { providerAccountExternalEnum, accountExternalStatusEnum } from '@prisma/client';
+
 import { UserEntity } from '../../user/entities/user.entity';
 
 export class AccountExternalEntity {
@@ -15,7 +17,7 @@ export class AccountExternalEntity {
 		type: () => UserEntity,
 		required: false,
 	})
-	User?: UserEntity;
+	user?: UserEntity;
 	@ApiProperty({
 		enum: providerAccountExternalEnum,
 	})

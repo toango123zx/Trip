@@ -1,8 +1,10 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, ValidateNested } from 'class-validator';
+
 import { Type } from 'class-transformer';
-import { ConnectUserDto } from '../../user/dto/connect-user.dto';
+import { IsNotEmpty, ValidateNested } from 'class-validator';
+
 import { ConnectProductScheduleDto } from '../../product_schedule/dto/connect-product_schedule.dto';
+import { ConnectUserDto } from '../../user/dto/connect-user.dto';
 
 export class CreateCartUserRelationInputDto {
 	@ApiProperty({

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { RoleEntity } from '../../role/entities/role.entity';
+
 import { PermissionEntity } from '../../permission/entities/permission.entity';
+import { RoleEntity } from '../../role/entities/role.entity';
 
 export class InfoPermissionEntity {
 	@ApiProperty({
@@ -15,7 +16,7 @@ export class InfoPermissionEntity {
 		type: () => RoleEntity,
 		required: false,
 	})
-	Role?: RoleEntity;
+	role?: RoleEntity;
 	@ApiProperty({
 		type: 'string',
 	})
@@ -24,7 +25,7 @@ export class InfoPermissionEntity {
 		type: () => PermissionEntity,
 		required: false,
 	})
-	Permission?: PermissionEntity;
+	permission?: PermissionEntity;
 	@ApiProperty({
 		type: 'string',
 	})

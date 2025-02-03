@@ -1,19 +1,21 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
 import { Type } from 'class-transformer';
-import { ConnectUserDto } from '../../user/dto/connect-user.dto';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
+import { CreateUserDto } from '../../user/dto/create-user.dto';
 
 export class CreateAccountUserRelationInputDto {
 	@ApiProperty({
-		type: ConnectUserDto,
+		type: CreateUserDto,
 	})
 	@IsNotEmpty()
 	@ValidateNested()
-	@Type(() => ConnectUserDto)
-	connect: ConnectUserDto;
+	@Type(() => CreateUserDto)
+	create: CreateUserDto;
 }
 
-@ApiExtraModels(ConnectUserDto, CreateAccountUserRelationInputDto)
+@ApiExtraModels(CreateUserDto, CreateAccountUserRelationInputDto)
 export class CreateAccountDto {
 	@ApiProperty({
 		type: 'string',
@@ -28,10 +30,16 @@ export class CreateAccountDto {
 	@IsString()
 	password: string;
 	@ApiProperty({
+		type: 'string',
+	})
+	@IsNotEmpty()
+	@IsString()
+	salt: string;
+	@ApiProperty({
 		type: CreateAccountUserRelationInputDto,
 	})
 	@IsNotEmpty()
 	@ValidateNested()
 	@Type(() => CreateAccountUserRelationInputDto)
-	User: CreateAccountUserRelationInputDto;
+	user: CreateAccountUserRelationInputDto;
 }

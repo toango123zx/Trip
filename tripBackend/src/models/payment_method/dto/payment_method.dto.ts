@@ -1,5 +1,6 @@
-import { paymentMethodStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { paymentMethodStatusEnum } from '@prisma/client';
 
 export class PaymentMethodDto {
 	@ApiProperty({

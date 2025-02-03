@@ -1,6 +1,7 @@
-import { IsInt, IsOptional, IsPositive } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { Type } from 'class-transformer';
+import { IsInt, IsOptional, IsPositive } from 'class-validator';
 import { GetApiConfig } from 'src/configs';
 
 export class PaginationDto {

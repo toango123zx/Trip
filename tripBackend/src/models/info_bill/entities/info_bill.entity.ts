@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { BillEntity } from '../../bill/entities/bill.entity';
 import { ProductScheduleEntity } from '../../product_schedule/entities/product_schedule.entity';
 
@@ -24,7 +25,7 @@ export class InfoBillEntity {
 		type: () => ProductScheduleEntity,
 		required: false,
 	})
-	Product_Schedule?: ProductScheduleEntity;
+	product_Schedule?: ProductScheduleEntity;
 	@ApiProperty({
 		type: 'integer',
 		format: 'int32',

@@ -1,6 +1,8 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, ValidateNested } from 'class-validator';
+
 import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, ValidateNested } from 'class-validator';
+
 import { ConnectBillDto } from '../../bill/dto/connect-bill.dto';
 import { ConnectProductScheduleDto } from '../../product_schedule/dto/connect-product_schedule.dto';
 
@@ -43,7 +45,7 @@ export class CreateInfoBillDto {
 	@IsNotEmpty()
 	@ValidateNested()
 	@Type(() => CreateInfoBillProductScheduleRelationInputDto)
-	Product_Schedule: CreateInfoBillProductScheduleRelationInputDto;
+	product_Schedule: CreateInfoBillProductScheduleRelationInputDto;
 	@ApiProperty({
 		type: 'integer',
 		format: 'int32',
