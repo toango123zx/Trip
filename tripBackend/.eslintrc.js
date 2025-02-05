@@ -101,7 +101,6 @@ module.exports = {
     ],
 
     // Các quy tắc khác
-    quotes: ['error', 'single'], // Sử dụng dấu nháy đơn
     semi: ['error', 'always'], // Bắt buộc có dấu chấm phẩy
   },
 };

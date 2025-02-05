@@ -1,13 +1,13 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
-export class ConflictException extends HttpException {
+export class UnauthorizedException extends HttpException {
 	constructor(public readonly location?: string) {
 		super(
 			{
 				status: 'fail',
-				message: `Resources already exist ${location}`,
+				message: "You're not authenticated",
 			},
-			HttpStatus.CONFLICT,
+			HttpStatus.UNAUTHORIZED,
 		);
 	}
 }

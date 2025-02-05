@@ -1,7 +1,13 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class InternalServerErrorException extends HttpException {
-	constructor() {
-		super('Error from the server', HttpStatus.INTERNAL_SERVER_ERROR);
+	constructor(public readonly location?: string) {
+		super(
+			{
+				statusL: 'fail',
+				message: `Error from the server ${location}`,
+			},
+			HttpStatus.INTERNAL_SERVER_ERROR,
+		);
 	}
 }
