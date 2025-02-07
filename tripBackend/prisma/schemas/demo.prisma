@@ -1,0 +1,4 @@
+model Demo {
+  name  String
+  price Float
+}
