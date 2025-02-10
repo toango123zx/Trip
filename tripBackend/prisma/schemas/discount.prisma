@@ -108,7 +108,7 @@ model discount {
     discountProviderType       discountProviderTypeEnum @map("discount_provider_type")
     userId                     String                   @map("user_id")
     /// @DtoRelationCanConnectOnCreate
-    User                       user                     @relation(fields: [userId], references: [id])
+    user                       user                     @relation(fields: [userId], references: [id])
     code                       String
     description                String
     startTime                  DateTime                 @map("start_time")
@@ -152,7 +152,7 @@ model infoDiscount {
     discount          discount               @relation(fields: [discountId], references: [id])
     productScheduleId String                 @map("product_schedule_id")
     /// @DtoRelationCanConnectOnCreate
-    Product_Schedule  productSchedule        @relation(fields: [productScheduleId], references: [id])
+    product_Schedule  productSchedule        @relation(fields: [productScheduleId], references: [id])
     createAt          DateTime               @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden

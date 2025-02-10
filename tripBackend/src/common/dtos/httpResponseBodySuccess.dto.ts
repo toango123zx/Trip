@@ -1,16 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class HttpResponseBodySuccessDto<T> {
+import { HttpResponseBodyDto } from './httpResponseBody.dto';
+
+export class HttpResponseBodySuccessDto<T> extends HttpResponseBodyDto<T> {
+	@ApiProperty({
+		required: true,
+		nullable: false,
+		type: Boolean,
+	})
+	success: boolean = true;
 	@ApiProperty({
 		required: true,
 		nullable: false,
 		type: Object,
 	})
 	data: T;
-	@ApiProperty({
-		required: false,
-		nullable: true,
-		type: Number,
-	})
-	totalPage?: number;
 }

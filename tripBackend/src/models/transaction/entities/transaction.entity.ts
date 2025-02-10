@@ -1,5 +1,7 @@
-import { transactionTargetEnum, transactionStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { transactionTargetEnum, transactionStatusEnum } from '@prisma/client';
+
 import { BillEntity } from '../../bill/entities/bill.entity';
 
 export class TransactionEntity {

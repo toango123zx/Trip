@@ -1,5 +1,7 @@
-import { discountProviderTypeEnum } from '@prisma/client';
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
+
+import { discountProviderTypeEnum } from '@prisma/client';
+import { Type } from 'class-transformer';
 import {
 	IsBoolean,
 	IsDateString,
@@ -9,7 +11,7 @@ import {
 	IsString,
 	ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+
 import { ConnectUserDto } from '../../user/dto/connect-user.dto';
 
 export class CreateDiscountUserRelationInputDto {
@@ -41,7 +43,7 @@ export class CreateDiscountDto {
 	@IsNotEmpty()
 	@ValidateNested()
 	@Type(() => CreateDiscountUserRelationInputDto)
-	User: CreateDiscountUserRelationInputDto;
+	user: CreateDiscountUserRelationInputDto;
 	@ApiProperty({
 		type: 'string',
 	})

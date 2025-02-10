@@ -1,5 +1,7 @@
-import { permissionStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { permissionStatusEnum } from '@prisma/client';
+
 import { InfoPermissionEntity } from '../../info_permission/entities/info_permission.entity';
 
 export class PermissionEntity {

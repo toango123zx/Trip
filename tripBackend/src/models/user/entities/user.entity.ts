@@ -1,15 +1,17 @@
-import { userStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { RoleEntity } from '../../role/entities/role.entity';
-import { SupplierEntity } from '../../supplier/entities/supplier.entity';
-import { ProductRateEntity } from '../../product_rate/entities/product_rate.entity';
-import { AccountExternalEntity } from '../../account_external/entities/account_external.entity';
+
+import { genderUserEnum, userStatusEnum } from '@prisma/client';
+
 import { AccountEntity } from '../../account/entities/account.entity';
+import { AccountExternalEntity } from '../../account_external/entities/account_external.entity';
 import { BillEntity } from '../../bill/entities/bill.entity';
+import { BoxChatMemberEntity } from '../../box_chat_member/entities/box_chat_member.entity';
 import { CartEntity } from '../../cart/entities/cart.entity';
 import { DiscountEntity } from '../../discount/entities/discount.entity';
-import { BoxChatMemberEntity } from '../../box_chat_member/entities/box_chat_member.entity';
 import { MessageEntity } from '../../message/entities/message.entity';
+import { ProductRateEntity } from '../../product_rate/entities/product_rate.entity';
+import { RoleEntity } from '../../role/entities/role.entity';
+import { SupplierEntity } from '../../supplier/entities/supplier.entity';
 
 export class UserEntity {
 	@ApiProperty({
@@ -28,15 +30,15 @@ export class UserEntity {
 		type: () => RoleEntity,
 		required: false,
 	})
-	Role?: RoleEntity;
+	role?: RoleEntity;
 	@ApiProperty({
 		type: 'string',
 	})
 	image: string;
 	@ApiProperty({
-		type: 'string',
+		enum: genderUserEnum,
 	})
-	gender: string;
+	gender: genderUserEnum;
 	@ApiProperty({
 		type: 'string',
 	})

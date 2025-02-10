@@ -1,5 +1,6 @@
-export interface JwtPayload {
-	username: string;
-	id_user: string;
-	role: string;
+export interface IJwtPayload {
+	accountId: string;
+	userId: string;
+	roles: Array<string>;
+	permissions: Array<string>;
 }

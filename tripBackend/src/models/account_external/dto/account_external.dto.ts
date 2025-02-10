@@ -1,5 +1,6 @@
-import { providerAccountExternalEnum, accountExternalStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { providerAccountExternalEnum, accountExternalStatusEnum } from '@prisma/client';
 
 export class AccountExternalDto {
 	@ApiProperty({

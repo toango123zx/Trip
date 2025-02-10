@@ -1,12 +1,14 @@
-import { discountProviderTypeEnum, discountStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserEntity } from '../../user/entities/user.entity';
-import { DiscountTypeEntity } from '../../discount_type/entities/discount_type.entity';
-import { DiscountEligibilityEntity } from '../../discount_eligibility/entities/discount_eligibility.entity';
+
+import { discountProviderTypeEnum, discountStatus } from '@prisma/client';
+
 import { DiscountApplicationScopeEntity } from '../../discount_application_scope/entities/discount_application_scope.entity';
-import { InfoBillDiscountEntity } from '../../info_bill_discount/entities/info_bill_discount.entity';
+import { DiscountEligibilityEntity } from '../../discount_eligibility/entities/discount_eligibility.entity';
 import { DiscountForBillEntity } from '../../discount_for_bill/entities/discount_for_bill.entity';
+import { DiscountTypeEntity } from '../../discount_type/entities/discount_type.entity';
+import { InfoBillDiscountEntity } from '../../info_bill_discount/entities/info_bill_discount.entity';
 import { InfoDiscountEntity } from '../../info_discount/entities/info_discount.entity';
+import { UserEntity } from '../../user/entities/user.entity';
 
 export class DiscountEntity {
 	@ApiProperty({
@@ -29,7 +31,7 @@ export class DiscountEntity {
 		type: () => UserEntity,
 		required: false,
 	})
-	User?: UserEntity;
+	user?: UserEntity;
 	@ApiProperty({
 		type: 'string',
 	})

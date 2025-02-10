@@ -1,5 +1,7 @@
-import { accountStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { accountStatusEnum } from '@prisma/client';
+
 import { UserEntity } from '../../user/entities/user.entity';
 import { VerifyEmailEntity } from '../../verify_email/entities/verify_email.entity';
 
@@ -28,7 +30,7 @@ export class AccountEntity {
 		type: () => UserEntity,
 		required: false,
 	})
-	User?: UserEntity;
+	user?: UserEntity;
 	@ApiProperty({
 		type: 'string',
 		format: 'date-time',

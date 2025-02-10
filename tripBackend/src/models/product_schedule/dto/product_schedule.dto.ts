@@ -1,5 +1,6 @@
-import { productScheduleStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { productScheduleStatusEnum } from '@prisma/client';
 
 export class ProductScheduleDto {
 	@ApiProperty({

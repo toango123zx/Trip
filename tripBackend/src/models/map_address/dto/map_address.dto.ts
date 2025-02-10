@@ -1,5 +1,6 @@
-import { mapAddressStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { mapAddressStatusEnum } from '@prisma/client';
 
 export class MapAddressDto {
 	@ApiProperty({
