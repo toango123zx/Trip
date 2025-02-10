@@ -19,7 +19,8 @@
 		"test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
 		"test:e2e": "jest --config ./test/jest-e2e.json",
 		"db:push": "npx prisma db push",
-		"db:generate-dto": "npx prisma generate"
+		"db:generate-dto": "npx prisma generate",
+		"db:add-base": "tsx ./prisma/scripts/mergeBaseEntity.ts"
 	},
 	"dependencies": {
 		"@brakebein/prisma-generator-nestjs-dto": "^1.23.3",

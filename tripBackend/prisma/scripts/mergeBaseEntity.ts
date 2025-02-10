@@ -2,13 +2,13 @@ const fs = require('fs');
 const path = require('path');
 
 const baseEntityFields = {
-	id: 'id        String   @id @default(cuid())',
+	// id: 'id        String   @id @default(cuid())',
 	createAt: 'createdAt DateTime @default(now())',
 	updateAt: 'updatedAt DateTime @updatedAt',
 	deletedAt: 'deletedAt DateTime?',
 };
 
-const schemaDir = './schemas';
+const schemaDir = './prisma/schemas';
 const files = fs.readdirSync(schemaDir).filter((file) => file.endsWith('.prisma'));
 
 files.forEach((file) => {
@@ -17,6 +17,7 @@ files.forEach((file) => {
 
 	// Tìm tất cả các model trong file
 	const modelRegex = /model (\w+) {([\s\S]*?)}/g;
+
 	let updatedContent = content;
 	let hasChanges = false;
 

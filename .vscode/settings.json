@@ -1,8 +1,11 @@
 {
-	"editor.formatOnSave": true, // Tự động format mỗi khi lưu
-	"eslint.alwaysShowStatus": true, // Hiển thị trạng thái ESLint trong VSCode
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"[typescript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	} // Sử dụng Prettier để format mã
+  "editor.formatOnSave": true, // Tự động format mỗi khi lưu
+  "eslint.alwaysShowStatus": true, // Hiển thị trạng thái ESLint trong VSCode
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  } // Sử dụng Prettier để format mã
 }
