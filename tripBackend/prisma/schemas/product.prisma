@@ -229,7 +229,7 @@ model productSchedule {
     status     productScheduleStatusEnum @default(active)
 
     infoBill     infoBill[]
-    Cacartrt     cart[]
+    cart         cart[]
     infoDiscount infoDiscount[]
 
     @@map("Product_Schedule")

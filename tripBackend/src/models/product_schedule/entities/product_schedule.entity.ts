@@ -82,7 +82,7 @@ export class ProductScheduleEntity {
 		isArray: true,
 		required: false,
 	})
-	Cacartrt?: CartEntity[];
+	cart?: CartEntity[];
 	@ApiProperty({
 		type: () => InfoDiscountEntity,
 		isArray: true,

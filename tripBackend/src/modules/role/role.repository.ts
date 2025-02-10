@@ -8,7 +8,7 @@ import { PrismaService } from '../database/services';
 export class RoleRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async getRoleByName(name: string): Promise<RoleEntity> {
+	async findRoleByName(name: string): Promise<RoleEntity> {
 		try {
 			return this.prismaService.role.findFirst({
 				where: {
