@@ -5,6 +5,7 @@ import { setupSwagger } from './swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { ValidationException } from './common';
 import { DatabaseException } from './common/exceptions/database.exception';
+import { HttpExceptionFilter } from './common/filters/exception.filter';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, { cors: true });
@@ -14,6 +15,7 @@ async function bootstrap() {
 			exceptionFactory: (errors) => new ValidationException(errors),
 		}),
 	);
+	app.useGlobalFilters(new HttpExceptionFilter());
 	app.useGlobalFilters(new DatabaseException());
 
 	const port = commonAppConfig.port;
