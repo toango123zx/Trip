@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
+import { IPaginationQuery } from 'src/common';
 import { UserEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
+
+import { UserOrderByDto } from './dtos';
 
 @Injectable()
 export class UserRepository {
@@ -20,12 +23,19 @@ export class UserRepository {
 		}
 	}
 
-	async findUsers(): Promise<UserEntity[]> {
-		try {
-			return this.prismaService.user.findMany();
-		} catch (error) {
-			return error;
-		}
+	async findUsers(
+		pagination: IPaginationQuery,
+		filter?: UserOrderByDto,
+	): Promise<[UserEntity[], number]> {
+		const [users, totalRecords] = await Promise.all([
+			this.prismaService.user.findMany({
+				skip: pagination.skip,
+				take: pagination.take,
+				orderBy: filter,
+			}),
+			this.prismaService.user.count(),
+		]);
+		return [users, totalRecords];
 	}
 
 	async findUserById(id: string): Promise<UserEntity> {
