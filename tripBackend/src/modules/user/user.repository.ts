@@ -8,7 +8,7 @@ import { PrismaService } from '../database/services';
 export class UserRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async getUserByEmail(email: string): Promise<UserEntity> {
+	async findUserByEmail(email: string): Promise<UserEntity> {
 		try {
 			return this.prismaService.user.findFirst({
 				where: {

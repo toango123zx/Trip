@@ -8,11 +8,25 @@ import { PrismaService } from '../database/services';
 export class AuthRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async findAccountByEmail(username: string): Promise<AccountEntity> {
+	async findAccountByUsername(username: string): Promise<AccountEntity> {
 		try {
 			return this.prismaService.account.findFirst({
+				include: {
+					user: {
+						include: {
+							role: true,
+						},
+					},
+				},
 				where: {
 					username: username,
+					status: 'active',
+					user: {
+						status: 'active',
+						role: {
+							status: 'active',
+						},
+					},
 				},
 			});
 		} catch (error) {

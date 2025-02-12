@@ -23,8 +23,8 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 		command: RegisterCommand,
 	): Promise<HttpResponseBodySuccessDto<AccountEntity> | HttpException> {
 		const { registerDto } = command;
-		const user = await this.userRepository.getUserByEmail(registerDto.email);
-		const account = await this.authRepository.findAccountByEmail(
+		const user = await this.userRepository.findUserByEmail(registerDto.email);
+		const account = await this.authRepository.findAccountByUsername(
 			registerDto.username,
 		);
 		if (user || account) {
