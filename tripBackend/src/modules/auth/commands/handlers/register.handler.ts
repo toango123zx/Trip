@@ -42,17 +42,16 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 			user: {
 				create: {
 					name: registerDto.name,
-					gender: registerDto.gender,
 					email: registerDto.email,
-					dateOfBirth: registerDto.dateOfBirth,
-					phoneNumber: registerDto.phoneNumber,
-					address: registerDto.address,
 					roleId: roleTourist.id,
 				},
 			},
 		};
 
 		const newAccount = await this.authRepository.createAccount(accountData);
+
+		delete newAccount.password;
+		delete newAccount.salt;
 		return { success: true, data: newAccount };
 	}
 }

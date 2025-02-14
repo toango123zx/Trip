@@ -29,9 +29,10 @@ export class UpdateUserDto {
 	@ApiProperty({
 		enum: genderUserEnum,
 		required: false,
+		nullable: true,
 	})
 	@IsOptional()
-	gender?: genderUserEnum;
+	gender?: genderUserEnum | null;
 	@ApiProperty({
 		type: 'string',
 		required: false,
@@ -43,22 +44,25 @@ export class UpdateUserDto {
 		type: 'string',
 		format: 'date-time',
 		required: false,
+		nullable: true,
 	})
 	@IsOptional()
 	@IsDateString()
-	dateOfBirth?: Date;
+	dateOfBirth?: Date | null;
 	@ApiProperty({
 		type: 'string',
 		required: false,
+		nullable: true,
 	})
 	@IsOptional()
 	@IsString()
-	phoneNumber?: string;
+	phoneNumber?: string | null;
 	@ApiProperty({
 		type: 'string',
 		required: false,
+		nullable: true,
 	})
 	@IsOptional()
 	@IsString()
-	address?: string;
+	address?: string | null;
 }

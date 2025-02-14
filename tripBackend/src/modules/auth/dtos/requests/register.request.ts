@@ -1,16 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { genderUserEnum } from '@prisma/client';
-import { Type } from 'class-transformer';
-import {
-	IsDate,
-	IsEmail,
-	IsNotEmpty,
-	IsPhoneNumber,
-	IsString,
-	Length,
-	Matches,
-} from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class RegisterRequestDto {
 	@ApiProperty({
@@ -19,6 +10,7 @@ export class RegisterRequestDto {
 	})
 	@IsNotEmpty()
 	@IsString()
+	@Transform(({ value }) => value.trim())
 	username: string;
 
 	@ApiProperty({
@@ -39,6 +31,7 @@ export class RegisterRequestDto {
 	})
 	@IsNotEmpty()
 	@IsString()
+	@Transform(({ value }) => value.trim())
 	@IsEmail()
 	email: string;
 
@@ -48,39 +41,6 @@ export class RegisterRequestDto {
 	})
 	@IsNotEmpty()
 	@IsString()
+	@Transform(({ value }) => value.trim())
 	name: string;
-
-	@ApiProperty({
-		enum: genderUserEnum,
-	})
-	@IsNotEmpty()
-	@IsString()
-	gender: genderUserEnum;
-
-	@ApiProperty({
-		type: 'string',
-		required: true,
-	})
-	@IsNotEmpty()
-	@Type(() => Date)
-	@IsDate()
-	dateOfBirth: Date;
-
-	@ApiProperty({
-		type: 'string',
-		required: true,
-	})
-	@IsNotEmpty()
-	@IsString()
-	@Length(10, 10)
-	@IsPhoneNumber('VN')
-	phoneNumber: string;
-
-	@ApiProperty({
-		type: 'string',
-		required: true,
-	})
-	@IsNotEmpty()
-	@IsString()
-	address: string;
 }

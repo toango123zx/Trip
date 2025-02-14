@@ -37,8 +37,9 @@ export class UserEntity {
 	image: string;
 	@ApiProperty({
 		enum: genderUserEnum,
+		nullable: true,
 	})
-	gender: genderUserEnum;
+	gender: genderUserEnum | null;
 	@ApiProperty({
 		type: 'string',
 	})
@@ -46,16 +47,19 @@ export class UserEntity {
 	@ApiProperty({
 		type: 'string',
 		format: 'date-time',
+		nullable: true,
 	})
-	dateOfBirth: Date;
+	dateOfBirth: Date | null;
 	@ApiProperty({
 		type: 'string',
+		nullable: true,
 	})
-	phoneNumber: string;
+	phoneNumber: string | null;
 	@ApiProperty({
 		type: 'string',
+		nullable: true,
 	})
-	address: string;
+	address: string | null;
 	@ApiProperty({
 		type: 'integer',
 		format: 'int32',

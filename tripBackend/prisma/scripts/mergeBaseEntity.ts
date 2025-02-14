@@ -99,7 +99,6 @@ files.forEach((file) => {
 	];
 
 	updatedContent = updatedContent.replace(modelRegex, (match, modelName, modelBody) => {
-
 		let missingFields = [];
 
 		// Kiểm tra từng trường của BaseEntity
