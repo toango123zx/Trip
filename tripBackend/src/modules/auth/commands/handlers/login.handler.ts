@@ -3,7 +3,11 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 
 import { hash } from 'bcrypt';
-import { HttpResponseBodySuccessDto, UnauthorizedException } from 'src/common';
+import {
+	ForbiddenException,
+	HttpResponseBodySuccessDto,
+	UnauthorizedException,
+} from 'src/common';
 import { jwtConfig } from 'src/configs';
 
 import { AuthRepository } from '../../auth.repository';
@@ -32,6 +36,10 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
 		if (hashedPassword !== account.password) {
 			throw new UnauthorizedException();
+		}
+
+		if (!account.user.role) {
+			throw new ForbiddenException();
 		}
 
 		const payloadToken = {

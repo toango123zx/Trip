@@ -29,36 +29,32 @@ export class UserRepository {
 	}
 
 	async findUserById(id: string): Promise<UserEntity> {
-		try {
-			return this.prismaService.user.findFirst({
-				include: {
-					role: {
-						include: {
-							infoPermission: {
-								include: {
-									permission: true,
-								},
-							},
-						},
-					},
-				},
-				where: {
-					id: id,
-					status: 'active',
-					role: {
-						status: 'active',
+		return this.prismaService.user.findFirst({
+			include: {
+				role: {
+					include: {
 						infoPermission: {
-							every: {
-								permission: {
-									status: 'active',
-								},
+							include: {
+								permission: true,
 							},
 						},
 					},
 				},
-			});
-		} catch (error) {
-			return error;
-		}
+			},
+			where: {
+				id: id,
+				status: 'active',
+				role: {
+					status: 'active',
+					infoPermission: {
+						every: {
+							permission: {
+								status: 'active',
+							},
+						},
+					},
+				},
+			},
+		});
 	}
 }
