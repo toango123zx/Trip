@@ -5,6 +5,12 @@ export class NotFoundException extends HttpException {
 		if (!location) {
 			location = '';
 		}
-		super(`Resource not found ${location}`, HttpStatus.NOT_FOUND);
+		super(
+			{
+				status: 'fail',
+				message: `Resource not found ${location}`,
+			},
+			HttpStatus.NOT_FOUND,
+		);
 	}
 }
