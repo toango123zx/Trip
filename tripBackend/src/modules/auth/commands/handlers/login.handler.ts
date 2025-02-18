@@ -1,11 +1,50 @@
-// import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-// import { LoginCommand } from '../implements';
+import { HttpException, NotFoundException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { JwtService } from '@nestjs/jwt';
 
-// @CommandHandler(LoginCommand)
-// export class LoginHandler implements ICommandHandler<LoginCommand> {
-// 	constructor(private readonly userRepository) {}
+import { hash } from 'bcrypt';
+import { HttpResponseBodySuccessDto, UnauthorizedException } from 'src/common';
+import { jwtConfig } from 'src/configs';
 
-// 	execute(command: LoginCommand): Promise<any> {
-// 		return Promise.resolve();
-// 	}
-// }
+import { AuthRepository } from '../../auth.repository';
+import { LoginResponseDto } from '../../dtos';
+import { LoginCommand } from '../implements';
+
+@CommandHandler(LoginCommand)
+export class LoginHandler implements ICommandHandler<LoginCommand> {
+	constructor(
+		private readonly authRepository: AuthRepository,
+		private readonly jwtService: JwtService,
+	) {}
+
+	async execute(
+		command: LoginCommand,
+	): Promise<HttpResponseBodySuccessDto<LoginResponseDto> | HttpException> {
+		const { loginDto } = command;
+		const account = await this.authRepository.findAccountByUsername(
+			loginDto.username,
+		);
+		if (!account) {
+			throw new NotFoundException('user');
+		}
+
+		const hashedPassword = await hash(loginDto.password, account.salt);
+
+		if (hashedPassword !== account.password) {
+			throw new UnauthorizedException();
+		}
+
+		const payloadToken = {
+			accountId: account.id,
+			userId: account.userId,
+			roleId: account.user.roleId,
+		};
+
+		const accesToken = this.jwtService.sign(payloadToken, {
+			expiresIn: jwtConfig.expiresIn,
+			secret: jwtConfig.secret,
+		});
+
+		return { success: true, data: { accessToken: accesToken } };
+	}
+}

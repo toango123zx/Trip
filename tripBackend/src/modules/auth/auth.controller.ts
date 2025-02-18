@@ -5,8 +5,13 @@ import { ApiTags } from '@nestjs/swagger';
 import { HttpResponseBodyDto } from 'src/common';
 import { DatabaseException } from 'src/common/exceptions/database.exception';
 
-import { RegisterCommand } from './commands/implements';
-import { RegisterRequestDto, RegisterResponseDto } from './dtos';
+import { LoginCommand, RegisterCommand } from './commands/implements';
+import {
+	LoginRequestDto,
+	LoginResponseDto,
+	RegisterRequestDto,
+	RegisterResponseDto,
+} from './dtos';
 
 @UseFilters(DatabaseException)
 @ApiTags('Auth')
@@ -22,5 +27,12 @@ export class AuthController {
 		@Body() registerDto: RegisterRequestDto,
 	): Promise<HttpResponseBodyDto<RegisterResponseDto | HttpException>> {
 		return this.commandBus.execute(new RegisterCommand(registerDto));
+	}
+
+	@Post('login')
+	async loginUser(
+		@Body() loginDto: LoginRequestDto,
+	): Promise<HttpResponseBodyDto<LoginResponseDto | HttpException>> {
+		return this.commandBus.execute(new LoginCommand(loginDto));
 	}
 }

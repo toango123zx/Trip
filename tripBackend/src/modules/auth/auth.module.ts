@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { JwtModule } from '@nestjs/jwt';
 
 import { DatabaseModule } from '../database/database.module';
 import { PrismaService } from '../database/services';
@@ -11,7 +12,7 @@ import { AuthRepository } from './auth.repository';
 import { AuthCommandHandlers } from './commands/handlers';
 
 @Module({
-	imports: [CqrsModule, DatabaseModule],
+	imports: [CqrsModule, DatabaseModule, JwtModule],
 	controllers: [AuthController],
 	providers: [
 		PrismaService,
