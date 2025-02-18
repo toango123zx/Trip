@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 
-import { UnauthorizedException } from 'src/common';
+import { IJwtPayload, UnauthorizedException } from 'src/common';
 import { jwtConfig } from 'src/configs';
 import { UserInformationDto } from 'src/modules/user/dtos';
 
@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
 			throw new UnauthorizedException();
 		}
 		try {
-			const payload = this.jwtService.verify(accessToken, {
+			const payload: IJwtPayload = this.jwtService.verify(accessToken, {
 				secret: jwtConfig.secret,
 			});
 			const user: UserInformationDto = await this.userRepository.findUserById(

@@ -6,6 +6,7 @@ import { hash } from 'bcrypt';
 import {
 	ForbiddenException,
 	HttpResponseBodySuccessDto,
+	IJwtPayload,
 	UnauthorizedException,
 } from 'src/common';
 import { jwtConfig } from 'src/configs';
@@ -42,7 +43,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 			throw new ForbiddenException();
 		}
 
-		const payloadToken = {
+		const payloadToken: IJwtPayload = {
 			accountId: account.id,
 			userId: account.userId,
 			roleName: account.user.role.name,
