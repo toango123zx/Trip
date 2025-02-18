@@ -46,9 +46,11 @@ export class CreateUserDto {
 	image?: string;
 	@ApiProperty({
 		enum: genderUserEnum,
+		required: false,
+		nullable: true,
 	})
-	@IsNotEmpty()
-	gender: genderUserEnum;
+	@IsOptional()
+	gender?: genderUserEnum | null;
 	@ApiProperty({
 		type: 'string',
 	})
@@ -58,22 +60,28 @@ export class CreateUserDto {
 	@ApiProperty({
 		type: 'string',
 		format: 'date-time',
+		required: false,
+		nullable: true,
 	})
-	@IsNotEmpty()
+	@IsOptional()
 	@IsDateString()
-	dateOfBirth: Date;
+	dateOfBirth?: Date | null;
 	@ApiProperty({
 		type: 'string',
+		required: false,
+		nullable: true,
 	})
-	@IsNotEmpty()
+	@IsOptional()
 	@IsString()
-	phoneNumber: string;
+	phoneNumber?: string | null;
 	@ApiProperty({
 		type: 'string',
+		required: false,
+		nullable: true,
 	})
-	@IsNotEmpty()
+	@IsOptional()
 	@IsString()
-	address: string;
+	address?: string | null;
 	@ApiProperty({
 		required: false,
 		nullable: true,

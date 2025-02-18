@@ -120,11 +120,11 @@ model user {
     /// @DtoCreateOptional
     /// @DtoUpdateOptional
     image       String         @default("https://11")
-    gender      genderUserEnum
+    gender      genderUserEnum?
     email       String         @unique
-    dateOfBirth DateTime       @map("date_of_birth")
-    phoneNumber String         @map("phone_number") @db.Char(10)
-    address     String
+    dateOfBirth DateTime?       @map("date_of_birth")
+    phoneNumber String?         @map("phone_number") @db.Char(10)
+    address     String?
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
     balance     Int            @default(0)
