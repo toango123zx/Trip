@@ -19,4 +19,42 @@ export class UserRepository {
 			return error;
 		}
 	}
+
+	async findUsers(): Promise<UserEntity[]> {
+		try {
+			return this.prismaService.user.findMany();
+		} catch (error) {
+			return error;
+		}
+	}
+
+	async findUserById(id: string): Promise<UserEntity> {
+		return this.prismaService.user.findFirst({
+			include: {
+				role: {
+					include: {
+						infoPermission: {
+							include: {
+								permission: true,
+							},
+						},
+					},
+				},
+			},
+			where: {
+				id: id,
+				status: 'active',
+				role: {
+					status: 'active',
+					infoPermission: {
+						every: {
+							permission: {
+								status: 'active',
+							},
+						},
+					},
+				},
+			},
+		});
+	}
 }

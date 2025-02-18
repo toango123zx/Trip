@@ -125,7 +125,7 @@ export class UserEntity {
 		isArray: true,
 		required: false,
 	})
-	Cacartrt?: CartEntity[];
+	cart?: CartEntity[];
 	@ApiProperty({
 		type: () => DiscountEntity,
 		isArray: true,

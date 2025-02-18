@@ -149,7 +149,7 @@ model user {
     accountExternal accountExternal[]
     account         account[]
     bill            bill[]
-    Cacartrt        cart[]
+    cart            cart[]
     discount        discount[]
     boxChatMember   boxChatMember[]
     message         message[]

@@ -32,7 +32,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 			throw new ConflictException('username or email');
 		}
 
-		const roleTourist = await this.roleRepository.getRoleByName('tourist');
+		const roleTourist = await this.roleRepository.findRoleByName('tourist');
 
 		const salt = await genSalt(10);
 		const hashedPassword = await hash(registerDto.password, salt);
