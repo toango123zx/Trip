@@ -3,12 +3,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { genSalt, hash } from 'bcrypt';
 import { ConflictException, HttpResponseBodySuccessDto } from 'src/common';
-import { AccountEntity, CreateAccountDto } from 'src/models';
+import { CreateAccountDto } from 'src/models';
 
 import { RoleRepository } from 'src/modules/role/role.repository';
 import { UserRepository } from 'src/modules/user/user.repository';
 
 import { AuthRepository } from '../../auth.repository';
+import { RegisterResponseDto } from '../../dtos';
 import { RegisterCommand } from '../implements';
 
 @CommandHandler(RegisterCommand)
@@ -21,7 +22,7 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 
 	async execute(
 		command: RegisterCommand,
-	): Promise<HttpResponseBodySuccessDto<AccountEntity> | HttpException> {
+	): Promise<HttpResponseBodySuccessDto<RegisterResponseDto> | HttpException> {
 		const { registerDto } = command;
 		const user = await this.userRepository.findUserByEmail(registerDto.email);
 		const account = await this.authRepository.findAccountByUsername(
@@ -48,10 +49,12 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 			},
 		};
 
-		const newAccount = await this.authRepository.createAccount(accountData);
+		const newAccount: RegisterResponseDto =
+			await this.authRepository.createAccount(accountData);
 
 		delete newAccount.password;
 		delete newAccount.salt;
+		newAccount.name = accountData.user.create.name;
 		return { success: true, data: newAccount };
 	}
 }
