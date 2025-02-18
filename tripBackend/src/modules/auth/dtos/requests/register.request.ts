@@ -10,7 +10,7 @@ export class RegisterRequestDto {
 	})
 	@IsNotEmpty()
 	@IsString()
-	@Transform(({ value }) => value.trim())
+	@Transform(({ value }) => value.trim().toLowerCase())
 	username: string;
 
 	@ApiProperty({

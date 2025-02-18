@@ -10,7 +10,7 @@ export class LoginRequestDto {
 	})
 	@IsNotEmpty()
 	@IsString()
-	@Transform(({ value }) => value.trim())
+	@Transform(({ value }) => value.trim().toLowerCase())
 	username: string;
 	@ApiProperty({
 		type: 'string',
