@@ -19,6 +19,7 @@ export class UserInformationDto implements UserEntity {
 	name: string;
 	roleId: string;
 	role?: RoleEntity;
+	roleName?: string;
 	image: string;
 	gender: $Enums.genderUserEnum;
 	email: string;

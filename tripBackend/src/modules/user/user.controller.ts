@@ -6,10 +6,12 @@ import { HttpResponseBodyDto, PaginationDto } from 'src/common';
 import { RoleEnum } from 'src/common/enums';
 import { UserEntity } from 'src/models';
 
-import { AuthRole } from '../auth/decorators';
+import { Auth, AuthRole } from '../auth/decorators';
 
+import { UserInformationDto } from './dtos';
 import { UserFilterRequestDto } from './dtos/requests/userFilter.request';
-import { GetUserQuery, GetUsersQuery } from './queries/implements';
+import { MyInforamtion } from './guards';
+import { GetMeQuery, GetUserQuery, GetUsersQuery } from './queries/implements';
 
 @ApiTags('User')
 @Controller('user')
@@ -29,8 +31,16 @@ export class UserController {
 		return this.queryBus.execute(new GetUsersQuery(pagination, filter));
 	}
 
-	@Get('/:userId')
+	@Get('/me')
 	@AuthRole(RoleEnum.Admin)
+	async getMe(
+		@MyInforamtion() userInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
+		return this.queryBus.execute(new GetMeQuery(userInformation));
+	}
+
+	@Get('/:userId')
+	@Auth()
 	async getUser(
 		@Param('userId') userId: string,
 	): Promise<HttpResponseBodyDto<UserEntity | HttpException>> {

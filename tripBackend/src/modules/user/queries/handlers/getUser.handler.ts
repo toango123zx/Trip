@@ -21,10 +21,10 @@ export class GetUserQueryHandler implements IQueryHandler<GetUserQuery> {
 			throw new NotFoundException('userId');
 		}
 
-		user.permission = user.role.infoPermission.map(
-			(infoPermission) => infoPermission.permission,
-		);
-		delete user.role.infoPermission;
+		user.roleName = user.role.name;
+		delete user.role;
+		delete user.roleId;
+
 		return {
 			success: true,
 			data: user,
