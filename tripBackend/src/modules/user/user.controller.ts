@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, Query } from '@nestjs/common';
+import { Controller, Get, HttpException, Param, Query } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -9,7 +9,7 @@ import { UserEntity } from 'src/models';
 import { AuthRole } from '../auth/decorators';
 
 import { UserFilterRequestDto } from './dtos/requests/userFilter.request';
-import { GetUsersQuery } from './queries/implements';
+import { GetUserQuery, GetUsersQuery } from './queries/implements';
 
 @ApiTags('User')
 @Controller('user')
@@ -27,5 +27,13 @@ export class UserController {
 		@Query() filter?: UserFilterRequestDto,
 	): Promise<HttpResponseBodyDto<UserEntity[] | HttpException>> {
 		return this.queryBus.execute(new GetUsersQuery(pagination, filter));
+	}
+
+	@Get('/:userId')
+	@AuthRole(RoleEnum.Admin)
+	async getUser(
+		@Param('userId') userId: string,
+	): Promise<HttpResponseBodyDto<UserEntity | HttpException>> {
+		return this.queryBus.execute(new GetUserQuery(userId));
 	}
 }
