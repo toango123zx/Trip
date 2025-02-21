@@ -13,6 +13,7 @@ export class UpdateDiscountDto {
 	name?: string;
 	@ApiProperty({
 		enum: discountProviderTypeEnum,
+		enumName: 'discountProviderTypeEnum',
 		required: false,
 	})
 	@IsOptional()

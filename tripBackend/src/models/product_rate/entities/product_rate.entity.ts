@@ -51,6 +51,7 @@ export class ProductRateEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: productRateStatusEnum,
+		enumName: 'productRateStatusEnum',
 	})
 	status: productRateStatusEnum;
 }

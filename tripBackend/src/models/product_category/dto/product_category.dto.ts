@@ -33,6 +33,7 @@ export class ProductCategoryDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: productStatusEnum,
+		enumName: 'productStatusEnum',
 	})
 	status: productStatusEnum;
 }

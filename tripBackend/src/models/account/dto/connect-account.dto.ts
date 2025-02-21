@@ -19,4 +19,12 @@ export class ConnectAccountDto {
 	@IsOptional()
 	@IsString()
 	username?: string;
+	@ApiProperty({
+		type: 'string',
+		required: false,
+		nullable: true,
+	})
+	@IsOptional()
+	@IsString()
+	userId?: string;
 }

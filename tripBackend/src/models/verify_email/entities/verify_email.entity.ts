@@ -34,6 +34,7 @@ export class VerifyEmailEntity {
 	createAt: Date;
 	@ApiProperty({
 		enum: verifyEmailStatusEnum,
+		enumName: 'verifyEmailStatusEnum',
 	})
 	status: verifyEmailStatusEnum;
 }

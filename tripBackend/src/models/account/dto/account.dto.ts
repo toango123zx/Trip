@@ -37,6 +37,7 @@ export class AccountDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: accountStatusEnum,
+		enumName: 'accountStatusEnum',
 	})
 	status: accountStatusEnum;
 }

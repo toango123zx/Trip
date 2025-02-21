@@ -13,13 +13,6 @@ export class UpdateUserDto {
 	name?: string;
 	@ApiProperty({
 		type: 'string',
-		required: false,
-	})
-	@IsOptional()
-	@IsString()
-	roleId?: string;
-	@ApiProperty({
-		type: 'string',
 		default: 'https://11',
 		required: false,
 	})
@@ -28,6 +21,7 @@ export class UpdateUserDto {
 	image?: string;
 	@ApiProperty({
 		enum: genderUserEnum,
+		enumName: 'genderUserEnum',
 		required: false,
 		nullable: true,
 	})

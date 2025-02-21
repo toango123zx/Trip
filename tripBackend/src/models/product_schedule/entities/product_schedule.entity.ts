@@ -69,6 +69,7 @@ export class ProductScheduleEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: productScheduleStatusEnum,
+		enumName: 'productScheduleStatusEnum',
 	})
 	status: productScheduleStatusEnum;
 	@ApiProperty({

@@ -37,6 +37,21 @@ export class AuthRepository {
 	async createAccount(account: CreateAccountDto): Promise<AccountEntity> {
 		try {
 			return this.prismaService.account.create({
+				include: {
+					user: {
+						include: {
+							role: {
+								include: {
+									infoPermission: {
+										include: {
+											permission: true,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
 				data: account,
 			});
 		} catch (error) {

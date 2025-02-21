@@ -13,6 +13,7 @@ export class UpdateTransactionDto {
 	description?: string;
 	@ApiProperty({
 		enum: transactionTargetEnum,
+		enumName: 'transactionTargetEnum',
 		required: false,
 	})
 	@IsOptional()

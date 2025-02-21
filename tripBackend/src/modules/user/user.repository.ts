@@ -29,6 +29,17 @@ export class UserRepository {
 	): Promise<[UserEntity[], number]> {
 		const [users, totalRecords] = await Promise.all([
 			this.prismaService.user.findMany({
+				include: {
+					role: {
+						include: {
+							infoPermission: {
+								include: {
+									permission: true,
+								}
+							}
+						}
+					}
+				},
 				skip: pagination.skip,
 				take: pagination.take,
 				orderBy: filter,

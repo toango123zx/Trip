@@ -27,6 +27,7 @@ export class CreateAccountExternalDto {
 	user: CreateAccountExternalUserRelationInputDto;
 	@ApiProperty({
 		enum: providerAccountExternalEnum,
+		enumName: 'providerAccountExternalEnum',
 	})
 	@IsNotEmpty()
 	providerAccountExternal: providerAccountExternalEnum;

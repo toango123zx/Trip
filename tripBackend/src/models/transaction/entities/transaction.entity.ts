@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { transactionTargetEnum, transactionStatusEnum } from '@prisma/client';
+import { transactionStatusEnum, transactionTargetEnum } from '@prisma/client';
 
 import { BillEntity } from '../../bill/entities/bill.entity';
 
@@ -19,6 +19,7 @@ export class TransactionEntity {
 	description: string;
 	@ApiProperty({
 		enum: transactionTargetEnum,
+		enumName: 'transactionTargetEnum',
 	})
 	transactionTarget: transactionTargetEnum;
 	@ApiProperty({
@@ -39,6 +40,7 @@ export class TransactionEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: transactionStatusEnum,
+		enumName: 'transactionStatusEnum',
 	})
 	status: transactionStatusEnum;
 	@ApiProperty({

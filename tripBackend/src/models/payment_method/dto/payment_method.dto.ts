@@ -33,6 +33,7 @@ export class PaymentMethodDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: paymentMethodStatusEnum,
+		enumName: 'paymentMethodStatusEnum',
 	})
 	status: paymentMethodStatusEnum;
 }

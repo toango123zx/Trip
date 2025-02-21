@@ -10,8 +10,18 @@ import {
 	ValidateNested,
 } from 'class-validator';
 
+import { ConnectRoleDto } from '../../role/dto/connect-role.dto';
 import { CreateSupplierDto } from '../../supplier/dto/create-supplier.dto';
 
+export class CreateUserRoleRelationInputDto {
+	@ApiProperty({
+		type: ConnectRoleDto,
+	})
+	@IsNotEmpty()
+	@ValidateNested()
+	@Type(() => ConnectRoleDto)
+	connect: ConnectRoleDto;
+}
 export class CreateUserSupplierRelationInputDto {
 	@ApiProperty({
 		type: CreateSupplierDto,
@@ -22,7 +32,12 @@ export class CreateUserSupplierRelationInputDto {
 	create: CreateSupplierDto;
 }
 
-@ApiExtraModels(CreateSupplierDto, CreateUserSupplierRelationInputDto)
+@ApiExtraModels(
+	ConnectRoleDto,
+	CreateUserRoleRelationInputDto,
+	CreateSupplierDto,
+	CreateUserSupplierRelationInputDto,
+)
 export class CreateUserDto {
 	@ApiProperty({
 		type: 'string',
@@ -31,11 +46,12 @@ export class CreateUserDto {
 	@IsString()
 	name: string;
 	@ApiProperty({
-		type: 'string',
+		type: CreateUserRoleRelationInputDto,
 	})
 	@IsNotEmpty()
-	@IsString()
-	roleId: string;
+	@ValidateNested()
+	@Type(() => CreateUserRoleRelationInputDto)
+	role: CreateUserRoleRelationInputDto;
 	@ApiProperty({
 		type: 'string',
 		default: 'https://11',
@@ -46,6 +62,7 @@ export class CreateUserDto {
 	image?: string;
 	@ApiProperty({
 		enum: genderUserEnum,
+		enumName: 'genderUserEnum',
 		required: false,
 		nullable: true,
 	})

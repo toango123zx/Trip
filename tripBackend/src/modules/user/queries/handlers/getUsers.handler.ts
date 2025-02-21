@@ -3,17 +3,17 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { HttpResponseBodySuccessDto, IPaginationQuery } from 'src/common';
 import { UserEntity } from 'src/models';
 
-import { UserOrderByDto } from '../../dtos';
+import { UserInformationDto, UserOrderByDto } from '../../dtos';
 import { UserRepository } from '../../user.repository';
 import { GetUsersQuery } from '../implements';
 
 @QueryHandler(GetUsersQuery)
-export class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery> {
+export class GetUsersHandler implements IQueryHandler<GetUsersQuery> {
 	constructor(private readonly userRepository: UserRepository) {}
 
 	public async execute(
 		query: GetUsersQuery,
-	): Promise<HttpResponseBodySuccessDto<UserEntity[]>> {
+	): Promise<HttpResponseBodySuccessDto<UserInformationDto[]>> {
 		const skip = (query.pagination.page - 1) * query.pagination.limit;
 
 		const pagination: IPaginationQuery = {
@@ -35,11 +35,14 @@ export class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery> {
 			pagination,
 			userOrderBy,
 		);
+		const usersInformation = users.map((user) =>
+			new UserInformationDto(user).getUserInformation(),
+		);
 
 		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
 		return {
 			success: true,
-			data: users,
+			data: usersInformation,
 			pagination: {
 				totalItems: totalRecords,
 				itemsPerPage: users.length,

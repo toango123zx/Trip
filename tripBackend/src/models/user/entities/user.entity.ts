@@ -37,6 +37,7 @@ export class UserEntity {
 	image: string;
 	@ApiProperty({
 		enum: genderUserEnum,
+		enumName: 'genderUserEnum',
 		nullable: true,
 	})
 	gender: genderUserEnum | null;
@@ -88,6 +89,7 @@ export class UserEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: userStatusEnum,
+		enumName: 'userStatusEnum',
 	})
 	status: userStatusEnum;
 	@ApiProperty({
@@ -104,16 +106,16 @@ export class UserEntity {
 	productRate?: ProductRateEntity[];
 	@ApiProperty({
 		type: () => AccountExternalEntity,
-		isArray: true,
 		required: false,
+		nullable: true,
 	})
-	accountExternal?: AccountExternalEntity[];
+	accountExternal?: AccountExternalEntity | null;
 	@ApiProperty({
 		type: () => AccountEntity,
-		isArray: true,
 		required: false,
+		nullable: true,
 	})
-	account?: AccountEntity[];
+	account?: AccountEntity | null;
 	@ApiProperty({
 		type: () => BillEntity,
 		isArray: true,

@@ -33,6 +33,7 @@ export class PermissionDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: permissionStatusEnum,
+		enumName: 'permissionStatusEnum',
 	})
 	status: permissionStatusEnum;
 }

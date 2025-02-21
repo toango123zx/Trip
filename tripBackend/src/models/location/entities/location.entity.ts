@@ -20,6 +20,7 @@ export class LocationEntity {
 	displayName: string;
 	@ApiProperty({
 		enum: cityEnum,
+		enumName: 'cityEnum',
 	})
 	city: cityEnum;
 	@ApiProperty({
@@ -49,6 +50,7 @@ export class LocationEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: locationStatusEnum,
+		enumName: 'locationStatusEnum',
 	})
 	status: locationStatusEnum;
 	@ApiProperty({

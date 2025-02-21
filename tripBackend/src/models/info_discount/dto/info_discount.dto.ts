@@ -25,6 +25,7 @@ export class InfoDiscountDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: infoDiscountStatusEnum,
+		enumName: 'infoDiscountStatusEnum',
 	})
 	status: infoDiscountStatusEnum;
 }

@@ -33,6 +33,7 @@ export class DiscountApplicationScopeDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: discountApplicationScopeStatusEnum,
+		enumName: 'discountApplicationScopeStatusEnum',
 	})
 	status: discountApplicationScopeStatusEnum;
 }

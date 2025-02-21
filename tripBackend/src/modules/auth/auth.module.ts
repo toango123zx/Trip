@@ -21,6 +21,6 @@ import { AuthCommandHandlers } from './commands/handlers';
 		RoleRepository,
 		...AuthCommandHandlers,
 	],
-	exports: [JwtModule],
+	exports: [JwtModule, AuthRepository],
 })
 export class AuthModule {}

@@ -18,6 +18,7 @@ export class CreateTransactionDto {
 	description: string;
 	@ApiProperty({
 		enum: transactionTargetEnum,
+		enumName: 'transactionTargetEnum',
 	})
 	@IsNotEmpty()
 	transactionTarget: transactionTargetEnum;

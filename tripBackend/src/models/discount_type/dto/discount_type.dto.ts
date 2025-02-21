@@ -33,6 +33,7 @@ export class DiscountTypeDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: discountTypeStatusEnum,
+		enumName: 'discountTypeStatusEnum',
 	})
 	status: discountTypeStatusEnum;
 }

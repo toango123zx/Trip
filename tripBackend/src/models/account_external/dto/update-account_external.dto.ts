@@ -6,6 +6,7 @@ import { IsOptional, IsString } from 'class-validator';
 export class UpdateAccountExternalDto {
 	@ApiProperty({
 		enum: providerAccountExternalEnum,
+		enumName: 'providerAccountExternalEnum',
 		required: false,
 	})
 	@IsOptional()
