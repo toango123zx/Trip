@@ -6,6 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ValidationException } from './common';
 import { DatabaseException } from './common/exceptions/database.exception';
 import { HttpExceptionFilter } from './common/filters/exception.filter';
+import * as morgan from 'morgan';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, { cors: true });
@@ -21,6 +22,7 @@ async function bootstrap() {
 
 	const port = commonAppConfig.port;
 	setupSwagger(app);
+	app.use(morgan('combined'));
 
 	await app.listen(port);
 

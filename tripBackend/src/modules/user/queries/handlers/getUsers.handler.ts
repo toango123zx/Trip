@@ -8,7 +8,7 @@ import { UserRepository } from '../../user.repository';
 import { GetUsersQuery } from '../implements';
 
 @QueryHandler(GetUsersQuery)
-export class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery> {
+export class GetUsersHandler implements IQueryHandler<GetUsersQuery> {
 	constructor(private readonly userRepository: UserRepository) {}
 
 	public async execute(

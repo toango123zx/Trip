@@ -1,5 +1,5 @@
 export enum PermissionEnum {
 	FindUsers = 'find_users',
 	FindUser = 'find_user',
-	CreateAdministratorAccount = 'create_administrator_account',
+	UpdateAdministratorRoleForUser = 'update_administrator_role_for_user',
 }

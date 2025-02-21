@@ -1,9 +1,5 @@
 import { GetMeHandler } from './getMe.handler';
-import { GetUserQueryHandler } from './getUser.handler';
-import { GetUsersQueryHandler } from './getUsers.handler';
+import { GetUserByUserIdHandler } from './getUserByUserId.handler';
+import { GetUsersHandler } from './getUsers.handler';
 
-export const UserQueryHandlers = [
-	GetUsersQueryHandler,
-	GetMeHandler,
-	GetUserQueryHandler,
-];
+export const UserQueryHandlers = [GetMeHandler, GetUserByUserIdHandler, GetUsersHandler];

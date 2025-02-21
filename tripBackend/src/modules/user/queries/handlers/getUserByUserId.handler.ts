@@ -5,14 +5,14 @@ import { UserEntity } from 'src/models';
 
 import { UserInformationDto } from '../../dtos';
 import { UserRepository } from '../../user.repository';
-import { GetUserQuery } from '../implements';
+import { GetUserByUserIdQuery } from '../implements';
 
-@QueryHandler(GetUserQuery)
-export class GetUserQueryHandler implements IQueryHandler<GetUserQuery> {
+@QueryHandler(GetUserByUserIdQuery)
+export class GetUserByUserIdHandler implements IQueryHandler<GetUserByUserIdQuery> {
 	constructor(private readonly userRepository: UserRepository) {}
 
 	public async execute(
-		query: GetUserQuery,
+		query: GetUserByUserIdQuery,
 	): Promise<HttpResponseBodySuccessDto<UserEntity>> {
 		const user: UserInformationDto = await this.userRepository.findUserById(
 			query.userId,

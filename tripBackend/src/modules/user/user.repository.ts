@@ -67,4 +67,27 @@ export class UserRepository {
 			},
 		});
 	}
+
+	async updateAdminUserRole(userId: string, roleId: string): Promise<UserEntity> {
+		return this.prismaService.user.update({
+			include: {
+				role: true,
+			},
+			where: {
+				id: userId,
+				status: 'active',
+				roleId: {
+					not: roleId,
+				},
+			},
+			data: {
+				role: {
+					connect: {
+						id: roleId,
+						status: 'active',
+					},
+				},
+			},
+		});
+	}
 }
