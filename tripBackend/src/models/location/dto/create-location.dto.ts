@@ -32,6 +32,7 @@ export class CreateLocationDto {
 	displayName: string;
 	@ApiProperty({
 		enum: cityEnum,
+		enumName: 'cityEnum',
 	})
 	@IsNotEmpty()
 	city: cityEnum;

@@ -36,6 +36,7 @@ export class RoleEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: roleStatusEnum,
+		enumName: 'roleStatusEnum',
 	})
 	status: roleStatusEnum;
 	@ApiProperty({

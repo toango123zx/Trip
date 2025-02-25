@@ -112,42 +112,42 @@ model infoPermission {
 }
 
 model user {
-    id          String         @id @default(cuid())
+    id          String          @id @default(cuid())
     name        String
-    /// @DtoRelationIncludeId
-    roleId      String         @map("role_id")
-    role        role           @relation(fields: [roleId], references: [id])
+    roleId      String          @map("role_id")
+    /// @DtoRelationCanConnectOnCreate
+    role        role            @relation(fields: [roleId], references: [id])
     /// @DtoCreateOptional
     /// @DtoUpdateOptional
-    image       String         @default("https://11")
+    image       String          @default("https://11")
     gender      genderUserEnum?
-    email       String         @unique
+    email       String          @unique
     dateOfBirth DateTime?       @map("date_of_birth")
     phoneNumber String?         @map("phone_number") @db.Char(10)
     address     String?
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    balance     Int            @default(0)
+    balance     Int             @default(0)
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    point       Int            @default(0)
-    createAt    DateTime       @default(now()) @map("create_at")
+    point       Int             @default(0)
+    createAt    DateTime        @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    updateAt    DateTime       @updatedAt @map("update_at")
+    updateAt    DateTime        @updatedAt @map("update_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    deletedAt   DateTime?      @map("deleted_at")
+    deletedAt   DateTime?       @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status      userStatusEnum @default(active)
+    status      userStatusEnum  @default(active)
 
     ///@DtoRelationCanCreateOnCreate
     supplier supplier?
 
     productRate     productRate[]
-    accountExternal accountExternal[]
-    account         account[]
+    accountExternal accountExternal?
+    account         account?
     bill            bill[]
     cart            cart[]
     discount        discount[]
@@ -160,7 +160,7 @@ model user {
 model accountExternal {
     id                      String                      @id @default(cuid())
     /// @DtoUpdateHidden
-    user_id                 String                      @map("userId")
+    user_id                 String                      @unique @map("userId")
     /// @DtoRelationCanConnectOnCreate
     user                    user                        @relation(fields: [user_id], references: [id])
     providerAccountExternal providerAccountExternalEnum @map("provider_account_external")
@@ -188,7 +188,7 @@ model account {
     /// @DtoUpdateHidden
     salt        String
     /// @DtoUpdateHidden
-    userId      String            @map("user_id")
+    userId      String            @unique @map("user_id")
     /// @DtoRelationCanCreateOnCreate
     user        user              @relation(fields: [userId], references: [id])
     createAt    DateTime          @default(now()) @map("create_at")

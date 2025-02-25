@@ -49,6 +49,7 @@ export class AccountEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: accountStatusEnum,
+		enumName: 'accountStatusEnum',
 	})
 	status: accountStatusEnum;
 	@ApiProperty({

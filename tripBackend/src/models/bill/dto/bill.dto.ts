@@ -35,6 +35,7 @@ export class BillDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: billStatusEnum,
+		enumName: 'billStatusEnum',
 	})
 	status: billStatusEnum;
 }

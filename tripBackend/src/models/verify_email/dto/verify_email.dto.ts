@@ -23,6 +23,7 @@ export class VerifyEmailDto {
 	createAt: Date;
 	@ApiProperty({
 		enum: verifyEmailStatusEnum,
+		enumName: 'verifyEmailStatusEnum',
 	})
 	status: verifyEmailStatusEnum;
 }

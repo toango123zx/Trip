@@ -41,6 +41,7 @@ export class MapAddressEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: mapAddressStatusEnum,
+		enumName: 'mapAddressStatusEnum',
 	})
 	mapAddressStatus: mapAddressStatusEnum;
 	@ApiProperty({

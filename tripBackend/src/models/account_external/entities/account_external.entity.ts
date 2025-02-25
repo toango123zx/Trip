@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { providerAccountExternalEnum, accountExternalStatusEnum } from '@prisma/client';
+import { accountExternalStatusEnum, providerAccountExternalEnum } from '@prisma/client';
 
 import { UserEntity } from '../../user/entities/user.entity';
 
@@ -20,6 +20,7 @@ export class AccountExternalEntity {
 	user?: UserEntity;
 	@ApiProperty({
 		enum: providerAccountExternalEnum,
+		enumName: 'providerAccountExternalEnum',
 	})
 	providerAccountExternal: providerAccountExternalEnum;
 	@ApiProperty({
@@ -44,6 +45,7 @@ export class AccountExternalEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: accountExternalStatusEnum,
+		enumName: 'accountExternalStatusEnum',
 	})
 	status: accountExternalStatusEnum;
 }

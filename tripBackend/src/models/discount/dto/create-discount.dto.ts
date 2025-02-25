@@ -34,6 +34,7 @@ export class CreateDiscountDto {
 	name: string;
 	@ApiProperty({
 		enum: discountProviderTypeEnum,
+		enumName: 'discountProviderTypeEnum',
 	})
 	@IsNotEmpty()
 	discountProviderType: discountProviderTypeEnum;

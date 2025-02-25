@@ -17,6 +17,7 @@ export class LocationDto {
 	displayName: string;
 	@ApiProperty({
 		enum: cityEnum,
+		enumName: 'cityEnum',
 	})
 	city: cityEnum;
 	@ApiProperty({
@@ -37,6 +38,7 @@ export class LocationDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: locationStatusEnum,
+		enumName: 'locationStatusEnum',
 	})
 	status: locationStatusEnum;
 }

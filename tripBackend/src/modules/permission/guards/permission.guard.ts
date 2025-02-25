@@ -25,10 +25,13 @@ export class PermissionGuard implements CanActivate {
 			throw new ForbiddenException();
 		}
 
-		const access =
-			user.permission?.every((permission) =>
-				requiredPermission.includes(permission.name as PermissionEnum),
-			) ?? false;
+		const userPermission = user.permission.map(
+			(permission) => permission.name as PermissionEnum,
+		);
+
+		const access = requiredPermission.every((permission) =>
+			userPermission.includes(permission),
+		);
 		if (!access) {
 			throw new ForbiddenException();
 		}

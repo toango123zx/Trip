@@ -35,6 +35,7 @@ export class PermissionEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: permissionStatusEnum,
+		enumName: 'permissionStatusEnum',
 	})
 	status: permissionStatusEnum;
 	@ApiProperty({

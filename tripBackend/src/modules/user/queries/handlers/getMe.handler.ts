@@ -10,8 +10,11 @@ export class GetMeHandler implements IQueryHandler<GetMeQuery> {
 	async execute(
 		query: GetMeQuery,
 	): Promise<HttpResponseBodySuccessDto<UserInformationDto>> {
-		const { roleId, role, permission, ...user } = query.userInformation;
-		user.roleName = role?.name;
+		const user: UserInformationDto = query.userInformation;
+		user.roleName = user.role?.name;
+		delete user.role;
+		delete user.roleId;
+		delete user.permission;
 
 		return {
 			success: true,

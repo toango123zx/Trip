@@ -1,17 +1,18 @@
-import { Controller, Get, HttpException, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { HttpResponseBodyDto, PaginationDto } from 'src/common';
-import { RoleEnum } from 'src/common/enums';
+import { PermissionEnum, RoleEnum } from 'src/common/enums';
 import { UserEntity } from 'src/models';
 
-import { Auth, AuthRole } from '../auth/decorators';
+import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
 
-import { UserInformationDto } from './dtos';
+import { CreateUserCommand } from './commands/implements';
+import { CreateUserRequestDto, UserInformationDto } from './dtos';
 import { UserFilterRequestDto } from './dtos/requests/userFilter.request';
 import { MyInforamtion } from './guards';
-import { GetMeQuery, GetUserQuery, GetUsersQuery } from './queries/implements';
+import { GetMeQuery, GetUserByUserIdQuery, GetUsersQuery } from './queries/implements';
 
 @ApiTags('User')
 @Controller('user')
@@ -27,12 +28,12 @@ export class UserController {
 	async getUsers(
 		@Query() pagination: PaginationDto,
 		@Query() filter?: UserFilterRequestDto,
-	): Promise<HttpResponseBodyDto<UserEntity[] | HttpException>> {
+	): Promise<HttpResponseBodyDto<UserInformationDto[] | HttpException>> {
 		return this.queryBus.execute(new GetUsersQuery(pagination, filter));
 	}
 
 	@Get('/me')
-	@AuthRole(RoleEnum.Admin)
+	@Auth()
 	async getMe(
 		@MyInforamtion() userInformation: UserInformationDto,
 	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
@@ -40,10 +41,18 @@ export class UserController {
 	}
 
 	@Get('/:userId')
-	@Auth()
-	async getUser(
+	@AuthPermission(PermissionEnum.FindUser)
+	async findUserByUserId(
 		@Param('userId') userId: string,
-	): Promise<HttpResponseBodyDto<UserEntity | HttpException>> {
-		return this.queryBus.execute(new GetUserQuery(userId));
+	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
+		return this.queryBus.execute(new GetUserByUserIdQuery(userId));
+	}
+
+	@Post()
+	@AuthPermission(PermissionEnum.CreateUser)
+	async createUser(
+		@Body() user: CreateUserRequestDto,
+	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
+		return this.commandBus.execute(new CreateUserCommand(user));
 	}
 }

@@ -5,24 +5,24 @@ import { genSalt, hash } from 'bcrypt';
 import { ConflictException, HttpResponseBodySuccessDto } from 'src/common';
 import { CreateAccountDto } from 'src/models';
 
+import { AuthRepository } from 'src/modules/auth/auth.repository';
 import { RoleRepository } from 'src/modules/role/role.repository';
-import { UserRepository } from 'src/modules/user/user.repository';
 
-import { AuthRepository } from '../../auth.repository';
-import { RegisterResponseDto } from '../../dtos';
-import { RegisterCommand } from '../implements';
+import { UserInformationDto } from '../../dtos';
+import { UserRepository } from '../../user.repository';
+import { CreateUserCommand } from '../implements';
 
-@CommandHandler(RegisterCommand)
-export class RegisterHandler implements ICommandHandler<RegisterCommand> {
+@CommandHandler(CreateUserCommand)
+export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 	constructor(
 		private readonly authRepository: AuthRepository,
-		private readonly userRepository: UserRepository,
 		private readonly roleRepository: RoleRepository,
+		private readonly userRepository: UserRepository,
 	) {}
 
 	async execute(
-		command: RegisterCommand,
-	): Promise<HttpResponseBodySuccessDto<RegisterResponseDto> | HttpException> {
+		command: CreateUserCommand,
+	): Promise<HttpResponseBodySuccessDto<UserInformationDto> | HttpException> {
 		const { registerDto } = command;
 		const user = await this.userRepository.findUserByEmail(registerDto.email);
 		const account = await this.authRepository.findAccountByUsername(
@@ -32,10 +32,11 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 			throw new ConflictException('username or email');
 		}
 
-		const roleTourist = await this.roleRepository.findRoleByName('tourist');
+		const role = await this.roleRepository.findRoleByName(registerDto.roleName);
 
 		const salt = await genSalt(10);
 		const hashedPassword = await hash(registerDto.password, salt);
+
 		const accountData: CreateAccountDto = {
 			username: registerDto.username,
 			password: hashedPassword,
@@ -46,20 +47,17 @@ export class RegisterHandler implements ICommandHandler<RegisterCommand> {
 					email: registerDto.email,
 					role: {
 						connect: {
-							id: roleTourist.id,
+							id: role.id,
 						},
 					},
 				},
 			},
 		};
 
-		const newAccount: RegisterResponseDto =
-			await this.authRepository.createAccount(accountData);
+		const newAccount = await this.authRepository.createAccount(accountData);
+		const userInfomation =
+			UserInformationDto.constructorFromAccount(newAccount).getUserInformation();
 
-		delete newAccount.password;
-		delete newAccount.salt;
-		newAccount.name = accountData.user.create.name;
-		delete newAccount.user;
-		return { success: true, data: newAccount };
+		return { success: true, data: userInfomation };
 	}
 }

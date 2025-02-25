@@ -20,6 +20,7 @@ export class UpdateLocationDto {
 	displayName?: string;
 	@ApiProperty({
 		enum: cityEnum,
+		enumName: 'cityEnum',
 		required: false,
 	})
 	@IsOptional()

@@ -35,6 +35,7 @@ export class DiscountApplicationScopeEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: discountApplicationScopeStatusEnum,
+		enumName: 'discountApplicationScopeStatusEnum',
 	})
 	status: discountApplicationScopeStatusEnum;
 	@ApiProperty({

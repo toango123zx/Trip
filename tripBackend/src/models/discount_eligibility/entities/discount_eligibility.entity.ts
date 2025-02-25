@@ -35,6 +35,7 @@ export class DiscountEligibilityEntity {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: discountEligibilityStatusEnum,
+		enumName: 'discountEligibilityStatusEnum',
 	})
 	status: discountEligibilityStatusEnum;
 	@ApiProperty({

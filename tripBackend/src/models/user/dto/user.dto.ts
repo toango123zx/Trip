@@ -14,13 +14,10 @@ export class UserDto {
 	@ApiProperty({
 		type: 'string',
 	})
-	roleId: string;
-	@ApiProperty({
-		type: 'string',
-	})
 	image: string;
 	@ApiProperty({
 		enum: genderUserEnum,
+		enumName: 'genderUserEnum',
 		nullable: true,
 	})
 	gender: genderUserEnum | null;
@@ -72,6 +69,7 @@ export class UserDto {
 	deletedAt: Date | null;
 	@ApiProperty({
 		enum: userStatusEnum,
+		enumName: 'userStatusEnum',
 	})
 	status: userStatusEnum;
 }
