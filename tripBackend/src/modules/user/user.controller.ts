@@ -1,15 +1,27 @@
-import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Get,
+	HttpException,
+	Param,
+	Patch,
+	Post,
+	Query,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { HttpResponseBodyDto, PaginationDto } from 'src/common';
 import { PermissionEnum, RoleEnum } from 'src/common/enums';
-import { UserEntity } from 'src/models';
 
 import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
 
-import { CreateUserCommand } from './commands/implements';
-import { CreateUserRequestDto, UserInformationDto } from './dtos';
+import { CreateUserCommand, ResetUserPasswordCommand } from './commands/implements';
+import {
+	CreateUserRequestDto,
+	ResetUserPasswordResponseDto,
+	UserInformationDto,
+} from './dtos';
 import { UserFilterRequestDto } from './dtos/requests/userFilter.request';
 import { MyInforamtion } from './guards';
 import { GetMeQuery, GetUserByUserIdQuery, GetUsersQuery } from './queries/implements';
@@ -23,7 +35,7 @@ export class UserController {
 	) {}
 
 	@Get()
-	@ApiOperation({ summary: 'Get paginated list of users for admin' })
+	@ApiOperation({ summary: 'Get paginated list of users for tadmin' })
 	@AuthRole(RoleEnum.Admin)
 	async getUsers(
 		@Query() pagination: PaginationDto,
@@ -54,5 +66,13 @@ export class UserController {
 		@Body() user: CreateUserRequestDto,
 	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
 		return this.commandBus.execute(new CreateUserCommand(user));
+	}
+
+	@Patch('/:userId/reset-password')
+	@AuthPermission(PermissionEnum.ResetUserPassword)
+	async resetUserPassword(
+		@Param('userId') userId: string,
+	): Promise<HttpResponseBodyDto<ResetUserPasswordResponseDto | HttpException>> {
+		return this.commandBus.execute(new ResetUserPasswordCommand(userId));
 	}
 }

@@ -1,7 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { HttpResponseBodySuccessDto, IPaginationQuery } from 'src/common';
-import { UserEntity } from 'src/models';
 
 import { UserInformationDto, UserOrderByDto } from '../../dtos';
 import { UserRepository } from '../../user.repository';

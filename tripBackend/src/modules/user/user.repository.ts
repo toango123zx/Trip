@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { IPaginationQuery } from 'src/common';
-import { UserEntity } from 'src/models';
+import { UpdateUserDto, UserEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -35,10 +35,10 @@ export class UserRepository {
 							infoPermission: {
 								include: {
 									permission: true,
-								}
-							}
-						}
-					}
+								},
+							},
+						},
+					},
 				},
 				skip: pagination.skip,
 				take: pagination.take,
@@ -76,6 +76,27 @@ export class UserRepository {
 					},
 				},
 			},
+		});
+	}
+
+	async updateUserByUserId(userId: string, user: UpdateUserDto): Promise<UserEntity> {
+		return this.prismaService.user.update({
+			include: {
+				role: {
+					include: {
+						infoPermission: {
+							include: {
+								permission: true,
+							},
+						},
+					},
+				},
+			},
+			where: {
+				id: userId,
+				status: 'active',
+			},
+			data: user,
 		});
 	}
 }
