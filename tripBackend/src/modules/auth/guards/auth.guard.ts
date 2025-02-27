@@ -26,7 +26,7 @@ export class AuthGuard implements CanActivate {
 				secret: jwtConfig.secret,
 			});
 			const user: UserInformationDto = new UserInformationDto(
-				await this.userRepository.findUserById(payload.userId),
+				await this.userRepository.findUserByUserId(payload.userId),
 			);
 
 			user.permission = user.role.infoPermission.map(

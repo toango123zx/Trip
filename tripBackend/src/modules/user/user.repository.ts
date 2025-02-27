@@ -49,7 +49,7 @@ export class UserRepository {
 		return [users, totalRecords];
 	}
 
-	async findUserById(id: string): Promise<UserEntity> {
+	async findUserByUserId(userId: string): Promise<UserEntity> {
 		return this.prismaService.user.findFirst({
 			include: {
 				role: {
@@ -63,7 +63,7 @@ export class UserRepository {
 				},
 			},
 			where: {
-				id: id,
+				id: userId,
 				status: 'active',
 				role: {
 					status: 'active',
