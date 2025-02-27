@@ -1,7 +1,14 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
 import { genderUserEnum } from '@prisma/client';
-import { IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
+import {
+	IsEmail,
+	IsEnum,
+	IsOptional,
+	IsPhoneNumber,
+	IsString,
+	IsUrl,
+} from 'class-validator';
 import { RoleEnum } from 'src/common';
 import { AutoTrim } from 'src/common/decorators';
 import { UpdateUserDto } from 'src/models';
@@ -22,6 +29,7 @@ export class UpdateUserInformationByUserIdRequestDto extends OmitType(UpdateUser
 	@AutoTrim()
 	name?: string;
 	@AutoTrim()
+	@IsUrl()
 	image?: string;
 	@AutoTrim()
 	gender?: genderUserEnum | null;

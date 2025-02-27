@@ -1,7 +1,8 @@
-import { ConflictException, HttpException } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import {
+	ConflictException,
 	HttpResponseBodySuccessDto,
 	NotFoundException,
 	ObjectComparerDto,
