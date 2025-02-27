@@ -183,13 +183,12 @@ model account {
     id          String            @id @default(cuid())
     /// @DtoUpdateHidden
     username    String            @unique
-    /// @DtoUpdateHidden
     password    String
-    /// @DtoUpdateHidden
     salt        String
     /// @DtoUpdateHidden
     userId      String            @unique @map("user_id")
     /// @DtoRelationCanCreateOnCreate
+    /// @DtoUpdateHidden
     user        user              @relation(fields: [userId], references: [id])
     createAt    DateTime          @default(now()) @map("create_at")
     /// @DtoCreateHidden

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { AccountEntity, CreateAccountDto } from 'src/models';
+import { AccountEntity, CreateAccountDto, UpdateAccountDto } from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -34,6 +34,18 @@ export class AuthRepository {
 		}
 	}
 
+	async findAccountByUserId(userId: string): Promise<AccountEntity> {
+		return this.prismaService.account.findFirst({
+			include: {
+				user: true,
+			},
+			where: {
+				userId: userId,
+				status: 'active',
+			},
+		});
+	}
+
 	async createAccount(account: CreateAccountDto): Promise<AccountEntity> {
 		try {
 			return this.prismaService.account.create({
@@ -51,6 +63,26 @@ export class AuthRepository {
 							},
 						},
 					},
+				},
+				data: account,
+			});
+		} catch (error) {
+			return error;
+		}
+	}
+
+	async updateAccountByAccountId(
+		accountId: string,
+		account: UpdateAccountDto,
+	): Promise<AccountEntity> {
+		try {
+			return this.prismaService.account.update({
+				include: {
+					user: true,
+				},
+				where: {
+					id: accountId,
+					status: 'active',
 				},
 				data: account,
 			});
