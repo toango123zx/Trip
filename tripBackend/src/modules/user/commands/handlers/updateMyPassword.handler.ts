@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { genSalt, hash } from 'bcrypt';
+import { genSalt, hash, compare } from 'bcrypt';
 import {
 	HttpResponseBodySuccessDto,
 	optionalException,
@@ -22,8 +22,8 @@ export class UpdateMyPasswordHandler implements ICommandHandler<UpdateMyPassword
 	): Promise<HttpResponseBodySuccessDto | HttpException> {
 		const { currentPassword, newPassword, userInformation } = command;
 		const account = await this.authRepository.findAccountByUserId(userInformation.id);
-		const currentHashedPassword = await hash(currentPassword, account.salt);
-		if (currentHashedPassword != account.password) {
+		const isPasswordValid = await compare(currentPassword, account.password);
+		if (!isPasswordValid) {
 			throw new optionalException(
 				HttpStatus.FORBIDDEN,
 				'Current password is incorrect',
