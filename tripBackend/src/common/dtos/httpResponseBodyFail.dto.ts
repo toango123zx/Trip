@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { HttpResponseBodyDto } from './httpResponseBody.dto';
 
-export class HttpResponseBodyFailDto<T> extends HttpResponseBodyDto<T> {
+export class HttpResponseBodyFailDto<T = undefined> extends HttpResponseBodyDto<T> {
 	@ApiProperty({
 		required: true,
 		nullable: false,
