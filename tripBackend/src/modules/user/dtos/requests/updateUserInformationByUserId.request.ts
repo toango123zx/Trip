@@ -1,9 +1,9 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
 import { genderUserEnum } from '@prisma/client';
-import { Transform } from 'class-transformer';
 import { IsEmail, IsEnum, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 import { RoleEnum } from 'src/common';
+import { AutoTrim } from 'src/common/decorators';
 import { UpdateUserDto } from 'src/models';
 
 export class UpdateUserInformationByUserIdRequestDto extends OmitType(UpdateUserDto, [
@@ -19,20 +19,20 @@ export class UpdateUserInformationByUserIdRequestDto extends OmitType(UpdateUser
 	@IsString()
 	@IsEnum(RoleEnum)
 	roleName?: RoleEnum;
-	@Transform(({ value }) => value.trim())
+	@AutoTrim()
 	name?: string;
-	@Transform(({ value }) => value.trim())
+	@AutoTrim()
 	image?: string;
-	@Transform(({ value }) => value.trim())
+	@AutoTrim()
 	gender?: genderUserEnum | null;
-	@Transform(({ value }) => value.trim())
+	@AutoTrim()
 	@IsEmail()
 	email?: string;
-	@Transform(({ value }) => value.trim())
+	@AutoTrim()
 	dateOfBirth?: Date | null;
-	@Transform(({ value }) => value.trim())
+	@AutoTrim()
 	@IsPhoneNumber('VN')
 	phoneNumber?: string | null;
-	@Transform(({ value }) => value.trim())
+	@AutoTrim()
 	address?: string | null;
 }
