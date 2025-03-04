@@ -31,7 +31,7 @@ export class UpdateMyInformationHandler
 			return {
 				success: true,
 				data: new UserInformationDto(myInformation).getUserInformation(),
-			};	
+			};
 		}
 
 		if (updateUserData.email) {

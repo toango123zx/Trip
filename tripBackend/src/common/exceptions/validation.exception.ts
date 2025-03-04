@@ -3,13 +3,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 
 export class ValidationException extends HttpException {
-	constructor(errors: ValidationError[]) {
-		// const formattedErrors = errors.map((err) => ({
-		// 	field: err.property,
-		// 	message: Object.values(err.constraints)[0],
-		// }));
-		const message = Object.values(errors[0].constraints)[0];
-
+	constructor(message: string = 'request validation data failed') {
 		super(
 			{
 				status: 'fail',
@@ -17,5 +11,10 @@ export class ValidationException extends HttpException {
 			},
 			HttpStatus.UNPROCESSABLE_ENTITY,
 		);
+	}
+
+	static fromValidationError(errors: ValidationError[]): ValidationException {
+		const message = Object.values(errors[0].constraints)[0];
+		return new ValidationException(message);
 	}
 }

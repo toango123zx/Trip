@@ -1,20 +1,13 @@
 import { $Enums } from '@prisma/client';
 import {
 	AccountEntity,
-	AccountExternalEntity,
-	BillEntity,
-	BoxChatMemberEntity,
-	CartEntity,
-	DiscountEntity,
-	MessageEntity,
 	PermissionEntity,
-	ProductRateEntity,
 	RoleEntity,
 	SupplierEntity,
 	UserEntity,
 } from 'src/models';
 
-export class UserInformationDto implements UserEntity {
+export class UserInformationDto {
 	id: string;
 	name: string;
 	roleId: string;
@@ -33,14 +26,6 @@ export class UserInformationDto implements UserEntity {
 	deletedAt: Date;
 	status: $Enums.userStatusEnum;
 	supplier?: SupplierEntity;
-	productRate?: ProductRateEntity[];
-	accountExternal?: AccountExternalEntity;
-	account?: AccountEntity;
-	bill?: BillEntity[];
-	cart?: CartEntity[];
-	discount?: DiscountEntity[];
-	boxChatMember?: BoxChatMemberEntity[];
-	message?: MessageEntity[];
 	permission?: PermissionEntity[];
 
 	constructor(user: UserEntity) {
@@ -62,14 +47,6 @@ export class UserInformationDto implements UserEntity {
 		this.deletedAt = user.deletedAt;
 		this.status = user.status;
 		this.supplier = user.supplier;
-		this.productRate = user.productRate;
-		this.accountExternal = user.accountExternal;
-		this.account = user.account;
-		this.bill = user.bill;
-		this.cart = user.cart;
-		this.discount = user.discount;
-		this.boxChatMember = user.boxChatMember;
-		this.message = user.message;
 		this.permission = user.role?.infoPermission?.map(
 			(inforPermission) => inforPermission.permission,
 		);

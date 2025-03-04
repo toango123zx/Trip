@@ -2,6 +2,7 @@ import {
 	Body,
 	Controller,
 	Get,
+	HttpCode,
 	HttpException,
 	Param,
 	Patch,
@@ -12,7 +13,12 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { HttpResponseBodyDto, PaginationDto } from 'src/common';
+import {
+	HttpResponseBodyDto,
+	HttpResponseBodyFailDto,
+	HttpResponseBodySuccessDto,
+	PaginationDto,
+} from 'src/common';
 import { PermissionEnum, RoleEnum } from 'src/common/enums';
 
 import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
@@ -21,12 +27,14 @@ import {
 	CreateUserCommand,
 	ResetUserPasswordCommand,
 	UpdateMyInformationCommand,
+	UpdateMyPasswordComand,
 	UpdateUserInformationByUserIdCommand,
 } from './commands/implements';
 import {
 	CreateUserRequestDto,
 	ResetUserPasswordResponseDto,
 	UpdateMyInformationRequestDto,
+	UpdateMyPasswordRequestDto,
 	UpdateUserInformationByUserIdRequestDto,
 	UserInformationDto,
 } from './dtos';
@@ -95,6 +103,22 @@ export class UserController {
 	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
 		return this.commandBus.execute(
 			new UpdateUserInformationByUserIdCommand(userId, updateUserDataRequest),
+		);
+	}
+
+	@HttpCode(204)
+	@Patch('/change-password')
+	@Auth()
+	async updateMyPassword(
+		@Body() updateMyPasswordRequest: UpdateMyPasswordRequestDto,
+		@MyInforamtion() userInformation: UserInformationDto,
+	): Promise<HttpResponseBodySuccessDto | HttpResponseBodyFailDto> {
+		return this.commandBus.execute(
+			new UpdateMyPasswordComand(
+				updateMyPasswordRequest.currentPassword,
+				updateMyPasswordRequest.newPassword,
+				userInformation,
+			),
 		);
 	}
 

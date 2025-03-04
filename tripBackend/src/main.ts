@@ -14,7 +14,7 @@ async function bootstrap() {
 		new ValidationPipe({
 			transform: true,
 			whitelist: true,
-			exceptionFactory: (errors) => new ValidationException(errors),
+			exceptionFactory: (errors) => ValidationException.fromValidationError(errors),
 		}),
 	);
 	app.useGlobalFilters(new HttpExceptionFilter());
