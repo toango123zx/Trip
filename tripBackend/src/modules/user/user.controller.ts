@@ -6,6 +6,7 @@ import {
 	Param,
 	Patch,
 	Post,
+	Put,
 	Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -16,12 +17,17 @@ import { PermissionEnum, RoleEnum } from 'src/common/enums';
 
 import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
 
-import { CreateUserCommand, ResetUserPasswordCommand } from './commands/implements';
+import {
+	CreateUserCommand,
+	ResetUserPasswordCommand,
+	UpdateUserInformationByUserIdCommand,
+} from './commands/implements';
 import {
 	CreateUserRequestDto,
 	ResetUserPasswordResponseDto,
 	UserInformationDto,
 } from './dtos';
+import { UpdateUserInformationByUserIdRequestDto } from './dtos/requests/updateUserInformationByUserId.request';
 import { UserFilterRequestDto } from './dtos/requests/userFilter.request';
 import { MyInforamtion } from './guards';
 import { GetMeQuery, GetUserByUserIdQuery, GetUsersQuery } from './queries/implements';
@@ -66,6 +72,17 @@ export class UserController {
 		@Body() user: CreateUserRequestDto,
 	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
 		return this.commandBus.execute(new CreateUserCommand(user));
+	}
+
+	@Put('/:userId')
+	@AuthPermission(PermissionEnum.UpdateUserInformation)
+	async updateUserInformationByUserId(
+		@Param('userId') userId: string,
+		@Body() updateUserDataRequest: UpdateUserInformationByUserIdRequestDto,
+	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
+		return this.commandBus.execute(
+			new UpdateUserInformationByUserIdCommand(userId, updateUserDataRequest),
+		);
 	}
 
 	@Patch('/:userId/reset-password')

@@ -13,7 +13,7 @@ export class GetUserByUserIdHandler implements IQueryHandler<GetUserByUserIdQuer
 	public async execute(
 		query: GetUserByUserIdQuery,
 	): Promise<HttpResponseBodySuccessDto<UserInformationDto>> {
-		const user = await this.userRepository.findUserById(query.userId);
+		const user = await this.userRepository.findUserByUserId(query.userId);
 
 		if (!user) {
 			throw new NotFoundException('userId');

@@ -1,11 +1,4 @@
-import {
-	Body,
-	Controller,
-	HttpCode,
-	HttpException,
-	Post,
-	UseFilters,
-} from '@nestjs/common';
+import { Body, Controller, HttpException, Post, UseFilters } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -36,7 +29,6 @@ export class AuthController {
 		return this.commandBus.execute(new RegisterCommand(registerDto));
 	}
 
-	@HttpCode(204)
 	@Post('login')
 	async loginUser(
 		@Body() loginDto: LoginRequestDto,

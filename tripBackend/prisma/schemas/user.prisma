@@ -116,6 +116,7 @@ model user {
     name        String
     roleId      String          @map("role_id")
     /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanConnectOnUpdate
     role        role            @relation(fields: [roleId], references: [id])
     /// @DtoCreateOptional
     /// @DtoUpdateOptional
