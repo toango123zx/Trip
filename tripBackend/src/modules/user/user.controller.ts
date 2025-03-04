@@ -20,14 +20,16 @@ import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
 import {
 	CreateUserCommand,
 	ResetUserPasswordCommand,
+	UpdateMyInformationCommand,
 	UpdateUserInformationByUserIdCommand,
 } from './commands/implements';
 import {
 	CreateUserRequestDto,
 	ResetUserPasswordResponseDto,
+	UpdateMyInformationRequestDto,
+	UpdateUserInformationByUserIdRequestDto,
 	UserInformationDto,
 } from './dtos';
-import { UpdateUserInformationByUserIdRequestDto } from './dtos/requests/updateUserInformationByUserId.request';
 import { UserFilterRequestDto } from './dtos/requests/userFilter.request';
 import { MyInforamtion } from './guards';
 import { GetMeQuery, GetUserByUserIdQuery, GetUsersQuery } from './queries/implements';
@@ -72,6 +74,17 @@ export class UserController {
 		@Body() user: CreateUserRequestDto,
 	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
 		return this.commandBus.execute(new CreateUserCommand(user));
+	}
+
+	@Put()
+	@Auth()
+	async updateMyInformation(
+		@Body() updateMyInformationDataRequest: UpdateMyInformationRequestDto,
+		@MyInforamtion() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
+		return this.commandBus.execute(
+			new UpdateMyInformationCommand(updateMyInformationDataRequest, myInformation),
+		);
 	}
 
 	@Put('/:userId')
