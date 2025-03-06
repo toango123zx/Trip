@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
-import { IPaginationQuery } from 'src/common';
-import { UpdateUserDto, UserEntity } from 'src/models';
+import { Prisma } from '@prisma/client';
+import { IPaginationQuery, UserStatusEnum } from 'src/common';
+import {
+	AccountEntity,
+	AccountExternalEntity,
+	UpdateUserDto,
+	UserEntity,
+} from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -49,7 +55,10 @@ export class UserRepository {
 		return [users, totalRecords];
 	}
 
-	async findUserByUserId(userId: string): Promise<UserEntity> {
+	async findUserByUserId(
+		userId: string,
+		userStatus?: UserStatusEnum,
+	): Promise<UserEntity> {
 		return this.prismaService.user.findFirst({
 			include: {
 				role: {
@@ -64,7 +73,7 @@ export class UserRepository {
 			},
 			where: {
 				id: userId,
-				status: 'active',
+				status: userStatus,
 				role: {
 					status: 'active',
 					infoPermission: {
@@ -98,5 +107,68 @@ export class UserRepository {
 			},
 			data: user,
 		});
+	}
+
+	async lockUserByUserId(
+		userId: string,
+		account?: boolean,
+		accountExternal?: boolean,
+	): Promise<[UserEntity, AccountEntity?, AccountExternalEntity?]> {
+		const transactions: Prisma.PrismaPromise<
+			UserEntity | AccountEntity | AccountExternalEntity
+		>[] = [
+			this.prismaService.user.update({
+				include: {
+					role: {
+						include: {
+							infoPermission: {
+								include: {
+									permission: true,
+								},
+							},
+						},
+					},
+				},
+				where: {
+					id: userId,
+					status: 'active',
+				},
+				data: {
+					status: 'locked',
+				},
+			}),
+		];
+
+		if (account) {
+			transactions.push(
+				this.prismaService.account.update({
+					where: {
+						userId: userId,
+						status: 'active',
+					},
+					data: {
+						status: 'locked',
+					},
+				}),
+			);
+		}
+
+		if (accountExternal) {
+			transactions.push(
+				this.prismaService.accountExternal.update({
+					where: {
+						userId: userId,
+						status: 'active',
+					},
+					data: {
+						status: 'locked',
+					},
+				}),
+			);
+		}
+
+		return this.prismaService.$transaction(transactions) as Promise<
+			[UserEntity, AccountEntity?, AccountExternalEntity?]
+		>;
 	}
 }

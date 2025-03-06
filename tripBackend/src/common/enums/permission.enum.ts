@@ -4,4 +4,5 @@ export enum PermissionEnum {
 	CreateUser = 'create_user',
 	UpdateUserInformation = 'update_user_information',
 	ResetUserPassword = 'reset_user_password',
+	LockUser = 'lock_user',
 }

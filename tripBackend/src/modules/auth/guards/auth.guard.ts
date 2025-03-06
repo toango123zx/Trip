@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
 
-import { IJwtPayload, UnauthorizedException } from 'src/common';
+import { IJwtPayload, UnauthorizedException, UserStatusEnum } from 'src/common';
 import { jwtConfig } from 'src/configs';
 import { UserInformationDto } from 'src/modules/user/dtos';
 
@@ -26,7 +26,10 @@ export class AuthGuard implements CanActivate {
 				secret: jwtConfig.secret,
 			});
 			const user: UserInformationDto = new UserInformationDto(
-				await this.userRepository.findUserByUserId(payload.userId),
+				await this.userRepository.findUserByUserId(
+					payload.userId,
+					UserStatusEnum.active,
+				),
 			);
 
 			user.permission = user.role.infoPermission.map(

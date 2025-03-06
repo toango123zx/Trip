@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { genSalt, hash, compare } from 'bcrypt';
 import {
+	AccountStatusEnum,
 	HttpResponseBodySuccessDto,
 	optionalException,
 	ValidationException,

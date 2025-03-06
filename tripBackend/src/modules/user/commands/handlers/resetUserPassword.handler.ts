@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { genSalt, hash } from 'bcrypt';
 import { generate } from 'generate-password';
-import { HttpResponseBodyDto, NotFoundException } from 'src/common';
+import { AccountStatusEnum, HttpResponseBodyDto, NotFoundException } from 'src/common';
 import { UpdateAccountDto } from 'src/models';
 
 import { AuthRepository } from 'src/modules/auth/auth.repository';
@@ -24,7 +24,10 @@ export class ResetUserPasswordHandler
 	async execute(
 		command: ResetUserPasswordCommand,
 	): Promise<HttpResponseBodyDto<ResetUserPasswordResponseDto> | HttpException> {
-		const account = await this.authRepository.findAccountByUserId(command.userId);
+		const account = await this.authRepository.findAccountByUserId(
+			command.userId,
+			AccountStatusEnum.active,
+		);
 		if (!account) {
 			throw new NotFoundException('userId');
 		}

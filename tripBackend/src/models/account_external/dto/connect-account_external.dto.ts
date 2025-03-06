@@ -18,5 +18,5 @@ export class ConnectAccountExternalDto {
 	})
 	@IsOptional()
 	@IsString()
-	user_id?: string;
+	userId?: string;
 }

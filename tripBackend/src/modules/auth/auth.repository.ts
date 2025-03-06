@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
-import { AccountEntity, CreateAccountDto, UpdateAccountDto } from 'src/models';
+import { accountExternalStatusEnum, accountStatusEnum } from '@prisma/client';
+import {
+	AccountEntity,
+	AccountExternalDto,
+	CreateAccountDto,
+	UpdateAccountDto,
+} from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -34,14 +40,29 @@ export class AuthRepository {
 		}
 	}
 
-	async findAccountByUserId(userId: string): Promise<AccountEntity> {
+	async findAccountByUserId(
+		userId: string,
+		accountStatus?: accountStatusEnum,
+	): Promise<AccountEntity> {
 		return this.prismaService.account.findFirst({
 			include: {
 				user: true,
 			},
 			where: {
 				userId: userId,
-				status: 'active',
+				status: accountStatus,
+			},
+		});
+	}
+
+	async findAccountExternalByUserId(
+		userId: string,
+		accountExternalStatus?: accountExternalStatusEnum,
+	): Promise<AccountExternalDto> {
+		return this.prismaService.accountExternal.findFirst({
+			where: {
+				userId: userId,
+				status: accountExternalStatus,
 			},
 		});
 	}
@@ -89,5 +110,25 @@ export class AuthRepository {
 		} catch (error) {
 			return error;
 		}
+	}
+
+	async updateAccountStatusByUserId(
+		userId: string,
+		accountStatus: accountStatusEnum,
+	): Promise<AccountEntity> {
+		return this.prismaService.account.update({
+			include: {
+				user: true,
+			},
+			where: {
+				userId: userId,
+				status: {
+					not: accountStatus,
+				},
+			},
+			data: {
+				status: accountStatus,
+			},
+		});
 	}
 }
