@@ -171,4 +171,67 @@ export class UserRepository {
 			[UserEntity, AccountEntity?, AccountExternalEntity?]
 		>;
 	}
+
+	async unlockUserByUserId(
+		userId: string,
+		account?: boolean,
+		accountExternal?: boolean,
+	): Promise<[UserEntity, AccountEntity?, AccountExternalEntity?]> {
+		const transactions: Prisma.PrismaPromise<
+			UserEntity | AccountEntity | AccountExternalEntity
+		>[] = [
+			this.prismaService.user.update({
+				include: {
+					role: {
+						include: {
+							infoPermission: {
+								include: {
+									permission: true,
+								},
+							},
+						},
+					},
+				},
+				where: {
+					id: userId,
+					status: 'locked',
+				},
+				data: {
+					status: 'active',
+				},
+			}),
+		];
+
+		if (account) {
+			transactions.push(
+				this.prismaService.account.update({
+					where: {
+						userId: userId,
+						status: 'locked',
+					},
+					data: {
+						status: 'active',
+					},
+				}),
+			);
+		}
+
+		if (accountExternal) {
+			transactions.push(
+				this.prismaService.accountExternal.update({
+					where: {
+						userId: userId,
+						status: 'locked',
+					},
+					data: {
+						status: 'active',
+					},
+				}),
+			);
+		}
+
+		return this.prismaService.$transaction(transactions) as Promise<
+			[UserEntity, AccountEntity?, AccountExternalEntity?]
+		>;
+	}
 }

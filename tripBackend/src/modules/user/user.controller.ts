@@ -1,7 +1,6 @@
 import {
 	Body,
 	Controller,
-	Delete,
 	Get,
 	HttpCode,
 	HttpException,
@@ -28,6 +27,7 @@ import {
 	CreateUserCommand,
 	LockUserByUserIdCommand,
 	ResetUserPasswordCommand,
+	UnlockUserByUserIdCommand,
 	UpdateMyInformationCommand,
 	UpdateMyPasswordComand,
 	UpdateUserInformationByUserIdCommand,
@@ -138,5 +138,13 @@ export class UserController {
 		@Param('userId') userId: string,
 	): Promise<HttpResponseBodyDto<UserInformationDto> | HttpException> {
 		return this.commandBus.execute(new LockUserByUserIdCommand(userId));
+	}
+
+	@Patch('/:userId/unlock')
+	@AuthPermission(PermissionEnum.UnlockUser)
+	async unlockUserByUserId(
+		@Param('userId') userId: string,
+	): Promise<HttpResponseBodyDto<UserInformationDto> | HttpException> {
+		return this.commandBus.execute(new UnlockUserByUserIdCommand(userId));
 	}
 }
