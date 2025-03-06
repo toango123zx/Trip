@@ -5,7 +5,7 @@ import { genSalt, hash, compare } from 'bcrypt';
 import {
 	AccountStatusEnum,
 	HttpResponseBodySuccessDto,
-	optionalException,
+	OptionalException,
 	ValidationException,
 } from 'src/common';
 import { UpdateAccountDto } from 'src/models';
@@ -28,12 +28,12 @@ export class UpdateMyPasswordHandler implements ICommandHandler<UpdateMyPassword
 		);
 
 		if (!account) {
-			throw new optionalException(HttpStatus.FORBIDDEN, 'Account unavailable');
+			throw new OptionalException(HttpStatus.FORBIDDEN, 'Account unavailable');
 		}
 
 		const isPasswordValid = await compare(currentPassword, account.password);
 		if (!isPasswordValid) {
-			throw new optionalException(
+			throw new OptionalException(
 				HttpStatus.FORBIDDEN,
 				'Current password is incorrect',
 			);

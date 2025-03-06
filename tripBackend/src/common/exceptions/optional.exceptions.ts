@@ -2,7 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 
 import { InternalServerErrorException } from './internalServerError.exception';
 
-export class optionalException extends HttpException {
+export class OptionalException extends HttpException {
 	constructor(
 		public readonly httpStatusCode: HttpStatus,
 		public readonly message: string,
