@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpCode,
 	HttpException,
@@ -25,6 +26,7 @@ import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
 
 import {
 	CreateUserCommand,
+	LockUserByUserIdCommand,
 	ResetUserPasswordCommand,
 	UpdateMyInformationCommand,
 	UpdateMyPasswordComand,
@@ -128,5 +130,13 @@ export class UserController {
 		@Param('userId') userId: string,
 	): Promise<HttpResponseBodyDto<ResetUserPasswordResponseDto | HttpException>> {
 		return this.commandBus.execute(new ResetUserPasswordCommand(userId));
+	}
+
+	@Patch('/:userId/lock')
+	@AuthPermission(PermissionEnum.LockUser)
+	async lockUserByUserId(
+		@Param('userId') userId: string,
+	): Promise<HttpResponseBodyDto<UserInformationDto> | HttpException> {
+		return this.commandBus.execute(new LockUserByUserIdCommand(userId));
 	}
 }

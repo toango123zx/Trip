@@ -23,6 +23,7 @@ enum permissionStatusEnum {
 enum accountExternalStatusEnum {
     active
     verificationPending @map("verification_pending")
+    locked
     inactive
 
     @@map("Account_External_Status_Enum")
@@ -30,6 +31,7 @@ enum accountExternalStatusEnum {
 
 enum userStatusEnum {
     active
+    locked
     inactive
 
     @@map("User_Status_Enum")
@@ -161,9 +163,9 @@ model user {
 model accountExternal {
     id                      String                      @id @default(cuid())
     /// @DtoUpdateHidden
-    user_id                 String                      @unique @map("userId")
+    userId                  String                      @unique @map("user_id")
     /// @DtoRelationCanConnectOnCreate
-    user                    user                        @relation(fields: [user_id], references: [id])
+    user                    user                        @relation(fields: [userId], references: [id])
     providerAccountExternal providerAccountExternalEnum @map("provider_account_external")
     providerToken           String                      @map("provider_token")
     createAt                DateTime                    @default(now()) @map("create_at")

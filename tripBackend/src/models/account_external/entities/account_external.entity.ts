@@ -12,7 +12,7 @@ export class AccountExternalEntity {
 	@ApiProperty({
 		type: 'string',
 	})
-	user_id: string;
+	userId: string;
 	@ApiProperty({
 		type: () => UserEntity,
 		required: false,

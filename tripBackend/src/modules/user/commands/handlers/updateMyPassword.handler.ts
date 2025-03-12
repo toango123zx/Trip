@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { genSalt, hash, compare } from 'bcrypt';
 import {
+	AccountStatusEnum,
 	HttpResponseBodySuccessDto,
 	optionalException,
 	ValidationException,
@@ -21,7 +22,15 @@ export class UpdateMyPasswordHandler implements ICommandHandler<UpdateMyPassword
 		command: UpdateMyPasswordComand,
 	): Promise<HttpResponseBodySuccessDto | HttpException> {
 		const { currentPassword, newPassword, userInformation } = command;
-		const account = await this.authRepository.findAccountByUserId(userInformation.id);
+		const account = await this.authRepository.findAccountByUserId(
+			userInformation.id,
+			AccountStatusEnum.active,
+		);
+
+		if (!account) {
+			throw new optionalException(HttpStatus.FORBIDDEN, 'Account unavailable');
+		}
+
 		const isPasswordValid = await compare(currentPassword, account.password);
 		if (!isPasswordValid) {
 			throw new optionalException(

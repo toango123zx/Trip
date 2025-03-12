@@ -6,6 +6,7 @@ import {
 	HttpResponseBodySuccessDto,
 	NotFoundException,
 	ObjectComparerDto,
+	UserStatusEnum,
 } from 'src/common';
 import { UpdateUserDto, UserEntity } from 'src/models';
 
@@ -29,7 +30,10 @@ export class UpdateUserInformationByUserIdHandler
 	): Promise<HttpResponseBodySuccessDto<UserInformationDto> | HttpException> {
 		const { userId, updateUserDataRequest } = command;
 
-		const user = await this.userRepository.findUserByUserId(userId);
+		const user = await this.userRepository.findUserByUserId(
+			userId,
+			UserStatusEnum.active,
+		);
 		if (!user) {
 			throw new NotFoundException('userId');
 		}
