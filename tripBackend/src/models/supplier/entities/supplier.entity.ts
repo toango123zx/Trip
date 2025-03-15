@@ -23,7 +23,7 @@ export class SupplierEntity {
 	taxId: string;
 	@ApiProperty({
 		minimum: 1,
-		maximum: 14,
+		maximum: 100,
 		type: 'integer',
 		format: 'int32',
 	})

@@ -4,6 +4,7 @@ import { genderUserEnum } from '@prisma/client';
 import {
 	IsEmail,
 	IsEnum,
+	IsIn,
 	IsOptional,
 	IsPhoneNumber,
 	IsString,
@@ -18,13 +19,14 @@ export class UpdateUserInformationByUserIdRequestDto extends OmitType(UpdateUser
 ] as const) {
 	@ApiProperty({
 		type: 'string',
-		enum: RoleEnum,
+		enum: [RoleEnum.Admin, RoleEnum.Supplier, RoleEnum.Tourist],
 		required: false,
 		default: RoleEnum.Tourist,
 	})
 	@IsOptional()
 	@IsString()
 	@IsEnum(RoleEnum)
+	@IsIn([RoleEnum.Admin, RoleEnum.Tourist])
 	roleName?: RoleEnum;
 	@AutoTrim()
 	name?: string;

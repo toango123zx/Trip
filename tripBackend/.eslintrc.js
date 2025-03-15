@@ -33,13 +33,14 @@ module.exports = {
 
     // Quy tắc unused-imports
     'unused-imports/no-unused-imports': 'error', // Xóa import không cần thiết
-    'unused-imports/no-unused-vars': [
+    '@typescript-eslint/no-unused-vars': [
       'warn',
       {
         vars: 'all', // Kiểm tra tất cả các biến
         varsIgnorePattern: '^_', // Bỏ qua biến bắt đầu với '_'
         args: 'after-used', // Kiểm tra các tham số sau tham số được sử dụng cuối cùng
         argsIgnorePattern: '^_', // Bỏ qua tham số bắt đầu bằng '_'
+        ignoreRestSiblings: true,
       },
     ],
 

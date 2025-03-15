@@ -234,7 +234,7 @@ model supplier {
     user   user   @relation(fields: [userId], references: [id])
     taxId  String @map("tax_id") @db.VarChar(13)
     /// @minimum 1
-    /// @maximum 14
+    /// @maximum 100
     fee    Int    @default(10)
 
     product product[]
