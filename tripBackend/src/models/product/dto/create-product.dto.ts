@@ -58,6 +58,7 @@ export class CreateProductDto {
 	@Type(() => CreateProductSupplierRelationInputDto)
 	supplier: CreateProductSupplierRelationInputDto;
 	@ApiProperty({
+		minimum: 0.01,
 		type: 'integer',
 		format: 'int32',
 	})
@@ -65,6 +66,7 @@ export class CreateProductDto {
 	@IsInt()
 	time: number;
 	@ApiProperty({
+		minimum: 1,
 		type: 'integer',
 		format: 'int32',
 	})
@@ -72,6 +74,7 @@ export class CreateProductDto {
 	@IsInt()
 	quantityAvailable: number;
 	@ApiProperty({
+		minimum: 0,
 		type: 'integer',
 		format: 'int32',
 	})

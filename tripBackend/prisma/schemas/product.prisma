@@ -134,8 +134,11 @@ model product {
     supplierId        String            @map("supplier_id")
     /// @DtoRelationCanConnectOnCreate
     supplier          supplier          @relation(fields: [supplierId], references: [id])
+    /// @minimum 0.01
     time              Int
+    /// @minimum 1
     quantityAvailable Int               @map("quantity_available")
+    /// @minimum 0
     age               Int
     quantityCompleted Int               @default(0) @map("quantity_completed")
     description       String

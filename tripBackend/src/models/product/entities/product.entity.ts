@@ -28,16 +28,19 @@ export class ProductEntity {
 	})
 	supplier?: SupplierEntity;
 	@ApiProperty({
+		minimum: 0.01,
 		type: 'integer',
 		format: 'int32',
 	})
 	time: number;
 	@ApiProperty({
+		minimum: 1,
 		type: 'integer',
 		format: 'int32',
 	})
 	quantityAvailable: number;
 	@ApiProperty({
+		minimum: 0,
 		type: 'integer',
 		format: 'int32',
 	})
