@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { permissionStatusEnum } from '@prisma/client';
+import { PermissionStatusEnum } from '@prisma/client';
 
 export class PermissionDto {
 	@ApiProperty({
@@ -32,8 +32,8 @@ export class PermissionDto {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: permissionStatusEnum,
-		enumName: 'permissionStatusEnum',
+		enum: PermissionStatusEnum,
+		enumName: 'PermissionStatusEnum',
 	})
-	status: permissionStatusEnum;
+	status: PermissionStatusEnum;
 }

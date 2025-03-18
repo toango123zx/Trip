@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { AccountStatusEnum } from '@prisma/client';
 import { genSalt, hash, compare } from 'bcrypt';
 import {
-	AccountStatusEnum,
 	HttpResponseBodySuccessDto,
 	OptionalException,
 	ValidationException,

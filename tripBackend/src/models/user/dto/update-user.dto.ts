@@ -1,6 +1,6 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 
-import { genderUserEnum } from '@prisma/client';
+import { GenderUserEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
 	IsDateString,
@@ -48,13 +48,13 @@ export class UpdateUserDto {
 	@IsString()
 	image?: string;
 	@ApiProperty({
-		enum: genderUserEnum,
-		enumName: 'genderUserEnum',
+		enum: GenderUserEnum,
+		enumName: 'GenderUserEnum',
 		required: false,
 		nullable: true,
 	})
 	@IsOptional()
-	gender?: genderUserEnum | null;
+	gender?: GenderUserEnum | null;
 	@ApiProperty({
 		type: 'string',
 		required: false,

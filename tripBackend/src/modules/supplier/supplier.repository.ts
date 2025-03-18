@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserStatusEnum } from 'src/common';
+import { UserStatusEnum } from '@prisma/client';
 import { supplierInformationConfig } from 'src/configs/supplierInformation.config';
-import { UpdateUserDto, UserEntity } from 'src/models';
+import { SupplierEntity, UpdateUserDto, UserEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -24,6 +24,20 @@ export class SupplierRepository {
 				status: userStatus,
 				NOT: {
 					supplier: null,
+				},
+			},
+		});
+	}
+
+	async findSupplierFeeByUserId(
+		userId: string,
+		userStatus: UserStatusEnum,
+	): Promise<SupplierEntity> {
+		return this.prismaService.supplier.findFirst({
+			where: {
+				user: {
+					id: userId,
+					status: userStatus,
 				},
 			},
 		});

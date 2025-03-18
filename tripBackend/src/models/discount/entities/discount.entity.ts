@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { discountProviderTypeEnum, discountStatus } from '@prisma/client';
+import { DiscountProviderTypeEnum, DiscountStatusEnum } from '@prisma/client';
 
 import { DiscountApplicationScopeEntity } from '../../discount_application_scope/entities/discount_application_scope.entity';
 import { DiscountEligibilityEntity } from '../../discount_eligibility/entities/discount_eligibility.entity';
@@ -20,10 +20,10 @@ export class DiscountEntity {
 	})
 	name: string;
 	@ApiProperty({
-		enum: discountProviderTypeEnum,
-		enumName: 'discountProviderTypeEnum',
+		enum: DiscountProviderTypeEnum,
+		enumName: 'DiscountProviderTypeEnum',
 	})
-	discountProviderType: discountProviderTypeEnum;
+	discountProviderType: DiscountProviderTypeEnum;
 	@ApiProperty({
 		type: 'string',
 	})
@@ -119,10 +119,10 @@ export class DiscountEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: discountStatus,
-		enumName: 'discountStatus',
+		enum: DiscountStatusEnum,
+		enumName: 'DiscountStatusEnum',
 	})
-	status: discountStatus;
+	status: DiscountStatusEnum;
 	@ApiProperty({
 		type: () => InfoBillDiscountEntity,
 		isArray: true,

@@ -14,7 +14,7 @@ export class UserInformationDto {
 	role?: RoleEntity;
 	roleName?: string;
 	image: string;
-	gender: $Enums.genderUserEnum;
+	gender: $Enums.GenderUserEnum;
 	email: string;
 	dateOfBirth: Date;
 	phoneNumber: string;
@@ -24,7 +24,7 @@ export class UserInformationDto {
 	createAt: Date;
 	updateAt: Date;
 	deletedAt: Date;
-	status: $Enums.userStatusEnum;
+	status: $Enums.UserStatusEnum;
 	supplier?: SupplierEntity;
 	permission?: PermissionEntity[];
 

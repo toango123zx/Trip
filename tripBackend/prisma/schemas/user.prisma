@@ -1,4 +1,4 @@
-enum genderUserEnum {
+enum GenderUserEnum {
     male
     female
     other
@@ -6,21 +6,21 @@ enum genderUserEnum {
     @@map("Gender_User_Enum")
 }
 
-enum roleStatusEnum {
+enum RoleStatusEnum {
     active
     inactive
 
     @@map("Role_Status_Enum")
 }
 
-enum permissionStatusEnum {
+enum PermissionStatusEnum {
     active
     inactive
 
     @@map("Permission_Status_Enum")
 }
 
-enum accountExternalStatusEnum {
+enum AccountExternalStatusEnum {
     active
     verificationPending @map("verification_pending")
     locked
@@ -29,7 +29,7 @@ enum accountExternalStatusEnum {
     @@map("Account_External_Status_Enum")
 }
 
-enum userStatusEnum {
+enum UserStatusEnum {
     active
     locked
     inactive
@@ -37,7 +37,7 @@ enum userStatusEnum {
     @@map("User_Status_Enum")
 }
 
-enum accountStatusEnum {
+enum AccountStatusEnum {
     active
     verificationPending @map("verification_pending")
     locked
@@ -45,7 +45,7 @@ enum accountStatusEnum {
     @@map("Account_Status_Enum")
 }
 
-enum verifyEmailStatusEnum {
+enum VerifyEmailStatusEnum {
     active
     used
     overdue
@@ -67,7 +67,7 @@ model role {
     deletedAt   DateTime?      @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status      roleStatusEnum @default(active)
+    status      RoleStatusEnum @default(active)
 
     infoPermission infoPermission[]
     user           user[]
@@ -88,7 +88,7 @@ model permission {
     deletedAt   DateTime?            @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status      permissionStatusEnum @default(active)
+    status      PermissionStatusEnum @default(active)
 
     infoPermission infoPermission[]
 
@@ -123,7 +123,7 @@ model user {
     /// @DtoCreateOptional
     /// @DtoUpdateOptional
     image       String          @default("https://11")
-    gender      genderUserEnum?
+    gender      GenderUserEnum?
     email       String          @unique
     dateOfBirth DateTime?       @map("date_of_birth")
     phoneNumber String?         @map("phone_number") @db.Char(10)
@@ -143,7 +143,7 @@ model user {
     deletedAt   DateTime?       @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status      userStatusEnum  @default(active)
+    status      UserStatusEnum  @default(active)
 
     ///@DtoRelationCanCreateOnCreate
     supplier supplier?
@@ -166,7 +166,7 @@ model accountExternal {
     userId                  String                      @unique @map("user_id")
     /// @DtoRelationCanConnectOnCreate
     user                    user                        @relation(fields: [userId], references: [id])
-    providerAccountExternal providerAccountExternalEnum @map("provider_account_external")
+    providerAccountExternal ProviderAccountExternalEnum @map("provider_account_external")
     providerToken           String                      @map("provider_token")
     createAt                DateTime                    @default(now()) @map("create_at")
     /// @DtoCreateHidden
@@ -177,7 +177,7 @@ model accountExternal {
     deletedAt               DateTime?                   @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status                  accountExternalStatusEnum   @default(active)
+    status                  AccountExternalStatusEnum   @default(active)
 
     @@map("Account_External")
 }
@@ -202,7 +202,7 @@ model account {
     deletedAt   DateTime?         @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status      accountStatusEnum @default(active)
+    status      AccountStatusEnum @default(active)
     verifyEmail verifyEmail[]
 
     @@map("Account")
@@ -221,7 +221,7 @@ model verifyEmail {
     createAt  DateTime              @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status    verifyEmailStatusEnum @default(active)
+    status    VerifyEmailStatusEnum @default(active)
 
     @@map("Verify_Email")
 }

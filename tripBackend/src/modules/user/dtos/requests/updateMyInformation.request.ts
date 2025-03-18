@@ -1,6 +1,6 @@
 import { OmitType } from '@nestjs/swagger';
 
-import { genderUserEnum } from '@prisma/client';
+import { GenderUserEnum } from '@prisma/client';
 import { IsEmail, IsPhoneNumber, IsUrl } from 'class-validator';
 import { AutoTrim } from 'src/common/decorators';
 import { UpdateUserDto } from 'src/models';
@@ -12,7 +12,7 @@ export class UpdateMyInformationRequestDto extends OmitType(UpdateUserDto, ['rol
 	@IsUrl()
 	image?: string;
 	@AutoTrim()
-	gender?: genderUserEnum | null;
+	gender?: GenderUserEnum | null;
 	@AutoTrim()
 	@IsEmail()
 	email?: string;

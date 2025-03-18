@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { mapAddressStatusEnum } from '@prisma/client';
+import { MapAddressStatusEnum } from '@prisma/client';
 
 import { LocationEntity } from '../../location/entities/location.entity';
 import { ProviderMapEntity } from '../../provider_map/entities/provider_map.entity';
@@ -40,10 +40,10 @@ export class MapAddressEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: mapAddressStatusEnum,
-		enumName: 'mapAddressStatusEnum',
+		enum: MapAddressStatusEnum,
+		enumName: 'MapAddressStatusEnum',
 	})
-	mapAddressStatus: mapAddressStatusEnum;
+	mapAddressStatus: MapAddressStatusEnum;
 	@ApiProperty({
 		type: () => LocationEntity,
 		required: false,

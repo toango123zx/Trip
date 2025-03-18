@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { infoDiscountStatusEnum } from '@prisma/client';
+import { InfoDiscountStatusEnum } from '@prisma/client';
 
 import { DiscountEntity } from '../../discount/entities/discount.entity';
 import { ProductScheduleEntity } from '../../product_schedule/entities/product_schedule.entity';
@@ -45,8 +45,8 @@ export class InfoDiscountEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: infoDiscountStatusEnum,
-		enumName: 'infoDiscountStatusEnum',
+		enum: InfoDiscountStatusEnum,
+		enumName: 'InfoDiscountStatusEnum',
 	})
-	status: infoDiscountStatusEnum;
+	status: InfoDiscountStatusEnum;
 }

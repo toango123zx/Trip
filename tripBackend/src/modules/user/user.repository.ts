@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-import { Prisma } from '@prisma/client';
-import { IPaginationQuery, UserStatusEnum } from 'src/common';
+import { Prisma, UserStatusEnum } from '@prisma/client';
+import { IPaginationQuery } from 'src/common';
 import {
 	AccountEntity,
 	AccountExternalEntity,

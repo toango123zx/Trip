@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { verifyEmailStatusEnum } from '@prisma/client';
+import { VerifyEmailStatusEnum } from '@prisma/client';
 
 import { AccountEntity } from '../../account/entities/account.entity';
 
@@ -33,8 +33,8 @@ export class VerifyEmailEntity {
 	})
 	createAt: Date;
 	@ApiProperty({
-		enum: verifyEmailStatusEnum,
-		enumName: 'verifyEmailStatusEnum',
+		enum: VerifyEmailStatusEnum,
+		enumName: 'VerifyEmailStatusEnum',
 	})
-	status: verifyEmailStatusEnum;
+	status: VerifyEmailStatusEnum;
 }

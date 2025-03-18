@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
-import { genderUserEnum } from '@prisma/client';
+import { GenderUserEnum } from '@prisma/client';
 import {
 	IsEmail,
 	IsEnum,
@@ -34,7 +34,7 @@ export class UpdateUserInformationByUserIdRequestDto extends OmitType(UpdateUser
 	@IsUrl()
 	image?: string;
 	@AutoTrim()
-	gender?: genderUserEnum | null;
+	gender?: GenderUserEnum | null;
 	@AutoTrim()
 	@IsEmail()
 	email?: string;

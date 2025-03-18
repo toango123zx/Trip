@@ -1,12 +1,11 @@
 import { HttpException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { AccountExternalStatusEnum, UserStatusEnum } from '@prisma/client';
 import {
-	AccountExternalStatusEnum,
 	ConflictException,
 	HttpResponseBodySuccessDto,
 	NotFoundException,
-	UserStatusEnum,
 } from 'src/common';
 
 import { AuthRepository } from 'src/modules/auth/auth.repository';

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { accountExternalStatusEnum, accountStatusEnum } from '@prisma/client';
-import { AccountStatusEnum } from 'src/common';
+import { AccountExternalStatusEnum, AccountStatusEnum } from '@prisma/client';
 import {
 	AccountEntity,
 	AccountExternalDto,
@@ -45,7 +44,7 @@ export class AuthRepository {
 
 	async findAccountByUserId(
 		userId: string,
-		accountStatus?: accountStatusEnum,
+		accountStatus?: AccountStatusEnum,
 	): Promise<AccountEntity> {
 		return this.prismaService.account.findFirst({
 			include: {
@@ -60,7 +59,7 @@ export class AuthRepository {
 
 	async findAccountExternalByUserId(
 		userId: string,
-		accountExternalStatus?: accountExternalStatusEnum,
+		accountExternalStatus?: AccountExternalStatusEnum,
 	): Promise<AccountExternalDto> {
 		return this.prismaService.accountExternal.findFirst({
 			where: {
@@ -117,7 +116,7 @@ export class AuthRepository {
 
 	async updateAccountStatusByUserId(
 		userId: string,
-		accountStatus: accountStatusEnum,
+		accountStatus: AccountStatusEnum,
 	): Promise<AccountEntity> {
 		return this.prismaService.account.update({
 			include: {

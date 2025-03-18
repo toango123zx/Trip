@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { genderUserEnum, userStatusEnum } from '@prisma/client';
+import { GenderUserEnum, UserStatusEnum } from '@prisma/client';
 
 import { AccountEntity } from '../../account/entities/account.entity';
 import { AccountExternalEntity } from '../../account_external/entities/account_external.entity';
@@ -36,11 +36,11 @@ export class UserEntity {
 	})
 	image: string;
 	@ApiProperty({
-		enum: genderUserEnum,
-		enumName: 'genderUserEnum',
+		enum: GenderUserEnum,
+		enumName: 'GenderUserEnum',
 		nullable: true,
 	})
-	gender: genderUserEnum | null;
+	gender: GenderUserEnum | null;
 	@ApiProperty({
 		type: 'string',
 	})
@@ -88,10 +88,10 @@ export class UserEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: userStatusEnum,
-		enumName: 'userStatusEnum',
+		enum: UserStatusEnum,
+		enumName: 'UserStatusEnum',
 	})
-	status: userStatusEnum;
+	status: UserStatusEnum;
 	@ApiProperty({
 		type: () => SupplierEntity,
 		required: false,

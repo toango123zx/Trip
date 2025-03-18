@@ -1,10 +1,12 @@
-import { HttpException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import {
 	ConflictException,
 	HttpResponseBodySuccessDto,
 	ObjectComparerDto,
+	OptionalException,
+	RoleEnum,
 } from 'src/common';
 import { UserEntity } from 'src/models';
 import { UpdateMyInformationRequestDto } from 'src/modules/user/dtos';
@@ -31,12 +33,20 @@ export class CreateSupplierHandler implements ICommandHandler<CreateSupplierComm
 		const {
 			deletedAt,
 			permission,
+			roleName,
 			supplier: supplierInformation,
 			...userData
 		} = {
 			...userInformation,
 			...updateUser,
 		};
+		if (roleName != RoleEnum.Tourist) {
+			throw new OptionalException(
+				HttpStatus.FORBIDDEN,
+				'Only tourist can create supplier',
+			);
+		}
+
 		if (isSupplierExist) {
 			throw new ConflictException('Supplier');
 		}

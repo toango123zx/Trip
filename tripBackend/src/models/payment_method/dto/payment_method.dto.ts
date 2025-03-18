@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { paymentMethodStatusEnum } from '@prisma/client';
+import { PaymentMethodStatusEnum } from '@prisma/client';
 
 export class PaymentMethodDto {
 	@ApiProperty({
@@ -32,8 +32,8 @@ export class PaymentMethodDto {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: paymentMethodStatusEnum,
-		enumName: 'paymentMethodStatusEnum',
+		enum: PaymentMethodStatusEnum,
+		enumName: 'PaymentMethodStatusEnum',
 	})
-	status: paymentMethodStatusEnum;
+	status: PaymentMethodStatusEnum;
 }

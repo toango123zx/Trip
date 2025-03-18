@@ -1,6 +1,6 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 
-import { cityEnum } from '@prisma/client';
+import { CityEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
@@ -31,11 +31,11 @@ export class CreateLocationDto {
 	@IsString()
 	displayName: string;
 	@ApiProperty({
-		enum: cityEnum,
-		enumName: 'cityEnum',
+		enum: CityEnum,
+		enumName: 'CityEnum',
 	})
 	@IsNotEmpty()
-	city: cityEnum;
+	city: CityEnum;
 	@ApiProperty({
 		type: CreateLocationMapAddressRelationInputDto,
 	})

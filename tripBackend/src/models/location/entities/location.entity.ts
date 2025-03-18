@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { cityEnum, locationStatusEnum } from '@prisma/client';
+import { CityEnum, LocationStatusEnum } from '@prisma/client';
 
 import { MapAddressEntity } from '../../map_address/entities/map_address.entity';
 import { ProductEntity } from '../../product/entities/product.entity';
@@ -19,10 +19,10 @@ export class LocationEntity {
 	})
 	displayName: string;
 	@ApiProperty({
-		enum: cityEnum,
-		enumName: 'cityEnum',
+		enum: CityEnum,
+		enumName: 'CityEnum',
 	})
-	city: cityEnum;
+	city: CityEnum;
 	@ApiProperty({
 		type: 'string',
 	})
@@ -49,10 +49,10 @@ export class LocationEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: locationStatusEnum,
-		enumName: 'locationStatusEnum',
+		enum: LocationStatusEnum,
+		enumName: 'LocationStatusEnum',
 	})
-	status: locationStatusEnum;
+	status: LocationStatusEnum;
 	@ApiProperty({
 		type: () => ProductEntity,
 		isArray: true,
