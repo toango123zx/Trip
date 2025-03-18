@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { accountExternalStatusEnum, accountStatusEnum } from '@prisma/client';
+import { AccountStatusEnum } from 'src/common';
 import {
 	AccountEntity,
 	AccountExternalDto,
@@ -14,7 +15,10 @@ import { PrismaService } from '../database/services';
 export class AuthRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async findAccountByUsername(username: string): Promise<AccountEntity> {
+	async findAccountByUsername(
+		username: string,
+		accountStatus?: AccountStatusEnum,
+	): Promise<AccountEntity> {
 		try {
 			return this.prismaService.account.findFirst({
 				include: {
@@ -26,9 +30,8 @@ export class AuthRepository {
 				},
 				where: {
 					username: username,
-					status: 'active',
+					status: accountStatus,
 					user: {
-						status: 'active',
 						role: {
 							status: 'active',
 						},

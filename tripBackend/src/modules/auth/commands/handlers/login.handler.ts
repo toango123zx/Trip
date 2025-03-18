@@ -1,4 +1,4 @@
-import { HttpException, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 
@@ -7,6 +7,7 @@ import {
 	ForbiddenException,
 	HttpResponseBodySuccessDto,
 	IJwtPayload,
+	OptionalException,
 	UnauthorizedException,
 } from 'src/common';
 import { jwtConfig } from 'src/configs';
@@ -31,6 +32,10 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 		);
 		if (!account) {
 			throw new NotFoundException('user');
+		}
+
+		if (account.status !== 'active') {
+			throw new OptionalException(HttpStatus.FORBIDDEN, 'Account is not active');
 		}
 
 		const hashedPassword = await hash(loginDto.password, account.salt);
