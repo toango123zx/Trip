@@ -11,13 +11,18 @@ import {
 import { UserEntity } from 'src/models';
 import { UpdateMyInformationRequestDto } from 'src/modules/user/dtos';
 
+import { RoleRepository } from 'src/modules/role/role.repository';
+
 import { SupplierInformationResponseDto } from '../../dtos';
 import { SupplierRepository } from '../../supplier.repository';
 import { CreateSupplierCommand } from '../implements';
 
 @CommandHandler(CreateSupplierCommand)
 export class CreateSupplierHandler implements ICommandHandler<CreateSupplierCommand> {
-	constructor(private readonly supplierRepository: SupplierRepository) {}
+	constructor(
+		private readonly supplierRepository: SupplierRepository,
+		private readonly roleRepository: RoleRepository,
+	) {}
 
 	async execute(
 		command: CreateSupplierCommand,
@@ -62,9 +67,12 @@ export class CreateSupplierHandler implements ICommandHandler<CreateSupplierComm
 			userInformation,
 		).getUpdatedFields<UpdateMyInformationRequestDto>(updateUser);
 
+		const roleSupplier = await this.roleRepository.findRoleByName(RoleEnum.Supplier);
+
 		const supplier = await this.supplierRepository.createSupplierByUserId(
 			userInformation.id,
 			updateUserData,
+			roleSupplier.id,
 			taxId,
 		);
 

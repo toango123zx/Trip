@@ -41,12 +41,4 @@ export class UpdateProductDto {
 	@IsOptional()
 	@IsString()
 	description?: string;
-	@ApiProperty({
-		type: 'integer',
-		format: 'int32',
-		required: false,
-	})
-	@IsOptional()
-	@IsInt()
-	avgRate?: number;
 }

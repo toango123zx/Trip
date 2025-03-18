@@ -104,9 +104,11 @@ model mapAddress {
 
 model location {
     id           String             @id @default(cuid())
+    /// @DtoConnectHidden
     systemName   String             @unique @map("system_name")
     displayName  String             @map("display_name")
     city         CityEnum
+    /// @DtoConnectHidden
     mapAddressId String             @unique @map("map_address_id")
     /// @DtoRelationCanConnectOnCreate
     mapAddress   mapAddress         @relation(fields: [mapAddressId], references: [id])
@@ -138,8 +140,9 @@ model product {
     quantityCompleted Int               @default(0) @map("quantity_completed")
     description       String
     quantityRate      Int               @default(0) @map("quantity_rate")
-    avgRate           Int               @map("avg_rate")
+    avgRate           Int               @default(0) @map("avg_rate")
     locationId        String            @map("location_id")
+    /// @DtoRelationCanConnectOnCreate
     location          location          @relation(fields: [locationId], references: [id])
     productCategoryId String            @map("product_category_id")
     /// @DtoRelationCanConnectOnCreate

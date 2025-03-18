@@ -18,6 +18,7 @@ import { UserRepository } from './user.repository';
 	providers: [
 		PrismaService,
 		UserRepository,
+		SupplierRepository,
 		RoleRepository,
 		...UserQueryHandlers,
 		...UserCommandHandlers,
