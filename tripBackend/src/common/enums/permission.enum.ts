@@ -6,4 +6,5 @@ export enum PermissionEnum {
 	ResetUserPassword = 'reset_user_password',
 	LockUser = 'lock_user',
 	UnlockUser = 'unlock_user',
+	CreateProduct = 'create_product',
 }

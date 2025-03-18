@@ -229,6 +229,7 @@ model verifyEmail {
 model supplier {
     id     String @id @default(cuid())
     /// @DtoUpdateHidden
+    /// @DtoConnectHidden
     userId String @unique @map("user_id")
     /// @DtoRelationCanConnectOnCreate
     user   user   @relation(fields: [userId], references: [id])

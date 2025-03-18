@@ -11,6 +11,7 @@ export class UpdateProductDto {
 	@IsString()
 	name?: string;
 	@ApiProperty({
+		minimum: 0.01,
 		type: 'integer',
 		format: 'int32',
 		required: false,
@@ -19,6 +20,7 @@ export class UpdateProductDto {
 	@IsInt()
 	time?: number;
 	@ApiProperty({
+		minimum: 1,
 		type: 'integer',
 		format: 'int32',
 		required: false,
@@ -27,6 +29,7 @@ export class UpdateProductDto {
 	@IsInt()
 	quantityAvailable?: number;
 	@ApiProperty({
+		minimum: 0,
 		type: 'integer',
 		format: 'int32',
 		required: false,
@@ -41,12 +44,4 @@ export class UpdateProductDto {
 	@IsOptional()
 	@IsString()
 	description?: string;
-	@ApiProperty({
-		type: 'integer',
-		format: 'int32',
-		required: false,
-	})
-	@IsOptional()
-	@IsInt()
-	avgRate?: number;
 }

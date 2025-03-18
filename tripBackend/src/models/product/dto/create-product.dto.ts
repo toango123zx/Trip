@@ -3,6 +3,7 @@ import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
+import { ConnectLocationDto } from '../../location/dto/connect-location.dto';
 import { ConnectProductCategoryDto } from '../../product_category/dto/connect-product_category.dto';
 import { ConnectSupplierDto } from '../../supplier/dto/connect-supplier.dto';
 
@@ -14,6 +15,15 @@ export class CreateProductSupplierRelationInputDto {
 	@ValidateNested()
 	@Type(() => ConnectSupplierDto)
 	connect: ConnectSupplierDto;
+}
+export class CreateProductLocationRelationInputDto {
+	@ApiProperty({
+		type: ConnectLocationDto,
+	})
+	@IsNotEmpty()
+	@ValidateNested()
+	@Type(() => ConnectLocationDto)
+	connect: ConnectLocationDto;
 }
 export class CreateProductProductCategoryRelationInputDto {
 	@ApiProperty({
@@ -28,6 +38,8 @@ export class CreateProductProductCategoryRelationInputDto {
 @ApiExtraModels(
 	ConnectSupplierDto,
 	CreateProductSupplierRelationInputDto,
+	ConnectLocationDto,
+	CreateProductLocationRelationInputDto,
 	ConnectProductCategoryDto,
 	CreateProductProductCategoryRelationInputDto,
 )
@@ -46,6 +58,7 @@ export class CreateProductDto {
 	@Type(() => CreateProductSupplierRelationInputDto)
 	supplier: CreateProductSupplierRelationInputDto;
 	@ApiProperty({
+		minimum: 0.01,
 		type: 'integer',
 		format: 'int32',
 	})
@@ -53,6 +66,7 @@ export class CreateProductDto {
 	@IsInt()
 	time: number;
 	@ApiProperty({
+		minimum: 1,
 		type: 'integer',
 		format: 'int32',
 	})
@@ -60,6 +74,7 @@ export class CreateProductDto {
 	@IsInt()
 	quantityAvailable: number;
 	@ApiProperty({
+		minimum: 0,
 		type: 'integer',
 		format: 'int32',
 	})
@@ -73,12 +88,12 @@ export class CreateProductDto {
 	@IsString()
 	description: string;
 	@ApiProperty({
-		type: 'integer',
-		format: 'int32',
+		type: CreateProductLocationRelationInputDto,
 	})
 	@IsNotEmpty()
-	@IsInt()
-	avgRate: number;
+	@ValidateNested()
+	@Type(() => CreateProductLocationRelationInputDto)
+	location: CreateProductLocationRelationInputDto;
 	@ApiProperty({
 		type: CreateProductProductCategoryRelationInputDto,
 	})

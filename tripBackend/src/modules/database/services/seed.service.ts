@@ -24,6 +24,7 @@ export class SeedService implements OnModuleInit {
 			await this.prisma.role.createMany({
 				data: [
 					{ name: 'admin', description: 'admin' },
+					{ name: 'supplier', description: 'supplier' },
 					{ name: 'tourist', description: 'tourist' },
 				],
 			});

@@ -46,6 +46,7 @@ export class SupplierRepository {
 	async createSupplierByUserId(
 		userId: string,
 		userInformation: UpdateUserDto,
+		roleSupplierId: string,
 		taxId: string,
 	): Promise<UserEntity> {
 		return this.prismaService.user.update({
@@ -58,6 +59,11 @@ export class SupplierRepository {
 			},
 			data: {
 				...userInformation,
+				role: {
+					connect: {
+						id: roleSupplierId,
+					},
+				},
 				supplier: {
 					create: {
 						taxId: taxId,
