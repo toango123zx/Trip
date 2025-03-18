@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { accountStatusEnum } from '@prisma/client';
+import { AccountStatusEnum } from '@prisma/client';
 
 export class AccountDto {
 	@ApiProperty({
@@ -36,8 +36,8 @@ export class AccountDto {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: accountStatusEnum,
-		enumName: 'accountStatusEnum',
+		enum: AccountStatusEnum,
+		enumName: 'AccountStatusEnum',
 	})
-	status: accountStatusEnum;
+	status: AccountStatusEnum;
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { cityEnum, locationStatusEnum } from '@prisma/client';
+import { CityEnum, LocationStatusEnum } from '@prisma/client';
 
 export class LocationDto {
 	@ApiProperty({
@@ -16,10 +16,10 @@ export class LocationDto {
 	})
 	displayName: string;
 	@ApiProperty({
-		enum: cityEnum,
-		enumName: 'cityEnum',
+		enum: CityEnum,
+		enumName: 'CityEnum',
 	})
-	city: cityEnum;
+	city: CityEnum;
 	@ApiProperty({
 		type: 'string',
 		format: 'date-time',
@@ -37,8 +37,8 @@ export class LocationDto {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: locationStatusEnum,
-		enumName: 'locationStatusEnum',
+		enum: LocationStatusEnum,
+		enumName: 'LocationStatusEnum',
 	})
-	status: locationStatusEnum;
+	status: LocationStatusEnum;
 }

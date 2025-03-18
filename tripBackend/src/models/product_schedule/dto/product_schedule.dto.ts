@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { productScheduleStatusEnum } from '@prisma/client';
+import { ProductScheduleStatusEnum } from '@prisma/client';
 
 export class ProductScheduleDto {
 	@ApiProperty({
@@ -54,8 +54,8 @@ export class ProductScheduleDto {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: productScheduleStatusEnum,
-		enumName: 'productScheduleStatusEnum',
+		enum: ProductScheduleStatusEnum,
+		enumName: 'ProductScheduleStatusEnum',
 	})
-	status: productScheduleStatusEnum;
+	status: ProductScheduleStatusEnum;
 }

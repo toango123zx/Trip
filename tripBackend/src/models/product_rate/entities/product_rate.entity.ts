@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { productRateStatusEnum } from '@prisma/client';
+import { ProductRateStatusEnum } from '@prisma/client';
 
 import { ProductEntity } from '../../product/entities/product.entity';
 import { UserEntity } from '../../user/entities/user.entity';
@@ -50,8 +50,8 @@ export class ProductRateEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: productRateStatusEnum,
-		enumName: 'productRateStatusEnum',
+		enum: ProductRateStatusEnum,
+		enumName: 'ProductRateStatusEnum',
 	})
-	status: productRateStatusEnum;
+	status: ProductRateStatusEnum;
 }

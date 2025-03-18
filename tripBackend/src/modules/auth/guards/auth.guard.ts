@@ -1,7 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService, TokenExpiredError } from '@nestjs/jwt';
+import { UserStatusEnum } from '@prisma/client';
 
-import { IJwtPayload, UnauthorizedException, UserStatusEnum } from 'src/common';
+import { IJwtPayload, UnauthorizedException } from 'src/common';
 import { jwtConfig } from 'src/configs';
 import { UserInformationDto } from 'src/modules/user/dtos';
 

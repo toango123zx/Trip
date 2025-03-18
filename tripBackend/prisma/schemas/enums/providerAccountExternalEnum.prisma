@@ -1,4 +1,4 @@
-enum providerAccountExternalEnum {
+enum ProviderAccountExternalEnum {
     google
 
     @@map("Provider_Account_External_Enum")

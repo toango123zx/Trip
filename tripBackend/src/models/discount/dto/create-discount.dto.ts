@@ -1,6 +1,6 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 
-import { discountProviderTypeEnum } from '@prisma/client';
+import { DiscountProviderTypeEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
 	IsBoolean,
@@ -33,11 +33,11 @@ export class CreateDiscountDto {
 	@IsString()
 	name: string;
 	@ApiProperty({
-		enum: discountProviderTypeEnum,
-		enumName: 'discountProviderTypeEnum',
+		enum: DiscountProviderTypeEnum,
+		enumName: 'DiscountProviderTypeEnum',
 	})
 	@IsNotEmpty()
-	discountProviderType: discountProviderTypeEnum;
+	discountProviderType: DiscountProviderTypeEnum;
 	@ApiProperty({
 		type: CreateDiscountUserRelationInputDto,
 	})

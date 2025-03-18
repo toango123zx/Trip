@@ -1,12 +1,12 @@
 import { HttpException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { UserStatusEnum } from '@prisma/client';
 import {
 	ConflictException,
 	HttpResponseBodySuccessDto,
 	NotFoundException,
 	ObjectComparerDto,
-	UserStatusEnum,
 } from 'src/common';
 import { UpdateUserDto, UserEntity } from 'src/models';
 

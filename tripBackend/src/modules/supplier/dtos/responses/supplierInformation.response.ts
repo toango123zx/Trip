@@ -9,7 +9,7 @@ export class SupplierInformationResponseDto {
 	role?: RoleEntity;
 	roleName?: string;
 	image: string;
-	gender: $Enums.genderUserEnum;
+	gender: $Enums.GenderUserEnum;
 	email: string;
 	dateOfBirth: Date;
 	phoneNumber: string;
@@ -20,7 +20,7 @@ export class SupplierInformationResponseDto {
 	createAt: Date;
 	updateAt: Date;
 	deletedAt: Date;
-	status: $Enums.userStatusEnum;
+	status: $Enums.UserStatusEnum;
 	permission?: PermissionEntity[];
 
 	constructor(user: UserEntity) {

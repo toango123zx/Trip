@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { discountProviderTypeEnum } from '@prisma/client';
+import { DiscountProviderTypeEnum } from '@prisma/client';
 import { IsBoolean, IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UpdateDiscountDto {
@@ -12,12 +12,12 @@ export class UpdateDiscountDto {
 	@IsString()
 	name?: string;
 	@ApiProperty({
-		enum: discountProviderTypeEnum,
-		enumName: 'discountProviderTypeEnum',
+		enum: DiscountProviderTypeEnum,
+		enumName: 'DiscountProviderTypeEnum',
 		required: false,
 	})
 	@IsOptional()
-	discountProviderType?: discountProviderTypeEnum;
+	discountProviderType?: DiscountProviderTypeEnum;
 	@ApiProperty({
 		type: 'string',
 		required: false,

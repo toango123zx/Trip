@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { discountApplicationScopeStatusEnum } from '@prisma/client';
+import { DiscountApplicationScopeStatusEnum } from '@prisma/client';
 
 import { DiscountEntity } from '../../discount/entities/discount.entity';
 
@@ -34,10 +34,10 @@ export class DiscountApplicationScopeEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: discountApplicationScopeStatusEnum,
-		enumName: 'discountApplicationScopeStatusEnum',
+		enum: DiscountApplicationScopeStatusEnum,
+		enumName: 'DiscountApplicationScopeStatusEnum',
 	})
-	status: discountApplicationScopeStatusEnum;
+	status: DiscountApplicationScopeStatusEnum;
 	@ApiProperty({
 		type: () => DiscountEntity,
 		isArray: true,

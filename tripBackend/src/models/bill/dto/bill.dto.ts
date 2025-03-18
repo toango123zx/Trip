@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { billStatusEnum } from '@prisma/client';
+import { BillStatusEnum } from '@prisma/client';
 
 export class BillDto {
 	@ApiProperty({
@@ -34,8 +34,8 @@ export class BillDto {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: billStatusEnum,
-		enumName: 'billStatusEnum',
+		enum: BillStatusEnum,
+		enumName: 'BillStatusEnum',
 	})
-	status: billStatusEnum;
+	status: BillStatusEnum;
 }

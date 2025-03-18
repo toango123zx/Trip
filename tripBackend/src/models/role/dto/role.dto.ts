@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { roleStatusEnum } from '@prisma/client';
+import { RoleStatusEnum } from '@prisma/client';
 
 export class RoleDto {
 	@ApiProperty({
@@ -32,8 +32,8 @@ export class RoleDto {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: roleStatusEnum,
-		enumName: 'roleStatusEnum',
+		enum: RoleStatusEnum,
+		enumName: 'RoleStatusEnum',
 	})
-	status: roleStatusEnum;
+	status: RoleStatusEnum;
 }

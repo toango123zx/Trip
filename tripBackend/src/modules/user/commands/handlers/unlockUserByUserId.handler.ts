@@ -1,13 +1,12 @@
 import { HttpException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { userStatusEnum } from '@prisma/client';
 import {
 	AccountExternalStatusEnum,
 	AccountStatusEnum,
-	HttpResponseBodySuccessDto,
-	NotFoundException,
-} from 'src/common';
+	UserStatusEnum,
+} from '@prisma/client';
+import { HttpResponseBodySuccessDto, NotFoundException } from 'src/common';
 
 import { AuthRepository } from 'src/modules/auth/auth.repository';
 
@@ -30,7 +29,7 @@ export class UnlockUserByUserIdHandler
 		const { userId } = command;
 		const user = await this.userRepository.findUserByUserId(
 			userId,
-			userStatusEnum.locked,
+			UserStatusEnum.locked,
 		);
 		if (!user) {
 			throw new NotFoundException('User not found');

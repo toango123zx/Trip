@@ -1,9 +1,10 @@
 import { HttpException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
+import { AccountStatusEnum } from '@prisma/client';
 import { genSalt, hash } from 'bcrypt';
 import { generate } from 'generate-password';
-import { AccountStatusEnum, HttpResponseBodyDto, NotFoundException } from 'src/common';
+import { HttpResponseBodyDto, NotFoundException } from 'src/common';
 import { UpdateAccountDto } from 'src/models';
 
 import { AuthRepository } from 'src/modules/auth/auth.repository';

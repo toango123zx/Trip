@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { billStatusEnum } from '@prisma/client';
+import { BillStatusEnum } from '@prisma/client';
 
 import { DiscountForBillEntity } from '../../discount_for_bill/entities/discount_for_bill.entity';
 import { InfoBillEntity } from '../../info_bill/entities/info_bill.entity';
@@ -68,10 +68,10 @@ export class BillEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: billStatusEnum,
-		enumName: 'billStatusEnum',
+		enum: BillStatusEnum,
+		enumName: 'BillStatusEnum',
 	})
-	status: billStatusEnum;
+	status: BillStatusEnum;
 	@ApiProperty({
 		type: () => InfoBillEntity,
 		isArray: true,

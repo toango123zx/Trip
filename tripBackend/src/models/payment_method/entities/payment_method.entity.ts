@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { paymentMethodStatusEnum } from '@prisma/client';
+import { PaymentMethodStatusEnum } from '@prisma/client';
 
 import { BillEntity } from '../../bill/entities/bill.entity';
 
@@ -34,10 +34,10 @@ export class PaymentMethodEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: paymentMethodStatusEnum,
-		enumName: 'paymentMethodStatusEnum',
+		enum: PaymentMethodStatusEnum,
+		enumName: 'PaymentMethodStatusEnum',
 	})
-	status: paymentMethodStatusEnum;
+	status: PaymentMethodStatusEnum;
 	@ApiProperty({
 		type: () => BillEntity,
 		isArray: true,

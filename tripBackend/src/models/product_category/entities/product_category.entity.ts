@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { productStatusEnum } from '@prisma/client';
+import { ProductStatusEnum } from '@prisma/client';
 
 import { ProductEntity } from '../../product/entities/product.entity';
 
@@ -34,10 +34,10 @@ export class ProductCategoryEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: productStatusEnum,
-		enumName: 'productStatusEnum',
+		enum: ProductStatusEnum,
+		enumName: 'ProductStatusEnum',
 	})
-	status: productStatusEnum;
+	status: ProductStatusEnum;
 	@ApiProperty({
 		type: () => ProductEntity,
 		isArray: true,

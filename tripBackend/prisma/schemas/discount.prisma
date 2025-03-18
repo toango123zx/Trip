@@ -1,4 +1,4 @@
-enum discountTypeStatusEnum {
+enum DiscountTypeStatusEnum {
     active
     full
     canceled
@@ -6,28 +6,28 @@ enum discountTypeStatusEnum {
     @@map("Discount_Type_Status_Enum")
 }
 
-enum discountProviderTypeEnum {
+enum DiscountProviderTypeEnum {
     admin
     supplier
 
     @@map("Discount_Provider_Type_Enum")
 }
 
-enum discountEligibilityStatusEnum {
+enum DiscountEligibilityStatusEnum {
     active
     inactive
 
     @@map("Discount_Eligibility_Status_Enum")
 }
 
-enum discountApplicationScopeStatusEnum {
+enum DiscountApplicationScopeStatusEnum {
     active
     inactive
 
     @@map("Discount_Application_Scope_Status_Enum")
 }
 
-enum discountStatus {
+enum DiscountStatusEnum {
     active
     full
     canceled
@@ -35,7 +35,7 @@ enum discountStatus {
     @@map("Discount_Status_Enum")
 }
 
-enum infoDiscountStatusEnum {
+enum InfoDiscountStatusEnum {
     active
     inactive
 
@@ -55,7 +55,7 @@ model discountType {
     deletedAt   DateTime?              @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status      discountTypeStatusEnum @default(active)
+    status      DiscountTypeStatusEnum @default(active)
 
     discount discount[]
 
@@ -75,7 +75,7 @@ model discountEligibility {
     deletedAt   DateTime?                     @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status      discountEligibilityStatusEnum @default(active)
+    status      DiscountEligibilityStatusEnum @default(active)
 
     discount discount[]
 
@@ -95,7 +95,7 @@ model discountApplicationScope {
     deletedAt   DateTime?                          @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status      discountApplicationScopeStatusEnum @default(active)
+    status      DiscountApplicationScopeStatusEnum @default(active)
 
     discount discount[]
 
@@ -105,7 +105,7 @@ model discountApplicationScope {
 model discount {
     id                         String                   @id @default(cuid())
     name                       String
-    discountProviderType       discountProviderTypeEnum @map("discount_provider_type")
+    discountProviderType       DiscountProviderTypeEnum @map("discount_provider_type")
     userId                     String                   @map("user_id")
     /// @DtoRelationCanConnectOnCreate
     user                       user                     @relation(fields: [userId], references: [id])
@@ -135,7 +135,7 @@ model discount {
     deletedAt                  DateTime?                @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status                     discountStatus           @default(active)
+    status                     DiscountStatusEnum       @default(active)
 
     infoBillDiscount infoBillDiscount[]
     discountForBill  discountForBill[]
@@ -162,7 +162,7 @@ model infoDiscount {
     deletedAt         DateTime?              @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status            infoDiscountStatusEnum @default(active)
+    status            InfoDiscountStatusEnum @default(active)
 
     @@map("Info_Discount")
 }

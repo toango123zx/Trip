@@ -5,6 +5,7 @@ import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
 import { PrismaService } from '../database/services';
 import { RoleRepository } from '../role/role.repository';
+import { SupplierRepository } from '../supplier/supplier.repository';
 
 import { UserCommandHandlers } from './commands/handlers';
 import { UserQueryHandlers } from './queries/handlers';

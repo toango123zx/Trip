@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { roleStatusEnum } from '@prisma/client';
+import { RoleStatusEnum } from '@prisma/client';
 
 import { InfoPermissionEntity } from '../../info_permission/entities/info_permission.entity';
 import { UserEntity } from '../../user/entities/user.entity';
@@ -35,10 +35,10 @@ export class RoleEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: roleStatusEnum,
-		enumName: 'roleStatusEnum',
+		enum: RoleStatusEnum,
+		enumName: 'RoleStatusEnum',
 	})
-	status: roleStatusEnum;
+	status: RoleStatusEnum;
 	@ApiProperty({
 		type: () => InfoPermissionEntity,
 		isArray: true,

@@ -32,6 +32,7 @@ import {
 	UpdateMyPasswordComand,
 	UpdateUserInformationByUserIdCommand,
 } from './commands/implements';
+import { MyInforamtion } from './decorators';
 import {
 	CreateUserRequestDto,
 	ResetUserPasswordResponseDto,
@@ -41,7 +42,6 @@ import {
 	UserInformationDto,
 } from './dtos';
 import { UserFilterRequestDto } from './dtos/requests/userFilter.request';
-import { MyInforamtion } from './guards';
 import { GetMeQuery, GetUserByUserIdQuery, GetUsersQuery } from './queries/implements';
 
 @ApiTags('User')

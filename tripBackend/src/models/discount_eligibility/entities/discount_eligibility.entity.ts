@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { discountEligibilityStatusEnum } from '@prisma/client';
+import { DiscountEligibilityStatusEnum } from '@prisma/client';
 
 import { DiscountEntity } from '../../discount/entities/discount.entity';
 
@@ -34,10 +34,10 @@ export class DiscountEligibilityEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
-		enum: discountEligibilityStatusEnum,
-		enumName: 'discountEligibilityStatusEnum',
+		enum: DiscountEligibilityStatusEnum,
+		enumName: 'DiscountEligibilityStatusEnum',
 	})
-	status: discountEligibilityStatusEnum;
+	status: DiscountEligibilityStatusEnum;
 	@ApiProperty({
 		type: () => DiscountEntity,
 		isArray: true,

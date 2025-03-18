@@ -1,4 +1,4 @@
-enum cityEnum {
+enum CityEnum {
     AnGiang      @map("An Giang")
     BaRiaVungTau @map("Bà Rịa - Vũng Tàu")
     BacLieu      @map("Bạc Liêu")

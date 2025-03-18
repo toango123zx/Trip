@@ -1,4 +1,4 @@
-enum paymentMethodStatusEnum {
+enum PaymentMethodStatusEnum {
     active
     error
     inactive
@@ -6,7 +6,7 @@ enum paymentMethodStatusEnum {
     @@map("Payment_Method_Status_Enum")
 }
 
-enum transactionTargetEnum {
+enum TransactionTargetEnum {
     deposit
     withdrawal
     pay
@@ -15,14 +15,14 @@ enum transactionTargetEnum {
     @@map("Transaction_Target_Enum")
 }
 
-enum transactionStatusEnum {
+enum TransactionStatusEnum {
     completed
     canceled
 
     @@map("Transaction_Status_Enum")
 }
 
-enum billStatusEnum {
+enum BillStatusEnum {
     done
     paided
     pending
@@ -45,7 +45,7 @@ model paymentMethod {
     deletedAt   DateTime?               @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status      paymentMethodStatusEnum @default(active)
+    status      PaymentMethodStatusEnum @default(active)
 
     bill bill[]
 
@@ -57,7 +57,7 @@ model transaction {
     /// @DtoUpdateHidden
     code              String
     description       String
-    transactionTarget transactionTargetEnum @map("transaction_target")
+    transactionTarget TransactionTargetEnum @map("transaction_target")
     createAt          DateTime              @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
@@ -67,7 +67,7 @@ model transaction {
     deletedAt         DateTime?             @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status            transactionStatusEnum @default(completed)
+    status            TransactionStatusEnum @default(completed)
 
     bill bill[]
 
@@ -95,7 +95,7 @@ model bill {
     deletedAt           DateTime?      @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status              billStatusEnum @default(pending)
+    status              BillStatusEnum @default(pending)
 
     infoBill         infoBill[]
     infoBillDiscount infoBillDiscount[]
