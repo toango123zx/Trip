@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 import { ConnectLocationDto } from '../../location/dto/connect-location.dto';
-import { ConnectProductCategoryDto } from '../../product_category/dto/connect-product_category.dto';
+import { ConnectProductCategoryDto } from '../../productCategory/dto/connect-productCategory.dto';
 import { ConnectSupplierDto } from '../../supplier/dto/connect-supplier.dto';
 
 export class CreateProductSupplierRelationInputDto {
