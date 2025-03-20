@@ -217,8 +217,9 @@ model productSchedule {
     product    product                   @relation(fields: [productId], references: [id])
     startTime  DateTime                  @map("start_time")
     endTime    DateTime                  @map("end_time")
+    /// @minimum 1
     price      Int
-    booked     Int
+    booked     Int                       @default(0)
     startOrder DateTime                  @map("start_order")
     endOrder   DateTime                  @map("end_order")
     /// @DtoCreateHidden
