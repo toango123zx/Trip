@@ -39,19 +39,13 @@ export class CreateProductScheduleDto {
 	@IsDateString()
 	endTime: Date;
 	@ApiProperty({
+		minimum: 1,
 		type: 'integer',
 		format: 'int32',
 	})
 	@IsNotEmpty()
 	@IsInt()
 	price: number;
-	@ApiProperty({
-		type: 'integer',
-		format: 'int32',
-	})
-	@IsNotEmpty()
-	@IsInt()
-	booked: number;
 	@ApiProperty({
 		type: 'string',
 		format: 'date-time',

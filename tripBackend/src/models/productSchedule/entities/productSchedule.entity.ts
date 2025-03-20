@@ -32,6 +32,7 @@ export class ProductScheduleEntity {
 	})
 	endTime: Date;
 	@ApiProperty({
+		minimum: 1,
 		type: 'integer',
 		format: 'int32',
 	})

@@ -39,7 +39,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 				},
 			}),
 		};
-		const [products, totalRecords] = await this.productRepository.getProducts(
+		const [products, totalRecords] = await this.productRepository.findProducts(
 			pagination,
 			productOrderBy,
 		);
