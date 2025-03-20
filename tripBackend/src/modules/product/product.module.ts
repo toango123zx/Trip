@@ -11,6 +11,7 @@ import { UserRepository } from '../user/user.repository';
 import { ProductCommandHandlers } from './commands/handlers';
 import { ProductController } from './product.controller';
 import { ProductRepository } from './product.repository';
+import { ProductQueryHandlers } from './queries/handller';
 
 @Module({
 	imports: [CqrsModule, DatabaseModule, AuthModule],
@@ -21,6 +22,7 @@ import { ProductRepository } from './product.repository';
 		ProductRepository,
 		LocationRepository,
 		ProductCategoryRepository,
+		...ProductQueryHandlers,
 		...ProductCommandHandlers,
 	],
 	exports: [],
