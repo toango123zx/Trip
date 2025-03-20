@@ -20,6 +20,7 @@ export class UpdateProductScheduleDto {
 	@IsDateString()
 	endTime?: Date;
 	@ApiProperty({
+		minimum: 1,
 		type: 'integer',
 		format: 'int32',
 		required: false,
@@ -27,14 +28,6 @@ export class UpdateProductScheduleDto {
 	@IsOptional()
 	@IsInt()
 	price?: number;
-	@ApiProperty({
-		type: 'integer',
-		format: 'int32',
-		required: false,
-	})
-	@IsOptional()
-	@IsInt()
-	booked?: number;
 	@ApiProperty({
 		type: 'string',
 		format: 'date-time',

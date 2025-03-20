@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { ProductStatusEnum } from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
 import { CreateProductDto, ProductEntity } from 'src/models';
 
@@ -11,12 +12,12 @@ import { ProductOrderByDto } from './dtos/productOrderBy.dto';
 export class ProductRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async getProducts(
+	async findProducts(
 		pagination: IPaginationQuery,
 		filter?: ProductOrderByDto,
 	): Promise<[ProductEntity[], number]> {
 		const orderBy = [];
-		if (filter.location.displayName && filter.location.city) {
+		if (filter.location?.displayName && filter.location?.city) {
 			orderBy.push(
 				{
 					location: {
@@ -57,6 +58,34 @@ export class ProductRepository {
 			this.prismaService.product.count(),
 		]);
 		return [products, totalRecords];
+	}
+
+	async findProductByProductId(
+		productId: string,
+		prodcutStatus: ProductStatusEnum,
+	): Promise<ProductEntity> {
+		return this.prismaService.product.findFirst({
+			include: {
+				supplier: {
+					include: {
+						user: true,
+					},
+				},
+				productImage: true,
+				productSchedule: true,
+				productRate: {
+					include: {
+						user: true,
+					},
+				},
+				location: true,
+				productCategory: true,
+			},
+			where: {
+				id: productId,
+				status: prodcutStatus,
+			},
+		});
 	}
 
 	async createProduct(productInformation: CreateProductDto): Promise<ProductEntity> {

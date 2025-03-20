@@ -5,6 +5,7 @@ import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
 import { LocationRepository } from '../location/location.repository';
 import { ProductCategoryRepository } from '../productCategory/productCategory.repository';
+import { ProductScheduleRepository } from '../productSchedule/productSchedule.repository';
 import { SupplierRepository } from '../supplier/supplier.repository';
 import { UserRepository } from '../user/user.repository';
 
@@ -22,6 +23,7 @@ import { ProductQueryHandlers } from './queries/handller';
 		ProductRepository,
 		LocationRepository,
 		ProductCategoryRepository,
+		ProductScheduleRepository,
 		...ProductQueryHandlers,
 		...ProductCommandHandlers,
 	],
