@@ -18,7 +18,8 @@ import {
 	GetProductsResponseDto,
 	ProductFilterRequestDto,
 } from './dtos';
-import { GetProductsQuery } from './queries/implement';
+import { GetProductByProductIdResponseDto } from './dtos/responses/getProductBByProductId.response';
+import { GetProductByProductIdQuery, GetProductsQuery } from './queries/implement';
 
 @Controller('prodcut')
 export class ProductController {
@@ -33,6 +34,13 @@ export class ProductController {
 		@Query() filter?: ProductFilterRequestDto,
 	): Promise<HttpResponseBodyDto<GetProductsResponseDto[]>> {
 		return this.queryBus.execute(new GetProductsQuery(pagination, filter));
+	}
+
+	@Get('/:productId')
+	async getProductByProductId(
+		@Param('productId') productId: string,
+	): Promise<HttpResponseBodyDto<GetProductByProductIdResponseDto | HttpException>> {
+		return this.queryBus.execute(new GetProductByProductIdQuery(productId));
 	}
 
 	@Post()

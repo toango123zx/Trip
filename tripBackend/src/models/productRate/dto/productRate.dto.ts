@@ -14,6 +14,10 @@ export class ProductRateDto {
 	star: number;
 	@ApiProperty({
 		type: 'string',
+	})
+	comment: string;
+	@ApiProperty({
+		type: 'string',
 		format: 'date-time',
 	})
 	createAt: Date;
