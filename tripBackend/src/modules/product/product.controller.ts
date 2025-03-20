@@ -13,7 +13,7 @@ import {
 	CreateProductScheduleByProductIdCommand,
 } from './commands/implements';
 import {
-	CreateProdcutScheduleByProductIdRequestDto,
+	CreateProductScheduleByProductIdRequestDto,
 	CreateProductRequestDto,
 	GetProductsResponseDto,
 	ProductFilterRequestDto,
@@ -50,7 +50,7 @@ export class ProductController {
 	@AuthPermission(PermissionEnum.CreateProductSchedule)
 	async createProductScheduleByProductId(
 		@Param('productId') productId: string,
-		@Body() productScheduleInformation: CreateProdcutScheduleByProductIdRequestDto,
+		@Body() productScheduleInformation: CreateProductScheduleByProductIdRequestDto,
 		@SupplierInforamtion() supplierInformation: SupplierInformationDto,
 	): Promise<HttpResponseBodyDto<ProductScheduleEntity | HttpException>> {
 		return this.commandBus.execute(

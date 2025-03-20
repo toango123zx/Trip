@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsInt, IsNotEmpty, Min } from 'class-validator';
 import { AutoTrim, IsAfterToday } from 'src/common/decorators';
 
-export class CreateProdcutScheduleByProductIdRequestDto {
+export class CreateProductScheduleByProductIdRequestDto {
 	@ApiProperty({
 		type: 'string',
 		format: 'date-time',

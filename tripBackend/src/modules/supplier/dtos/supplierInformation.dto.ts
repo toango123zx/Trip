@@ -1,5 +1,5 @@
 import { $Enums } from '@prisma/client';
-import { PermissionEntity, RoleEntity } from 'src/models';
+import { PermissionEntity, ProductEntity, RoleEntity } from 'src/models';
 
 export class SupplierInformationDto {
 	userId: string;
@@ -26,4 +26,11 @@ export class SupplierInformationDto {
 		fee: number;
 		taxId: string;
 	};
+
+	async checkSupplierIsProductSupplier(product: ProductEntity): Promise<boolean> {
+		if (this.supplier.id !== product.supplier.id) {
+			return false;
+		}
+		return true;
+	}
 }

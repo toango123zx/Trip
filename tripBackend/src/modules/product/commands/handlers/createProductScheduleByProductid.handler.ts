@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { ProductStatusEnum, UserStatusEnum } from '@prisma/client';
+import { ProductStatusEnum } from '@prisma/client';
 import {
 	HttpResponseBodySuccessDto,
 	NotFoundException,
@@ -42,13 +42,6 @@ export class CreateProductScheduleByProductIdHandler
 			throw new ValidationException('End order must be after start order.');
 		}
 
-		if (supplierInformation.status != UserStatusEnum.active) {
-			throw new OptionalException(
-				HttpStatus.FORBIDDEN,
-				'You are not an active user.',
-			);
-		}
-
 		const product = await this.productRepository.findProductByProductId(
 			productId,
 			ProductStatusEnum.active,
@@ -58,7 +51,7 @@ export class CreateProductScheduleByProductIdHandler
 			throw new NotFoundException('productId');
 		}
 
-		if (supplierInformation.supplier.id !== product.supplier.id) {
+		if (!supplierInformation.checkSupplierIsProductSupplier(product)) {
 			throw new OptionalException(
 				HttpStatus.FORBIDDEN,
 				'You are not a product supplier.',
