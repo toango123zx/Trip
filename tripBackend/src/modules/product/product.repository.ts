@@ -62,7 +62,7 @@ export class ProductRepository {
 
 	async findProductByProductId(
 		productId: string,
-		prodcutStatus: ProductStatusEnum,
+		prodcutStatus?: ProductStatusEnum,
 	): Promise<ProductEntity> {
 		return this.prismaService.product.findFirst({
 			include: {

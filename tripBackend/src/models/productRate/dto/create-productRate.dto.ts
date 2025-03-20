@@ -1,7 +1,7 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 
 import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, ValidateNested } from 'class-validator';
+import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
 import { ConnectProductDto } from '../../product/dto/connect-product.dto';
 import { ConnectUserDto } from '../../user/dto/connect-user.dto';
@@ -53,4 +53,10 @@ export class CreateProductRateDto {
 	@IsNotEmpty()
 	@IsInt()
 	star: number;
+	@ApiProperty({
+		type: 'string',
+	})
+	@IsNotEmpty()
+	@IsString()
+	comment: string;
 }
