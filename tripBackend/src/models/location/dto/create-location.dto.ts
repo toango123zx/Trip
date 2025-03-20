@@ -4,7 +4,7 @@ import { CityEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
 
-import { ConnectMapAddressDto } from '../../map_address/dto/connect-map_address.dto';
+import { ConnectMapAddressDto } from '../../mapAddress/dto/connect-mapAddress.dto';
 
 export class CreateLocationMapAddressRelationInputDto {
 	@ApiProperty({

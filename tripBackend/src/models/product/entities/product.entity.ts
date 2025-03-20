@@ -3,10 +3,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ProductStatusEnum } from '@prisma/client';
 
 import { LocationEntity } from '../../location/entities/location.entity';
-import { ProductCategoryEntity } from '../../product_category/entities/product_category.entity';
-import { ProductImageEntity } from '../../product_image/entities/product_image.entity';
-import { ProductRateEntity } from '../../product_rate/entities/product_rate.entity';
-import { ProductScheduleEntity } from '../../product_schedule/entities/product_schedule.entity';
+import { ProductCategoryEntity } from '../../productCategory/entities/productCategory.entity';
+import { ProductImageEntity } from '../../productImage/entities/productImage.entity';
+import { ProductRateEntity } from '../../productRate/entities/productRate.entity';
+import { ProductScheduleEntity } from '../../productSchedule/entities/productSchedule.entity';
 import { SupplierEntity } from '../../supplier/entities/supplier.entity';
 
 export class ProductEntity {

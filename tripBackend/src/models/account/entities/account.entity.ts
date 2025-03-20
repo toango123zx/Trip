@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { AccountStatusEnum } from '@prisma/client';
 
 import { UserEntity } from '../../user/entities/user.entity';
-import { VerifyEmailEntity } from '../../verify_email/entities/verify_email.entity';
+import { VerifyEmailEntity } from '../../verifyEmail/entities/verifyEmail.entity';
 
 export class AccountEntity {
 	@ApiProperty({

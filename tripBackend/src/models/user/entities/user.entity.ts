@@ -3,13 +3,13 @@ import { ApiProperty } from '@nestjs/swagger';
 import { GenderUserEnum, UserStatusEnum } from '@prisma/client';
 
 import { AccountEntity } from '../../account/entities/account.entity';
-import { AccountExternalEntity } from '../../account_external/entities/account_external.entity';
+import { AccountExternalEntity } from '../../accountExternal/entities/accountExternal.entity';
 import { BillEntity } from '../../bill/entities/bill.entity';
-import { BoxChatMemberEntity } from '../../box_chat_member/entities/box_chat_member.entity';
+import { BoxChatMemberEntity } from '../../boxChatMember/entities/boxChatMember.entity';
 import { CartEntity } from '../../cart/entities/cart.entity';
 import { DiscountEntity } from '../../discount/entities/discount.entity';
 import { MessageEntity } from '../../message/entities/message.entity';
-import { ProductRateEntity } from '../../product_rate/entities/product_rate.entity';
+import { ProductRateEntity } from '../../productRate/entities/productRate.entity';
 import { RoleEntity } from '../../role/entities/role.entity';
 import { SupplierEntity } from '../../supplier/entities/supplier.entity';
 

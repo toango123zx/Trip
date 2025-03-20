@@ -2,12 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { DiscountProviderTypeEnum, DiscountStatusEnum } from '@prisma/client';
 
-import { DiscountApplicationScopeEntity } from '../../discount_application_scope/entities/discount_application_scope.entity';
-import { DiscountEligibilityEntity } from '../../discount_eligibility/entities/discount_eligibility.entity';
-import { DiscountForBillEntity } from '../../discount_for_bill/entities/discount_for_bill.entity';
-import { DiscountTypeEntity } from '../../discount_type/entities/discount_type.entity';
-import { InfoBillDiscountEntity } from '../../info_bill_discount/entities/info_bill_discount.entity';
-import { InfoDiscountEntity } from '../../info_discount/entities/info_discount.entity';
+import { DiscountApplicationScopeEntity } from '../../discountApplicationScope/entities/discountApplicationScope.entity';
+import { DiscountEligibilityEntity } from '../../discountEligibility/entities/discountEligibility.entity';
+import { DiscountForBillEntity } from '../../discountForBill/entities/discountForBill.entity';
+import { DiscountTypeEntity } from '../../discountType/entities/discountType.entity';
+import { InfoBillDiscountEntity } from '../../infoBillDiscount/entities/infoBillDiscount.entity';
+import { InfoDiscountEntity } from '../../infoDiscount/entities/infoDiscount.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
 export class DiscountEntity {

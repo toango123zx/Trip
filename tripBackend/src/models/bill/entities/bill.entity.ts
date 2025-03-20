@@ -2,10 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { BillStatusEnum } from '@prisma/client';
 
-import { DiscountForBillEntity } from '../../discount_for_bill/entities/discount_for_bill.entity';
-import { InfoBillEntity } from '../../info_bill/entities/info_bill.entity';
-import { InfoBillDiscountEntity } from '../../info_bill_discount/entities/info_bill_discount.entity';
-import { PaymentMethodEntity } from '../../payment_method/entities/payment_method.entity';
+import { DiscountForBillEntity } from '../../discountForBill/entities/discountForBill.entity';
+import { InfoBillEntity } from '../../infoBill/entities/infoBill.entity';
+import { InfoBillDiscountEntity } from '../../infoBillDiscount/entities/infoBillDiscount.entity';
+import { PaymentMethodEntity } from '../../paymentMethod/entities/paymentMethod.entity';
 import { TransactionEntity } from '../../transaction/entities/transaction.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 

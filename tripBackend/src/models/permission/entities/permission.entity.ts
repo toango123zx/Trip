@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { PermissionStatusEnum } from '@prisma/client';
 
-import { InfoPermissionEntity } from '../../info_permission/entities/info_permission.entity';
+import { InfoPermissionEntity } from '../../infoPermission/entities/infoPermission.entity';
 
 export class PermissionEntity {
 	@ApiProperty({
