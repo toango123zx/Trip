@@ -8,7 +8,12 @@ import {
 	OptionalException,
 	ValidationException,
 } from 'src/common';
-import { CreateProductScheduleDto, ProductScheduleEntity } from 'src/models';
+import {
+	CreateProductScheduleDto,
+	ProductEntity,
+	ProductScheduleEntity,
+} from 'src/models';
+import { SupplierInformationDto } from 'src/modules/supplier/dtos';
 
 import { ProductScheduleRepository } from 'src/modules/productSchedule/productSchedule.repository';
 
@@ -23,6 +28,19 @@ export class CreateProductScheduleByProductIdHandler
 		private readonly productRepository: ProductRepository,
 		private readonly productScheduleRepository: ProductScheduleRepository,
 	) {}
+
+	private checkSupplierPermissions(
+		supplier: SupplierInformationDto,
+		product: ProductEntity,
+	): void | HttpException {
+		if (!supplier.checkSupplierIsProductSupplier(product)) {
+			throw new OptionalException(
+				HttpStatus.FORBIDDEN,
+				'You are not a product supplier.',
+			);
+		}
+		return;
+	}
 
 	async execute(
 		command: CreateProductScheduleByProductIdCommand,
@@ -51,12 +69,7 @@ export class CreateProductScheduleByProductIdHandler
 			throw new NotFoundException('productId');
 		}
 
-		if (!supplierInformation.checkSupplierIsProductSupplier(product)) {
-			throw new OptionalException(
-				HttpStatus.FORBIDDEN,
-				'You are not a product supplier.',
-			);
-		}
+		this.checkSupplierPermissions(supplierInformation, product);
 
 		const productScheduleInformation: CreateProductScheduleDto = {
 			product: {
