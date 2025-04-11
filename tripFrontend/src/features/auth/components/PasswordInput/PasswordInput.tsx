@@ -1,0 +1,51 @@
+'use client';
+
+import { Eye, EyeOff } from 'lucide-react';
+import { useState, JSX, RefObject } from 'react';
+
+import { cn } from '@/lib/cn';
+type Props = {
+	label?: string;
+	placeholder?: string;
+	value?: RefObject<HTMLInputElement | null>;
+	error?: string;
+	className?: string;
+};
+
+export const PasswordInput = ({
+	label,
+	placeholder,
+	value,
+	error,
+	className,
+}: Props): JSX.Element => {
+	const [showPassword, setShowPassword] = useState(false);
+
+	return (
+		<div className="w-full">
+			{label && <label className="block text-orange-500 text-sm">{label}</label>}
+			<div className="relative">
+				<input
+					type={showPassword ? 'text' : 'password'}
+					id="password"
+					ref={value}
+					placeholder={placeholder}
+					autoComplete="current-password"
+					className={cn(
+						'w-full px-4 py-3 rounded-md bg-[#F8EFE4] border border-[#F8EFE4] focus:outline-none focus:border-[#FF7A22] transition-colors pr-10',
+						error && 'border-red-500',
+						className,
+					)}
+				/>
+				<button
+					type="button"
+					className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500"
+					onClick={() => setShowPassword(!showPassword)}
+				>
+					{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+				</button>
+			</div>
+			{error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+		</div>
+	);
+};
