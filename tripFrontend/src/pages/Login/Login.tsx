@@ -3,17 +3,16 @@
 import { JSX } from 'react';
 
 import { Footer, Header } from '@/components';
+import { LoginForm } from '@/features';
 
-import { SignInForm } from './components';
-
-const SignInPage = (): JSX.Element => {
+const LoginPage = (): JSX.Element => {
 	return (
 		<div className="min-h-screen flex flex-col">
 			<Header />
 
 			<main className="flex-grow">
 				<div className="flex flex-col md:flex-row h-full">
-					<SignInForm />
+					<LoginForm />
 				</div>
 			</main>
 
@@ -22,4 +21,4 @@ const SignInPage = (): JSX.Element => {
 	);
 };
 
-export default SignInPage;
+export default LoginPage;

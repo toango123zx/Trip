@@ -7,7 +7,7 @@ import { cn } from '@/lib/cn';
 type Props = {
 	label?: string;
 	placeholder?: string;
-	value?: RefObject<HTMLInputElement | null>;
+	valueRef?: RefObject<HTMLInputElement | null>;
 	error?: string;
 	className?: string;
 };
@@ -15,7 +15,7 @@ type Props = {
 export const PasswordInput = ({
 	label,
 	placeholder,
-	value,
+	valueRef,
 	error,
 	className,
 }: Props): JSX.Element => {
@@ -23,12 +23,14 @@ export const PasswordInput = ({
 
 	return (
 		<div className="w-full">
-			{label && <label className="block text-orange-500 text-sm">{label}</label>}
+			{label && (
+				<label className="block mb-1 text-orange-500 text-sm">{label}</label>
+			)}
 			<div className="relative">
 				<input
 					type={showPassword ? 'text' : 'password'}
 					id="password"
-					ref={value}
+					ref={valueRef}
 					placeholder={placeholder}
 					autoComplete="current-password"
 					className={cn(
@@ -42,7 +44,7 @@ export const PasswordInput = ({
 					className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-500"
 					onClick={() => setShowPassword(!showPassword)}
 				>
-					{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+					{showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
 				</button>
 			</div>
 			{error && <p className="mt-1 text-xs text-red-500">{error}</p>}

@@ -1,1 +1,1 @@
-export * from './apiBackend';
+export * from './api';

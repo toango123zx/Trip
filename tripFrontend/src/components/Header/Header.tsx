@@ -23,7 +23,12 @@ type Props = {
 
 export const Header = ({ className }: Props): JSX.Element => {
 	return (
-		<header className={cn('w-full py-4 px-6 md:py-12 md:px-24 bg-white', className)}>
+		<header
+			className={cn(
+				'w-full py-4 px-6 md:py-12 md:px-24  bg-gradient-to-b from-[#fffdea]/100 to-white/0',
+				className,
+			)}
+		>
 			<div className="max-w-7xl mx-auto flex justify-start items-center gap-[287px]">
 				<Link to="/" className="flex items-center">
 					<img

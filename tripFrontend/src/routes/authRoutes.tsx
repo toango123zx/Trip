@@ -1,16 +1,15 @@
 import { lazy } from 'react';
 
-import SignInForm from '@/features/auth/SignInPage';
-
-const LoginPage = lazy(() => import('@/pages/SignIn'));
+const LoginPage = lazy(() => import('@/pages/Login'));
+const RegisterPage = lazy(() => import('@/pages/Register'));
 
 export const authRoutes = [
 	{
-		path: '/auth/sign-in',
-		element: <SignInForm />,
+		path: '/auth/login',
+		element: <LoginPage />,
 	},
 	{
 		path: '/auth/register',
-		element: <LoginPage />,
+		element: <RegisterPage />,
 	},
 ];
