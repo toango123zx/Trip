@@ -8,7 +8,7 @@ type Props = {
 	className?: string;
 	value?: React.RefObject<HTMLInputElement | null>;
 	label?: string;
-	[key: string]: string | object | void | undefined;
+	[key: string]: string | object | undefined | void;
 };
 
 export const Checkbox = ({ className, value, label, ...props }: Props): JSX.Element => {

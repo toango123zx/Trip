@@ -5,3 +5,12 @@ export type TAuthState = {
 	loading: boolean;
 	error: string | null;
 };
+
+export type TRequestBodyLoginApi = {
+	username: string;
+	password: string;
+};
+
+export type TDataLogin = {
+	accessToken: string;
+};

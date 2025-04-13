@@ -10,7 +10,7 @@ type Props = {
 	label?: string;
 	error?: string;
 	type?: string;
-	[key: string]: string | object | void | undefined;
+	[key: string]: string | object | undefined | void;
 };
 
 export const Input = ({

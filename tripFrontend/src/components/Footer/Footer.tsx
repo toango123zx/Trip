@@ -14,7 +14,7 @@ export const Footer = (): JSX.Element => {
 						<Link to="/" className="inline-block mb-4">
 							<img
 								src={logos.subTravalidLogo}
-								alt="Travalid Lgoo"
+								alt="Travalid Logosuccess"
 								className="w-44 h-20 py-2.5"
 							/>
 						</Link>
