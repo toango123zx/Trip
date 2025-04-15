@@ -1,14 +1,14 @@
 'use client';
 
-import { JSX, useState } from 'react';
+import { JSX, useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
-
 import { loginImages } from '@/assets';
+import { AuthApi } from '@/features/auth/authApi';
 
-import { LoginApi } from '../../authApi';
 import { PasswordInput } from '../PasswordInput';
 import { SubmitButton } from '../SubmitButton';
+import { message } from 'antd';
 
 type LoginFormInputs = {
 	username: string;
@@ -16,11 +16,22 @@ type LoginFormInputs = {
 };
 
 export const LoginForm = (): JSX.Element => {
-	const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
-	const [rememberMe, setRememberMe] = useState(false);
+	const { register, handleSubmit, formState: { errors }, setValue } = useForm<LoginFormInputs>();
+	const [rememberMe, setRememberMe] = useState(() => {
+		const savedUsername = localStorage.getItem('rememberedUsername');
+		return !!savedUsername;
+	});
 	const [loginError, setLoginError] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const navigate = useNavigate();
+
+	// Load saved username if exists
+	useEffect(() => {
+		const savedUsername = localStorage.getItem('rememberedUsername');
+		if (savedUsername) {
+			setValue('username', savedUsername);
+		}
+	}, [setValue]);
 
 	const image = loginImages.loginBackground;
 
@@ -28,24 +39,36 @@ export const LoginForm = (): JSX.Element => {
 		try {
 			setIsSubmitting(true);
 			setLoginError(null);
-
-			const data = await LoginApi(
+	
+			const data = await AuthApi.login(
 				String(formData.username),
 				String(formData.password),
 			);
-
+	
 			if (!data.accessToken) {
-				setLoginError("Invalid username or password");
+				message.error("Invalid username or password");
 				return;
 			}
 
+			// Handle remember me
+			if (rememberMe) {
+				localStorage.setItem('rememberedUsername', formData.username);
+			} else {
+				localStorage.removeItem('rememberedUsername');
+			}
+	
 			navigate('/');
-		} catch (error) {
-			setLoginError("An error occurred during login. Please try again.");
+		} catch (error: any) {
+			const errorMsg =
+				error?.response?.data?.message ||
+				error?.message ||
+				"An error occurred during login. Please try again.";
+			message.error(errorMsg);
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
+	
 
 	return (
 		<div className="container mx-auto px-4 pt-8 pb-28 max-w-5xl">
@@ -64,12 +87,6 @@ export const LoginForm = (): JSX.Element => {
 					<h2 className="text-7xl text-center font-bold text-orange-500 mb-8">
 						Login{' '}
 					</h2>
-
-					{loginError && (
-						<div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-							{loginError}
-						</div>
-					)}
 
 					<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
 						<div className="space-y-2">
@@ -125,7 +142,8 @@ export const LoginForm = (): JSX.Element => {
 								Forgot your password?
 							</a>
 						</div>
-						<SubmitButton label={isSubmitting ? "Logging in..." : "Login"} />
+						<SubmitButton disabled={isSubmitting} label={isSubmitting ? "Logging in..." : "Login"} />
+
 					</form>
 
 					<p className="text-center mt-6 text-gray-700">
