@@ -2,6 +2,7 @@
 
 import { JSX } from 'react';
 
+import { Footer, Header } from '@/components';
 import { LoginForm } from '@/features';
 import { MainLayout } from '@/layouts';
 

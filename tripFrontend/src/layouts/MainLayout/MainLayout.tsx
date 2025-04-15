@@ -9,14 +9,12 @@ interface IMainLayoutProps {
 
 export const MainLayout = ({ children }: IMainLayoutProps): JSX.Element => {
 	return (
-		<div className="flex flex-col min-h-screen">
+		<div className="flex flex-col min-h-screen w-full overflow-x-hidden">
 			{/* Fixed header at top */}
 			<Header className="sticky top-0 z-50 shadow-sm" />
 
 			{/* Main content */}
-			<main className="flex justify-center items-center">
-				{children || <Outlet />}
-			</main>
+			<main className="flex-1 flex flex-col">{children || <Outlet />}</main>
 
 			{/* Footer */}
 			<Footer />
