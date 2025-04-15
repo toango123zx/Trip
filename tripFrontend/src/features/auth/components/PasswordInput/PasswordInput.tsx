@@ -1,21 +1,23 @@
 'use client';
 
 import { Eye, EyeOff } from 'lucide-react';
-import { useState, JSX, RefObject } from 'react';
+import { useState, JSX } from 'react';
+import { FieldError, UseFormRegisterReturn } from 'react-hook-form';
 
 import { cn } from '@/lib/cn';
+
 type Props = {
+	register?: UseFormRegisterReturn;
 	label?: string;
 	placeholder?: string;
-	valueRef?: RefObject<HTMLInputElement | null>;
-	error?: string;
+	error?: FieldError;
 	className?: string;
 };
 
 export const PasswordInput = ({
+	register,
 	label,
 	placeholder,
-	valueRef,
 	error,
 	className,
 }: Props): JSX.Element => {
@@ -24,13 +26,14 @@ export const PasswordInput = ({
 	return (
 		<div className="w-full">
 			{label && (
-				<label className="block mb-1 text-orange-500 text-sm">{label}</label>
+				<label htmlFor={register?.name} className="block mb-1 text-orange-500 text-sm">
+					{label}
+				</label>
 			)}
 			<div className="relative">
 				<input
 					type={showPassword ? 'text' : 'password'}
-					id="password"
-					ref={valueRef}
+					id={register?.name}
 					placeholder={placeholder}
 					autoComplete="current-password"
 					className={cn(
@@ -38,6 +41,7 @@ export const PasswordInput = ({
 						error && 'border-red-500',
 						className,
 					)}
+					{...register}
 				/>
 				<button
 					type="button"
@@ -47,7 +51,7 @@ export const PasswordInput = ({
 					{showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
 				</button>
 			</div>
-			{error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+			{error && <p className="mt-1 text-xs text-red-700">{error.message}</p>}
 		</div>
 	);
 };

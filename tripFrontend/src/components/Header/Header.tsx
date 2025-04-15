@@ -1,4 +1,4 @@
-import { JSX } from 'react';
+import { JSX, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { logos } from '@/assets';
@@ -22,6 +22,12 @@ type Props = {
 };
 
 export const Header = ({ className }: Props): JSX.Element => {
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+	const toggleMobileMenu = (): void => {
+		setMobileMenuOpen(!mobileMenuOpen);
+	};
+
 	return (
 		<header
 			className={cn(
@@ -29,12 +35,12 @@ export const Header = ({ className }: Props): JSX.Element => {
 				className,
 			)}
 		>
-			<div className="max-w-7xl mx-auto flex justify-start items-center gap-[287px]">
+			<div className="max-w-7xl mx-auto flex justify-between md:justify-start items-center md:gap-[287px]">
 				<Link to="/" className="flex items-center">
 					<img
 						src={logos.mainTravalidLogo}
 						alt="Travalid Logo"
-						className="h-14 p-2.5"
+						className="h-5 md:h-14 md:p-2.5"
 					/>
 				</Link>
 
@@ -52,7 +58,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 				</nav>
 
 				{/* Mobile Navigation Toggle */}
-				<button className="md:hidden text-gray-800">
+				<button className="md:hidden text-gray-800" onClick={toggleMobileMenu} aria-label="Toggle mobile menu" aria-expanded={mobileMenuOpen} aria-controls="mobile-menu">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
@@ -68,6 +74,23 @@ export const Header = ({ className }: Props): JSX.Element => {
 						/>
 					</svg>
 				</button>
+				{/* Mobile Menu */}
+				{mobileMenuOpen && (
+					<div className="md:hidden absolute top-20 left-0 right-0 bg-white p-4 shadow-md z-50">
+						<nav className="flex flex-col space-y-4">
+							{navItems.map((item) => (
+								<Link
+									key={item.label}
+									to={item.href}
+									className="text-gray-800 hover:text-[#FF7A22] transition-colors duration-200"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									{item.label}
+								</Link>
+							))}
+						</nav>
+					</div>
+				)}
 			</div>
 		</header>
 	);

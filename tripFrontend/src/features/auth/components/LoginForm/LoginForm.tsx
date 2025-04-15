@@ -1,6 +1,7 @@
 'use client';
 
-import { JSX, useRef, useState } from 'react';
+import { JSX, useState } from 'react';
+import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 
 import { loginImages } from '@/assets';
@@ -9,37 +10,47 @@ import { LoginApi } from '../../authApi';
 import { PasswordInput } from '../PasswordInput';
 import { SubmitButton } from '../SubmitButton';
 
+type LoginFormInputs = {
+	username: string;
+	password: string;
+};
+
 export const LoginForm = (): JSX.Element => {
-	const username = useRef<HTMLInputElement>(null);
-	const password = useRef<HTMLInputElement>(null);
+	const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
 	const [rememberMe, setRememberMe] = useState(false);
+	const [loginError, setLoginError] = useState<string | null>(null);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const navigate = useNavigate();
 
 	const image = loginImages.loginBackground;
 
-	const handlerSubmitClick = async (): Promise<void> => {
-		if (!username.current?.value || !password.current?.value) {
-			alert('Please fill in username and password');
-			return;
+	const onSubmit = async (formData: LoginFormInputs) => {
+		try {
+			setIsSubmitting(true);
+			setLoginError(null);
+
+			const data = await LoginApi(
+				String(formData.username),
+				String(formData.password),
+			);
+
+			if (!data.accessToken) {
+				setLoginError("Invalid username or password");
+				return;
+			}
+
+			navigate('/');
+		} catch (error) {
+			setLoginError("An error occurred during login. Please try again.");
+		} finally {
+			setIsSubmitting(false);
 		}
-
-		const data = await LoginApi(
-			String(username.current?.value),
-			String(password.current?.value),
-		);
-		if (!data.accessToken) {
-			return;
-		}
-
-		localStorage.setItem('accessToken', data.accessToken);
-
-		navigate('/');
 	};
 
 	return (
 		<div className="container mx-auto px-4 pt-8 pb-28 max-w-5xl">
 			<div className="flex flex-col md:flex-row rounded-lg overflow-hidden shadow-lg">
-				{/* Left side - Image with overlay text */}
+				{/* Left side - Image */}
 				<div className="relative w-full md:w-1/2 h-[300px] md:h-auto">
 					<img
 						src={image}
@@ -54,20 +65,40 @@ export const LoginForm = (): JSX.Element => {
 						Login{' '}
 					</h2>
 
-					<form className="space-y-6">
+					{loginError && (
+						<div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+							{loginError}
+						</div>
+					)}
+
+					<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
 						<div className="space-y-2">
-							<p className="mb-1 text-orange-500 text-sm ">Username:</p>
+							<p className="mb-1 text-orange-500 text-sm">Username:</p>
 							<input
 								type="text"
 								id="username"
-								ref={username}
 								autoComplete="username"
-								className="w-full bg-[#F8EFE4]  p-3 rounded-md  border-none focus:ring-1 focus:ring-[#FF7A22] focus:outline-none transition-colors"
+								{...register("username", { required: "Username is required" })}
+								className={`w-full bg-[#F8EFE4] p-3 rounded-md ${errors.username ? "border border-red-500" : "border-none"} focus:ring-1 focus:ring-[#FF7A22] focus:outline-none transition-colors`}
 							/>
+							{errors.username && (
+								<p className="mt-1 text-xs text-red-700">{errors.username.message}</p>
+							)}
 						</div>
 
 						<div className="space-y-2">
-							<PasswordInput label="Password: " valueRef={password} />
+							<PasswordInput
+								label="Password: "
+								error={errors.password}
+								register={register("password", {
+									required: "Password is required",
+									minLength: {
+										value: 6,
+										message: "Password must be at least 6 characters"
+									}
+								})}
+							/>
+							{/* Password errors are now handled by the PasswordInput component */}
 						</div>
 
 						<div className="flex justify-between items-center">
@@ -94,7 +125,7 @@ export const LoginForm = (): JSX.Element => {
 								Forgot your password?
 							</a>
 						</div>
-						<SubmitButton label="Login" onClick={handlerSubmitClick} />
+						<SubmitButton label={isSubmitting ? "Logging in..." : "Login"} />
 					</form>
 
 					<p className="text-center mt-6 text-gray-700">
