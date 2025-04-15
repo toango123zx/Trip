@@ -7,7 +7,7 @@ export class GetProductsResponseDto {
 	quantityAvailable: number;
 	age: number;
 	quantityCompleted: number;
-	despcription: string;
+	description: string;
 	quantityRate: number;
 	avgRate: number;
 	productCategoryName: string;
@@ -32,7 +32,7 @@ export class GetProductsResponseDto {
 		this.quantityAvailable = product.quantityAvailable;
 		this.age = product.age;
 		this.quantityCompleted = product.quantityCompleted;
-		this.despcription = product.description;
+		this.description = product.description;
 		this.quantityRate = product.quantityRate;
 		this.avgRate = product.avgRate;
 		this.productCategoryName = product.productCategory.name;

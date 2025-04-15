@@ -7,7 +7,7 @@ export class NotFoundException extends HttpException {
 		}
 		super(
 			{
-				status: 'fail',
+				success: false,
 				message: `Resource not found ${location}`,
 			},
 			HttpStatus.NOT_FOUND,

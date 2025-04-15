@@ -1,8 +1,15 @@
-import { Body, Controller, HttpException, Post, UseFilters } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	HttpException,
+	Post,
+	UseFilters,
+	UseInterceptors,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
-import { HttpResponseBodyDto } from 'src/common';
+import { HttpResponseBodyDto, SetCookieInterceptor } from 'src/common';
 import { DatabaseException } from 'src/common/exceptions/database.exception';
 
 import { LoginCommand, RegisterCommand } from './commands/implements';
@@ -30,6 +37,7 @@ export class AuthController {
 	}
 
 	@Post('login')
+	@UseInterceptors(SetCookieInterceptor)
 	async loginUser(
 		@Body() loginDto: LoginRequestDto,
 	): Promise<HttpResponseBodyDto<LoginResponseDto | HttpException>> {

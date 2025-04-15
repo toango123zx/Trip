@@ -4,7 +4,7 @@ export class ForbiddenException extends HttpException {
 	constructor() {
 		super(
 			{
-				status: 'fail',
+				success: false,
 				message:
 					'The user does not have permission to make changes to this resource',
 			},

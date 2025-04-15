@@ -7,7 +7,7 @@ export class InternalServerErrorException extends HttpException {
 		}
 		super(
 			{
-				status: 'fail',
+				success: false,
 				message: `Error from the server ${location}`,
 			},
 			HttpStatus.INTERNAL_SERVER_ERROR,
