@@ -1,7 +1,16 @@
+'use client';
+
 import { JSX } from 'react';
 
-const Login = (): JSX.Element => {
-	return <div>Login</div>;
+import { LoginForm } from '@/features';
+import { MainLayout } from '@/layouts';
+
+const LoginPage = (): JSX.Element => {
+	return (
+		<MainLayout>
+			<LoginForm />
+		</MainLayout>
+	);
 };
 
-export default Login;
+export default LoginPage;

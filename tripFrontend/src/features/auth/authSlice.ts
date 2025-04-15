@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 import { TAuthState } from './authType';
 
-const initialStateL: TAuthState = {
+const initialState: TAuthState = {
 	account: [],
 	loading: false,
 	error: null,
@@ -10,6 +10,6 @@ const initialStateL: TAuthState = {
 
 export const authSlice = createSlice({
 	name: 'auth',
-	initialState: initialStateL,
+	initialState: initialState,
 	reducers: {},
 });
