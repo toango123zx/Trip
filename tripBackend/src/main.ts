@@ -7,6 +7,7 @@ import { ValidationException } from './common';
 import { DatabaseException } from './common/exceptions/database.exception';
 import { HttpExceptionFilter } from './common/filters/exception.filter';
 import * as morgan from 'morgan';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, { cors: true });
@@ -17,12 +18,12 @@ async function bootstrap() {
 			exceptionFactory: (errors) => ValidationException.fromValidationError(errors),
 		}),
 	);
-	app.useGlobalFilters(new HttpExceptionFilter());
-	app.useGlobalFilters(new DatabaseException());
+	app.useGlobalFilters(new HttpExceptionFilter(), new DatabaseException());
 
 	const port = commonAppConfig.port;
 	setupSwagger(app);
 	app.use(morgan('combined'));
+	app.use(cookieParser(commonAppConfig.cookieSecret));
 
 	await app.listen(port);
 

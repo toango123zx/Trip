@@ -6,7 +6,7 @@ export class ValidationException extends HttpException {
 	constructor(message: string = 'request validation data failed') {
 		super(
 			{
-				status: 'fail',
+				success: false,
 				message: message,
 			},
 			HttpStatus.UNPROCESSABLE_ENTITY,

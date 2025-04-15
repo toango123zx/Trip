@@ -58,4 +58,18 @@ export class HttpResponseBodyDto<T> {
 		type: Object,
 	})
 	pagination?: PaginationDto;
+	@ApiProperty({
+		required: false,
+		nullable: true,
+		type: Object,
+		additionalProperties: {
+			oneOf: [
+				{ type: 'string' },
+				{ type: 'number' },
+				{ type: 'boolean' },
+				{ type: 'object' },
+			],
+		},
+	})
+	cookie?: Record<string, string | number | boolean | object>;
 }

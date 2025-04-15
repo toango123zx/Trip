@@ -4,7 +4,7 @@ export class UnauthorizedException extends HttpException {
 	constructor(public readonly location?: string) {
 		super(
 			{
-				status: 'fail',
+				success: false,
 				message: "You're not authenticated",
 			},
 			HttpStatus.UNAUTHORIZED,

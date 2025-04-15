@@ -4,7 +4,7 @@ export class ConflictException extends HttpException {
 	constructor(public readonly location?: string) {
 		super(
 			{
-				status: 'fail',
+				success: false,
 				message: `Resources already exist ${location}`,
 			},
 			HttpStatus.CONFLICT,

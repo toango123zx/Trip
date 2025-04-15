@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 
@@ -7,6 +7,7 @@ import {
 	ForbiddenException,
 	HttpResponseBodySuccessDto,
 	IJwtPayload,
+	NotFoundException,
 	OptionalException,
 	UnauthorizedException,
 } from 'src/common';
@@ -59,6 +60,10 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 			secret: jwtConfig.secret,
 		});
 
-		return { success: true, data: { accessToken: accesToken } };
+		return {
+			success: true,
+			data: { accessToken: accesToken },
+			cookie: { accessToken: accesToken },
+		};
 	}
 }

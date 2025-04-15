@@ -12,7 +12,7 @@ export class OptionalException extends HttpException {
 		}
 		super(
 			{
-				status: 'fail',
+				success: false,
 				message: message,
 			},
 			httpStatusCode,
