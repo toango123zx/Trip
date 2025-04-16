@@ -1,5 +1,5 @@
+import { notification } from 'antd';
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
-import { message } from 'antd';
 
 import {
 	DOMAIN_BACKEND,
@@ -40,7 +40,11 @@ const handleApiError = (error: AxiosError<IApiError>): void => {
 	}
 
 	// Display error message
-	message.error(errorMessage);
+	notification.error({
+		message: 'Error',
+		description: errorMessage,
+		duration: 5,
+	});
 };
 
 // Factory function to create an API client with custom configurations

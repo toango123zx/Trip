@@ -1,19 +1,26 @@
 import { api } from '@/lib';
 
-import { TDataLogin, TRequestBodyLoginApi } from './authType';
+import {
+	TDataLogin,
+	TDataRegister,
+	TRequestBodyLoginApi,
+	TRequestBodyRegisterApi,
+} from './authType';
 
-export const AuthApi = {
-	login: async (username: string, password: string): Promise<TDataLogin> => {
-		try {
-			const res = await api.post<TRequestBodyLoginApi, TDataLogin>('/auth/login', {
-				username,
-				password,
-			});
-			return res;
-		} catch (err: any) {
-			throw new Error(err?.response?.data?.message || 'Login failed');
-		}
+export const authApi = {
+	async login(loginInfromation: TRequestBodyLoginApi): Promise<TDataLogin> {
+		const data = await api.post<TRequestBodyLoginApi, TDataLogin>(
+			'/auth/login',
+			loginInfromation,
+		);
+		return data;
 	},
-	// register: async ...,
-	// logout: async ...,
+
+	async register(registerInformation: TRequestBodyRegisterApi): Promise<TDataRegister> {
+		const data = await api.post<TRequestBodyRegisterApi, TDataRegister>(
+			'/auth/register',
+			registerInformation,
+		);
+		return data;
+	},
 };
