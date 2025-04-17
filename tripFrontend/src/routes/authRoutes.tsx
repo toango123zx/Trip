@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+
 import { AuthMiddleware } from '@/middleware/authMiddleware';
 
 const LoginPage = lazy(() => import('@/pages/Login'));

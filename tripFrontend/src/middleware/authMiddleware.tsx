@@ -1,28 +1,33 @@
-import { FC } from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { TReduxStoreState } from '@/store/reduxStore';
+import { JSX, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-interface AuthMiddlewareProps {
-  children: React.ReactNode;
-  requireAuth?: boolean;
-}
+type AuthMiddlewareProps = {
+	children: React.ReactNode;
+	requireAuth?: boolean;
+	redirectPath?: string;
+};
 
-export const AuthMiddleware: FC<AuthMiddlewareProps> = ({ children, requireAuth = false }) => {
-  const location = useLocation();
-  const isAuthenticated = useSelector((state: TReduxStoreState) => state.account.isAuthenticated);
+export const AuthMiddleware = ({
+	children,
+	requireAuth = true,
+	redirectPath,
+}: AuthMiddlewareProps): JSX.Element => {
+	const navigate = useNavigate();
+	const isAuthenticated = Boolean(localStorage.getItem('logged'));
 
-// If the route requires auth but the user is not logged in
-  if (requireAuth && !isAuthenticated) {
-    return <Navigate to="/auth/login" state={{ from: location }} replace />;
-  }
+	// Use React's useEffect for navigation
+	useEffect(() => {
+		// If the route requires auth but the user is not logged in
+		if (requireAuth && !isAuthenticated) {
+			navigate(redirectPath ? redirectPath : '/auth/login');
+		}
 
-  // If the user is logged in but tries to access the login/register page
-  if (!requireAuth && isAuthenticated) {
-    // If the user has a previous URL, redirect back to it
-    const from = location.state?.from?.pathname || '/';
-    return <Navigate to={from} replace />;
-  }
+		// If the user is logged in but tries to access the login/register page
+		if (!requireAuth && isAuthenticated) {
+			// If the user has a previous URL, redirect back to it
+			navigate('/');
+		}
+	});
 
-  return <>{children}</>;
-}; 
+	return <>{children}</>;
+};
