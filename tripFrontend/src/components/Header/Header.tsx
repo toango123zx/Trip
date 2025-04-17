@@ -58,7 +58,13 @@ export const Header = ({ className }: Props): JSX.Element => {
 				</nav>
 
 				{/* Mobile Navigation Toggle */}
-				<button className="md:hidden text-gray-800" onClick={toggleMobileMenu} aria-label="Toggle mobile menu" aria-expanded={mobileMenuOpen} aria-controls="mobile-menu">
+				<button
+					className="md:hidden text-gray-800"
+					onClick={toggleMobileMenu}
+					aria-label="Toggle mobile menu"
+					aria-expanded={mobileMenuOpen}
+					aria-controls="mobile-menu"
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"

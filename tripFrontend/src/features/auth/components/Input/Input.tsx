@@ -23,7 +23,10 @@ export const Input = ({
 	return (
 		<div className="w-full">
 			{label && (
-				<label htmlFor={register?.name} className="block mb-1 text-orange-500 text-sm">
+				<label
+					htmlFor={register?.name}
+					className="block mb-1 text-orange-500 text-sm"
+				>
 					{label}
 				</label>
 			)}
