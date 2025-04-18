@@ -2,15 +2,15 @@ import { TStat } from '@/types';
 
 export const stat: TStat[] = [
 	{
-		value: '141,432',
+		value: '141432',
 		label: 'Satisfied Customers',
 	},
 	{
-		value: '12,929',
+		value: '12929',
 		label: 'Staff',
 	},
 	{
-		value: '1,367',
+		value: '1367',
 		label: 'Destinations',
 	},
 ];

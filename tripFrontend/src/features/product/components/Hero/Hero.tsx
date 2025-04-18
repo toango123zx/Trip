@@ -16,7 +16,7 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 			<div className="container mx-auto px-4">
 				<div className="flex flex-col md:flex-row md:items-stretch md:justify-between gap-5">
 					{/* Left side with circular images and plane */}
-					<div className="relative mb-8 md:mb-0 md:pt-40">
+					<div className="relative mb-8 pt-7 md:mb-0 md:pt-40">
 						{/* Decorative plane and path */}
 						<div className="absolute -top-10 -left-4 hidden md:block md:pt-40 md:pl-8">
 							<svg
@@ -46,7 +46,15 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 						</div>
 
 						{/* Stonehenge circular image */}
-						<div className="relative w-52 h-52 md:w-40 md:h-40 rounded-full border-4 border-gray-200 overflow-hidden mx-auto md:mx-0">
+						<div className="md:hidden px-5 relative overflow-hidden mx-auto ">
+							<img
+								src={home.homeMobile}
+								alt="homeMobile"
+								className="w-full h-full object-cover"
+								loading="lazy"
+							/>
+						</div>
+						<div className="hidden md:block relative w-40 h-40 rounded-full border-4 border-gray-200 overflow-hidden mx-0">
 							<img
 								src={home.homeImage1}
 								alt="homeImage1"

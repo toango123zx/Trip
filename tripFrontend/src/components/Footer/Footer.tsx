@@ -7,8 +7,8 @@ import { logos } from '@/assets';
 export const Footer = (): JSX.Element => {
 	return (
 		<footer className="bg-[#FF7A22] text-white py-12  md:px-16 font-[Poppins]">
-			<div className="max-w-[1280px] mx-auto px-6">
-				<div className="flex gap-64">
+			<div className="max-w-[1728px] mx-auto px-6">
+				<div className="flex gap-64 justify-between">
 					{/* Logo and Description */}
 					<div className="md:col-span-1">
 						<Link to="/" className="inline-block mb-4">
@@ -18,7 +18,7 @@ export const Footer = (): JSX.Element => {
 								className="w-44 h-20 py-2.5"
 							/>
 						</Link>
-						<p className="text-sm leading-relaxed w-72">
+						<p className="text-sm leading-relaxed max-w-96">
 							Lorem ipsum dolor sit amet, consectetur adipiscing elit ut
 							aliquam, purus sit amet luctus venenatis, lectus magna
 							fringilla urna, porttitor rhoncus dolor purus non enim
