@@ -51,6 +51,12 @@ export class CreateProductDto {
 	@IsString()
 	name: string;
 	@ApiProperty({
+		type: 'string',
+	})
+	@IsNotEmpty()
+	@IsString()
+	posterImageUrl: string;
+	@ApiProperty({
 		type: CreateProductSupplierRelationInputDto,
 	})
 	@IsNotEmpty()

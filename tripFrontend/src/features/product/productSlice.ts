@@ -11,7 +11,7 @@ const initialState: TProductState = {
 };
 
 export const productSlice = createSlice({
-	name: 'prouduct',
+	name: 'product',
 	initialState: initialState,
 	reducers: {},
 	extraReducers: (builder) => {

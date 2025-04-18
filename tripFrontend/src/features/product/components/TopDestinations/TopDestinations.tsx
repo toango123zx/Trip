@@ -1,54 +1,27 @@
-import type React from 'react';
-
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { cn } from '@/lib/utils';
-import { TProductSumary } from '@/types';
+import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 
+import { productThunk } from '../../productThunk';
 import { Button } from '../Button';
 import { CardProduct } from '../Card';
 
-type TopDestinationsProps = {
-	productSummaries: TProductSumary[];
+type TTopDestinationsProps = {
 	className?: string;
 };
 
-const TopDestinations: React.FC<TopDestinationsProps> = ({
-	productSummaries,
-	className,
-}) => {
-	const fakeData: TProductSumary[] = [];
+const TopDestinations = ({ className }: TTopDestinationsProps): JSX.Element => {
+	const dispatch = useDispatch<TReduxStoreDispatch>();
+	const productSummaries = useSelector(
+		(state: TReduxStoreState) => state.product.products,
+	);
 
-	for (let i = 1; i <= 10; i++) {
-		fakeData.push({
-			id: String(new Date().getTime() + i),
-			name: `Tour số ${i}`,
-			time: 60 + i * 5,
-			quantityAvailable: 50 + i * 10,
-			age: 10 + i,
-			quantityCompleted: i * 100,
-			description: `Mô tả tour du lịch số ${i}`,
-			quantityRate: 1000 + i * 50,
-			avgRate: parseFloat((4 + Math.random()).toFixed(1)),
-			productCategoryName: 'Du lịch',
-			locationName: `Địa điểm ${i}`,
-			city: 'Đà Nẵng',
-			price: 150000 + i * 10000,
-			status: 'active',
-			supplier: {
-				id: String(new Date().getTime()),
-				userId: String(new Date().getTime()),
-				name: `Supplier ${i}`,
-				image: '11234',
-				status: 'active',
-			},
-			createAt: new Date().toISOString(),
-			updateAt: new Date().toISOString(),
-			deletedAt: null,
-		});
-	}
-	productSummaries = [...fakeData];
+	useEffect(() => {
+		dispatch(productThunk.getProducts());
+	}, [dispatch]);
 
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const maxIndex = productSummaries.length - (window.innerWidth >= 768 ? 3 : 1);
@@ -113,8 +86,8 @@ const TopDestinations: React.FC<TopDestinationsProps> = ({
 								transform: `translateX(-${currentIndex * (100 / (window.innerWidth >= 768 ? 3 : 1))}%)`,
 							}}
 						>
-							{productSummaries.map((attraction) => (
-								<CardProduct product={attraction} />
+							{productSummaries.map((product) => (
+								<CardProduct key={product.id} product={product} />
 							))}
 						</div>
 					</div>
@@ -124,5 +97,4 @@ const TopDestinations: React.FC<TopDestinationsProps> = ({
 	);
 };
 
-export default TopDestinations;
 export { TopDestinations };

@@ -13,7 +13,7 @@ export const Footer = (): JSX.Element => {
 					<div className="md:col-span-1">
 						<Link to="/" className="inline-block mb-4">
 							<img
-								src={logos.subTravalidLogo}
+								src={logos.subTravalidName}
 								alt="Travalid Logo"
 								className="w-44 h-20 py-2.5"
 							/>

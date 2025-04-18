@@ -23,6 +23,7 @@ export type TProductSumary = {
 	id: string;
 	name: string;
 	time: number;
+	posterImageUrl: string;
 	quantityAvailable: number;
 	age: number;
 	quantityCompleted: number;
@@ -44,6 +45,7 @@ export type TProductDetail = {
 	id: string;
 	name: string;
 	time: number;
+	posterImageUrl: string;
 	quantityAvailable: number;
 	age: number;
 	quantityCompleted: number;

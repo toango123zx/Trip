@@ -11,6 +11,13 @@ export class UpdateProductDto {
 	@IsString()
 	name?: string;
 	@ApiProperty({
+		type: 'string',
+		required: false,
+	})
+	@IsOptional()
+	@IsString()
+	posterImageUrl?: string;
+	@ApiProperty({
 		minimum: 0.01,
 		type: 'integer',
 		format: 'int32',

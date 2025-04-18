@@ -38,7 +38,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 			<div className="max-w-7xl mx-auto flex justify-between md:justify-start items-center md:gap-[287px]">
 				<Link to="/" className="flex items-center">
 					<img
-						src={logos.mainTravalidLogo}
+						src={logos.mainTravalidName}
 						alt="Travalid Logo"
 						className="h-5 md:h-14 md:p-2.5"
 					/>

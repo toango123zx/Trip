@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
-import { IsNotEmpty, IsString, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsUrl, Min } from 'class-validator';
 import { AutoTrim } from 'src/common/decorators';
 import { CreateProductDto } from 'src/models';
 
@@ -11,6 +11,8 @@ export class CreateProductRequestDto extends OmitType(CreateProductDto, [
 ]) {
 	@AutoTrim()
 	name: string;
+	@IsUrl()
+	posterImageUrl: string;
 	@AutoTrim()
 	description: string;
 	@Min(0.01)

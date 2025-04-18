@@ -31,15 +31,16 @@ export const Card = React.forwardRef<HTMLDivElement, ICardProps>(
 
 Card.displayName = 'Card';
 
-const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-	({ className, ...props }, ref) => (
-		<div
-			ref={ref}
-			className={cn('flex flex-col space-y-1.5 p-4', className)}
-			{...props}
-		/>
-	),
-);
+export const CardHeader = React.forwardRef<
+	HTMLDivElement,
+	React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+	<div
+		ref={ref}
+		className={cn('flex flex-col space-y-1.5 p-4', className)}
+		{...props}
+	/>
+));
 
 CardHeader.displayName = 'CardHeader';
 
@@ -69,17 +70,14 @@ type TCardProductInput = {
 export const CardProduct = ({ product, className }: TCardProductInput): JSX.Element => {
 	const currency = 'VND';
 	return (
-		<div key={product.id} className="w-full md:md:w-1/3 md:flex-shrink-0 px-2">
+		<div
+			key={product.id}
+			className={cn('w-full md:md:w-1/3 md:flex-shrink-0 px-2', className)}
+		>
 			<Card className="overflow-hidden border shadow-md">
 				<div className="relative h-72 w-full">
-					{/* <Image
-											src={product.image || "/placeholder.svg"}
-											alt={product.title}
-											fill
-											className="object-cover"
-										/> */}
 					<img
-						src="https://i.pinimg.com/736x/ca/b7/8d/cab78d000d6535dad1d6482e75fb9529.jpg"
+						src={product.posterImageUrl}
 						// alt={destination.name}
 						className="w-full h-full object-cover"
 					/>

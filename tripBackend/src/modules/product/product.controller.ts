@@ -20,7 +20,7 @@ import {
 } from './dtos';
 import { GetProductsQuery } from './queries/implement';
 
-@Controller('prodcut')
+@Controller('product')
 export class ProductController {
 	constructor(
 		private readonly queryBus: QueryBus,

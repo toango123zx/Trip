@@ -1,18 +1,16 @@
 import type React from 'react';
 
-import { Hero, Services } from '@/features/product';
-import Stats from '@/features/product/components/Stats/Stats';
-import { TopDestinations } from '@/features/product/components/TopDestinations/TopDestinations';
+import { Hero, Services, Stats, TopDestinations } from '@/features/product';
 import { MainLayout } from '@/layouts';
-import { destinations, stats } from '@/utils';
+import { stat } from '@/utils/fakeData';
 
 const Home: React.FC = () => {
 	return (
 		<MainLayout>
 			<Hero />
 			<Services />
-			<TopDestinations destinations={destinations} />
-			<Stats stats={stats} />
+			<TopDestinations />
+			<Stats stats={stat} />
 		</MainLayout>
 	);
 };

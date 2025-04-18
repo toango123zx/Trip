@@ -1,5 +1,3 @@
-import type React from 'react';
-
 import { JSX } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -10,7 +8,7 @@ type TStatCardProps = {
 	className?: string;
 };
 
-export const StatCard = ({ stats, className }: TStatCardProps): JSX.Element => {
+export const Stats = ({ stats, className }: TStatCardProps): JSX.Element => {
 	return (
 		<div className={cn('hidden md:block py-16 px-4 md:px-8 lg:px-16', className)}>
 			<div className="w-full max-w-[1536px] mx-auto bg-gray-100 flex justify-around items-center rounded-3xl px-12 py-14 shadow-md">

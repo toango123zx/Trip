@@ -1,10 +1,14 @@
 import MainTravalidLogo from './mainTravalidLogo.svg';
-import SubTravalidLogo from './subTravalidLogo.svg';
+import MainTravalidName from './mainTravalidName.svg';
+import SubTravalidName from './subTravalidName.svg';
 
 const mainTravalidLogo = String(MainTravalidLogo);
-const subTravalidLogo = String(SubTravalidLogo);
+
+const mainTravalidName = String(MainTravalidName);
+const subTravalidName = String(SubTravalidName);
 
 export const logos = {
 	mainTravalidLogo,
-	subTravalidLogo,
+	mainTravalidName,
+	subTravalidName,
 };

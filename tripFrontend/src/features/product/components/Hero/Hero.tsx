@@ -1,7 +1,6 @@
-import type React from 'react';
-
 import { JSX } from 'react';
 
+import { home, logos } from '@/assets';
 import { cn } from '@/lib/utils';
 
 type THeroProps = {
@@ -10,7 +9,10 @@ type THeroProps = {
 
 export const Hero = ({ className }: THeroProps): JSX.Element => {
 	return (
-		<section className={cn('bg-white py-6 md:py-12', className)}>
+		<section
+			className={cn('bg-white py-6 md:py-12', className)}
+			aria-labelledby="hero-heading"
+		>
 			<div className="container mx-auto px-4">
 				<div className="flex flex-col md:flex-row md:items-stretch md:justify-between gap-5">
 					{/* Left side with circular images and plane */}
@@ -45,20 +47,19 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 
 						{/* Stonehenge circular image */}
 						<div className="relative w-52 h-52 md:w-40 md:h-40 rounded-full border-4 border-gray-200 overflow-hidden mx-auto md:mx-0">
-							{/* <img
-                src="/placeholder.svg?height=150&width=150"
-                alt="Stonehenge"
-                className="w-full h-full object-cover"
-              /> */}
 							<img
-								src="https://i.pinimg.com/736x/ca/b7/8d/cab78d000d6535dad1d6482e75fb9529.jpg"
-								alt="Stonehenge"
+								src={home.homeImage1}
+								alt="homeImage1"
 								className="w-full h-full object-cover"
+								loading="lazy"
 							/>
 						</div>
 
 						{/* Stats */}
-						<div className="hidden md:block mt-8">
+						<div
+							className="hidden md:block mt-8"
+							aria-label="Travel statistics"
+						>
 							<div className="mb-4">
 								<div className="font-[Mogra] text-4xl font-extrabold">
 									70K+
@@ -81,11 +82,11 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 					{/* Center content */}
 					<div className="hidden md:flex h-full mt-auto flex-col justify-end text-center md:text-left md:flex-1 md:max-w-[700px]">
 						<div className="mb-24 flex items-start justify-center gap-7">
-							{/* <img src="/placeholder.svg?height=40&width=40" alt="Travalid Logo" className="w-10 h-10" /> */}
 							<img
-								src="https://i.pinimg.com/736x/ca/b7/8d/cab78d000d6535dad1d6482e75fb9529.jpg"
+								src={logos.mainTravalidLogo}
 								alt="Travalid Logo"
 								className="w-24 h-24 rounded-full mt-4"
+								loading="lazy"
 							/>
 							<div>
 								<h1 className="tracking-tight font-[Mogra] text-6xl font-black mb-4">
@@ -101,15 +102,11 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 						{/* Small destination previews */}
 						<div className="flex flex-row justify-around ">
 							<div className="rounded-2xl overflow-hidden relative flex flex-row gap-2.5 max-w-64">
-								{/* <img
-									src="/placeholder.svg?height=150&width=100"
-									alt="Destination preview"
-									className="w-full h-24 object-cover"
-									/> */}
 								<img
-									src="https://i.pinimg.com/736x/ca/b7/8d/cab78d000d6535dad1d6482e75fb9529.jpg"
-									alt="Destination preview"
+									src={home.homeImage2}
+									alt="homeImage2"
 									className="w-full h-40 object-cover rounded-3xl"
+									loading="lazy"
 								/>
 								<div className=" bg-white p-2 text-xs">
 									<p className="text-gray-700">
@@ -120,15 +117,11 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 								</div>
 							</div>
 							<div className="rounded-2xl overflow-hidden relative flex flex-row gap-2.5 max-w-64">
-								{/* <img
-									src="/placeholder.svg?height=150&width=100"
-									alt="Destination preview"
-									className="w-full h-24 object-cover"
-									/> */}
 								<img
-									src="https://i.pinimg.com/736x/ca/b7/8d/cab78d000d6535dad1d6482e75fb9529.jpg"
-									alt="Destination preview"
+									src={home.homeImage3}
+									alt="homeImage3"
 									className="w-full h-40 object-cover rounded-3xl"
+									loading="lazy"
 								/>
 								<div className=" bg-white p-2 text-xs">
 									<p className="text-gray-700">
@@ -144,15 +137,11 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 					{/* Right side circular image */}
 					<div className="hidden md:block">
 						<div className="w-80 h-80 rounded-full overflow-hidden">
-							{/* <img
-                src="/placeholder.svg?height=300&width=300"
-                alt="Scenic view of islands"
-                className="w-full h-full object-cover"
-              /> */}
 							<img
-								src="https://i.pinimg.com/736x/ca/b7/8d/cab78d000d6535dad1d6482e75fb9529.jpg"
-								alt="Scenic view of islands"
+								src={home.homeImage4}
+								alt="homeImage4"
 								className="w-full h-full object-cover"
+								loading="lazy"
 							/>
 						</div>
 					</div>

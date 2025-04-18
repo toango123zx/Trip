@@ -21,6 +21,10 @@ export class ProductEntity {
 	@ApiProperty({
 		type: 'string',
 	})
+	posterImageUrl: string;
+	@ApiProperty({
+		type: 'string',
+	})
 	supplierId: string;
 	@ApiProperty({
 		type: () => SupplierEntity,
