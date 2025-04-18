@@ -12,6 +12,10 @@ export class ProductDto {
 	})
 	name: string;
 	@ApiProperty({
+		type: 'string',
+	})
+	posterImageUrl: string;
+	@ApiProperty({
 		minimum: 0.01,
 		type: 'integer',
 		format: 'int32',

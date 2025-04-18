@@ -1,5 +1,6 @@
-import { JSX, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { JSX, useEffect, useMemo, useState } from 'react';
+import { FaShoppingCart, FaUser } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { logos } from '@/assets';
 import { cn } from '@/lib/cn';
@@ -9,43 +10,65 @@ type TNavItem = {
 	href: string;
 };
 
-const navItems: TNavItem[] = [
-	{ label: 'Home', href: '/' },
-	{ label: 'Attractions', href: '/attractions' },
-	{ label: 'Services', href: '/services' },
-	{ label: 'Sales', href: '/sales' },
-	{ label: 'Contact', href: '/contact' },
-];
-
 type Props = {
 	className?: string;
 };
 
 export const Header = ({ className }: Props): JSX.Element => {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+	const [isLogged, setIsLogged] = useState(false);
+	const nav = useNavigate();
+
+	const initialNavItems = useMemo(
+		() => [
+			{ label: 'Home', href: '/' },
+			{ label: 'Attractions', href: '/attractions' },
+			{ label: 'Services', href: '/services' },
+			{ label: 'Sales', href: '/sales' },
+			{ label: 'Profile', href: '/user/me' },
+			{ label: 'Cart', href: '/cart' },
+			{ label: 'Contact', href: '/contact' },
+		],
+		[],
+	);
+
+	const [navItems, setNavItems] = useState<TNavItem[]>(initialNavItems);
+
+	useEffect(() => {
+		const loggedInStatus = localStorage.getItem('logged') !== null;
+		setIsLogged(loggedInStatus);
+
+		if (!loggedInStatus && !navItems.some((item) => item.label === 'Login')) {
+			setNavItems((prev) => [...prev, { label: 'Login', href: '/auth/login' }]);
+		}
+	}, [navItems]);
 
 	const toggleMobileMenu = (): void => {
 		setMobileMenuOpen(!mobileMenuOpen);
 	};
 
+	const handleClickloginButton = (): void => {
+		nav('auth/login');
+	};
+
 	return (
 		<header
 			className={cn(
-				'w-full py-4 px-6 md:py-12 md:px-24  bg-gradient-to-b from-[#fffdea]/100 to-white/0',
+				'w-full py-4 px-6 md:py-12 md:px-24 bg-gradient-to-b from-[#fffdea]/100 to-white/0',
 				className,
 			)}
 		>
-			<div className="max-w-7xl mx-auto flex justify-between md:justify-start items-center md:gap-[287px]">
+			<div className="max-w-[1728px] mx-auto flex justify-between md:justify-between items-center]">
 				<Link to="/" className="flex items-center">
 					<img
-						src={logos.mainTravalidLogo}
+						src={logos.mainTravalidName}
 						alt="Travalid Logo"
 						className="h-5 md:h-14 md:p-2.5"
 					/>
 				</Link>
 
 				{/* Desktop Navigation */}
-				<nav className="hidden md:flex justify-start items-center gap-24 font-[Montserrat] text-2xl ">
+				<nav className="hidden md:flex justify-start items-center gap-12 font-[Montserrat] text-2xl ">
 					{navItems.map((item) => (
 						<Link
 							key={item.label}
@@ -56,7 +79,31 @@ export const Header = ({ className }: Props): JSX.Element => {
 						</Link>
 					))}
 				</nav>
-
+				<div className="w-fit">
+					{isLogged ? (
+						<div className="hidden md:flex items-center space-x-4 ">
+							<Link
+								to="/cart"
+								className="p-2 hover:text-orange-500 transition-colors"
+							>
+								<FaShoppingCart className="h-5 w-5" />
+							</Link>
+							<Link
+								to="/account"
+								className="p-2 hover:text-orange-500 transition-colors"
+							>
+								<FaUser className="h-5 w-5" />
+							</Link>
+						</div>
+					) : (
+						<button
+							onClick={handleClickloginButton}
+							className="hidden md:block w-36 bg-orange-500 text-white py-3 rounded-3xl hover:bg-orange-600 text-xl text-center font-bold transition-colors duration-200"
+						>
+							Login
+						</button>
+					)}
+				</div>
 				{/* Mobile Navigation Toggle */}
 				<button
 					className="md:hidden text-gray-800"

@@ -3,6 +3,7 @@ import { ProductEntity } from 'src/models';
 export class GetProductsResponseDto {
 	id: string;
 	name: string;
+	posterImageUrl: string;
 	time: number;
 	quantityAvailable: number;
 	age: number;
@@ -28,6 +29,7 @@ export class GetProductsResponseDto {
 	constructor(product: ProductEntity) {
 		this.id = product.id;
 		this.name = product.name;
+		this.posterImageUrl = product.posterImageUrl;
 		this.time = product.time;
 		this.quantityAvailable = product.quantityAvailable;
 		this.age = product.age;

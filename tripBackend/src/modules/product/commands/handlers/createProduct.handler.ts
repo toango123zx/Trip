@@ -3,6 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { LocationStatusEnum, ProductCategoryStatusEnum } from '@prisma/client';
 import { ConflictException, HttpResponseBodySuccessDto } from 'src/common';
+import { productInformation } from 'src/configs';
 import { CreateProductDto, ProductEntity } from 'src/models';
 
 import { LocationRepository } from 'src/modules/location/location.repository';
@@ -30,6 +31,10 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
 				productCategoryId,
 				ProductCategoryStatusEnum.active,
 			);
+
+		if (!productData.posterImageUrl) {
+			productData.posterImageUrl = productInformation.defaultProductImageUrl;
+		}
 
 		const location = await this.locationRepository.findLocationByLocationId(
 			locationId,

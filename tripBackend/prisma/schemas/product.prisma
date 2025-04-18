@@ -131,6 +131,7 @@ model location {
 model product {
     id                String            @id @default(cuid())
     name              String
+    posterImageUrl    String            @map("poster_image_url")
     supplierId        String            @map("supplier_id")
     /// @DtoRelationCanConnectOnCreate
     supplier          supplier          @relation(fields: [supplierId], references: [id])
