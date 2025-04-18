@@ -9,7 +9,7 @@ import {
 
 export const authApi = {
 	async login(loginInfromation: TRequestBodyLoginApi): Promise<TDataLogin> {
-		const data = await api.post<TRequestBodyLoginApi, TDataLogin>(
+		const data = await api.post<TDataLogin, TRequestBodyLoginApi>(
 			'/auth/login',
 			loginInfromation,
 		);
@@ -17,7 +17,7 @@ export const authApi = {
 	},
 
 	async register(registerInformation: TRequestBodyRegisterApi): Promise<TDataRegister> {
-		const data = await api.post<TRequestBodyRegisterApi, TDataRegister>(
+		const data = await api.post<TDataRegister, TRequestBodyRegisterApi>(
 			'/auth/register',
 			registerInformation,
 		);

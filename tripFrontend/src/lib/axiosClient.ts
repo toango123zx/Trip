@@ -19,6 +19,11 @@ export interface IApiError {
 	message: string;
 }
 
+export enum EServer {
+	Backend = 'backend',
+	AI = 'ai',
+}
+
 // Interface describing the structure of API clients
 interface IApiClients {
 	backend: AxiosInstance;
@@ -139,13 +144,14 @@ export const getApiClient = (service: keyof IApiClients = 'backend'): AxiosInsta
 
 // Helper functions to make axios usage easier with error handling
 export const api = {
-	get: <T>(
+	get: <T, Q = unknown>(
 		url: string,
+		query?: Q,
 		service: keyof IApiClients = 'backend',
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.get<IApiResponse<T>>(url, config)
+			.get<IApiResponse<T>>(url, { ...config, params: query })
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
@@ -153,14 +159,15 @@ export const api = {
 			});
 	},
 
-	post: <D, T>(
+	post: <T, D, Q = unknown>(
 		url: string,
 		data?: D,
+		query?: Q,
 		service: keyof IApiClients = 'backend',
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.post<IApiResponse<T>>(url, data, config)
+			.post<IApiResponse<T>>(url, data, { ...config, params: query })
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
@@ -168,14 +175,15 @@ export const api = {
 			});
 	},
 
-	put: <D, T>(
+	put: <T, D, Q = unknown>(
 		url: string,
 		data?: D,
+		query?: Q,
 		service: keyof IApiClients = 'backend',
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.put<IApiResponse<T>>(url, data, config)
+			.put<IApiResponse<T>>(url, data, { ...config, params: query })
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
@@ -183,13 +191,14 @@ export const api = {
 			});
 	},
 
-	delete: <T>(
+	delete: <T, Q = unknown>(
 		url: string,
+		query?: Q,
 		service: keyof IApiClients = 'backend',
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.delete<IApiResponse<T>>(url, config)
+			.delete<IApiResponse<T>>(url, { ...config, params: query })
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
