@@ -4,15 +4,19 @@ import { acttractionsImages } from '@/assets';
 import { cn } from '@/lib';
 
 import { SearchBarDesktop, SearchBarMobile } from '../SearchBar';
+import { UseFormHandleSubmit, UseFormRegister } from 'react-hook-form';
+import { TSearchAttraction } from '../../product.type';
 
 type THeroAttractionsProps = {
+	register: UseFormRegister<TSearchAttraction>
+	handleSubmit: UseFormHandleSubmit<TSearchAttraction, TSearchAttraction>
 	className?: string;
 };
 
-export const HeroAttractions = ({ className }: THeroAttractionsProps): JSX.Element => {
+export const HeroAttractions = ({ register, handleSubmit, className }: THeroAttractionsProps): JSX.Element => {
 	return (
 		<section
-			className={cn('bg-white py-6 md:py-12 relative', className)}
+			className={cn('bg-white py-6 md:py-12 relative md:pt-0', className)}
 			aria-labelledby="hero-home-heading"
 		>
 			<div className="relative max-h-[1080px] bg-cover bg-center">
@@ -36,8 +40,8 @@ export const HeroAttractions = ({ className }: THeroAttractionsProps): JSX.Eleme
 					</div>
 				</div>
 				<div className="relative md:absolute left-0 bottom-0 w-full flex justify-center z-10">
-					<SearchBarDesktop className="hidden md:block rounded-4xl m-5" />
-					<SearchBarMobile className="block md:hidden" />
+					<SearchBarDesktop register={register} handleSubmit={handleSubmit} className="hidden md:block rounded-4xl m-5" />
+					<SearchBarMobile register={register} handleSubmit={handleSubmit} className="block md:hidden" />
 				</div>
 			</div>
 		</section>

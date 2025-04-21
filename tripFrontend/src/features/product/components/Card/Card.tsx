@@ -4,6 +4,7 @@ import { IoLocationOutline } from 'react-icons/io5';
 
 import { cn } from '@/lib/utils';
 import { TProductSumary } from '@/types';
+import { useNavigate } from 'react-router-dom';
 
 interface ICardProps extends React.HTMLAttributes<HTMLDivElement> {
 	shadow?: 'none' | 'sm' | 'md' | 'lg';
@@ -69,14 +70,19 @@ type TCardProductInput = {
 };
 
 export const CardProduct = ({ product, className }: TCardProductInput): JSX.Element => {
+	const nav = useNavigate();
 	const currency = 'VND';
+
+	const handlerCardOnClick = () => {
+		nav(`/product/${product.id}`);
+	}
 	return (
 		<div
 			key={product.id}
 			// className={cn('w-full md:w-1/3 md:flex-shrink-0 px-2', className)}
 			className={cn('w-full h-full md:flex-shrink-0 px-2', className)}
 		>
-			<button className="w-full h-full text-left shadow-xl">
+			<button className="w-full h-full text-left shadow-xl" onClick={handlerCardOnClick}>
 				<Card className="h-full overflow-hidden border-none shadow-md pt-4 px-3">
 					<div className="relative h-72 w-full">
 						<img
@@ -110,11 +116,10 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 							{[...Array(5)].map((_, i) => (
 								<Star
 									key={i}
-									className={`h-4 w-4 ${
-										i < Math.floor(product.avgRate)
+									className={`h-4 w-4 ${i < Math.floor(product.avgRate)
 											? 'text-yellow-400 fill-yellow-400'
 											: 'text-gray-300'
-									}`}
+										}`}
 								/>
 							))}
 						</div>

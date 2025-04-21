@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import React, { JSX, useEffect, useState } from 'react';
 import { MdExpandMore } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,22 +8,34 @@ import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 
 import { productThunk } from '../../productThunk';
 import { CardProduct } from '../Card';
+import { SelectBox } from '@/components';
+import { Segmented } from 'antd';
+import { HiOutlineArrowNarrowDown, HiOutlineArrowNarrowUp } from "react-icons/hi";
+import { locations, optionSortAttraction } from '@/utils';
+import { TRequestQueryGetProducts, TSearchAttraction } from '../../product.type';
+import { useForm, UseFormSetValue } from 'react-hook-form';
 
 type TAttractionListProps = {
+	setValue: UseFormSetValue<TSearchAttraction>
 	className?: string;
 };
 
-export const AttractionList = ({ className }: TAttractionListProps): JSX.Element => {
+export const AttractionList = ({ setValue, className }: TAttractionListProps): JSX.Element => {
+
+
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const attractions = useSelector((state: TReduxStoreState) => state.product.products);
-	const locations = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'];
-	const [queryLocation, setQueryLocation] = useState<string>('');
 	const [selectOption, setSelectOption] = useState<string>('');
-	const options = ['Place', 'Attraction', 'Hotel', 'Restaurant'];
+	const [selectSort, setSelectSort] = useState<string>('desc');
 
 	useEffect(() => {
 		dispatch(productThunk.getProducts());
 	}, [dispatch]);
+
+	const handleSortChange = () => {
+		setValue(selectOption as keyof TSearchAttraction, selectSort);
+	};
 
 	return (
 		<section
@@ -33,17 +45,6 @@ export const AttractionList = ({ className }: TAttractionListProps): JSX.Element
 			<div className="max-w-[1536px] mx-auto">
 				<div className="mb-8 flex flex-row justify-between items-center px-2">
 					<div className="relative">
-						<select
-							value={selectOption}
-							className="rounded-4xl border py-1 px-3.5 text-2xl font-[Inter] font-bold border-black focus:outline-none focus:ring-2 focus:ring-primary"
-						>
-							<option value="">Place</option>
-							{options.map((option) => (
-								<option key={option} value={option} className="h-14">
-									{option}
-								</option>
-							))}
-						</select>
 					</div>
 					<div className="flex items-center gap-5">
 						{locations && (
@@ -54,21 +55,28 @@ export const AttractionList = ({ className }: TAttractionListProps): JSX.Element
 								Sort by:
 							</label>
 						)}
-						<div className="relative">
-							<select
-								id="sort-select"
-								value={queryLocation}
-								className="appearance-none bg-white border-none rounded-md py-1.5 px-3 pr-8 font-[Inter] text-black text-2xl font-bold focus:outline-none focus:ring-1 focus:ring-black focus:border-black cursor-pointer"
-							>
-								{locations.map((option) => (
-									<option key={option} value={option}>
-										{option}
-									</option>
-								))}
-							</select>
-							<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-								<ChevronDownIcon className="h-4 w-4" />
-							</div>
+						<div className="relative flex flex-row justify-center items-center gap-2.5">
+							<SelectBox selectOption={optionSortAttraction} value={selectOption} className='w-48 flex items-center justify-between h-14 px-3 py-2 border border-black rounded-md bg-white focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150' />
+
+							<Segmented
+								options={[
+									{
+										label: (
+											<div className="w-full flex justify-center items-center">
+												{selectSort === 'asc' ? (
+													<HiOutlineArrowNarrowUp className="h-4 w-4" />
+												) : (
+													<HiOutlineArrowNarrowDown className="h-4 w-4" />
+												)}
+											</div>
+										),
+										value: selectSort === 'asc' ? 'desc' : 'asc',
+									},
+								]}
+								className="segmented-custom h-[56px] border-black bg-white border flex justify-center items-center"
+								onClick={handleSortChange}
+								defaultValue="desc"
+							/>
 						</div>
 					</div>
 				</div>

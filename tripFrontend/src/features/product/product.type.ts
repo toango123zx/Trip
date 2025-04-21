@@ -25,3 +25,9 @@ export type TRequestQueryGetProducts = {
 	deletedAt?: EArrange;
 	status?: EArrange;
 };
+
+export type TSearchAttraction = {
+	name?: string;
+	minPrice?: number;
+	maxPrice?: number;
+} & TRequestQueryGetProducts
