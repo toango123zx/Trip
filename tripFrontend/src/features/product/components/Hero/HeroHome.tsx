@@ -1,17 +1,17 @@
 import { JSX } from 'react';
 
-import { home, logos } from '@/assets';
+import { homeImages, logos } from '@/assets';
 import { cn } from '@/lib/utils';
 
-type THeroProps = {
+type THeroHomeProps = {
 	className?: string;
 };
 
-export const Hero = ({ className }: THeroProps): JSX.Element => {
+export const HeroHome = ({ className }: THeroHomeProps): JSX.Element => {
 	return (
 		<section
 			className={cn('bg-white py-6 md:py-12', className)}
-			aria-labelledby="hero-heading"
+			aria-labelledby="hero-home-heading"
 		>
 			<div className="container mx-auto px-4">
 				<div className="flex flex-col md:flex-row md:items-stretch md:justify-between gap-5">
@@ -48,7 +48,7 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 						{/* Stonehenge circular image */}
 						<div className="md:hidden px-5 relative overflow-hidden mx-auto ">
 							<img
-								src={home.homeMobile}
+								src={homeImages.homeMobile}
 								alt="homeMobile"
 								className="w-full h-full object-cover"
 								loading="lazy"
@@ -56,7 +56,7 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 						</div>
 						<div className="hidden md:block relative w-40 h-40 rounded-full border-4 border-gray-200 overflow-hidden mx-0">
 							<img
-								src={home.homeImage1}
+								src={homeImages.homeImage1}
 								alt="homeImage1"
 								className="w-full h-full object-cover"
 								loading="lazy"
@@ -111,7 +111,7 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 						<div className="flex flex-row justify-around ">
 							<div className="rounded-2xl overflow-hidden relative flex flex-row gap-2.5 max-w-64">
 								<img
-									src={home.homeImage2}
+									src={homeImages.homeImage2}
 									alt="homeImage2"
 									className="w-full h-40 object-cover rounded-3xl"
 									loading="lazy"
@@ -126,7 +126,7 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 							</div>
 							<div className="rounded-2xl overflow-hidden relative flex flex-row gap-2.5 max-w-64">
 								<img
-									src={home.homeImage3}
+									src={homeImages.homeImage3}
 									alt="homeImage3"
 									className="w-full h-40 object-cover rounded-3xl"
 									loading="lazy"
@@ -146,7 +146,7 @@ export const Hero = ({ className }: THeroProps): JSX.Element => {
 					<div className="hidden md:block">
 						<div className="w-80 h-80 rounded-full overflow-hidden">
 							<img
-								src={home.homeImage4}
+								src={homeImages.homeImage4}
 								alt="homeImage4"
 								className="w-full h-full object-cover"
 								loading="lazy"

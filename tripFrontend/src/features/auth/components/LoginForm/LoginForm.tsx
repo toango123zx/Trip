@@ -46,6 +46,7 @@ export const LoginForm = (): JSX.Element => {
 			return;
 		}
 
+		localStorage.setItem('logged', 'true');
 		setIsSubmitting(false);
 		navigate('/');
 	};

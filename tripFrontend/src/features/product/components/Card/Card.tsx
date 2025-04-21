@@ -1,5 +1,6 @@
 import { Eye, Star } from 'lucide-react';
 import React, { JSX } from 'react';
+import { IoLocationOutline } from 'react-icons/io5';
 
 import { cn } from '@/lib/utils';
 import { TProductSumary } from '@/types';
@@ -72,30 +73,40 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 	return (
 		<div
 			key={product.id}
-			className={cn('w-full md:md:w-1/3 md:flex-shrink-0 px-2', className)}
+			// className={cn('w-full md:w-1/3 md:flex-shrink-0 px-2', className)}
+			className={cn('w-full h-full md:flex-shrink-0 px-2', className)}
 		>
-			<button className="w-full h-full text-left">
-				<Card className="overflow-hidden border shadow-md">
+			<button className="w-full h-full text-left shadow-xl">
+				<Card className="h-full overflow-hidden border-none shadow-md pt-4 px-3">
 					<div className="relative h-72 w-full">
 						<img
 							src={product.posterImageUrl}
 							// alt={destination.name}
-							className="w-full h-full object-cover"
+							className="w-full h-full object-cover rounded-xl "
 						/>
 					</div>
 					<CardContent className="pt-4">
-						<h3 className="font-medium text-lg">{product.name}</h3>
-						<div className="flex items-center mt-2">
-							<p className="text-gray-500 line-through text-sm">
-								{currency} {product.price}
-							</p>
-							<p className="ml-2 text-orange-500 font-medium">
-								{currency} {product.price}
-							</p>
+						<h3 className="font-medium text-2xl leading-11 tracking-wide py-3">
+							{product.name}
+						</h3>
+						<div className="flex flex-col-reverse md:flex-row justify-between">
+							<div className="flex items-center mt-2">
+								<p className="text-gray-500 line-through text-lg">
+									{currency} {product.price}
+								</p>
+								<p className="ml-2 text-orange-500 font-medium text-xl">
+									{currency} {product.price}
+								</p>
+							</div>
+							<div className="flex flex-row items-center gap-2.5">
+								<IoLocationOutline />
+								<p className="text-black text-lg">{product.city}</p>
+							</div>
 						</div>
 					</CardContent>
 					<CardFooter className="flex justify-between items-center pt-0">
 						<div className="flex items-center">
+							<p className="pr-2.5 text-xl">{product.avgRate}</p>
 							{[...Array(5)].map((_, i) => (
 								<Star
 									key={i}
@@ -108,8 +119,10 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 							))}
 						</div>
 						<div className="flex items-center text-sm text-gray-500">
-							<Eye className="h-4 w-4 mr-1" />
-							{product.quantityRate}
+							<Eye className="h-6 w-6 mr-1" />
+							<p className="text-black-500 text-xl">
+								{product.quantityRate}
+							</p>
 						</div>
 					</CardFooter>
 				</Card>

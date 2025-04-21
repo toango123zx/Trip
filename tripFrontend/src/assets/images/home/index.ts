@@ -10,7 +10,7 @@ const homeImage3 = String(HomeImage3);
 const homeImage4 = String(HomeImage4);
 const homeMobile = String(HomeMobile);
 
-export const home = {
+export const homeImages = {
 	homeImage1,
 	homeImage2,
 	homeImage3,

@@ -1,1 +1,2 @@
-export * from './Hero';
+export * from './HeroAttractions';
+export * from './HeroHome';
