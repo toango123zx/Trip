@@ -1,29 +1,29 @@
-import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+import { Segmented } from 'antd';
 import React, { JSX, useEffect, useState } from 'react';
+import { UseFormReturn } from 'react-hook-form';
+import { HiOutlineArrowNarrowDown, HiOutlineArrowNarrowUp } from 'react-icons/hi';
 import { MdExpandMore } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { SelectBox } from '@/components';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
+import { locations, optionSortAttraction } from '@/utils';
 
+import { TSearchAttraction } from '../../product.type';
 import { productThunk } from '../../productThunk';
 import { CardProduct } from '../Card';
-import { SelectBox } from '@/components';
-import { Segmented } from 'antd';
-import { HiOutlineArrowNarrowDown, HiOutlineArrowNarrowUp } from "react-icons/hi";
-import { locations, optionSortAttraction } from '@/utils';
-import { TRequestQueryGetProducts, TSearchAttraction } from '../../product.type';
-import { useForm, UseFormSetValue } from 'react-hook-form';
 
 type TAttractionListProps = {
-	setValue: UseFormSetValue<TSearchAttraction>
+	form: UseFormReturn<TSearchAttraction>;
 	className?: string;
 };
 
-export const AttractionList = ({ setValue, className }: TAttractionListProps): JSX.Element => {
-
-
-	const [isSubmitting, setIsSubmitting] = useState(false);
+export const AttractionList = ({
+	form,
+	className,
+}: TAttractionListProps): JSX.Element => {
+	const { setValue } = form;
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const attractions = useSelector((state: TReduxStoreState) => state.product.products);
 	const [selectOption, setSelectOption] = useState<string>('');
@@ -33,8 +33,17 @@ export const AttractionList = ({ setValue, className }: TAttractionListProps): J
 		dispatch(productThunk.getProducts());
 	}, [dispatch]);
 
-	const handleSortChange = () => {
+	const handleSortChange = (): void => {
+		setSelectSort((prev) => (prev === 'asc' ? 'desc' : 'asc'));
 		setValue(selectOption as keyof TSearchAttraction, selectSort);
+	};
+
+	const handleSelectOptionOnChange = (
+		event: React.ChangeEvent<HTMLSelectElement>,
+	): void => {
+		const selectedValue = event.target.value;
+		setSelectOption(selectedValue);
+		setValue(selectedValue as keyof TSearchAttraction, selectSort);
 	};
 
 	return (
@@ -44,8 +53,7 @@ export const AttractionList = ({ setValue, className }: TAttractionListProps): J
 		>
 			<div className="max-w-[1536px] mx-auto">
 				<div className="mb-8 flex flex-row justify-between items-center px-2">
-					<div className="relative">
-					</div>
+					<div className="relative"></div>
 					<div className="flex items-center gap-5">
 						{locations && (
 							<label
@@ -56,21 +64,25 @@ export const AttractionList = ({ setValue, className }: TAttractionListProps): J
 							</label>
 						)}
 						<div className="relative flex flex-row justify-center items-center gap-2.5">
-							<SelectBox selectOption={optionSortAttraction} value={selectOption} className='w-48 flex items-center justify-between h-14 px-3 py-2 border border-black rounded-md bg-white focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150' />
+							<SelectBox
+								selectOption={optionSortAttraction}
+								onChange={handleSelectOptionOnChange}
+								className="w-48 flex items-center justify-between h-14 px-3 py-2 border border-black rounded-md bg-white focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150"
+							/>
 
 							<Segmented
 								options={[
 									{
 										label: (
 											<div className="w-full flex justify-center items-center">
-												{selectSort === 'asc' ? (
+												{selectSort === 'desc' ? (
 													<HiOutlineArrowNarrowUp className="h-4 w-4" />
 												) : (
 													<HiOutlineArrowNarrowDown className="h-4 w-4" />
 												)}
 											</div>
 										),
-										value: selectSort === 'asc' ? 'desc' : 'asc',
+										value: selectSort === 'asc' ? 'asc' : 'desc',
 									},
 								]}
 								className="segmented-custom h-[56px] border-black bg-white border flex justify-center items-center"

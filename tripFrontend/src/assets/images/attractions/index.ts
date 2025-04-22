@@ -2,6 +2,6 @@ import BackgroundHero from './background.svg';
 
 const backgroundHero = String(BackgroundHero);
 
-export const acttractionsImages = {
+export const attractionsImages = {
 	backgroundHero,
 };

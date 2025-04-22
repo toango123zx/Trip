@@ -30,4 +30,4 @@ export type TSearchAttraction = {
 	name?: string;
 	minPrice?: number;
 	maxPrice?: number;
-} & TRequestQueryGetProducts
+} & TRequestQueryGetProducts;
