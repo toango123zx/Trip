@@ -79,7 +79,7 @@ export const RegisterForm = (): JSX.Element => {
 
 			await authApi.register(registerInformation);
 
-			navigate('/');
+			navigate('/auth/login');
 		} finally {
 			setIsSubmitting(false);
 		}

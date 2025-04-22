@@ -3,3 +3,12 @@
 button {
     cursor: pointer;
 }
+.segmented-custom .ant-segmented-group{
+    height: 100%;
+
+}
+.segmented-custom .ant-segmented-item-label{
+    display: flex;
+    height: 100%;
+    background-color: white;
+}

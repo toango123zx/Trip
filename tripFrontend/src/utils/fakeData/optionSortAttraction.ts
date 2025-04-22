@@ -1,0 +1,15 @@
+export const optionSortAttraction = [
+	{ id: '1', display: 'Name', value: 'name' },
+	{ id: '2', display: 'Time', value: 'time' },
+	{ id: '3', display: 'Quantity available', value: 'quantityAvailable' },
+	{ id: '4', display: 'Age', value: 'age' },
+	{ id: '5', display: 'Quantity completed', value: 'quantityCompleted' },
+	{ id: '6', display: 'Quantity rate', value: 'quantityRate' },
+	{ id: '7', display: 'Average rate', value: 'avgRate' },
+	{ id: '8', display: 'Location name', value: 'locationName' },
+	{ id: '9', display: 'City', value: 'city' },
+	{ id: '10', display: 'Created at', value: 'createAt' },
+	{ id: '11', display: 'Updated at', value: 'updateAt' },
+	{ id: '12', display: 'Deleted at', value: 'deletedAt' },
+	{ id: '13', display: 'Status', value: 'status' },
+];

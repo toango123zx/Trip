@@ -1,5 +1,6 @@
 import { JSX, useEffect, useMemo, useState } from 'react';
-import { FaShoppingCart, FaUser } from 'react-icons/fa';
+import { FaRegUser } from 'react-icons/fa';
+import { IoCartOutline } from 'react-icons/io5';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { logos } from '@/assets';
@@ -86,13 +87,13 @@ export const Header = ({ className }: Props): JSX.Element => {
 								to="/cart"
 								className="p-2 hover:text-orange-500 transition-colors"
 							>
-								<FaShoppingCart className="h-5 w-5" />
+								<IoCartOutline className="h-8 w-8" />
 							</Link>
 							<Link
 								to="/account"
 								className="p-2 hover:text-orange-500 transition-colors"
 							>
-								<FaUser className="h-5 w-5" />
+								<FaRegUser className="h-7 w-7" />
 							</Link>
 						</div>
 					) : (
