@@ -43,8 +43,7 @@ export const SearchBarDesktop = ({ register, handleSubmit, className }: TSeachBa
 								<div className="">
 									<input
 										type="text"
-										{...register('name', {
-										})}
+										{...register('name')}
 										placeholder="Keyword here"
 										className="h-14 flex items-center bg-white border border-black rounded-lg px-4 py-2 w-fit focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150"
 									/>
