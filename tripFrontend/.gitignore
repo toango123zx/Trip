@@ -26,3 +26,5 @@ package-lock.json
 *.sw?
 
 .env
+
+../test.js

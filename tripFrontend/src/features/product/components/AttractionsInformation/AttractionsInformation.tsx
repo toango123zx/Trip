@@ -201,10 +201,10 @@ export const AttractionsInformation: React.FC = ({
 
 	return (
 		<section
-			className={cn('bg-white relative md:pt-0', className)}
+			className={cn('relative md:pt-0', className)}
 			aria-labelledby="hero-attractions-heading"
 		>
-			<div className="h-fit md:pb-28 bg-gray-100 md:p-8 font-Montserrat text-lg md:text-xl">
+			<div className="h-fit font-Montserrat text-lg md:text-xl">
 				<div className="container mx-auto bg-white rounded-lg shadow-lg p-6 md:px-14 md:py-16">
 					{/* Header */}
 					<div className="mb-6 border-b border-gray-200 pb-6">

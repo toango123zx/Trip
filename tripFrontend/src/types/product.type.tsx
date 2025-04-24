@@ -45,12 +45,12 @@ type TProductSchedule = {
 	status: EProductScheduleStatus;
 };
 
-type TProductRate = {
+export type TProductRate = {
 	id: string;
 	userId: string;
 	userName: string;
 	userImage: string;
-	star: string;
+	star: number;
 	comment: string;
 	createAt: string;
 	updateAt: string;
