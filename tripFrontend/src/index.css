@@ -1,14 +1,24 @@
 @import "tailwindcss";
+@import 'swiper/css';
+@import 'swiper/css/pagination';
+@import 'swiper/css/navigation';
+
 
 button {
     cursor: pointer;
 }
-.segmented-custom .ant-segmented-group{
+
+.segmented-custom .ant-segmented-group {
     height: 100%;
 
 }
-.segmented-custom .ant-segmented-item-label{
+
+.segmented-custom .ant-segmented-item-label {
     display: flex;
     height: 100%;
     background-color: white;
+}
+
+.swiper-wrapper {
+    padding-bottom: 35px;
 }

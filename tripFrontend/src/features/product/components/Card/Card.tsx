@@ -74,7 +74,7 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 	const currency = 'VND';
 
 	const handlerCardOnClick = (): void => {
-		nav(`/product/${product.id}`);
+		nav(`/attractions/${product.id}`);
 	};
 	return (
 		<div

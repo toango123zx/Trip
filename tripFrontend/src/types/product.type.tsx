@@ -1,12 +1,5 @@
 import { EUserStatus } from './user.type';
 
-export enum ProductStatusEnum {
-	active,
-	warning,
-	waiting,
-	inactive,
-}
-
 type Supplier = {
 	id: string;
 	userId: string;
@@ -15,9 +8,55 @@ type Supplier = {
 	status: keyof typeof EUserStatus;
 };
 
-type ProductImage = [];
-type ProductSchedule = [];
-type ProductRate = [];
+export enum EProductStatus {
+	active = 'active',
+	warning = 'warning',
+	waiting = 'waiting',
+	inactive = 'inactive',
+}
+
+export enum EProductRate {
+	active = 'active',
+	removed = 'removed',
+}
+
+export enum EProductScheduleStatus {
+	active = 'active',
+	full = 'full',
+	canceled = 'canceled',
+}
+
+export type TProductImage = {
+	id: string;
+	url: string;
+};
+
+type TProductSchedule = {
+	id: string;
+	startTime: string;
+	endTime: string;
+	price: string;
+	booked: string;
+	startOrder: string;
+	endOrder: string;
+	createAt: string;
+	updateAt: string;
+	deletedAt: string | null;
+	status: EProductScheduleStatus;
+};
+
+type TProductRate = {
+	id: string;
+	userId: string;
+	userName: string;
+	userImage: string;
+	star: string;
+	comment: string;
+	createAt: string;
+	updateAt: string;
+	deletedAt: string | null;
+	status: EProductRate;
+};
 
 export type TProductSumary = {
 	id: string;
@@ -38,7 +77,7 @@ export type TProductSumary = {
 	createAt: string;
 	updateAt: string;
 	deletedAt: string | null;
-	status: keyof typeof ProductStatusEnum;
+	status: keyof typeof EProductStatus;
 };
 
 export type TProductDetail = {
@@ -49,7 +88,7 @@ export type TProductDetail = {
 	quantityAvailable: number;
 	age: number;
 	quantityCompleted: number;
-	despcription: string;
+	description: string;
 	quantityRate: number;
 	avgRate: number;
 	productCategoryName: string;
@@ -60,13 +99,24 @@ export type TProductDetail = {
 	createAt: string;
 	updateAt: string;
 	deletedAt: string | null;
-	status: keyof typeof ProductStatusEnum;
-	productImage: ProductImage;
-	productSchedule: ProductSchedule;
-	productRate: ProductRate;
+	status: EProductStatus;
+	productImage: TProductImage[];
+	productSchedule: TProductSchedule[];
+	productRate: TProductRate[];
 };
 
 export type TStat = {
 	value: number | string;
 	label: string;
+};
+
+export type TSchedule = {
+	id: string;
+	startDate: string;
+	startTime: string;
+	endDate: string;
+	endTime: string;
+	booked: number;
+	price: string;
+	status: string;
 };
