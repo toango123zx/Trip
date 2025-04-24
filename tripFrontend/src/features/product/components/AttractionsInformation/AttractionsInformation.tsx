@@ -59,28 +59,28 @@ const ScheduleCard = ({ schedule, className }: TSheduleCardProps): JSX.Element =
 		label: string,
 		value: string,
 	): JSX.Element => (
-		<div className="flex items-center gap-2.5 md:gap-5">
+		<div className="flex items-center gap-1.5 md:gap-5">
 			<RiCalendarScheduleLine
 				type={icon}
-				className="w-10 md:w-14 h-full text-gray-700"
+				className="w-6 md:w-14 h-full text-gray-700"
 			/>
 			<div className="flex flex-col gap-1 md:gap-2.5">
-				<p className="text-xl md:text-2xl text-gray-500">{label}</p>
-				<p className="text-2xl md:text-3xl font-bold text-black">{value}</p>
+				<p className="tex-xs md:text-2xl text-gray-500">{label}</p>
+				<p className="text-sm md:text-3xl font-bold text-black">{value}</p>
 			</div>
 		</div>
 	);
 	return (
 		<section
-			className={cn('bg-gray-100 relative md:pt-0', className)}
+			className={cn('bg-gray-100 relative md:pt-	0', className)}
 			aria-labelledby="hero-attractions-heading"
 		>
-			<div className="h-fit bg-gray-100 font-[Montserrat] text-lg md:text-xl">
+			<div className="h-fit bg-gray-100 font-Montserrat text-lg md:text-xl">
 				<div className="container mx-auto bg-white rounded-lg shadow-lg">
 					<div className="bg-white rounded-xl shadow-md p-4 md:py-9 md:px-24 w-full mx-auto">
 						{/* <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4"> */}
 						<div className="w-full md:flex md:flex-row md:justify-between md:gap-8">
-							<div className="w-full md:max-w-8/12 grid grid-cols-2 grid-row-3 md:grid-rows-2 gap-x-8 gap-y-6 md:gap-y-11 ">
+							<div className="w-full md:max-w-8/12 grid grid-cols-2 grid-row-3 md:grid-rows-2 gap-x-8 gap-y-5 md:gap-y-11 ">
 								{/* Left Column: Start Date & Booked */}
 								{renderInfoSection(
 									'calendar',
@@ -92,24 +92,28 @@ const ScheduleCard = ({ schedule, className }: TSheduleCardProps): JSX.Element =
 									'End Date',
 									`${schedule.endTime} | ${schedule.endDate}`,
 								)}
-								<div className="flex items-center gap-2.5 md:gap-5">
+								<div className="flex items-center gap-1.5 md:gap-5">
 									<BsBookmarkCheck className="w-6 md:w-14 h-full text-gray-700" />
 									<div className="flex flex-col gap-1 md:gap-2.5">
-										<p className="text-xl md:text-2xl text-gray-500">
+										<p className="text-xs md:text-2xl text-gray-500">
 											Booked
 										</p>
-										<p className="text-2xl md:text-3xl font-bold text-black">
+										<p className="text-sm md:text-3xl font-bold text-black">
 											{schedule.booked.toString()}
 										</p>
 									</div>
 								</div>
 								<div className="w-full md:hidden row-span-2 flex-col space-y-3 sm:w-auto pt-2 sm:pt-0 justify-center items-center gap-10">
-									<div className="text-5xl font-bold text-orange-500">
-										<p className="text-center">{schedule.price}</p>
-										<p className="w-full text-2xl text-center">VND</p>
+									<div className="text-[32px] font-bold text-orange-400">
+										<span className="text-center mr-2.5">
+											{schedule.price}
+										</span>
+										<span className="w-full text-base text-center">
+											VND
+										</span>
 									</div>
 									<button
-										className="bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition duration-150 ease-in-out w-full sm:w-auto text-2xl px-11 py-1.5"
+										className="bg-orange-400 hover:bg-orange-600 text-white font-semibold rounded-full transition duration-150 ease-in-out w-full sm:w-auto text-2xl px-11 py-1.5"
 										aria-label="Add item"
 									>
 										Add
@@ -121,7 +125,7 @@ const ScheduleCard = ({ schedule, className }: TSheduleCardProps): JSX.Element =
 										className={`w-6 md:w-14 h-full ${statusColor}`}
 									/>
 									<p
-										className={`text-3xl md:text-4xl font-medium ${statusColor}`}
+										className={`text-sm font-bold md:text-4xl md:font-medium ${statusColor}`}
 									>
 										{schedule.status}
 									</p>
@@ -130,11 +134,11 @@ const ScheduleCard = ({ schedule, className }: TSheduleCardProps): JSX.Element =
 								{/* Right Column: Price & Add Button */}
 							</div>
 							<div className="w-full hidden md:flex flex-col space-y-3 sm:w-auto pt-2 sm:pt-0 justify-center items-center gap-10 text-center">
-								<div className="text-6xl font-bold text-orange-500">
+								<div className="text-6xl font-bold text-orange-400">
 									{schedule.price} <span>VND</span>
 								</div>
 								<button
-									className="bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-full transition duration-150 ease-in-out w-full sm:w-auto text-4xl px-20 py-3.5"
+									className="bg-orange-400 hover:bg-orange-600 text-white font-semibold rounded-full transition duration-150 ease-in-out w-full sm:w-auto text-4xl px-20 py-3.5"
 									aria-label="Add item"
 								>
 									Add
@@ -200,7 +204,7 @@ export const AttractionsInformation: React.FC = ({
 			className={cn('bg-white relative md:pt-0', className)}
 			aria-labelledby="hero-attractions-heading"
 		>
-			<div className="h-fit md:pb-28 bg-gray-100 md:p-8 font-[Montserrat] text-lg md:text-xl">
+			<div className="h-fit md:pb-28 bg-gray-100 md:p-8 font-Montserrat text-lg md:text-xl">
 				<div className="container mx-auto bg-white rounded-lg shadow-lg p-6 md:px-14 md:py-16">
 					{/* Header */}
 					<div className="mb-6 border-b border-gray-200 pb-6">
