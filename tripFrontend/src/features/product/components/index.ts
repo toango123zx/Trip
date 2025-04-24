@@ -1,4 +1,5 @@
 export * from './AttractionList';
+export * from './AttractionsInformation';
 export * from './Button';
 export * from './Card';
 export * from './Hero';

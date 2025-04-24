@@ -2,7 +2,7 @@ import { EArrange, TProductDetail, TProductSumary } from '@/types';
 
 export type TProductState = {
 	products: TProductSumary[];
-	productDetail: TProductDetail | null;
+	productDetail: TProductDetail;
 	loading: boolean;
 	error: string | null;
 };
