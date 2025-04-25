@@ -1,8 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 @import 'swiper/css';
 @import 'swiper/css/pagination';
 @import 'swiper/css/navigation';
 
+/* Các rule phía dưới */
+.font-Montserrat {
+    font-family: "Montserrat", sans-serif
+}
 
 button {
     cursor: pointer;
@@ -10,7 +15,6 @@ button {
 
 .segmented-custom .ant-segmented-group {
     height: 100%;
-
 }
 
 .segmented-custom .ant-segmented-item-label {
