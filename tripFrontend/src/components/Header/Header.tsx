@@ -130,7 +130,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 				</button>
 				{/* Mobile Menu */}
 				{mobileMenuOpen && (
-					<div className="md:hidden absolute top-20 left-0 right-0 bg-white p-4 shadow-md z-50">
+					<div className="md:hidden absolute top-12 left-0 right-0 bg-white p-4 shadow-md z-50">
 						<nav className="flex flex-col space-y-4">
 							{navItems.map((item) => (
 								<Link

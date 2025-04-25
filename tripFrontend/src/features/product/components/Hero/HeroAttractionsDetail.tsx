@@ -58,7 +58,7 @@ export const HeroAttractionsDetail = ({
 						<div className="container z-10">
 							<div
 								onClick={(e) => handleTabChange(e)}
-								className="w-full p-0.5 bg-gray-200 md:bg-white grid grid-cols-3 gap-x-1 md:gap-x-3 rounded-lg shadow-md font-semibold"
+								className="w-full p-0.5 bg-gray-200 grid grid-cols-3 gap-x-1 md:gap-x-3 rounded-lg shadow-md font-semibold"
 							>
 								<button
 									className={`hidden py-6 md:py-16 md:flex items-center justify-center rounded-md transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-500 focus:bg-white focus:text-orange-600 hover:bg-gray-200 hover:text-gray-700 focus:shadow-lg ${value == 'information' && classSelected}`}
