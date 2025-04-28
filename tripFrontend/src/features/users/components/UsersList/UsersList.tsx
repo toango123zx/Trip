@@ -21,7 +21,7 @@ import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TUser } from '@/types';
 
-import style from './style.module.scss';
+import './style.scss';
 import { userThunk } from '../../userThunk';
 
 type TTable<T> = {
@@ -43,7 +43,7 @@ const TableView = <T,>({
 			columns={columnTable}
 			dataSource={data}
 			pagination={{ pageSize: pageSize }}
-			className={cn(`relative md:pt-0 ${style.table} ${style.List}`, className)}
+			className={cn(`relative md:pt-0`, className)}
 		/>
 	);
 };
@@ -60,13 +60,18 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
 	const dispatch = useDispatch<TReduxStoreDispatch>();
+	const [filteredUsers, setFilteredUsers] = useState<TUser[]>([]);
 	const users: TUser[] = useSelector<TReduxStoreState, TUser[]>(
 		(state: TReduxStoreState) => state.user.users,
 	);
 
 	useEffect(() => {
 		dispatch(userThunk.getUsers({}));
+		console.log(`🚀 ~ UsersList.tsx:67 ~ users:`, users)
 	}, [dispatch]);
+
+
+
 
 	type DataIndex = keyof TUser;
 
@@ -143,9 +148,9 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 		onFilter: (value, record) =>
 			record[dataIndex] !== null && record[dataIndex] !== undefined
 				? record[dataIndex]
-						.toString()
-						.toLowerCase()
-						.includes((value as string).toLowerCase())
+					.toString()
+					.toLowerCase()
+					.includes((value as string).toLowerCase())
 				: false,
 		filterDropdownProps: {
 			onOpenChange(open): void {
@@ -246,7 +251,10 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 		columnTable = columnTable.filter((item) => item.title !== 'Fee');
 	}
 
-	const [filteredUsers, setFilteredUsers] = useState<TUser[]>([]);
+
+	useEffect(() => {
+		setFilteredUsers(users.filter((user) => user.roleName === activeTab));
+	}, [users]);
 
 	const handleChangeTab = (tab: 'admin' | 'supplier' | 'tourist'): void => {
 		setActiveTab(tab);
@@ -264,31 +272,28 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 					{/* Sidebar */}
 					<div className="space-y-5 w-3/15 font-Montserrat">
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
-								activeTab === 'tourist'
-									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100'
-							}`}
+							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${activeTab === 'tourist'
+								? 'bg-[#ff6b0a] text-white'
+								: 'bg-white text-gray-500 hover:bg-gray-100'
+								}`}
 							onClick={() => handleChangeTab('tourist')}
 						>
 							Tourist
 						</button>
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
-								activeTab === 'supplier'
-									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100 '
-							}`}
+							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${activeTab === 'supplier'
+								? 'bg-[#ff6b0a] text-white'
+								: 'bg-white text-gray-500 hover:bg-gray-100 '
+								}`}
 							onClick={() => handleChangeTab('supplier')}
 						>
 							Suppliers
 						</button>
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
-								activeTab === 'admin'
-									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100 '
-							}`}
+							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${activeTab === 'admin'
+								? 'bg-[#ff6b0a] text-white'
+								: 'bg-white text-gray-500 hover:bg-gray-100 '
+								}`}
 							onClick={() => handleChangeTab('admin')}
 						>
 							Admins
@@ -299,7 +304,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 					<div className="flex-1 rounded-lg bg-white p-6 shadow-md">
 						<div className="mb-4 flex items-center justify-between">
 							<h2 className="text-lg font-semibold text-gray-500">
-								{activeTab === 'tourist' ? 'tourist' : 'supplier'}
+								{activeTab}
 							</h2>
 							<div className="flex items-center gap-2">
 								<button className="rounded-md border border-gray-300 p-1 shadow-sm">
