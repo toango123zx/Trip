@@ -5,12 +5,14 @@ type AuthMiddlewareProps = {
 	children: React.ReactNode;
 	requireAuth?: boolean;
 	redirectPath?: string;
+	role?: 'admin' | 'supplier' | 'tourist';
 };
 
 export const AuthMiddleware = ({
 	children,
 	requireAuth = true,
 	redirectPath,
+	role,
 }: AuthMiddlewareProps): JSX.Element => {
 	const navigate = useNavigate();
 	const isAuthenticated = Boolean(localStorage.getItem('logged'));
@@ -27,6 +29,15 @@ export const AuthMiddleware = ({
 			// If the user has a previous URL, redirect back to it
 			navigate('/');
 		}
+
+		if (!role) {
+			return;
+		}
+
+		if (role !== String(localStorage.getItem('role'))) {
+			navigate('/');
+		}
+		return;
 	});
 
 	return <>{children}</>;
