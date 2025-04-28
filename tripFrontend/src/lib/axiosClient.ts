@@ -151,7 +151,11 @@ export const api = {
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.get<IApiResponse<T>>(url, { ...config, params: query })
+			.get<IApiResponse<T>>(url, {
+				...config,
+				withCredentials: true,
+				params: query,
+			})
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
@@ -167,7 +171,11 @@ export const api = {
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.post<IApiResponse<T>>(url, data, { ...config, params: query })
+			.post<IApiResponse<T>>(url, data, {
+				...config,
+				withCredentials: true,
+				params: query,
+			})
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
@@ -183,7 +191,11 @@ export const api = {
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.put<IApiResponse<T>>(url, data, { ...config, params: query })
+			.put<IApiResponse<T>>(url, data, {
+				...config,
+				withCredentials: true,
+				params: query,
+			})
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
@@ -198,7 +210,11 @@ export const api = {
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.delete<IApiResponse<T>>(url, { ...config, params: query })
+			.delete<IApiResponse<T>>(url, {
+				...config,
+				withCredentials: true,
+				params: query,
+			})
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow

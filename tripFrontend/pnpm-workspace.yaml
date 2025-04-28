@@ -1,4 +1,5 @@
 ignoredBuiltDependencies:
+  - '@parcel/watcher'
   - '@swc/core'
   - esbuild
   - swiper

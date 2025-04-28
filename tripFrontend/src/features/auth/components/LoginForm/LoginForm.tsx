@@ -1,11 +1,15 @@
 'use client';
 
 import { notification } from 'antd';
-import { JSX, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { loginImages } from '@/assets';
+import { userThunk } from '@/features/users';
+import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
+import { TUser } from '@/types';
 
 import { authApi } from '../../authApi';
 import { PasswordInput } from '../PasswordInput';
@@ -26,6 +30,11 @@ export const LoginForm = (): JSX.Element => {
 	const [loginError, setLoginError] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const navigate = useNavigate();
+	const dispatch = useDispatch<TReduxStoreDispatch>();
+	const userInformation: TUser = useSelector<TReduxStoreState, TUser>(
+		(state: TReduxStoreState) => state.user.userDetail,
+	);
+	const logged = Boolean(localStorage.getItem('logged'));
 
 	const image = loginImages.loginBackground;
 
@@ -45,11 +54,16 @@ export const LoginForm = (): JSX.Element => {
 			});
 			return;
 		}
-
 		localStorage.setItem('logged', 'true');
-		setIsSubmitting(false);
 		navigate('/');
 	};
+
+	useEffect(() => {
+		dispatch(userThunk.getMe());
+		if (userInformation && logged == true) {
+			localStorage.setItem('role', userInformation.roleName);
+		}
+	}, [dispatch, userInformation, logged]);
 
 	return (
 		<div className="container mx-auto px-4 pt-8 pb-28 max-w-5xl">
