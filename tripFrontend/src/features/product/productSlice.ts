@@ -1,12 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { TProductDetail } from '@/types';
+import { TPagination, TProductDetail } from '@/types';
 
 import { TProductState } from './product.type';
 import { productThunk } from './productThunk';
 
 const initialState: TProductState = {
 	products: [],
+	pagination: {} as TPagination,
 	productDetail: {} as TProductDetail,
 	loading: false,
 	error: null,
@@ -24,7 +25,8 @@ export const productSlice = createSlice({
 			})
 			.addCase(productThunk.getProducts.fulfilled, (state, action) => {
 				state.loading = false;
-				state.products = action.payload;
+				state.products = action.payload[0];
+				state.pagination = action.payload[1] || ({} as TPagination);
 			})
 			.addCase(productThunk.getProducts.rejected, (state, action) => {
 				state.loading = false;

@@ -67,11 +67,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 
 	useEffect(() => {
 		dispatch(userThunk.getUsers({}));
-		console.log(`🚀 ~ UsersList.tsx:67 ~ users:`, users)
 	}, [dispatch]);
-
-
-
 
 	type DataIndex = keyof TUser;
 
@@ -148,9 +144,9 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 		onFilter: (value, record) =>
 			record[dataIndex] !== null && record[dataIndex] !== undefined
 				? record[dataIndex]
-					.toString()
-					.toLowerCase()
-					.includes((value as string).toLowerCase())
+						.toString()
+						.toLowerCase()
+						.includes((value as string).toLowerCase())
 				: false,
 		filterDropdownProps: {
 			onOpenChange(open): void {
@@ -251,10 +247,9 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 		columnTable = columnTable.filter((item) => item.title !== 'Fee');
 	}
 
-
 	useEffect(() => {
 		setFilteredUsers(users.filter((user) => user.roleName === activeTab));
-	}, [users]);
+	}, [users, activeTab]);
 
 	const handleChangeTab = (tab: 'admin' | 'supplier' | 'tourist'): void => {
 		setActiveTab(tab);
@@ -272,28 +267,31 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 					{/* Sidebar */}
 					<div className="space-y-5 w-3/15 font-Montserrat">
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${activeTab === 'tourist'
-								? 'bg-[#ff6b0a] text-white'
-								: 'bg-white text-gray-500 hover:bg-gray-100'
-								}`}
+							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
+								activeTab === 'tourist'
+									? 'bg-[#ff6b0a] text-white'
+									: 'bg-white text-gray-500 hover:bg-gray-100'
+							}`}
 							onClick={() => handleChangeTab('tourist')}
 						>
 							Tourist
 						</button>
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${activeTab === 'supplier'
-								? 'bg-[#ff6b0a] text-white'
-								: 'bg-white text-gray-500 hover:bg-gray-100 '
-								}`}
+							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
+								activeTab === 'supplier'
+									? 'bg-[#ff6b0a] text-white'
+									: 'bg-white text-gray-500 hover:bg-gray-100 '
+							}`}
 							onClick={() => handleChangeTab('supplier')}
 						>
 							Suppliers
 						</button>
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${activeTab === 'admin'
-								? 'bg-[#ff6b0a] text-white'
-								: 'bg-white text-gray-500 hover:bg-gray-100 '
-								}`}
+							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
+								activeTab === 'admin'
+									? 'bg-[#ff6b0a] text-white'
+									: 'bg-white text-gray-500 hover:bg-gray-100 '
+							}`}
 							onClick={() => handleChangeTab('admin')}
 						>
 							Admins

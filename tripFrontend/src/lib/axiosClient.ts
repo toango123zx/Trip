@@ -7,11 +7,13 @@ import {
 	DOMAIN_BACKEND_TIMEOUT,
 	DOMAIN_AI_TIMEOUT,
 } from '@/constants';
+import { TPagination } from '@/types';
 
 // Define interfaces for API responses
 export interface IApiResponse<T = unknown> {
 	success: boolean;
 	data: T;
+	pagination?: TPagination;
 }
 
 export interface IApiError {
@@ -149,14 +151,14 @@ export const api = {
 		query?: Q,
 		service: keyof IApiClients = 'backend',
 		config?: AxiosRequestConfig,
-	): Promise<T> => {
+	): Promise<IApiResponse<T>> => {
 		return getApiClient(service)
 			.get<IApiResponse<T>>(url, {
 				...config,
 				withCredentials: true,
 				params: query,
 			})
-			.then((response) => response.data.data)
+			.then((response) => response.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
 				throw error;
