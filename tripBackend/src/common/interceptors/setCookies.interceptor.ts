@@ -28,8 +28,8 @@ export class SetCookieInterceptor implements NestInterceptor {
 						response.cookie(name, String(cookie[name]), {
 							httpOnly: true,
 							path: '/',
-							secure: true,
-							sameSite: 'strict',
+							// secure: true,
+							// sameSite: 'strict',
 						});
 					});
 
