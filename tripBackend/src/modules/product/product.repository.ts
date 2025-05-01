@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { ProductStatusEnum } from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
-import { CreateProductDto, ProductEntity } from 'src/models';
+import { CreateProductDto, ProductEntity, UpdateProductDto } from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -90,6 +90,27 @@ export class ProductRepository {
 
 	async createProduct(productInformation: CreateProductDto): Promise<ProductEntity> {
 		return this.prismaService.product.create({
+			data: productInformation,
+		});
+	}
+
+	async updateProductByProductId(
+		productId: string,
+		productInformation: UpdateProductDto,
+	): Promise<ProductEntity> {
+		return this.prismaService.product.update({
+			include: {
+				supplier: {
+					include: {
+						user: true,
+					},
+				},
+				location: true,
+				productCategory: true,
+			},
+			where: {
+				id: productId,
+			},
 			data: productInformation,
 		});
 	}

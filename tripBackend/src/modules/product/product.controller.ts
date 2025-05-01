@@ -1,8 +1,17 @@
-import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Get,
+	HttpException,
+	Param,
+	Post,
+	Put,
+	Query,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { HttpResponseBodyDto, PaginationDto, PermissionEnum } from 'src/common';
-import { ProductEntity, ProductScheduleEntity } from 'src/models';
+import { ProductEntity, ProductScheduleEntity, UpdateProductDto } from 'src/models';
 
 import { AuthPermission } from '../auth/decorators';
 import { SupplierInforamtion } from '../supplier/decorators';
@@ -11,6 +20,7 @@ import { SupplierInformationDto } from '../supplier/dtos';
 import {
 	CreateProductCommand,
 	CreateProductScheduleByProductIdCommand,
+	UpdateProductInformationByProductIdCommand,
 } from './commands/implements';
 import {
 	CreateProductScheduleByProductIdRequestDto,
@@ -65,6 +75,22 @@ export class ProductController {
 			new CreateProductScheduleByProductIdCommand(
 				productId,
 				productScheduleInformation,
+				supplierInformation,
+			),
+		);
+	}
+
+	@Put('/:productId')
+	@AuthPermission(PermissionEnum.UpdateProductInformation)
+	async updateProductInformationByProductId(
+		@Param('productId') productId: string,
+		@Body() productInformationRequest: UpdateProductDto,
+		@SupplierInforamtion() supplierInformation: SupplierInformationDto,
+	): Promise<HttpResponseBodyDto<GetProductsResponseDto | HttpException>> {
+		return this.commandBus.execute(
+			new UpdateProductInformationByProductIdCommand(
+				productId,
+				productInformationRequest,
 				supplierInformation,
 			),
 		);

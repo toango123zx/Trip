@@ -136,7 +136,7 @@ model product {
     /// @DtoRelationCanConnectOnCreate
     supplier          supplier          @relation(fields: [supplierId], references: [id])
     /// @minimum 0.01
-    time              Int
+    time              Float
     /// @minimum 1
     quantityAvailable Int               @map("quantity_available")
     /// @minimum 0

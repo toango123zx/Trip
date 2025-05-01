@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateProductDto {
 	@ApiProperty({
@@ -19,12 +19,12 @@ export class UpdateProductDto {
 	posterImageUrl?: string;
 	@ApiProperty({
 		minimum: 0.01,
-		type: 'integer',
-		format: 'int32',
+		type: 'number',
+		format: 'float',
 		required: false,
 	})
 	@IsOptional()
-	@IsInt()
+	@IsNumber()
 	time?: number;
 	@ApiProperty({
 		minimum: 1,
