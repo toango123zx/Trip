@@ -24,7 +24,7 @@ export const ProductsBoard = ({ className }: TProductsBoard): JSX.Element => {
 	);
 	const [page, setPage] = useState<number>(1);
 
-	const PAGE_SIZE = 3;
+	const PAGE_SIZE = 10;
 
 	useEffect(() => {
 		dispatch(

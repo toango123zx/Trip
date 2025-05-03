@@ -1,7 +1,7 @@
 import { JSX, useState } from 'react';
 import { IoIosAdd } from 'react-icons/io';
 
-import { DiscountBoard, ProductsBoard, SchedulesBoard } from '@/features';
+import { AddProduct, DiscountBoard, ProductsBoard, SchedulesBoard } from '@/features';
 import { cn } from '@/lib';
 
 enum EactiveTab {
@@ -16,9 +16,18 @@ type ProductListProps = {
 
 export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 	const [activeTab, setActiveTab] = useState<EactiveTab>(EactiveTab.product);
+	const [isOpenPopupAddProduct, setIsOpenPopupAddProduct] = useState(false);
 
 	const handleChangeTab = (tab: EactiveTab): void => {
 		setActiveTab(tab);
+	};
+
+	const handleAddProductOnClick = (): void => {
+		setIsOpenPopupAddProduct(true);
+	};
+
+	const handleClosePopup = (): void => {
+		setIsOpenPopupAddProduct(false);
 	};
 
 	return (
@@ -70,7 +79,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 								{activeTab === 'product' && (
 									<button
 										type="button"
-										// onClick={handleAddProductClick}
+										onClick={handleAddProductOnClick}
 										className={`
                                         flex items-center justify-center
                                         bg-orange-400 hover:bg-orange-500
@@ -92,6 +101,11 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 						{activeTab === EactiveTab.product && <ProductsBoard />}
 						{activeTab === EactiveTab.schedule && <SchedulesBoard />}
 						{activeTab === EactiveTab.discount && <DiscountBoard />}
+					</div>
+					<div onClick={() => handleClosePopup()}>
+						{isOpenPopupAddProduct && (
+							<AddProduct onCancel={handleClosePopup} />
+						)}
 					</div>
 				</main>
 			</div>

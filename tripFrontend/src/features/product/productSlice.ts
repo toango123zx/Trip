@@ -43,6 +43,19 @@ export const productSlice = createSlice({
 			.addCase(productThunk.getProductDetail.rejected, (state, action) => {
 				state.loading = false;
 				state.error = String(action.error.message);
+			})
+			.addCase(productThunk.createProduct.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(productThunk.createProduct.fulfilled, (state, action) => {
+				state.loading = false;
+				state.productDetail = action.payload;
+				state.error = null;
+			})
+			.addCase(productThunk.createProduct.rejected, (state, action) => {
+				state.loading = false;
+				state.error = String(action.error.message);
 			});
 	},
 });

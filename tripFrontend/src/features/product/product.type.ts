@@ -27,6 +27,19 @@ export type TRequestQueryGetProducts = {
 	status?: EArrange;
 };
 
+export type TRequestBodyCreateProduct = {
+	name: string;
+	posterImageUrl: string;
+	time: number;
+	quantityAvailable: number;
+	age: number;
+	description: string;
+	locationId: string;
+	cityName: string;
+	productCategoryId: string;
+	locationOnMap: string;
+};
+
 export type TSearchAttraction = {
 	name?: string;
 	minPrice?: number;
