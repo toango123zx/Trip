@@ -40,6 +40,15 @@ export type TRequestBodyCreateProduct = {
 	locationOnMap: string;
 };
 
+export type TRequestBodyUpdateProduct = {
+	name: string;
+	posterImageUrl: string;
+	time: number;
+	quantityAvailable: number;
+	age: number;
+	description: string;
+};
+
 export type TSearchAttraction = {
 	name?: string;
 	minPrice?: number;

@@ -1,13 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
+import { TPagination, TProductDetail, TProductSumary } from '@/types';
+
 import {
 	TRequestBodyCreateProduct,
-	TPagination,
-	TProductDetail,
-	TProductSumary,
-} from '@/types';
-
-import { TRequestQueryGetProducts } from './product.type';
+	TRequestBodyUpdateProduct,
+	TRequestQueryGetProducts,
+} from './product.type';
 import { productApi } from './productApi';
 
 const getProducts = createAsyncThunk(
@@ -36,8 +35,23 @@ const createProduct = createAsyncThunk(
 	},
 );
 
+const updateProductByProductId = createAsyncThunk(
+	'product/updateProductByProductId',
+	async ({
+		productId,
+		product,
+	}: {
+		productId: string;
+		product: TRequestBodyUpdateProduct;
+	}) => {
+		const data = await productApi.updateProductByProductId(productId, product);
+		return data;
+	},
+);
+
 export const productThunk = {
 	getProducts,
 	getProductDetail,
 	createProduct,
+	updateProductByProductId,
 };

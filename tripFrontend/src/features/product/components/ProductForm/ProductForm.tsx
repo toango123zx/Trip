@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Save, Plus, Map } from 'lucide-react';
+import { X, Save, Plus, Map, Trash2 } from 'lucide-react';
 import { JSX, useState, useEffect, useMemo } from 'react';
 import {
 	FieldErrors,
@@ -38,6 +38,7 @@ type TInputProps = {
 	register: ReturnType<typeof useForm<TRequestBodyCreateProduct>>['register'];
 	errors: FieldErr;
 	required?: boolean;
+	disabled?: boolean;
 	type?: string;
 	validate?: (value: string | number | boolean) => string | boolean;
 };
@@ -64,6 +65,7 @@ type TSelect = {
 
 type TProductFormProps = {
 	form: UseFormReturn<TRequestBodyCreateProduct>;
+	remove?: boolean;
 	onSubmit?: SubmitHandler<TRequestBodyCreateProduct>;
 	onCancel?: () => void;
 };
@@ -99,6 +101,7 @@ const Input = ({
 	register,
 	errors,
 	required,
+	disabled = false,
 	type = 'text',
 	validate,
 }: TInputProps): JSX.Element => (
@@ -110,7 +113,8 @@ const Input = ({
 				aria-invalid={errors[id] ? 'true' : undefined}
 				aria-describedby={`${id}-error`}
 				defaultValue={defaultValue}
-				className="h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none"
+				disabled={disabled}
+				className={`h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${disabled ? 'bg-gray-100 border-none pl-2.5' : 'bg-white'}`}
 				{...register(id, {
 					...(required && { required: `${label} is required` }),
 					...(type === 'number' && { valueAsNumber: true }),
@@ -127,7 +131,7 @@ const Textarea = ({ id, label, register, errors }: TTextareaProps): JSX.Element 
 		<div>
 			<textarea
 				id={id as string}
-				className="h-[100px] w-full rounded-md bg-gray-100 p-4 focus:outline-none"
+				className="h-[100px] w-full rounded-md bg-white-100 p-4 border border-gray-300 focus:outline-none"
 				{...register(id)}
 			/>
 			<ErrorText id={id} errors={errors} />
@@ -147,32 +151,42 @@ const Select = ({
 	defaultValue,
 	name,
 }: TSelect): JSX.Element => {
-	const [selected, setSelected] = useState(
-		options.find((o) => o.value === defaultValue) || null,
-	);
+	const [selectedOption, setSelectedOption] = useState<{
+		id: string;
+		value: string;
+		label: string;
+		city?: string;
+	} | null>(null);
 
 	useEffect(() => {
-		setValue(name || id, selected?.value || '');
-	}, [selected, setValue, id, name]);
+		const option = options.find((o) => o.label === defaultValue);
+		if (option) {
+			setSelectedOption(option);
+		}
+	}, [options, defaultValue]);
+
+	useEffect(() => {
+		const fieldName = name || id;
+		setValue(fieldName, selectedOption?.value || '');
+	}, [selectedOption, setValue, name, id]);
 
 	return (
 		<Row label={label} required={required}>
-			<div>
-				<ComboBox
-					options={options}
-					valueDefault={defaultValue}
-					setSelectedOption={setSelected}
-					placeholder={placeholder}
-					disabled={disabled}
-				/>
-				<ErrorText id={id} errors={errors} />
-			</div>
+			<ComboBox
+				options={options}
+				selectedOption={selectedOption}
+				setSelectedOption={setSelectedOption}
+				placeholder={placeholder}
+				disabled={disabled}
+			/>
+			<ErrorText id={id} errors={errors} />
 		</Row>
 	);
 };
 
 export const ProductForm = ({
 	form,
+	remove = true,
 	onSubmit,
 	onCancel = (): void => {},
 }: TProductFormProps): JSX.Element => {
@@ -223,6 +237,8 @@ export const ProductForm = ({
 		return true;
 	};
 
+	const handleRemoveOnClick = (): void => {};
+
 	return (
 		<div
 			className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 sm:px-20"
@@ -241,14 +257,23 @@ export const ProductForm = ({
 							onClick={onCancel}
 							className="flex h-10 items-center gap-1 rounded-md border bg-gray-50 px-4 py-2 hover:bg-gray-100"
 						>
-							<X className="h-4 w-4" /> Cancel
+							<X className="h-5 w-5" /> Cancel
 						</button>
+						{remove && (
+							<button
+								type="button"
+								onClick={handleRemoveOnClick}
+								className="flex h-10 items-center gap-1 rounded-md border border-red-500 bg-red-500 text-white px-4 py-2 hover:bg-red-700"
+							>
+								<Trash2 className="h-5 w-5" /> Remove
+							</button>
+						)}
 						<button
 							type="submit"
 							onClick={onSubmit && handleSubmit(onSubmit)}
-							className="flex h-10 items-center gap-1 rounded-md bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
+							className="flex h-10 items-center gap-1 rounded-md border border-orange-500 bg-orange-500  px-4 py-2 text-white hover:bg-orange-600"
 						>
-							<Save className="h-4 w-4" /> Save
+							<Save className="h-5 w-5" /> Save
 						</button>
 					</div>
 				</header>
@@ -269,6 +294,7 @@ export const ProductForm = ({
 						id="locationId"
 						label="Location On System"
 						required
+						defaultValue={watch('locationId')}
 						setValue={setValue}
 						errors={errors}
 						options={options}
@@ -286,7 +312,8 @@ export const ProductForm = ({
 						defaultValue={watch('cityName')}
 						register={register}
 						errors={errors}
-						required
+						// required
+						disabled
 					/>
 					<Input
 						id="time"

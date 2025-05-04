@@ -11,10 +11,14 @@ import { TPagination, TProductSumary } from '@/types';
 import { productThunk } from '../../productThunk';
 
 type TProductsBoard = {
+	openProductUpdateOnClick?: (productId: string) => void;
 	className?: string;
 };
 
-export const ProductsBoard = ({ className }: TProductsBoard): JSX.Element => {
+export const ProductsBoard = ({
+	openProductUpdateOnClick = (): void => {},
+	className,
+}: TProductsBoard): JSX.Element => {
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const products: TProductSumary[] = useSelector<TReduxStoreState, TProductSumary[]>(
 		(state: TReduxStoreState) => state.product.products,
@@ -134,8 +138,12 @@ export const ProductsBoard = ({ className }: TProductsBoard): JSX.Element => {
 		},
 		{
 			title: 'Action',
-			render: () => (
-				<button type="button" className="text-blue-500 flex gap-2.5 items-center">
+			render: (_, record: TProductSumary) => (
+				<button
+					type="button"
+					onClick={() => openProductUpdateOnClick(record.id)}
+					className="text-blue-500 flex gap-2.5 items-center"
+				>
 					<span>View detail</span>
 					<span className="h-fit">
 						<IoIosArrowRoundForward />
