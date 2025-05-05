@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpException,
 	Param,
@@ -10,16 +11,17 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { HttpResponseBodyDto, PaginationDto, PermissionEnum } from 'src/common';
+import { HttpResponseBodyDto, PaginationDto, PermissionEnum, RoleEnum } from 'src/common';
 import { ProductEntity, ProductScheduleEntity, UpdateProductDto } from 'src/models';
 
-import { AuthPermission } from '../auth/decorators';
+import { AuthPermission, AuthRole } from '../auth/decorators';
 import { SupplierInforamtion } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
 
 import {
 	CreateProductCommand,
 	CreateProductScheduleByProductIdCommand,
+	DeleteProductByProductIdCommand,
 	UpdateProductInformationByProductIdCommand,
 } from './commands/implements';
 import {
@@ -93,6 +95,17 @@ export class ProductController {
 				productInformationRequest,
 				supplierInformation,
 			),
+		);
+	}
+
+	@Delete('/:productId')
+	@AuthRole(RoleEnum.Supplier)
+	async deleteProductByProductId(
+		@Param('productId') productId: string,
+		@SupplierInforamtion() supplierInformation: SupplierInformationDto,
+	): Promise<HttpResponseBodyDto<ProductEntity | HttpException>> {
+		return this.commandBus.execute(
+			new DeleteProductByProductIdCommand(productId, supplierInformation),
 		);
 	}
 }

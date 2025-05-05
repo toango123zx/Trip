@@ -21,7 +21,7 @@ export class GetDiscountsByProductIdHandler
 			take: query.pagination.limit,
 		};
 
-		const { keyword, statusSearch, ...locationFilter } = query.filter;
+		const { keyword, statusSearch, ...locationFilter } = query.filter || {};
 		const [discounts, totalRecords] =
 			await this.discountRepository.findDiscountByProductId(
 				pagination,

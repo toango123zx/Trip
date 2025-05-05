@@ -56,7 +56,24 @@ export class DiscountRepository {
 				take: pagination.take,
 				orderBy: orderBy,
 			}),
-			this.prismaService.discount.count(),
+			this.prismaService.discount.count({
+				where: {
+					infoDiscount: {
+						some: {
+							product_Schedule: {
+								product: {
+									id: productId,
+								},
+							},
+						},
+					},
+					status: status,
+					name: {
+						contains: keyword,
+						mode: 'insensitive',
+					},
+				},
+			}),
 		]);
 		return [discounts, totalRecords];
 	}
