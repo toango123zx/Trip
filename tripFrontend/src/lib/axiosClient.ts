@@ -82,6 +82,14 @@ const createApiClient = (baseURL: string, timeout: number): AxiosInstance => {
 	// Response interceptor
 	client.interceptors.response.use(
 		(response) => {
+			if (response.status === 201) {
+				notification.success({
+					message: 'Success',
+					description: 'Created successfully',
+					placement: 'topRight',
+					duration: 5,
+				});
+			}
 			return response;
 		},
 		async (error: AxiosError<IApiError>) => {
@@ -161,7 +169,7 @@ export const api = {
 			.then((response) => response.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
-				throw error;
+				throw error.response.data || { success: false, message: 'Network error' };
 			});
 	},
 
@@ -181,7 +189,7 @@ export const api = {
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
-				throw error;
+				throw error.response.data;
 			});
 	},
 
@@ -201,7 +209,7 @@ export const api = {
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
-				throw error;
+				throw error.response.data;
 			});
 	},
 
@@ -220,7 +228,7 @@ export const api = {
 			.then((response) => response.data.data)
 			.catch((error) => {
 				// Error is already handled in interceptor, just rethrow
-				throw error;
+				throw error.response.data;
 			});
 	},
 

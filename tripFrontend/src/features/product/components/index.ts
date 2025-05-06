@@ -1,3 +1,4 @@
+export * from './AddProduct';
 export * from './AttractionList';
 export * from './AttractionsInformation';
 export * from './AttractionsRate';
@@ -5,6 +6,7 @@ export * from './Button';
 export * from './Card';
 export * from './Hero';
 export * from './ProductBoard';
+export * from './ProductForm';
 export * from './ProductList';
 export * from './SearchBar';
 export * from './Services';

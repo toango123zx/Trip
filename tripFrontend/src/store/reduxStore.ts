@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { authSlice, userSlice } from '@/features';
+import { locationSlice } from '@/features/location';
 import { productSlice } from '@/features/product';
 
 export const _reduxStore = configureStore({
 	reducer: {
 		account: authSlice.reducer,
+		location: locationSlice.reducer,
 		product: productSlice.reducer,
 		user: userSlice.reducer,
 	},
