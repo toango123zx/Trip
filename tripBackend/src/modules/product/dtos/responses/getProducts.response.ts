@@ -19,7 +19,7 @@ export class GetProductsResponseDto {
 		userId: string;
 		name: string;
 		image: string;
-		satus: string;
+		status: string;
 	};
 	createAt: Date;
 	updateAt: Date;
@@ -45,7 +45,7 @@ export class GetProductsResponseDto {
 			userId: product.supplier.user.id,
 			name: product.supplier.user.name,
 			image: product.supplier.user.image,
-			satus: product.supplier.user.status,
+			status: product.supplier.user.status,
 		};
 		this.createAt = product.createAt;
 		this.updateAt = product.updateAt;
