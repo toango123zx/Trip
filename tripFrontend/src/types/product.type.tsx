@@ -112,11 +112,13 @@ export type TStat = {
 
 export type TSchedule = {
 	id: string;
-	startDate: string;
+	productName: string;
+	cityName: string;
+	startDate: Date;
 	startTime: string;
-	endDate: string;
+	endDate: Date;
 	endTime: string;
 	booked: number;
-	price: string;
+	price: number;
 	status: string;
 };

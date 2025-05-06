@@ -36,7 +36,7 @@ export const userSlice = createSlice({
 			})
 			.addCase(userThunk.getUsers.fulfilled, (state, action) => {
 				state.loading = false;
-				state.users = action.payload;
+				state.users = action.payload[0];
 			})
 			.addCase(userThunk.getUsers.rejected, (state, action) => {
 				state.loading = false;

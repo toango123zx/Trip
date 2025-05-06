@@ -1,7 +1,8 @@
-import { EArrange, TProductDetail, TProductSumary } from '@/types';
+import { EArrange, TPagination, TProductDetail, TProductSumary } from '@/types';
 
 export type TProductState = {
 	products: TProductSumary[];
+	pagination: TPagination;
 	productDetail: TProductDetail;
 	loading: boolean;
 	error: string | null;

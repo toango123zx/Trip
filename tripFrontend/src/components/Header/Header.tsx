@@ -248,8 +248,6 @@ export const Header = ({ className }: Props): JSX.Element => {
 		return items;
 	}, [role]);
 
-
-
 	const [navItemsMobile, setNavItemsMobile] = useState<TNavItem[]>(initialNavItems);
 
 	useEffect(() => {
@@ -257,7 +255,10 @@ export const Header = ({ className }: Props): JSX.Element => {
 		setIsLogged(loggedInStatus);
 
 		if (!loggedInStatus && !navItemsMobile.some((item) => item.label === 'Login')) {
-			setNavItemsMobile((prev) => [...prev, { label: 'Login', href: '/auth/login' }]);
+			setNavItemsMobile((prev) => [
+				...prev,
+				{ label: 'Login', href: '/auth/login' },
+			]);
 			return;
 		}
 	}, [navItemsMobile, menuItems]);
@@ -357,10 +358,11 @@ export const Header = ({ className }: Props): JSX.Element => {
 								</button>
 
 								<div
-									className={`transition ease-out duration-100 transform ${isOpen
-										? 'opacity-100 scale-100'
-										: 'opacity-0 scale-95 pointer-events-none'
-										}`}
+									className={`transition ease-out duration-100 transform ${
+										isOpen
+											? 'opacity-100 scale-100'
+											: 'opacity-0 scale-95 pointer-events-none'
+									}`}
 								>
 									{isOpen && (
 										<UserProfileDropdown
