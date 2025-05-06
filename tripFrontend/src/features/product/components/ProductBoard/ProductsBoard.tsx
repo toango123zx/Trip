@@ -158,10 +158,12 @@ export const ProductsBoard = ({ className }: TProductsBoard): JSX.Element => {
 				pagination={false}
 			/>
 			<div className="flex items-center justify-center">
-				<PaginationTable
-					pagination={{ ...pagination, currentPage: page }}
-					onPageChange={handleChangePage}
-				/>
+				{pagination.totalPages > 1 && (
+					<PaginationTable
+						pagination={{ ...pagination, currentPage: page }}
+						onPageChange={handleChangePage}
+					/>
+				)}
 			</div>
 		</div>
 	);

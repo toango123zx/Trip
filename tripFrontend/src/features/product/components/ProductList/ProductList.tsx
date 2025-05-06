@@ -4,16 +4,20 @@ import { IoIosAdd } from 'react-icons/io';
 import { DiscountBoard, ProductsBoard, SchedulesBoard } from '@/features';
 import { cn } from '@/lib';
 
+enum EactiveTab {
+	product = 'product',
+	schedule = 'schedule',
+	discount = 'discount',
+}
+
 type ProductListProps = {
 	className?: string;
 };
 
 export const ProductList = ({ className }: ProductListProps): JSX.Element => {
-	const [activeTab, setActiveTab] = useState<'product' | 'schedule' | 'discount'>(
-		'product',
-	);
+	const [activeTab, setActiveTab] = useState<EactiveTab>(EactiveTab.product);
 
-	const handleChangeTab = (tab: 'product' | 'schedule' | 'discount'): void => {
+	const handleChangeTab = (tab: EactiveTab): void => {
 		setActiveTab(tab);
 	};
 
@@ -33,7 +37,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 									? 'bg-[#ff6b0a] text-white'
 									: 'bg-white text-gray-500 hover:bg-gray-100'
 							}`}
-							onClick={() => handleChangeTab('product')}
+							onClick={() => handleChangeTab(EactiveTab.product)}
 						>
 							Products
 						</button>
@@ -43,7 +47,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 									? 'bg-[#ff6b0a] text-white'
 									: 'bg-white text-gray-500 hover:bg-gray-100 '
 							}`}
-							onClick={() => handleChangeTab('schedule')}
+							onClick={() => handleChangeTab(EactiveTab.schedule)}
 						>
 							Schedules
 						</button>
@@ -53,7 +57,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 									? 'bg-[#ff6b0a] text-white'
 									: 'bg-white text-gray-500 hover:bg-gray-100 '
 							}`}
-							onClick={() => handleChangeTab('discount')}
+							onClick={() => handleChangeTab(EactiveTab.discount)}
 						>
 							Discounts
 						</button>
@@ -85,9 +89,9 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 							</div>
 						</div>
 
-						{activeTab === 'product' && <ProductsBoard />}
-						{activeTab === 'schedule' && <SchedulesBoard />}
-						{activeTab === 'discount' && <DiscountBoard />}
+						{activeTab === EactiveTab.product && <ProductsBoard />}
+						{activeTab === EactiveTab.schedule && <SchedulesBoard />}
+						{activeTab === EactiveTab.discount && <DiscountBoard />}
 					</div>
 				</main>
 			</div>

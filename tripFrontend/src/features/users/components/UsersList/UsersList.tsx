@@ -151,7 +151,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 		filterDropdownProps: {
 			onOpenChange(open): void {
 				if (open) {
-					setTimeout(() => searchInput.current?.select(), 100);
+					searchInput.current?.select();
 				}
 			},
 		},

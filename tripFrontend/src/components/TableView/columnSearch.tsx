@@ -93,16 +93,14 @@ export const getColumnSearchProps = <T,>(
 		<IoIosSearch style={{ color: filtered ? '#1677ff' : undefined }} />
 	),
 	onFilter: (value, record) =>
-		record[dataIndex] !== null && record[dataIndex] !== undefined
-			? record[dataIndex]
-					.toString()
-					.toLowerCase()
-					.includes((value as string).toLowerCase())
-			: false,
+		record[dataIndex]
+			?.toString()
+			.toLowerCase()
+			.includes((value as string).toLowerCase()) ?? false,
 	filterDropdownProps: {
 		onOpenChange(open): void {
 			if (open) {
-				setTimeout(() => searchInput.current?.select(), 100);
+				searchInput.current?.select();
 			}
 		},
 	},
