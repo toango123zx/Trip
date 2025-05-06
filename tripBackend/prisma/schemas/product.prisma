@@ -194,6 +194,7 @@ model productRate {
     /// @DtoRelationCanConnectOnCreate
     user      user                  @relation(fields: [userId], references: [id])
     star      Int
+    comment   String
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
     createAt  DateTime              @default(now()) @map("create_at")
