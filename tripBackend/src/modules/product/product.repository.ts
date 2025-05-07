@@ -125,7 +125,8 @@ export class ProductRepository {
 
 	async deleteProductByProductId(productId: string): Promise<ProductEntity> {
 		return await this.prismaService.$transaction(async (prisma) => {
-			const billsId: string[] = [];
+			const billsIdWaitingRefund: string[] = [];
+			const billsIdCancel: string[] = [];
 			const inDiscountsId: string[] = [];
 
 			const product = await prisma.product.update({
@@ -169,6 +170,7 @@ export class ProductRepository {
 					},
 				},
 				data: {
+					deletedAt: new Date(),
 					status: ProductStatusEnum.inactive,
 					productSchedule: {
 						updateMany: {
@@ -178,6 +180,7 @@ export class ProductRepository {
 								},
 							},
 							data: {
+								deletedAt: new Date(),
 								status: ProductScheduleStatusEnum.canceled,
 							},
 						},
@@ -185,8 +188,11 @@ export class ProductRepository {
 				},
 			});
 			product.productSchedule.forEach((schedule) => {
-				schedule.infoBill.forEach((bill) => {
-					billsId.push(bill.bill.id);
+				schedule.infoBill.forEach((info) => {
+					if (info.bill.status === BillStatusEnum.paided) {
+						return billsIdWaitingRefund.push(info.bill.id);
+					}
+					billsIdCancel.push(info.bill.id);
 				});
 				schedule.infoDiscount.forEach((info) => {
 					inDiscountsId.push(info.id);
@@ -201,19 +207,34 @@ export class ProductRepository {
 						},
 					},
 					data: {
+						deletedAt: new Date(),
 						status: InfoDiscountStatusEnum.inactive,
 					},
 				});
 			}
 
-			if (billsId.length > 0) {
+			if (billsIdWaitingRefund.length > 0) {
 				await prisma.bill.updateMany({
 					where: {
 						id: {
-							in: billsId,
+							in: billsIdWaitingRefund,
 						},
 					},
 					data: {
+						deletedAt: new Date(),
+						status: BillStatusEnum.waitingRefund,
+					},
+				});
+			}
+			if (billsIdCancel.length > 0) {
+				await prisma.bill.updateMany({
+					where: {
+						id: {
+							in: billsIdCancel,
+						},
+					},
+					data: {
+						deletedAt: new Date(),
 						status: BillStatusEnum.cancel,
 					},
 				});

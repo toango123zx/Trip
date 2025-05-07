@@ -28,7 +28,8 @@ enum BillStatusEnum {
     pending
     cancel
     refunded
-
+    waitingRefund @map("waiting_refund")
+    
     @@map("Bill_Status_Enum")
 }
 

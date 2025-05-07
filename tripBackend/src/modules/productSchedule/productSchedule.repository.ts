@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
-import { ProductScheduleStatusEnum } from '@prisma/client';
+import {
+	BillStatusEnum,
+	InfoDiscountStatusEnum,
+	ProductScheduleStatusEnum,
+} from '@prisma/client';
 import { IPaginationQuery, OrderByEnum, OrderBySearchDto } from 'src/common';
-import { CreateProductScheduleDto, ProductScheduleEntity } from 'src/models';
+import { BillEntity, CreateProductScheduleDto, ProductScheduleEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -66,7 +70,11 @@ export class ProductScheduleRepository {
 	): Promise<ProductScheduleEntity> {
 		return this.prismaService.productSchedule.findFirst({
 			include: {
-				product: true,
+				product: {
+					include: {
+						supplier: true,
+					},
+				},
 			},
 			where: {
 				id: productScheduleId,
@@ -80,6 +88,90 @@ export class ProductScheduleRepository {
 	): Promise<ProductScheduleEntity> {
 		return this.prismaService.productSchedule.create({
 			data: scheduleInformation,
+		});
+	}
+
+	async deleteProductScheduleByProductScheduleId(
+		productScheduleId: string,
+	): Promise<[ProductScheduleEntity, BillEntity[], BillEntity[]]> {
+		return await this.prismaService.$transaction(async (prisma) => {
+			const billsIdWaitingRefund: string[] = [];
+			const billsIdCancel: string[] = [];
+			let billsWaitingRefund: BillEntity[] = [];
+			let billsCancel: BillEntity[] = [];
+
+			const productSchedule = await prisma.productSchedule.update({
+				include: {
+					infoBill: {
+						include: {
+							bill: true,
+						},
+						where: {
+							bill: {
+								status: {
+									notIn: [BillStatusEnum.cancel, BillStatusEnum.done],
+								},
+							},
+						},
+					},
+				},
+				where: {
+					id: productScheduleId,
+				},
+				data: {
+					deletedAt: new Date(),
+					status: ProductScheduleStatusEnum.canceled,
+					infoDiscount: {
+						updateMany: {
+							where: {
+								status: {
+									not: InfoDiscountStatusEnum.inactive,
+								},
+							},
+							data: {
+								deletedAt: new Date(),
+								status: InfoDiscountStatusEnum.inactive,
+							},
+						},
+					},
+				},
+			});
+			productSchedule.infoBill.forEach((info) => {
+				if (info.bill.status === BillStatusEnum.paided) {
+					return billsIdWaitingRefund.push(info.bill.id);
+				}
+				billsIdCancel.push(info.bill.id);
+			});
+
+			if (billsIdWaitingRefund.length > 0) {
+				billsWaitingRefund = await prisma.bill.updateManyAndReturn({
+					where: {
+						id: {
+							in: billsIdWaitingRefund,
+						},
+					},
+					data: {
+						deletedAt: new Date(),
+						status: BillStatusEnum.waitingRefund,
+					},
+				});
+			}
+
+			if (billsIdCancel.length > 0) {
+				billsCancel = await prisma.bill.updateManyAndReturn({
+					where: {
+						id: {
+							in: billsIdCancel,
+						},
+					},
+					data: {
+						deletedAt: new Date(),
+						status: BillStatusEnum.cancel,
+					},
+				});
+			}
+
+			return [productSchedule, billsWaitingRefund, billsCancel];
 		});
 	}
 }

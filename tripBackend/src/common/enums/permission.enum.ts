@@ -10,4 +10,5 @@ export enum PermissionEnum {
 	CreateProductSchedule = 'create_product_schedule',
 	UpdateProductInformation = 'update_product_information',
 	FindProductScheduleBySupplierId = 'find_product_schedule_by_supplier_id',
+	DeleteProductScheduleByProductScheduleId = 'delete_product_schedule_by_product_schedule_id',
 }

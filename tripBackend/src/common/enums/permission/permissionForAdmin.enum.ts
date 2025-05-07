@@ -12,4 +12,5 @@ export enum PermissionForAdminEnum {
 	CreateProductSchedule = PermissionEnum.CreateProductSchedule,
 	UpdateProductInformation = PermissionEnum.UpdateProductInformation,
 	FindProductScheduleBySupplierId = PermissionEnum.FindProductScheduleBySupplierId,
+	DeleteProductScheduleByProductScheduleId = PermissionEnum.DeleteProductScheduleByProductScheduleId,
 }

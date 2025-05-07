@@ -26,6 +26,8 @@ export class GetProductScheduleByProductScheduleIdHandler
 			throw new NotFoundException('productScheduleId');
 		}
 
+		delete productSchedule.product.supplier;
+
 		return {
 			success: true,
 			data: productSchedule,

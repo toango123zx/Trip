@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
-import { AutoTrim } from 'src/common/decorators';
 
 export class UpdateProductDto {
 	@ApiProperty({
@@ -10,7 +9,6 @@ export class UpdateProductDto {
 	})
 	@IsOptional()
 	@IsString()
-	@AutoTrim()
 	name?: string;
 	@ApiProperty({
 		type: 'string',
@@ -18,7 +16,6 @@ export class UpdateProductDto {
 	})
 	@IsOptional()
 	@IsString()
-	@AutoTrim()
 	posterImageUrl?: string;
 	@ApiProperty({
 		minimum: 0.01,
@@ -53,6 +50,5 @@ export class UpdateProductDto {
 	})
 	@IsOptional()
 	@IsString()
-	@AutoTrim()
 	description?: string;
 }

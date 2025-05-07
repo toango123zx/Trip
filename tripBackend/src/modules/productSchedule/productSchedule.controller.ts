@@ -1,5 +1,5 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { QueryBus } from '@nestjs/cqrs';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOperation } from '@nestjs/swagger';
 
 import { HttpResponseBodyDto, PaginationDto, PermissionEnum } from 'src/common';
@@ -9,7 +9,9 @@ import { AuthPermission } from '../auth/decorators';
 import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
 
+import { DeleteProductScheduleByProductScheduleIdCommand } from './commands/implements';
 import {
+	DeleteProductScheduleByProductScheduleIdResponseDto,
 	GetProductScheduleByProductScheduleIdRequestDto,
 	ProductScheduleFilterRequestDto,
 } from './dtos';
@@ -20,7 +22,10 @@ import {
 
 @Controller('schedule')
 export class ProductScheduleController {
-	constructor(private readonly queryBus: QueryBus) {}
+	constructor(
+		private readonly queryBus: QueryBus,
+		private readonly commandBus: CommandBus,
+	) {}
 
 	@Get()
 	@AuthPermission(PermissionEnum.FindProductScheduleBySupplierId)
@@ -46,6 +51,20 @@ export class ProductScheduleController {
 	): Promise<HttpResponseBodyDto<ProductScheduleEntity>> {
 		return this.queryBus.execute(
 			new GetProductScheduleByProductScheduleIdQuery(productScheduleId, filter),
+		);
+	}
+
+	@Delete(':productScheduleId')
+	@AuthPermission(PermissionEnum.DeleteProductScheduleByProductScheduleId)
+	async deleteProductScheduleByProductScheduleId(
+		@Param('productScheduleId') productScheduleId: string,
+		@SupplierInformation() supplierInformation: SupplierInformationDto,
+	): Promise<HttpResponseBodyDto<DeleteProductScheduleByProductScheduleIdResponseDto>> {
+		return this.commandBus.execute(
+			new DeleteProductScheduleByProductScheduleIdCommand(
+				productScheduleId,
+				supplierInformation,
+			),
 		);
 	}
 }
