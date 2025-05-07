@@ -3,7 +3,6 @@ import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { DiscountProviderTypeEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
-	IsBoolean,
 	IsDateString,
 	IsInt,
 	IsNotEmpty,
@@ -12,6 +11,9 @@ import {
 	ValidateNested,
 } from 'class-validator';
 
+import { ConnectDiscountApplicationScopeDto } from '../../discountApplicationScope/dto/connect-discountApplicationScope.dto';
+import { ConnectDiscountEligibilityDto } from '../../discountEligibility/dto/connect-discountEligibility.dto';
+import { ConnectDiscountTypeDto } from '../../discountType/dto/connect-discountType.dto';
 import { ConnectUserDto } from '../../user/dto/connect-user.dto';
 
 export class CreateDiscountUserRelationInputDto {
@@ -23,8 +25,44 @@ export class CreateDiscountUserRelationInputDto {
 	@Type(() => ConnectUserDto)
 	connect: ConnectUserDto;
 }
+export class CreateDiscountDiscountTypeRelationInputDto {
+	@ApiProperty({
+		type: ConnectDiscountTypeDto,
+	})
+	@IsNotEmpty()
+	@ValidateNested()
+	@Type(() => ConnectDiscountTypeDto)
+	connect: ConnectDiscountTypeDto;
+}
+export class CreateDiscountDiscountEligibilityRelationInputDto {
+	@ApiProperty({
+		type: ConnectDiscountEligibilityDto,
+	})
+	@IsNotEmpty()
+	@ValidateNested()
+	@Type(() => ConnectDiscountEligibilityDto)
+	connect: ConnectDiscountEligibilityDto;
+}
+export class CreateDiscountDiscountApplicationScopeRelationInputDto {
+	@ApiProperty({
+		type: ConnectDiscountApplicationScopeDto,
+	})
+	@IsNotEmpty()
+	@ValidateNested()
+	@Type(() => ConnectDiscountApplicationScopeDto)
+	connect: ConnectDiscountApplicationScopeDto;
+}
 
-@ApiExtraModels(ConnectUserDto, CreateDiscountUserRelationInputDto)
+@ApiExtraModels(
+	ConnectUserDto,
+	CreateDiscountUserRelationInputDto,
+	ConnectDiscountTypeDto,
+	CreateDiscountDiscountTypeRelationInputDto,
+	ConnectDiscountEligibilityDto,
+	CreateDiscountDiscountEligibilityRelationInputDto,
+	ConnectDiscountApplicationScopeDto,
+	CreateDiscountDiscountApplicationScopeRelationInputDto,
+)
 export class CreateDiscountDto {
 	@ApiProperty({
 		type: 'string',
@@ -45,12 +83,6 @@ export class CreateDiscountDto {
 	@ValidateNested()
 	@Type(() => CreateDiscountUserRelationInputDto)
 	user: CreateDiscountUserRelationInputDto;
-	@ApiProperty({
-		type: 'string',
-	})
-	@IsNotEmpty()
-	@IsString()
-	code: string;
 	@ApiProperty({
 		type: 'string',
 	})
@@ -95,9 +127,24 @@ export class CreateDiscountDto {
 	@IsInt()
 	point?: number;
 	@ApiProperty({
-		type: 'boolean',
+		type: CreateDiscountDiscountTypeRelationInputDto,
 	})
 	@IsNotEmpty()
-	@IsBoolean()
-	stackable: boolean;
+	@ValidateNested()
+	@Type(() => CreateDiscountDiscountTypeRelationInputDto)
+	discountType: CreateDiscountDiscountTypeRelationInputDto;
+	@ApiProperty({
+		type: CreateDiscountDiscountEligibilityRelationInputDto,
+	})
+	@IsNotEmpty()
+	@ValidateNested()
+	@Type(() => CreateDiscountDiscountEligibilityRelationInputDto)
+	discountEligibility: CreateDiscountDiscountEligibilityRelationInputDto;
+	@ApiProperty({
+		type: CreateDiscountDiscountApplicationScopeRelationInputDto,
+	})
+	@IsNotEmpty()
+	@ValidateNested()
+	@Type(() => CreateDiscountDiscountApplicationScopeRelationInputDto)
+	discountApplicationScope: CreateDiscountDiscountApplicationScopeRelationInputDto;
 }

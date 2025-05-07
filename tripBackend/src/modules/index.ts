@@ -1,6 +1,9 @@
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { DiscountModule } from './discount/discount.module';
+import { DiscountApplicationScopeModule } from './discountApplicationScope/discountApplicationScope.module';
+import { DiscountEligibilityModule } from './discountEligibility/discountEligibility.module';
+import { DiscountTypeModule } from './discountType/discountType.module';
 import { HealthCheckModule } from './healthCheck/healthCheck.module';
 import { LocationModule } from './location/location.module';
 import { ProductModule } from './product/product.module';
@@ -17,5 +20,8 @@ export const Modules = [
 	LocationModule,
 	ProductModule,
 	ProductScheduleModule,
+	DiscountTypeModule,
+	DiscountEligibilityModule,
+	DiscountApplicationScopeModule,
 	DiscountModule,
 ];

@@ -30,6 +30,7 @@
 		"@nestjs/jwt": "^11.0.0",
 		"@nestjs/platform-express": "^10.0.0",
 		"@nestjs/swagger": "^11.0.2",
+		"@paralleldrive/cuid2": "^2.2.2",
 		"@prisma/client": "6.5.0",
 		"@types/bcrypt": "^5.0.2",
 		"@types/morgan": "^1.9.9",

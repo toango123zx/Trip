@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { DiscountStatusEnum } from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
-import { DiscountEntity } from 'src/models';
+import { CreateDiscountDto, DiscountEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -76,5 +76,21 @@ export class DiscountRepository {
 			}),
 		]);
 		return [discounts, totalRecords];
+	}
+
+	async createDiscount(
+		discountInformation: CreateDiscountDto,
+	): Promise<DiscountEntity> {
+		const discount = await this.prismaService.discount.create({
+			data: {
+				...discountInformation,
+				user: {
+					connect: {
+						id: discountInformation.user.connect.id,
+					},
+				},
+			},
+		});
+		return discount;
 	}
 }
