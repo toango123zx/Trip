@@ -1,5 +1,7 @@
 import { GetProductScheduleByProductScheduleIdHandler } from './getProductScheduleByProductScheduleId.handler';
+import { GetProductSchedulesBySupplierIdHandler } from './getProductSchedulesBySupplierId.handler';
 
-export const productScheduleCommandHandlers = [
+export const productScheduleQueryHandlers = [
 	GetProductScheduleByProductScheduleIdHandler,
+	GetProductSchedulesBySupplierIdHandler,
 ];

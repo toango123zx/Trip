@@ -2,7 +2,7 @@ import { createParamDecorator, ExecutionContext, HttpStatus } from '@nestjs/comm
 
 import { OptionalException } from 'src/common';
 
-export const SupplierInforamtion = createParamDecorator(
+export const SupplierInformation = createParamDecorator(
 	(data: unknown, context: ExecutionContext) => {
 		const request = context.switchToHttp().getRequest();
 		const { id, ...user } = request.user;
