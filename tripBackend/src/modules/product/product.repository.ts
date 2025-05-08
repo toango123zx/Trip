@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { ProductStatusEnum } from '@prisma/client';
+import {
+	BillStatusEnum,
+	InfoDiscountStatusEnum,
+	ProductScheduleStatusEnum,
+	ProductStatusEnum,
+} from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
 import { CreateProductDto, ProductEntity, UpdateProductDto } from 'src/models';
 
@@ -115,6 +120,106 @@ export class ProductRepository {
 				id: productId,
 			},
 			data: productInformation,
+		});
+	}
+
+	async deleteProductByProductId(productId: string): Promise<ProductEntity> {
+		return await this.prismaService.$transaction(async (prisma) => {
+			const billsId: string[] = [];
+			const inDiscountsId: string[] = [];
+
+			const product = await prisma.product.update({
+				include: {
+					productSchedule: {
+						include: {
+							infoBill: {
+								include: {
+									bill: true,
+								},
+								where: {
+									bill: {
+										status: {
+											notIn: [
+												BillStatusEnum.cancel,
+												BillStatusEnum.done,
+											],
+										},
+									},
+								},
+							},
+							infoDiscount: {
+								where: {
+									status: {
+										not: InfoDiscountStatusEnum.inactive,
+									},
+								},
+							},
+						},
+						where: {
+							status: {
+								not: ProductScheduleStatusEnum.canceled,
+							},
+						},
+					},
+				},
+				where: {
+					id: productId,
+					status: {
+						not: ProductStatusEnum.inactive,
+					},
+				},
+				data: {
+					status: ProductStatusEnum.inactive,
+					productSchedule: {
+						updateMany: {
+							where: {
+								status: {
+									not: ProductScheduleStatusEnum.canceled,
+								},
+							},
+							data: {
+								status: ProductScheduleStatusEnum.canceled,
+							},
+						},
+					},
+				},
+			});
+			product.productSchedule.forEach((schedule) => {
+				schedule.infoBill.forEach((bill) => {
+					billsId.push(bill.bill.id);
+				});
+				schedule.infoDiscount.forEach((info) => {
+					inDiscountsId.push(info.id);
+				});
+			});
+
+			if (inDiscountsId.length > 0) {
+				await prisma.infoDiscount.updateMany({
+					where: {
+						id: {
+							in: inDiscountsId,
+						},
+					},
+					data: {
+						status: InfoDiscountStatusEnum.inactive,
+					},
+				});
+			}
+
+			if (billsId.length > 0) {
+				await prisma.bill.updateMany({
+					where: {
+						id: {
+							in: billsId,
+						},
+					},
+					data: {
+						status: BillStatusEnum.cancel,
+					},
+				});
+			}
+
+			return product;
 		});
 	}
 }
