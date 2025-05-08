@@ -174,12 +174,9 @@ const Select = ({
 		if (option) {
 			setSelectedOption(option);
 		}
-	}, [options, defaultValue]);
-
-	useEffect(() => {
 		const fieldName = name || id;
 		setValue(fieldName, selectedOption?.value || '');
-	}, [selectedOption, setValue, name, id]);
+	}, [options, defaultValue, selectedOption, setValue, name, id]);
 
 	return (
 		<Row label={label} required={required}>
