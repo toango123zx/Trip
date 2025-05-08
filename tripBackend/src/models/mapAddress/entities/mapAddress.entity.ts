@@ -43,7 +43,7 @@ export class MapAddressEntity {
 		enum: MapAddressStatusEnum,
 		enumName: 'MapAddressStatusEnum',
 	})
-	mapAddressStatus: MapAddressStatusEnum;
+	status: MapAddressStatusEnum;
 	@ApiProperty({
 		type: () => LocationEntity,
 		required: false,

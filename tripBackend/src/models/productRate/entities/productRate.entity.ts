@@ -29,6 +29,8 @@ export class ProductRateEntity {
 	})
 	user?: UserEntity;
 	@ApiProperty({
+		minimum: 0,
+		maximum: 5,
 		type: 'integer',
 		format: 'int32',
 	})

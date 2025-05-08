@@ -81,23 +81,23 @@ model providerMap {
 }
 
 model mapAddress {
-    id               String               @id @default(cuid())
-    urlMap           String               @map("url_map")
-    providerMapId    String               @map("provider_map_id")
+    id            String               @id @default(cuid())
+    urlMap        String               @map("url_map")
+    providerMapId String               @map("provider_map_id")
     /// @DtoRelationCanConnectOnCreate
-    providerMap      providerMap          @relation(fields: [providerMapId], references: [id])
-    createAt         DateTime             @default(now()) @map("create_at")
+    providerMap   providerMap          @relation(fields: [providerMapId], references: [id])
+    createAt      DateTime             @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    updateAt         DateTime             @updatedAt @map("update_at")
+    updateAt      DateTime             @updatedAt @map("update_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    deletedAt        DateTime?            @map("deleted_at")
+    deletedAt     DateTime?            @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    mapAddressStatus MapAddressStatusEnum @default(active) @map("map_address_status")
+    status        MapAddressStatusEnum @default(active)
     ///@DtoRelationCanCreateOnCreate
-    location         location?
+    location      location?
 
     @@map("Map_Address")
 }
@@ -193,7 +193,9 @@ model productRate {
     userId    String                @map("user_id")
     /// @DtoRelationCanConnectOnCreate
     user      user                  @relation(fields: [userId], references: [id])
-    star      Int
+    /// @maximum 5
+    /// @minimum 0
+    star      Int                   @default(0)
     comment   String
     /// @DtoCreateHidden
     /// @DtoUpdateHidden

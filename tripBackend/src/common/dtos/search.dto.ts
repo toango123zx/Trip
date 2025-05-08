@@ -2,9 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { IsOptional, IsString } from 'class-validator';
 
-import { PaginationDto } from './pagination.dto';
-
-export class SearchDto<T> extends PaginationDto {
+export class SearchDto {
 	@ApiProperty({
 		required: false,
 		nullable: true,
@@ -13,11 +11,4 @@ export class SearchDto<T> extends PaginationDto {
 	@IsOptional()
 	@IsString()
 	keyword?: string;
-	@ApiProperty({
-		required: false,
-		nullable: true,
-		type: Object,
-	})
-	@IsOptional()
-	filters?: Record<string, T>;
 }

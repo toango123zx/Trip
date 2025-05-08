@@ -31,5 +31,5 @@ export class MapAddressDto {
 		enum: MapAddressStatusEnum,
 		enumName: 'MapAddressStatusEnum',
 	})
-	mapAddressStatus: MapAddressStatusEnum;
+	status: MapAddressStatusEnum;
 }

@@ -14,7 +14,6 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 		query: GetProductsQuery,
 	): Promise<HttpResponseBodySuccessDto<GetProductsResponseDto[]>> {
 		const skip = (query.pagination.page - 1) * query.pagination.limit;
-
 		const pagination: IPaginationQuery = {
 			skip,
 			take: query.pagination.limit,
