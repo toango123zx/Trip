@@ -8,4 +8,5 @@ export enum PermissionEnum {
 	UnlockUser = 'unlock_user',
 	CreateProduct = 'create_product',
 	CreateProductSchedule = 'create_product_schedule',
+	UpdateProductInformation = 'update_product_information',
 }

@@ -1,7 +1,7 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 
 import { Type } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-validator';
 
 import { ConnectLocationDto } from '../../location/dto/connect-location.dto';
 import { ConnectProductCategoryDto } from '../../productCategory/dto/connect-productCategory.dto';
@@ -65,11 +65,11 @@ export class CreateProductDto {
 	supplier: CreateProductSupplierRelationInputDto;
 	@ApiProperty({
 		minimum: 0.01,
-		type: 'integer',
-		format: 'int32',
+		type: 'number',
+		format: 'float',
 	})
 	@IsNotEmpty()
-	@IsInt()
+	@IsNumber()
 	time: number;
 	@ApiProperty({
 		minimum: 1,

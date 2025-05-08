@@ -17,8 +17,8 @@ export class ProductDto {
 	posterImageUrl: string;
 	@ApiProperty({
 		minimum: 0.01,
-		type: 'integer',
-		format: 'int32',
+		type: 'number',
+		format: 'float',
 	})
 	time: number;
 	@ApiProperty({
