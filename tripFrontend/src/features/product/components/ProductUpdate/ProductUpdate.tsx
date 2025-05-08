@@ -92,5 +92,17 @@ export const ProductUpdate = ({
 		}
 	}, [hasSubmitted, loading, error, onCancel]);
 
-	return <ProductForm form={form} onSubmit={onSubmit} onCancel={onCancel} />;
+	const onRemove = (): void => {
+		dispatch(productThunk.deleteProductByProductId(productId));
+		setHasSubmitted(true);
+	};
+	return (
+		<ProductForm
+			form={form}
+			onRemove={onRemove}
+			schedule={productDetail.productSchedule}
+			onSubmit={onSubmit}
+			onCancel={onCancel}
+		/>
+	);
 };

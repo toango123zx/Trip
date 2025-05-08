@@ -12,8 +12,11 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ComboBox } from '@/components';
+import { DiscountBoard } from '@/features/discount';
 import { locationThunk } from '@/features/location';
+import { SchedulesBoard } from '@/features/schedule';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
+import { TProductSchedule } from '@/types';
 
 import { TRequestBodyCreateProduct } from '../../product.type';
 
@@ -66,7 +69,9 @@ type TSelect = {
 
 type TProductFormProps = {
 	form: UseFormReturn<TRequestBodyCreateProduct>;
+	schedule?: TProductSchedule[];
 	remove?: boolean;
+	onRemove?: () => void;
 	onSubmit?: SubmitHandler<TRequestBodyCreateProduct>;
 	onCancel?: () => void;
 };
@@ -194,8 +199,10 @@ const Select = ({
 
 export const ProductForm = ({
 	form,
+	schedule = [],
 	remove = true,
 	onSubmit,
+	onRemove = (): void => {},
 	onCancel = (): void => {},
 }: TProductFormProps): JSX.Element => {
 	const {
@@ -245,7 +252,9 @@ export const ProductForm = ({
 		return true;
 	};
 
-	const handleRemoveOnClick = (): void => {};
+	const handleRemoveOnClick = (): void => {
+		onRemove();
+	};
 
 	return (
 		<div
@@ -392,8 +401,14 @@ export const ProductForm = ({
 									<Plus className="h-4 w-4" /> ADD {title.toUpperCase()}
 								</button>
 							</div>
-							<div className="flex h-[80px] items-center justify-center rounded-md border p-6 text-gray-500">
-								No {title.toLowerCase()} have been added yet
+
+							<div className=" items-center justify-center rounded-md border text-gray-500">
+								{/* No {title.toLowerCase()} have been added yet */}
+								{title === 'Schedules' ? (
+									<SchedulesBoard data={schedule} pageSize={5} />
+								) : (
+									title === 'Discounts' && <DiscountBoard />
+								)}
 							</div>
 						</section>
 					))}

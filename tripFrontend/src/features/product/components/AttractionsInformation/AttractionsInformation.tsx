@@ -46,12 +46,12 @@ const ImageFallback = ({ src, alt, className }: TImageFallbackProps): JSX.Elemen
 	/>
 );
 
-type TSheduleCardProps = {
+type TScheduleCardProps = {
 	schedule: TSchedule;
 	className?: string;
 };
 
-const ScheduleCard = ({ schedule, className }: TSheduleCardProps): JSX.Element => {
+const ScheduleCard = ({ schedule, className }: TScheduleCardProps): JSX.Element => {
 	const statusColor = schedule.status === 'Active' ? 'text-green-500' : 'text-gray-500';
 
 	const renderInfoSection = (

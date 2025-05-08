@@ -69,6 +69,19 @@ export const productSlice = createSlice({
 			.addCase(productThunk.updateProductByProductId.rejected, (state, action) => {
 				state.loading = false;
 				state.error = String(action.error.message);
+			})
+			.addCase(productThunk.deleteProductByProductId.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(productThunk.deleteProductByProductId.fulfilled, (state, action) => {
+				state.loading = false;
+				state.productDetail = action.payload;
+				state.error = null;
+			})
+			.addCase(productThunk.deleteProductByProductId.rejected, (state, action) => {
+				state.loading = false;
+				state.error = String(action.error.message);
 			});
 	},
 });

@@ -31,17 +31,17 @@ export type TProductImage = {
 	url: string;
 };
 
-type TProductSchedule = {
+export type TProductSchedule = {
 	id: string;
-	startTime: string;
-	endTime: string;
-	price: string;
-	booked: string;
-	startOrder: string;
-	endOrder: string;
-	createAt: string;
-	updateAt: string;
-	deletedAt: string | null;
+	startTime: Date;
+	endTime: Date;
+	booked: number;
+	startOrder: Date;
+	endOrder: Date;
+	price: number;
+	createAt: Date;
+	updateAt: Date;
+	deletedAt: Date | null;
 	status: EProductScheduleStatus;
 };
 

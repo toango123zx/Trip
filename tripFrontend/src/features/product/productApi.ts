@@ -48,4 +48,11 @@ export const productApi = {
 		);
 		return data;
 	},
+
+	async deleteProductByProductId(productId: string): Promise<TProductDetail> {
+		const data = await api.delete<TProductDetail, TRequestBodyUpdateProduct>(
+			`/product/${productId}`,
+		);
+		return data;
+	},
 };
