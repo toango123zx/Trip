@@ -2,6 +2,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { ProductStatusEnum } from '@prisma/client';
+import { plainToInstance } from 'class-transformer';
 import {
 	HttpResponseBodySuccessDto,
 	NotFoundException,
@@ -33,7 +34,12 @@ export class CreateProductScheduleByProductIdHandler
 		supplier: SupplierInformationDto,
 		product: ProductEntity,
 	): void | HttpException {
-		if (!supplier.checkSupplierIsProductSupplier(product)) {
+		if (
+			!plainToInstance(
+				SupplierInformationDto,
+				supplier,
+			).checkSupplierIsProductSupplier(product)
+		) {
 			throw new OptionalException(
 				HttpStatus.FORBIDDEN,
 				'You are not a product supplier.',

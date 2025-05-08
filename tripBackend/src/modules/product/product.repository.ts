@@ -39,6 +39,9 @@ export class ProductRepository {
 				});
 			}
 		}
+		orderBy.push({
+			name: 'asc',
+		});
 
 		const [products, totalRecords] = await Promise.all([
 			this.prismaService.product.findMany({

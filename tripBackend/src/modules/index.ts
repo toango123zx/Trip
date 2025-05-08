@@ -1,5 +1,6 @@
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
+import { DiscountModule } from './discount/discount.module';
 import { HealthCheckModule } from './healthCheck/healthCheck.module';
 import { LocationModule } from './location/location.module';
 import { ProductModule } from './product/product.module';
@@ -14,4 +15,5 @@ export const Modules = [
 	SupplierModule,
 	LocationModule,
 	ProductModule,
+	DiscountModule,
 ];
