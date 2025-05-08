@@ -23,14 +23,14 @@ export class GetLocationsHandler implements IQueryHandler<GetLocationsQuery> {
 		const {
 			keyword,
 			city,
-			statusSearch,
+			locationStatus,
 			...locationFilter
 		}: LocationFilterRequestDto = query.filter;
 		const [locations, totalRecords] = await this.locationRepository.findLocations(
 			pagination,
 			keyword,
 			city,
-			statusSearch,
+			locationStatus,
 			locationFilter,
 		);
 

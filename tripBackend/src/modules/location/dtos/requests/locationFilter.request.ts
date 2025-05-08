@@ -36,7 +36,7 @@ export class LocationFilterRequestDto extends SearchDto {
 	})
 	@IsOptional()
 	@IsEnum(LocationStatusEnum)
-	statusSearch?: LocationStatusEnum;
+	locationStatus?: LocationStatusEnum;
 	@ApiProperty({
 		type: 'string',
 		enum: OrderByEnum,
