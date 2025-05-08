@@ -193,7 +193,9 @@ model productRate {
     userId    String                @map("user_id")
     /// @DtoRelationCanConnectOnCreate
     user      user                  @relation(fields: [userId], references: [id])
-    star      Int
+    /// @maximum 5
+    /// @minimum 0
+    star      Int                   @default(0)
     comment   String
     /// @DtoCreateHidden
     /// @DtoUpdateHidden

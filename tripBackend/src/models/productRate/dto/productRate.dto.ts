@@ -8,6 +8,8 @@ export class ProductRateDto {
 	})
 	id: string;
 	@ApiProperty({
+		minimum: 0,
+		maximum: 5,
 		type: 'integer',
 		format: 'int32',
 	})
