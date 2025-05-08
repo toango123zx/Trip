@@ -90,6 +90,9 @@ export const ProductUpdate = ({
 		if (hasSubmitted && !loading && !error) {
 			onCancel();
 		}
+		if (error === 'Product deleted.') {
+			onCancel();
+		}
 	}, [hasSubmitted, loading, error, onCancel]);
 
 	const onRemove = (): void => {
