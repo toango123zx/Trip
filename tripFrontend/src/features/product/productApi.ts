@@ -1,7 +1,11 @@
 import { api, EServer } from '@/lib';
 import { TPagination, TProductDetail, TProductSumary } from '@/types';
 
-import { TRequestBodyCreateProduct, TRequestQueryGetProducts } from './product.type';
+import {
+	TRequestBodyCreateProduct,
+	TRequestBodyUpdateProduct,
+	TRequestQueryGetProducts,
+} from './product.type';
 
 export const productApi = {
 	async getProducts(
@@ -30,6 +34,17 @@ export const productApi = {
 			product,
 			{},
 			EServer.Backend,
+		);
+		return data;
+	},
+
+	async updateProductByProductId(
+		productId: string,
+		product: TRequestBodyUpdateProduct,
+	): Promise<TProductDetail> {
+		const data = await api.put<TProductDetail, TRequestBodyUpdateProduct>(
+			`/product/${productId}`,
+			product,
 		);
 		return data;
 	},

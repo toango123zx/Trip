@@ -44,7 +44,12 @@ export const AddProduct = ({
 
 	return (
 		<div>
-			<ProductForm form={form} onSubmit={onSubmit} onCancel={onCancel} />
+			<ProductForm
+				form={form}
+				remove={false}
+				onSubmit={onSubmit}
+				onCancel={onCancel}
+			/>
 		</div>
 	);
 };

@@ -4,6 +4,7 @@ export * from './AttractionsInformation';
 export * from './AttractionsRate';
 export * from './Button';
 export * from './Card';
+export * from './ProductUpdate';
 export * from './Hero';
 export * from './ProductBoard';
 export * from './ProductForm';

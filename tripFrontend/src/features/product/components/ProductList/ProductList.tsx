@@ -1,8 +1,16 @@
+import { notification } from 'antd';
 import { JSX, useState } from 'react';
 import { IoIosAdd } from 'react-icons/io';
 
-import { AddProduct, DiscountBoard, ProductsBoard, SchedulesBoard } from '@/features';
+import {
+	AddProduct,
+	DiscountBoard,
+	ProductsBoard,
+	ProductUpdate,
+	SchedulesBoard,
+} from '@/features';
 import { cn } from '@/lib';
+import { EProductStatus } from '@/types';
 
 enum EactiveTab {
 	product = 'product',
@@ -17,6 +25,8 @@ type ProductListProps = {
 export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 	const [activeTab, setActiveTab] = useState<EactiveTab>(EactiveTab.product);
 	const [isOpenPopupAddProduct, setIsOpenPopupAddProduct] = useState(false);
+	const [isOpenPopupProductUpdate, setIsOpenPopupProductUpdate] = useState(false);
+	const [productId, setProductId] = useState<string>('');
 
 	const handleChangeTab = (tab: EactiveTab): void => {
 		setActiveTab(tab);
@@ -26,8 +36,25 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 		setIsOpenPopupAddProduct(true);
 	};
 
+	const handleProductUpdateOnClick = (
+		productId: string,
+		status: EProductStatus,
+	): void => {
+		setProductId(productId);
+		if (status !== EProductStatus.inactive) {
+			setIsOpenPopupProductUpdate(true);
+		} else {
+			notification.error({
+				message: 'Error',
+				description: 'Product is inactive, cannot be updated.',
+				duration: 2,
+			});
+		}
+	};
+
 	const handleClosePopup = (): void => {
 		setIsOpenPopupAddProduct(false);
+		setIsOpenPopupProductUpdate(false);
 	};
 
 	return (
@@ -98,13 +125,25 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 							</div>
 						</div>
 
-						{activeTab === EactiveTab.product && <ProductsBoard />}
+						{activeTab === EactiveTab.product && (
+							<ProductsBoard
+								openProductUpdateOnClick={handleProductUpdateOnClick}
+							/>
+						)}
 						{activeTab === EactiveTab.schedule && <SchedulesBoard />}
 						{activeTab === EactiveTab.discount && <DiscountBoard />}
 					</div>
 					<div onClick={() => handleClosePopup()}>
 						{isOpenPopupAddProduct && (
 							<AddProduct onCancel={handleClosePopup} />
+						)}
+					</div>
+					<div>
+						{isOpenPopupProductUpdate && (
+							<ProductUpdate
+								productId={productId}
+								onCancel={handleClosePopup}
+							/>
 						)}
 					</div>
 				</main>
