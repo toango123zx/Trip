@@ -6,12 +6,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getColumnSearchProps, TableView, PaginationTable } from '@/components';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { TPagination, TProductSumary } from '@/types';
+import { EProductStatus, TPagination, TProductSumary } from '@/types';
 
 import { productThunk } from '../../productThunk';
 
 type TProductsBoard = {
-	openProductUpdateOnClick?: (productId: string) => void;
+	openProductUpdateOnClick?: (productId: string, status: EProductStatus) => void;
 	className?: string;
 };
 
@@ -141,7 +141,12 @@ export const ProductsBoard = ({
 			render: (_, record: TProductSumary) => (
 				<button
 					type="button"
-					onClick={() => openProductUpdateOnClick(record.id)}
+					onClick={() =>
+						openProductUpdateOnClick(
+							record.id,
+							EProductStatus[record.status as keyof typeof EProductStatus],
+						)
+					}
 					className="text-blue-500 flex gap-2.5 items-center"
 				>
 					<span>View detail</span>

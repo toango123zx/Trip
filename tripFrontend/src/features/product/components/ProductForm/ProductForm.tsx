@@ -47,6 +47,7 @@ type TTextareaProps = {
 	id: keyof TRequestBodyCreateProduct;
 	label: string;
 	register: ReturnType<typeof useForm<TRequestBodyCreateProduct>>['register'];
+	required?: boolean;
 	errors: FieldErr;
 };
 
@@ -119,6 +120,7 @@ const Input = ({
 					...(required && { required: `${label} is required` }),
 					...(type === 'number' && { valueAsNumber: true }),
 					...(validate && { validate: validate }),
+					setValueAs: (value) => value.trim(),
 				})}
 			/>
 			<ErrorText id={id} errors={errors} />
@@ -126,13 +128,22 @@ const Input = ({
 	</Row>
 );
 
-const Textarea = ({ id, label, register, errors }: TTextareaProps): JSX.Element => (
+const Textarea = ({
+	id,
+	label,
+	required,
+	register,
+	errors,
+}: TTextareaProps): JSX.Element => (
 	<Row label={label} top>
 		<div>
 			<textarea
 				id={id as string}
 				className="h-[100px] w-full rounded-md bg-white-100 p-4 border border-gray-300 focus:outline-none"
-				{...register(id)}
+				{...register(id, {
+					...(required && { required: `${label} is required` }),
+					setValueAs: (value) => value.trim(),
+				})}
 			/>
 			<ErrorText id={id} errors={errors} />
 		</div>
@@ -305,6 +316,7 @@ export const ProductForm = ({
 						label="Description"
 						register={register}
 						errors={errors}
+						required
 					/>
 					<Input
 						id="cityName"

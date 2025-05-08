@@ -1,3 +1,4 @@
+import { notification } from 'antd';
 import { JSX, useState } from 'react';
 import { IoIosAdd } from 'react-icons/io';
 
@@ -9,6 +10,7 @@ import {
 	SchedulesBoard,
 } from '@/features';
 import { cn } from '@/lib';
+import { EProductStatus } from '@/types';
 
 enum EactiveTab {
 	product = 'product',
@@ -34,9 +36,20 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 		setIsOpenPopupAddProduct(true);
 	};
 
-	const handleProductUpdateOnClick = (productId: string): void => {
+	const handleProductUpdateOnClick = (
+		productId: string,
+		status: EProductStatus,
+	): void => {
 		setProductId(productId);
-		setIsOpenPopupProductUpdate(true);
+		if (status !== EProductStatus.inactive) {
+			setIsOpenPopupProductUpdate(true);
+		} else {
+			notification.error({
+				message: 'Error',
+				description: 'Product is inactive, cannot be updated.',
+				duration: 2,
+			});
+		}
 	};
 
 	const handleClosePopup = (): void => {
