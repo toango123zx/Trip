@@ -5,7 +5,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import localeData from 'dayjs/plugin/localeData';
 import weekday from 'dayjs/plugin/weekday';
-import { X, Save } from 'lucide-react';
+import { X, Save, Trash2 } from 'lucide-react';
 import React, { JSX, useState } from 'react';
 import CurrencyInput from 'react-currency-input-field';
 
@@ -21,7 +21,9 @@ type TScheduleFormProps = {
 	productName: string;
 	data: TRequestBodyCreateSchedule;
 	setData: React.Dispatch<React.SetStateAction<TRequestBodyCreateSchedule>>;
+	isCreate?: boolean;
 	onSave?: (data: TRequestBodyCreateSchedule) => void;
+	onRemove?: () => void;
 	onCancel?: () => void;
 };
 
@@ -114,7 +116,9 @@ export const ScheduleForm = ({
 	productName,
 	data,
 	setData,
+	isCreate = false,
 	onSave = (): void => {},
+	onRemove = (): void => {},
 	onCancel,
 }: TScheduleFormProps): JSX.Element => {
 	const updateField = (dateOrTime: Dayjs, field: FieldKey, isDate: boolean): void => {
@@ -165,6 +169,10 @@ export const ScheduleForm = ({
 		onSave?.(data);
 	};
 
+	const handleRemoveOnClick = (): void => {
+		onRemove();
+	};
+
 	return (
 		<div
 			className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 px-4 sm:px-20"
@@ -184,13 +192,24 @@ export const ScheduleForm = ({
 						>
 							<X className="h-5 w-5" /> Cancel
 						</button>
-						<button
-							type="button"
-							onClick={handleSubmit}
-							className="flex items-center gap-1 px-4 py-2 border bg-orange-500 text-white rounded-md hover:bg-orange-600"
-						>
-							<Save className="h-5 w-5" /> Save
-						</button>
+						{!isCreate && (
+							<button
+								type="button"
+								onClick={handleRemoveOnClick}
+								className="flex items-center gap-1 rounded-md border border-red-500 bg-red-500 text-white px-4 py-2 hover:bg-red-700"
+							>
+								<Trash2 className="h-5 w-5" /> Remove
+							</button>
+						)}
+						{isCreate && (
+							<button
+								type="button"
+								onClick={handleSubmit}
+								className="flex items-center gap-1 px-4 py-2 border bg-orange-500 text-white rounded-md hover:bg-orange-600"
+							>
+								<Save className="h-5 w-5" /> Save
+							</button>
+						)}
 					</div>
 				</header>
 

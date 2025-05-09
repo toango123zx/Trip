@@ -42,7 +42,13 @@ export const AddProduct = ({
 	};
 
 	useEffect(() => {
-		if (schedules.length > 0 && hasSubmitted && !loadingApi && !errorApi) {
+		if (
+			schedules.length > 0 &&
+			hasSubmitted &&
+			!loadingApi &&
+			!errorApi &&
+			productDetail?.id
+		) {
 			schedules.forEach((schedule) => {
 				dispatch(
 					scheduleThunk.createSchedule({
@@ -51,6 +57,7 @@ export const AddProduct = ({
 					}),
 				);
 			});
+
 			setSchedules([]);
 		}
 		if (hasSubmitted && !loadingApi && !errorApi) {

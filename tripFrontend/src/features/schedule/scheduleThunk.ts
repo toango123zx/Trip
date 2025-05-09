@@ -16,6 +16,16 @@ const createSchedule = createAsyncThunk(
 		return data;
 	},
 );
+
+const deleteSchedule = createAsyncThunk(
+	'schedule/deleteSchedule',
+	async (scheduleId: string) => {
+		const data = await scheduleApi.deleteSchedule(scheduleId);
+		return data;
+	},
+);
+
 export const scheduleThunk = {
 	createSchedule,
+	deleteSchedule,
 };
