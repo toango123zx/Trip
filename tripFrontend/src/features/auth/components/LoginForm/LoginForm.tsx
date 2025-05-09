@@ -59,8 +59,8 @@ export const LoginForm = (): JSX.Element => {
 	};
 
 	useEffect(() => {
-		dispatch(userThunk.getMe());
 		if (userInformation && logged == true) {
+			dispatch(userThunk.getMe());
 			localStorage.setItem('role', userInformation.roleName);
 		}
 	}, [dispatch, userInformation, logged]);

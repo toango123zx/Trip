@@ -95,6 +95,12 @@ export const ProductUpdate = ({
 		}
 	}, [hasSubmitted, loading, error, onCancel]);
 
+	useEffect(() => {
+		if (error === 'Product deleted.' || error === 'Resource not found productId') {
+			onCancel();
+		}
+	}, [error, onCancel]);
+
 	const onRemove = (): void => {
 		dispatch(productThunk.deleteProductByProductId(productId));
 		setHasSubmitted(true);
