@@ -109,7 +109,6 @@ const createApiClient = (baseURL: string, timeout: number): AxiosInstance => {
 				localStorage.getItem('refreshToken')
 			) {
 				originalRequest._retry = true;
-				console.log('Refreshing token...');
 
 				try {
 					// const refreshToken = localStorage.getItem('refreshToken');

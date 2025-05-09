@@ -14,7 +14,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ComboBox } from '@/components';
 import { DiscountBoard } from '@/features/discount';
 import { locationThunk } from '@/features/location';
-import { SchedulesBoard } from '@/features/schedule';
+import {
+	ScheduleForm,
+	SchedulesBoard,
+	TRequestBodyCreateSchedule,
+} from '@/features/schedule';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TProductSchedule } from '@/types';
 
@@ -69,7 +73,11 @@ type TSelect = {
 
 type TProductFormProps = {
 	form: UseFormReturn<TRequestBodyCreateProduct>;
-	schedule?: TProductSchedule[];
+	// schedule?: TProductSchedule[];
+	schedules?: TProductSchedule[] | TRequestBodyCreateSchedule[];
+	setSchedules?: React.Dispatch<
+		React.SetStateAction<TProductSchedule[] | TRequestBodyCreateSchedule[]>
+	>;
 	remove?: boolean;
 	onRemove?: () => void;
 	onSubmit?: SubmitHandler<TRequestBodyCreateProduct>;
@@ -199,7 +207,8 @@ const Select = ({
 
 export const ProductForm = ({
 	form,
-	schedule = [],
+	schedules,
+	setSchedules = (): void => {},
 	remove = true,
 	onSubmit,
 	onRemove = (): void => {},
@@ -215,6 +224,7 @@ export const ProductForm = ({
 
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const locations = useSelector((s: TReduxStoreState) => s.location.locations);
+	const [isOpenPopupScheduleUpdate, setIsOpenPopupScheduleUpdate] = useState(false);
 
 	useEffect(() => {
 		dispatch(locationThunk.getLocations());
@@ -256,9 +266,33 @@ export const ProductForm = ({
 		onRemove();
 	};
 
+	const [newSchedule, setNewSchedule] = useState<TRequestBodyCreateSchedule>(
+		{} as TRequestBodyCreateSchedule,
+	);
+	const handleAddScheduleOnClick = (): void => {
+		setNewSchedule({
+			id: new Date().getTime().toString(),
+			price: 0,
+			startTime: new Date(),
+			startOrder: new Date(),
+			endTime: new Date(),
+			endOrder: new Date(),
+		});
+		setIsOpenPopupScheduleUpdate(true);
+	};
+
+	const handlerAddScheduleInPopup = (schedule: TRequestBodyCreateSchedule): void => {
+		setSchedules((prev = []) => [schedule, ...prev]);
+		setIsOpenPopupScheduleUpdate(false);
+	};
+
+	const handleClosePopupScheduleUpdate = (): void => {
+		setIsOpenPopupScheduleUpdate(false);
+	};
+
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 sm:px-20"
+			className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 px-4 sm:px-20"
 			onClick={onCancel}
 		>
 			<div
@@ -396,6 +430,11 @@ export const ProductForm = ({
 								<h2 className="text-xl font-bold">{title}</h2>
 								<button
 									type="button"
+									onClick={
+										title === 'Schedules'
+											? (): void => handleAddScheduleOnClick()
+											: (): void => {}
+									}
 									className="flex h-10 items-center gap-1 rounded-full bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
 								>
 									<Plus className="h-4 w-4" /> ADD {title.toUpperCase()}
@@ -405,13 +444,22 @@ export const ProductForm = ({
 							<div className=" items-center justify-center rounded-md border text-gray-500">
 								{/* No {title.toLowerCase()} have been added yet */}
 								{title === 'Schedules' ? (
-									<SchedulesBoard data={schedule} pageSize={5} />
+									<SchedulesBoard data={schedules} pageSize={5} />
 								) : (
-									title === 'Discounts' && <DiscountBoard />
+									title === 'Discounts' && <DiscountBoard data={[]} />
 								)}
 							</div>
 						</section>
 					))}
+					{isOpenPopupScheduleUpdate && (
+						<ScheduleForm
+							productName={watch('name')}
+							data={newSchedule}
+							setData={setNewSchedule}
+							onCancel={handleClosePopupScheduleUpdate}
+							onSave={handlerAddScheduleInPopup}
+						/>
+					)}
 				</form>
 			</div>
 		</div>
