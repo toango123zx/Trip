@@ -130,6 +130,25 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 										</span>
 									</button>
 								)}
+								{activeTab === 'discount' && (
+									<button
+										type="button"
+										onClick={handleAddProductOnClick}
+										className={`
+                                        flex items-center justify-center
+                                        bg-orange-400 hover:bg-orange-500
+                                        text-white font-bold
+                                        py-1.5 px-2.5
+                                        rounded-full
+                                        transition duration-150 ease-in-out
+                                      `}
+									>
+										<IoIosAdd className="w-5 h-full" />
+										<span className="font-Montserrat text-sm font-bold">
+											New Discount
+										</span>
+									</button>
+								)}
 							</div>
 						</div>
 

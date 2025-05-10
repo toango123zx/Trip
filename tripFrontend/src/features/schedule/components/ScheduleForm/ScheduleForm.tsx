@@ -1,6 +1,5 @@
 'use client';
 
-import { DatePicker, TimePicker, Space } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import localeData from 'dayjs/plugin/localeData';
@@ -9,7 +8,7 @@ import { X, Save, Trash2 } from 'lucide-react';
 import React, { JSX, useState } from 'react';
 import CurrencyInput from 'react-currency-input-field';
 
-import { ErrorText } from '@/components';
+import { DateTimeField, ErrorText } from '@/components';
 
 import type { TRequestBodyCreateSchedule } from '../../schedule.type';
 
@@ -41,66 +40,6 @@ const pickerConfigs: {
 	{ key: 'startOrder', label: 'Start Order' },
 	{ key: 'endOrder', label: 'End Order' },
 ];
-
-const DateTimeField = ({
-	label,
-	field,
-	value,
-	error,
-	onChangeDate,
-	onChangeTime,
-}: {
-	label: string;
-	field: FieldKey;
-	value: Date;
-	error?: boolean;
-	onChangeDate: (d: Dayjs | null, f: FieldKey) => void;
-	onChangeTime: (t: Dayjs | null, f: FieldKey) => void;
-}): JSX.Element => {
-	return (
-		<div>
-			<div className="flex items-center gap-5">
-				<label className="text-2xl font-medium w-9/12">{label} Date</label>
-				<Space direction="vertical" className="w-full">
-					<DatePicker
-						value={dayjs(value)}
-						onChange={(d) => onChangeDate(d, field)}
-						format="DD/MM/YYYY"
-						className="w-full text-2xl h-14"
-						size="large"
-					/>
-				</Space>
-				<label className="text-2xl font-medium w-9/12">{label} Time</label>
-				<Space direction="vertical" className="w-full">
-					<TimePicker
-						value={dayjs(value)}
-						onChange={(t) => onChangeTime(t, field)}
-						format="HH:mm"
-						className="w-full text-2xl h-14"
-						size="large"
-					/>
-				</Space>
-			</div>
-			<div className="pl-54 pt-2.5">
-				{error ? (
-					field === 'startTime' ? (
-						<ErrorText
-							id="startTime"
-							message="Start must be greater than current date"
-						/>
-					) : field === 'startOrder' ? (
-						<ErrorText
-							id="startOrder"
-							message="Start Order must be less than start time"
-						/>
-					) : (
-						<ErrorText message="The end date must be greater than the current date and greater than the start date and greater than the end order" />
-					)
-				) : null}
-			</div>
-		</div>
-	);
-};
 
 type TError = {
 	name: boolean;
@@ -248,7 +187,7 @@ export const ScheduleForm = ({
 
 					<div className="space-y-8">
 						{pickerConfigs.map((cfg) => (
-							<DateTimeField
+							<DateTimeField<TRequestBodyCreateSchedule, FieldKey>
 								key={cfg.key}
 								label={cfg.label}
 								field={cfg.key}
