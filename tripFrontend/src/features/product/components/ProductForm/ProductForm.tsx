@@ -22,7 +22,7 @@ import {
 	TRequestBodyCreateSchedule,
 } from '@/features/schedule';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { TProductSchedule } from '@/types';
+import { TDiscountDetail, TProductSchedule } from '@/types';
 
 import { TRequestBodyCreateProduct } from '../../product.type';
 
@@ -79,6 +79,7 @@ type TProductFormProps = {
 	setSchedules?: React.Dispatch<
 		React.SetStateAction<TProductSchedule[] | TRequestBodyCreateSchedule[]>
 	>;
+	discounts?: TDiscountDetail[];
 	remove?: boolean;
 	onRemove?: () => void;
 	onSubmit?: SubmitHandler<TRequestBodyCreateProduct>;
@@ -210,6 +211,7 @@ export const ProductForm = ({
 	form,
 	schedules,
 	setSchedules = (): void => {},
+	discounts = [],
 	remove = true,
 	onSubmit,
 	onRemove = (): void => {},
@@ -477,7 +479,7 @@ export const ProductForm = ({
 										}
 									/>
 								) : (
-									title === 'Discounts' && <DiscountBoard data={[]} />
+									title === 'Discounts' && <DiscountBoard data={discounts} />
 								)}
 							</div>
 						</section>

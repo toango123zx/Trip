@@ -5,7 +5,13 @@ import { JSX, useEffect, useRef, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ProductForm, scheduleThunk, TRequestBodyCreateSchedule } from '@/features';
+import {
+	discoutnThunk,
+	ProductForm,
+	scheduleThunk,
+	TRequestBodyCreateSchedule,
+} from '@/features';
+import { locationThunk } from '@/features/location';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TProductSchedule } from '@/types';
 
@@ -29,6 +35,8 @@ export const ProductUpdate = ({
 	);
 	const { loading, error } = useSelector((state: TReduxStoreState) => state.product);
 
+	const discounts = useSelector((state: TReduxStoreState) => state.discount.discounts);
+
 	const initialValuesRef = useRef<TRequestBodyUpdateProduct>(null);
 	const [schedules, setSchedules] = useState<
 		TRequestBodyCreateSchedule[] | TProductSchedule[]
@@ -44,6 +52,8 @@ export const ProductUpdate = ({
 
 	useEffect(() => {
 		dispatch(productThunk.getProductDetail(String(productId)));
+		dispatch(locationThunk.getLocations());
+		dispatch(discoutnThunk.getDiscountsByProductId({ productId: String(productId) }));
 	}, [dispatch, productId]);
 
 	useEffect(() => {
@@ -137,6 +147,7 @@ export const ProductUpdate = ({
 			onRemove={onRemove}
 			schedules={schedules}
 			setSchedules={setSchedules}
+			discounts={discounts}
 			onSubmit={onSubmit}
 			onCancel={onCancel}
 		/>

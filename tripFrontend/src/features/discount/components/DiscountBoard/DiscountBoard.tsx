@@ -4,19 +4,24 @@ import { IoIosArrowRoundForward } from 'react-icons/io';
 
 import { getColumnSearchProps, TableView } from '@/components';
 import { cn } from '@/lib';
-import { TDiscount } from '@/types';
+import { TDiscountDetail } from '@/types';
 
 type TDiscountBoard = {
-	data?: TDiscount[];
+	data?: TDiscountDetail[];
+	pageSize?: number;
 	className?: string;
 };
 
-export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element => {
+export const DiscountBoard = ({
+	data = [],
+	pageSize,
+	className,
+}: TDiscountBoard): JSX.Element => {
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
 	const searchInput = useRef<InputRef>(null);
 
-	const columnTable: TableColumnsType<TDiscount> = [
+	const columnTable: TableColumnsType<TDiscountDetail> = [
 		{
 			title: 'Discount ID',
 			dataIndex: 'id',
@@ -29,7 +34,7 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 			dataIndex: 'name',
 			key: 'name',
 			width: '20%',
-			...getColumnSearchProps<TDiscount>(
+			...getColumnSearchProps<TDiscountDetail>(
 				'name',
 				searchInput,
 				searchText,
@@ -40,29 +45,29 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 			sorter: (a, b) => a.name.length - b.name.length,
 			sortDirections: ['descend', 'ascend'],
 		},
-		{
-			title: 'Product Name',
-			dataIndex: 'productName',
-			key: 'productName',
-			width: '15%',
-			...getColumnSearchProps<TDiscount>(
-				'productName',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
-			sorter: (a, b) => a.productName.length - b.productName.length,
-			sortDirections: ['descend', 'ascend'],
-		},
+		// {
+		// 	title: 'Product Name',
+		// 	dataIndex: 'productName',
+		// 	key: 'productName',
+		// 	width: '15%',
+		// 	...getColumnSearchProps<TDiscountDetail>(
+		// 		'productName',
+		// 		searchInput,
+		// 		searchText,
+		// 		setSearchText,
+		// 		searchedColumn,
+		// 		setSearchedColumn,
+		// 	),
+		// 	sorter: (a, b) => a.name.length - b.name.length,
+		// 	sortDirections: ['descend', 'ascend'],
+		// },
 		{
 			title: 'Start Time',
-			dataIndex: 'startDate',
-			key: 'startDate',
+			dataIndex: 'startTime',
+			key: 'startTime',
 			width: '15%',
-			...getColumnSearchProps<TDiscount>(
-				'startDate',
+			...getColumnSearchProps<TDiscountDetail>(
+				'startTime',
 				searchInput,
 				searchText,
 				setSearchText,
@@ -70,16 +75,17 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 				setSearchedColumn,
 			),
 			sorter: (a, b) =>
-				new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+				new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
+			render: (value: Date) => new Date(value).toLocaleString(),
 		},
 		{
 			title: 'End Time',
-			dataIndex: 'endDate',
-			key: 'endDate',
+			dataIndex: 'endTime',
+			key: 'endTime',
 			width: '5%',
-			...getColumnSearchProps<TDiscount>(
-				'endDate',
+			...getColumnSearchProps<TDiscountDetail>(
+				'endTime',
 				searchInput,
 				searchText,
 				setSearchText,
@@ -87,15 +93,16 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 				setSearchedColumn,
 			),
 			sorter: (a, b) =>
-				new Date(a.endDate).getTime() - new Date(b.endDate).getTime(),
+				new Date(a.endTime).getTime() - new Date(b.endTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
+			render: (value: Date) => new Date(value).toLocaleString(),
 		},
 		{
 			title: 'Quantity',
 			dataIndex: 'quantity',
 			key: 'quantity',
 			width: '5%',
-			...getColumnSearchProps<TDiscount>(
+			...getColumnSearchProps<TDiscountDetail>(
 				'quantity',
 				searchInput,
 				searchText,
@@ -111,7 +118,7 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 			dataIndex: 'value',
 			key: 'value',
 			width: '8%',
-			...getColumnSearchProps<TDiscount>(
+			...getColumnSearchProps<TDiscountDetail>(
 				'value',
 				searchInput,
 				searchText,
@@ -150,10 +157,11 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 		},
 	];
 	return (
-		<TableView<TDiscount>
+		<TableView<TDiscountDetail>
 			className={cn(className)}
 			columnTable={columnTable}
 			data={data}
+			pageSize={pageSize}
 		/>
 	);
 };

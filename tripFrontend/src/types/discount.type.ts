@@ -4,19 +4,41 @@ export enum EDiscountStatus {
 	canceled = 'canceled',
 }
 
-export type TDiscount = {
+export type TDiscountSumary = {
 	id: string;
 	name: string;
 	productName: string;
 	code: string;
 	description: string;
 	discountPercent: number;
-	startDate: string;
-	endDate: string;
+	startTime: string;
+	endTime: string;
 	quantity: number;
 	value: number;
 	createAt: string;
 	updateAt: string;
 	deletedAt: string | null;
+	status: EDiscountStatus;
+};
+
+export type TDiscountDetail = {
+	id: string;
+	name: string;
+	user: {
+		id: string;
+		name: string;
+	};
+	code: string;
+	description: string;
+	startTime: Date;
+	endTime: Date;
+	value: number;
+	quantity: number;
+	point: number;
+	applited: number;
+	stackable: boolean;
+	createAt: Date;
+	updateAt: Date;
+	deletedAt: Date | null;
 	status: EDiscountStatus;
 };
