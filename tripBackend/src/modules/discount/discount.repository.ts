@@ -12,7 +12,7 @@ import { DiscountOrderByDto } from './dtos';
 export class DiscountRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async findDiscountByProductId(
+	async findDiscountsByProductId(
 		pagination: IPaginationQuery,
 		productId?: string,
 		keyword?: string,
@@ -28,7 +28,7 @@ export class DiscountRepository {
 					user: true,
 					infoDiscount: {
 						include: {
-							product_Schedule: {
+							productSchedule: {
 								include: {
 									product: true,
 								},
@@ -39,7 +39,7 @@ export class DiscountRepository {
 				where: {
 					infoDiscount: {
 						some: {
-							product_Schedule: {
+							productSchedule: {
 								product: {
 									id: productId,
 								},
@@ -60,7 +60,7 @@ export class DiscountRepository {
 				where: {
 					infoDiscount: {
 						some: {
-							product_Schedule: {
+							productSchedule: {
 								product: {
 									id: productId,
 								},
@@ -76,6 +76,38 @@ export class DiscountRepository {
 			}),
 		]);
 		return [discounts, totalRecords];
+	}
+
+	async findDiscountByDiscountId(
+		discountId: string,
+		status?: DiscountStatusEnum,
+	): Promise<DiscountEntity> {
+		return this.prismaService.discount.findFirst({
+			include: {
+				user: true,
+				infoDiscount: {
+					include: {
+						productSchedule: {
+							include: {
+								product: {
+									include: {
+										supplier: {
+											include: {
+												user: true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			where: {
+				id: discountId,
+				status: status,
+			},
+		});
 	}
 
 	async createDiscount(

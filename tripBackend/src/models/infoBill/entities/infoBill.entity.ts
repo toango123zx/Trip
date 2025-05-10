@@ -25,7 +25,7 @@ export class InfoBillEntity {
 		type: () => ProductScheduleEntity,
 		required: false,
 	})
-	product_Schedule?: ProductScheduleEntity;
+	productSchedule?: ProductScheduleEntity;
 	@ApiProperty({
 		type: 'integer',
 		format: 'int32',

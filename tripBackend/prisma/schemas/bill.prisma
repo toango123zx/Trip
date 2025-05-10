@@ -113,7 +113,7 @@ model infoBill {
     bill              bill            @relation(fields: [billId], references: [id])
     productScheduleId String          @map("product_schedule_id")
     /// @DtoRelationCanConnectOnCreate
-    product_Schedule  productSchedule @relation(fields: [productScheduleId], references: [id])
+    productSchedule  productSchedule @relation(fields: [productScheduleId], references: [id])
     quantity          Int
 
     @@map("Info_Bill")

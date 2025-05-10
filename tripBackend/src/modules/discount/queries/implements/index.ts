@@ -1,1 +1,1 @@
-export * from './getDiscountsByProductId.query';
+export * from './getDiscountByDiscountId.query';

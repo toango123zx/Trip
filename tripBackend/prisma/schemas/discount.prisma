@@ -155,7 +155,7 @@ model infoDiscount {
     discount          discount               @relation(fields: [discountId], references: [id])
     productScheduleId String                 @map("product_schedule_id")
     /// @DtoRelationCanConnectOnCreate
-    product_Schedule  productSchedule        @relation(fields: [productScheduleId], references: [id])
+    productSchedule   productSchedule        @relation(fields: [productScheduleId], references: [id])
     createAt          DateTime               @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden

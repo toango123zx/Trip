@@ -1,8 +1,7 @@
 import { IQuery } from '@nestjs/cqrs';
 
 import { PaginationDto } from 'src/common';
-
-import { DiscountFilterRequestDto } from '../../dtos';
+import { DiscountFilterRequestDto } from 'src/modules/discount/dtos';
 
 export class GetDiscountsByProductIdQuery implements IQuery {
 	constructor(

@@ -1,10 +1,11 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 
 import { HttpResponseBodySuccessDto, IPaginationQuery } from 'src/common';
+import { GetDiscountsByProductIdResponseDto } from 'src/modules/discount/dtos';
 
-import { DiscountRepository } from '../../discount.repository';
-import { GetDiscountsByProductIdResponseDto } from '../../dtos';
-import { GetDiscountsByProductIdQuery } from '../implements';
+import { DiscountRepository } from 'src/modules/discount/discount.repository';
+
+import { GetDiscountsByProductIdQuery } from '../implement/getDiscountsByProductId.query';
 
 @QueryHandler(GetDiscountsByProductIdQuery)
 export class GetDiscountsByProductIdHandler
@@ -23,7 +24,7 @@ export class GetDiscountsByProductIdHandler
 
 		const { keyword, statusSearch, ...locationFilter } = query.filter || {};
 		const [discounts, totalRecords] =
-			await this.discountRepository.findDiscountByProductId(
+			await this.discountRepository.findDiscountsByProductId(
 				pagination,
 				String(query.productId),
 				keyword,

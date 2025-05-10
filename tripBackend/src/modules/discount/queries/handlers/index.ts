@@ -1,3 +1,3 @@
-import { GetDiscountsByProductIdHandler } from './getDiscountsByProductId.handler';
+import { GetDiscountByDiscountIdHandler } from './getDiscountByDiscountId.handler';
 
-export const DiscountQueryHandlers = [GetDiscountsByProductIdHandler];
+export const DiscountQueryHandlers = [GetDiscountByDiscountIdHandler];
