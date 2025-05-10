@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { DiscountStatusEnum } from '@prisma/client';
+import { DiscountStatusEnum, InfoDiscountStatusEnum } from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
 import { CreateDiscountDto, DiscountEntity } from 'src/models';
 
@@ -124,5 +124,51 @@ export class DiscountRepository {
 			},
 		});
 		return discount;
+	}
+
+	async deleteDiscountByDiscountId(discountId: string): Promise<DiscountEntity> {
+		return this.prismaService.discount.update({
+			include: {
+				user: true,
+				infoDiscount: {
+					include: {
+						productSchedule: {
+							include: {
+								product: {
+									include: {
+										supplier: {
+											include: {
+												user: true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			where: {
+				id: discountId,
+				status: {
+					not: DiscountStatusEnum.canceled,
+				},
+			},
+			data: {
+				status: DiscountStatusEnum.canceled,
+				infoDiscount: {
+					updateMany: {
+						where: {
+							status: {
+								not: InfoDiscountStatusEnum.inactive,
+							},
+						},
+						data: {
+							status: InfoDiscountStatusEnum.inactive,
+						},
+					},
+				},
+			},
+		});
 	}
 }

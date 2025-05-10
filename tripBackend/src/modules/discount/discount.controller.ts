@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpException,
+	Param,
+	Post,
+	Query,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { DiscountStatusEnum } from '@prisma/client';
@@ -9,7 +18,10 @@ import { AuthPermission } from '../auth/decorators';
 import { MyInformation } from '../user/decorators';
 import { UserInformationDto } from '../user/dtos';
 
-import { CreateDiscountCommand } from './commands/implements';
+import {
+	CreateDiscountCommand,
+	DeleteDiscountByDiscountIdCommand,
+} from './commands/implements';
 import { CreateDiscountRequestDto, GetDiscountByDiscountIdResponseDto } from './dtos';
 import { GetDiscountByDiscountIdQuery } from './queries/implements';
 
@@ -38,6 +50,17 @@ export class DiscountController {
 	): Promise<HttpResponseBodyDto<DiscountEntity | HttpException>> {
 		return this.commandBus.execute(
 			new CreateDiscountCommand(discountInformation, myInformation),
+		);
+	}
+
+	@Delete('/:discountId')
+	@AuthPermission(PermissionEnum.DeleteDiscountByDiscountId)
+	async deleteDiscountByDiscountId(
+		@Param('discountId') discountId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<GetDiscountByDiscountIdResponseDto>> {
+		return this.commandBus.execute(
+			new DeleteDiscountByDiscountIdCommand(discountId, myInformation),
 		);
 	}
 }
