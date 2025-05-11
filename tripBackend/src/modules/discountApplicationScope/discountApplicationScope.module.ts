@@ -3,12 +3,17 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { DatabaseModule } from '../database/database.module';
 
+import { DiscountApplicationScopeController } from './discountApplicationScope.controller';
 import { DiscountApplicationScopeRepository } from './discountApplicationScope.repository';
+import { DiscountApplicationScopeQueryHandlers } from './queries/handlers';
 
 @Module({
 	imports: [CqrsModule, DatabaseModule],
-	controllers: [],
-	providers: [DiscountApplicationScopeRepository],
+	controllers: [DiscountApplicationScopeController],
+	providers: [
+		DiscountApplicationScopeRepository,
+		...DiscountApplicationScopeQueryHandlers,
+	],
 	exports: [],
 })
 export class DiscountApplicationScopeModule {}
