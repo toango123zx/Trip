@@ -6,6 +6,9 @@ import {
 	discountSlice,
 	productSlice,
 	userSlice,
+	discountTypeSlice,
+	discountApplicationScopeSlice,
+	discountEligibilitySlice,
 } from '@/features';
 import { locationSlice } from '@/features/location';
 
@@ -17,6 +20,9 @@ export const _reduxStore = configureStore({
 		schedule: scheduleSlice.reducer,
 		user: userSlice.reducer,
 		discount: discountSlice.reducer,
+		discountType: discountTypeSlice.reducer,
+		discountApplicationScope: discountApplicationScopeSlice.reducer,
+		discountEligibility: discountEligibilitySlice.reducer,
 	},
 });
 

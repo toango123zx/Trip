@@ -1,52 +1,52 @@
 export const locations = [
 	{
 		id: '1',
-		display: 'Đà Nẵng',
+		label: 'Đà Nẵng',
 		value: 'DaNang,',
 	},
 	{
 		id: '2',
-		display: 'Hội An',
+		label: 'Hội An',
 		value: 'HoiAn,',
 	},
 	{
 		id: '3',
-		display: 'Huế',
+		label: 'Huế',
 		value: 'Hue,',
 	},
 	{
 		id: '4',
-		display: 'Nha Trang',
+		label: 'Nha Trang',
 		value: 'NhaTrang,',
 	},
 	{
 		id: '5',
-		display: 'Đà Lạt',
+		label: 'Đà Lạt',
 		value: 'DaLat,',
 	},
 	{
 		id: '6',
-		display: 'Hà Nội',
+		label: 'Hà Nội',
 		value: 'HaNoi,',
 	},
 	{
 		id: '7',
-		display: 'TP Hồ Chí Minh',
+		label: 'TP Hồ Chí Minh',
 		value: 'TPHoChiMinh,',
 	},
 	{
 		id: '8',
-		display: 'Phú Quốc',
+		label: 'Phú Quốc',
 		value: 'PhuQuoc,',
 	},
 	{
 		id: '9',
-		display: 'Cần Thơ',
+		label: 'Cần Thơ',
 		value: 'CanTho,',
 	},
 	{
 		id: '10',
-		display: 'Vũng Tàu',
+		label: 'Vũng Tàu',
 		value: 'VungTau,',
 	},
 ];

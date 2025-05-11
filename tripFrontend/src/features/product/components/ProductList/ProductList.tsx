@@ -4,6 +4,7 @@ import { IoIosAdd } from 'react-icons/io';
 import { useDispatch } from 'react-redux';
 
 import {
+	AddDiscount,
 	AddProduct,
 	DiscountBoard,
 	ProductsBoard,
@@ -29,6 +30,7 @@ type ProductListProps = {
 export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 	const [activeTab, setActiveTab] = useState<EactiveTab>(EactiveTab.product);
 	const [isOpenPopupAddProduct, setIsOpenPopupAddProduct] = useState(false);
+	const [isOpenPopupAddDiscount, setIsOpenPopupAddDiscount] = useState(false);
 	const [isOpenPopupProductUpdate, setIsOpenPopupProductUpdate] = useState(false);
 	const [productId, setProductId] = useState<string>('');
 	const dispatch = useDispatch<TReduxStoreDispatch>();
@@ -59,10 +61,15 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 		}
 	};
 
+	const handleAddDiscountOnClick = (): void => {
+		setIsOpenPopupAddDiscount(true);
+	};
+
 	const handleClosePopup = (): void => {
 		dispatch(productThunk.getProducts({ page: pageProduct, limit: PAGE_SIZE }));
 		setIsOpenPopupAddProduct(false);
 		setIsOpenPopupProductUpdate(false);
+		setIsOpenPopupAddDiscount(false);
 	};
 
 	return (
@@ -133,7 +140,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 								{activeTab === 'discount' && (
 									<button
 										type="button"
-										onClick={handleAddProductOnClick}
+										onClick={handleAddDiscountOnClick}
 										className={`
                                         flex items-center justify-center
                                         bg-orange-400 hover:bg-orange-500
@@ -174,6 +181,11 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 								productId={productId}
 								onCancel={handleClosePopup}
 							/>
+						)}
+					</div>
+					<div>
+						{isOpenPopupAddDiscount && (
+							<AddDiscount onCancel={handleClosePopup} />
 						)}
 					</div>
 				</main>

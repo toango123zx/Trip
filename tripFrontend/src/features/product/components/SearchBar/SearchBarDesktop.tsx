@@ -59,9 +59,10 @@ export const SearchBarDesktop = ({
 
 								{/* Location Dropdown */}
 								<div className=" relative">
-									<SelectBox
+									<SelectBox<TSearchAttraction>
+										name="locationName"
 										selectOption={locations}
-										register={register('locationName')}
+										register={register}
 										className="flex items-center justify-between h-14 px-3 py-2 rounded-md bg-white border border-black focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150"
 									/>
 								</div>

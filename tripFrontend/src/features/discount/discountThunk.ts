@@ -2,7 +2,10 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { TDiscountDetail, TPagination } from '@/types';
 
-import { TRequestQueryGetDiscountsByProductId } from './discount.type';
+import {
+	TRequestBodyCreateDiscount,
+	TRequestQueryGetDiscountsByProductId,
+} from './discount.type';
 import { discountApi } from './discountApi';
 
 const getDiscountsByProductId = createAsyncThunk(
@@ -22,6 +25,19 @@ const getDiscountsByProductId = createAsyncThunk(
 	},
 );
 
+const createDiscount = createAsyncThunk(
+	'discount/createDiscount',
+	async ({
+		discount,
+	}: {
+		discount: TRequestBodyCreateDiscount;
+	}): Promise<TDiscountDetail> => {
+		const response = await discountApi.creatDiscount(discount);
+		return response;
+	},
+);
+
 export const discoutnThunk = {
 	getDiscountsByProductId,
+	createDiscount,
 };
