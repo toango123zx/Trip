@@ -78,6 +78,57 @@ export class DiscountRepository {
 		return [discounts, totalRecords];
 	}
 
+	async findDiscountsByUserId(
+		pagination: IPaginationQuery,
+		userId: string,
+		keyword?: string,
+		status?: DiscountStatusEnum,
+		filter?: DiscountOrderByDto,
+	): Promise<[DiscountEntity[], number]> {
+		const orderBy = Object.entries(filter || {})
+			.filter(([_, value]) => Boolean(value))
+			.map(([key, value]) => ({ [key]: value }));
+		const [discounts, totalRecords] = await Promise.all([
+			this.prismaService.discount.findMany({
+				include: {
+					user: true,
+					infoDiscount: {
+						include: {
+							productSchedule: {
+								include: {
+									product: true,
+								},
+							},
+						},
+					},
+				},
+				where: {
+					userId: userId,
+					status: status,
+					name: {
+						contains: keyword,
+						mode: 'insensitive',
+					},
+				},
+				skip: pagination.skip,
+				take: pagination.take,
+				orderBy: orderBy,
+			}),
+			this.prismaService.discount.count({
+				where: {
+					userId: userId,
+					status: status,
+					name: {
+						contains: keyword,
+						mode: 'insensitive',
+					},
+				},
+			}),
+		]);
+
+		return [discounts, totalRecords];
+	}
+
 	async findDiscountByDiscountId(
 		discountId: string,
 		status?: DiscountStatusEnum,

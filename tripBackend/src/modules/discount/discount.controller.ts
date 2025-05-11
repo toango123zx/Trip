@@ -11,7 +11,7 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { DiscountStatusEnum } from '@prisma/client';
-import { HttpResponseBodyDto, PermissionEnum } from 'src/common';
+import { HttpResponseBodyDto, PaginationDto, PermissionEnum } from 'src/common';
 import { DiscountEntity } from 'src/models';
 
 import { AuthPermission } from '../auth/decorators';
@@ -22,8 +22,15 @@ import {
 	CreateDiscountCommand,
 	DeleteDiscountByDiscountIdCommand,
 } from './commands/implements';
-import { CreateDiscountRequestDto, GetDiscountByDiscountIdResponseDto } from './dtos';
-import { GetDiscountByDiscountIdQuery } from './queries/implements';
+import {
+	CreateDiscountRequestDto,
+	DiscountFilterRequestDto,
+	GetDiscountByDiscountIdResponseDto,
+} from './dtos';
+import {
+	GetDiscountByDiscountIdQuery,
+	GetDiscountsByUserIdQuery,
+} from './queries/implements';
 
 @Controller('discount')
 export class DiscountController {
@@ -31,6 +38,18 @@ export class DiscountController {
 		private readonly queryBus: QueryBus,
 		private readonly commandBus: CommandBus,
 	) {}
+
+	@Get()
+	@AuthPermission(PermissionEnum.FindDiscountsByUserId)
+	async getDiscounts(
+		@Query() pagination: PaginationDto,
+		@MyInformation() myInformation: UserInformationDto,
+		@Query() search?: DiscountFilterRequestDto,
+	): Promise<HttpResponseBodyDto<DiscountEntity[] | HttpException>> {
+		return this.queryBus.execute(
+			new GetDiscountsByUserIdQuery(pagination, myInformation, search),
+		);
+	}
 
 	@Get('/:discountId')
 	async getDiscountByDiscountId(
