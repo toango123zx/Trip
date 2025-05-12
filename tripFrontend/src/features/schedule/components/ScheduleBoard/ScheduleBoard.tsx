@@ -127,14 +127,14 @@ export const SchedulesBoard = ({
 			sortDirections: ['descend', 'ascend'],
 			render: (text: string) => (
 				<span
-					className={`${text === 'watting'
+					className={`${text === 'waiting'
 							? 'text-amber-500'
 							: text === 'active'
 								? 'text-green-500'
 								: 'text-red-300'
-						} font - semibold`}
+						} font-semibold`}
 				>
-					{text === undefined ? 'watting' : text}
+					{text === undefined ? 'waiting' : text}
 				</span>
 			),
 		},
