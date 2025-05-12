@@ -4,6 +4,7 @@ import { DiscountModule } from './discount/discount.module';
 import { HealthCheckModule } from './healthCheck/healthCheck.module';
 import { LocationModule } from './location/location.module';
 import { ProductModule } from './product/product.module';
+import { ProductScheduleModule } from './productSchedule/productSchedule.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { UserModule } from './user/user.module';
 
@@ -15,5 +16,6 @@ export const Modules = [
 	SupplierModule,
 	LocationModule,
 	ProductModule,
+	ProductScheduleModule,
 	DiscountModule,
 ];
