@@ -127,13 +127,12 @@ export const SchedulesBoard = ({
 			sortDirections: ['descend', 'ascend'],
 			render: (text: string) => (
 				<span
-					className={`${
-						text === 'watting'
+					className={`${text === 'watting'
 							? 'text-amber-500'
 							: text === 'active'
 								? 'text-green-500'
 								: 'text-red-300'
-					} font - semibold`}
+						} font - semibold`}
 				>
 					{text === undefined ? 'watting' : text}
 				</span>
@@ -158,6 +157,7 @@ export const SchedulesBoard = ({
 			columnTable={columnTable}
 			data={data as TProductSchedule[]}
 			pageSize={pageSize}
+			pagination={(data?.length ?? 0) <= (pageSize ?? 0) ? false : true}
 		/>
 	);
 };
