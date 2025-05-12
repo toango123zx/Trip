@@ -15,7 +15,7 @@ import { HttpResponseBodyDto, PaginationDto, PermissionEnum, RoleEnum } from 'sr
 import { ProductEntity, ProductScheduleEntity, UpdateProductDto } from 'src/models';
 
 import { AuthPermission, AuthRole } from '../auth/decorators';
-import { SupplierInforamtion } from '../supplier/decorators';
+import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
 
 import {
@@ -59,7 +59,7 @@ export class ProductController {
 	@AuthPermission(PermissionEnum.CreateProduct)
 	async createProduct(
 		@Body() createProductRequestDto: CreateProductRequestDto,
-		@SupplierInforamtion() supplierInformation: SupplierInformationDto,
+		@SupplierInformation() supplierInformation: SupplierInformationDto,
 	): Promise<HttpResponseBodyDto<ProductEntity | HttpException>> {
 		return this.commandBus.execute(
 			new CreateProductCommand(createProductRequestDto, supplierInformation),
@@ -71,7 +71,7 @@ export class ProductController {
 	async createProductScheduleByProductId(
 		@Param('productId') productId: string,
 		@Body() productScheduleInformation: CreateProductScheduleByProductIdRequestDto,
-		@SupplierInforamtion() supplierInformation: SupplierInformationDto,
+		@SupplierInformation() supplierInformation: SupplierInformationDto,
 	): Promise<HttpResponseBodyDto<ProductScheduleEntity | HttpException>> {
 		return this.commandBus.execute(
 			new CreateProductScheduleByProductIdCommand(
@@ -87,7 +87,7 @@ export class ProductController {
 	async updateProductInformationByProductId(
 		@Param('productId') productId: string,
 		@Body() productInformationRequest: UpdateProductDto,
-		@SupplierInforamtion() supplierInformation: SupplierInformationDto,
+		@SupplierInformation() supplierInformation: SupplierInformationDto,
 	): Promise<HttpResponseBodyDto<GetProductsResponseDto | HttpException>> {
 		return this.commandBus.execute(
 			new UpdateProductInformationByProductIdCommand(
@@ -102,7 +102,7 @@ export class ProductController {
 	@AuthRole(RoleEnum.Supplier)
 	async deleteProductByProductId(
 		@Param('productId') productId: string,
-		@SupplierInforamtion() supplierInformation: SupplierInformationDto,
+		@SupplierInformation() supplierInformation: SupplierInformationDto,
 	): Promise<HttpResponseBodyDto<ProductEntity | HttpException>> {
 		return this.commandBus.execute(
 			new DeleteProductByProductIdCommand(productId, supplierInformation),

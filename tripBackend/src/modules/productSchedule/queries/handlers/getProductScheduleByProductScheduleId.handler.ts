@@ -17,7 +17,7 @@ export class GetProductScheduleByProductScheduleIdHandler
 		query: GetProductScheduleByProductScheduleIdQuery,
 	): Promise<HttpResponseBodySuccessDto<ProductScheduleEntity> | HttpException> {
 		const productSchedule =
-			await this.productScheduleRepository.getProductScheduleByProductScheduleId(
+			await this.productScheduleRepository.findProductScheduleByProductScheduleId(
 				query.productScheduleId,
 				query.filter?.status,
 			);
