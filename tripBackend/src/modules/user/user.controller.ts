@@ -32,7 +32,7 @@ import {
 	UpdateMyPasswordComand,
 	UpdateUserInformationByUserIdCommand,
 } from './commands/implements';
-import { MyInforamtion } from './decorators';
+import { MyInformation } from './decorators';
 import {
 	CreateUserRequestDto,
 	ResetUserPasswordResponseDto,
@@ -65,7 +65,7 @@ export class UserController {
 	@Get('/me')
 	@Auth()
 	async getMe(
-		@MyInforamtion() userInformation: UserInformationDto,
+		@MyInformation() userInformation: UserInformationDto,
 	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
 		return this.queryBus.execute(new GetMeQuery(userInformation));
 	}
@@ -90,7 +90,7 @@ export class UserController {
 	@Auth()
 	async updateMyInformation(
 		@Body() updateMyInformationDataRequest: UpdateMyInformationRequestDto,
-		@MyInforamtion() myInformation: UserInformationDto,
+		@MyInformation() myInformation: UserInformationDto,
 	): Promise<HttpResponseBodyDto<UserInformationDto | HttpException>> {
 		return this.commandBus.execute(
 			new UpdateMyInformationCommand(updateMyInformationDataRequest, myInformation),
@@ -113,7 +113,7 @@ export class UserController {
 	@Auth()
 	async updateMyPassword(
 		@Body() updateMyPasswordRequest: UpdateMyPasswordRequestDto,
-		@MyInforamtion() userInformation: UserInformationDto,
+		@MyInformation() userInformation: UserInformationDto,
 	): Promise<HttpResponseBodySuccessDto | HttpResponseBodyFailDto> {
 		return this.commandBus.execute(
 			new UpdateMyPasswordComand(

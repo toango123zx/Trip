@@ -5,7 +5,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { HttpResponseBodyDto } from 'src/common';
 
 import { Auth } from '../auth/decorators';
-import { MyInforamtion } from '../user/decorators';
+import { MyInformation } from '../user/decorators';
 import { UserInformationDto } from '../user/dtos';
 
 import { CreateSupplierCommand } from './commands/implements';
@@ -23,7 +23,7 @@ export class SupplierController {
 	@Auth()
 	async createSupplier(
 		@Body() createSupplierRequestDto: CreateSupplierRequestDto,
-		@MyInforamtion() userInformation: UserInformationDto,
+		@MyInformation() userInformation: UserInformationDto,
 	): Promise<HttpResponseBodyDto<SupplierInformationResponseDto | HttpException>> {
 		return this.commandBus.execute(
 			new CreateSupplierCommand(createSupplierRequestDto, userInformation),

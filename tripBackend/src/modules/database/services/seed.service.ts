@@ -1,6 +1,13 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 
-import { PermissionForAdminEnum, PermissionForSupplierEnum, RoleEnum } from 'src/common';
+import {
+	DiscountApplicationScopeEnum,
+	DiscountEligibilityEnum,
+	DiscountTypeEnum,
+	PermissionForAdminEnum,
+	PermissionForSupplierEnum,
+	RoleEnum,
+} from 'src/common';
 
 import { PrismaService } from './prisma.service';
 
@@ -13,6 +20,9 @@ export class SeedService implements OnModuleInit {
 		await this.seedPermissions();
 		await this.seedPermissionsForAdmin();
 		await this.seedPermissionsForSupplier();
+		await this.seedDiscountTypes();
+		await this.seedDiscountEligibilities();
+		await this.seedDiscountApplicationScopes();
 	}
 
 	private async seedRoles(): Promise<void> {
@@ -145,6 +155,91 @@ export class SeedService implements OnModuleInit {
 		}));
 		await this.prisma.infoPermission.createMany({
 			data: InfoPermissionForSupplier,
+		});
+
+		return;
+	}
+
+	private async seedDiscountTypes(): Promise<void> {
+		const DISCOUNT_TYPES: string[] = Object.values(DiscountTypeEnum);
+
+		const discountTypes = await this.prisma.discountType.findMany();
+		const discountTypeNamesDB = discountTypes.map(
+			(discountType) => discountType.name,
+		);
+		const discountTypeNames = DISCOUNT_TYPES.filter((discountTypeName) => {
+			return !discountTypeNamesDB.includes(discountTypeName);
+		});
+		if (discountTypeNames.length === 0) {
+			return;
+		}
+		const discountTypesData = discountTypeNames.map((discountType) => ({
+			name: discountType,
+			description: discountType.replaceAll('_', ' '),
+		}));
+		await this.prisma.discountType.createMany({
+			data: discountTypesData,
+		});
+
+		return;
+	}
+
+	private async seedDiscountEligibilities(): Promise<void> {
+		const DISCOUNT_ELIGIBILITYS: string[] = Object.values(DiscountEligibilityEnum);
+
+		const discountEligibilities = await this.prisma.discountEligibility.findMany();
+		const discountEligibilityNamesDB = discountEligibilities.map(
+			(discountApplicationScope) => discountApplicationScope.name,
+		);
+		const discountEligibilityNames = DISCOUNT_ELIGIBILITYS.filter(
+			(discountEligibilityName) => {
+				return !discountEligibilityNamesDB.includes(discountEligibilityName);
+			},
+		);
+		if (discountEligibilityNames.length === 0) {
+			return;
+		}
+		const discountEligibilitiesData = discountEligibilityNames.map(
+			(discountEligibilityName) => ({
+				name: discountEligibilityName,
+				description: discountEligibilityName.replaceAll('_', ' '),
+			}),
+		);
+		await this.prisma.discountEligibility.createMany({
+			data: discountEligibilitiesData,
+		});
+
+		return;
+	}
+
+	private async seedDiscountApplicationScopes(): Promise<void> {
+		const DISCOUNT_APPLICATION_SCOPES: string[] = Object.values(
+			DiscountApplicationScopeEnum,
+		);
+
+		const discountApplicationScopes =
+			await this.prisma.discountApplicationScope.findMany();
+		const discountApplicationScopeNamesDB = discountApplicationScopes.map(
+			(discountApplicationScope) => discountApplicationScope.name,
+		);
+		const discountApplicationScopeNames = DISCOUNT_APPLICATION_SCOPES.filter(
+			(discountApplicationScopeName) => {
+				return !discountApplicationScopeNamesDB.includes(
+					discountApplicationScopeName,
+				);
+			},
+		);
+		if (discountApplicationScopeNames.length === 0) {
+			return;
+		}
+		const discountApplicationScopesData = discountApplicationScopeNames.map(
+			(discountApplicationScopeName) => ({
+				name: discountApplicationScopeName,
+				description: discountApplicationScopeName.replaceAll('_', ' '),
+			}),
+		);
+		await this.prisma.discountApplicationScope.createMany({
+			data: discountApplicationScopesData,
 		});
 
 		return;

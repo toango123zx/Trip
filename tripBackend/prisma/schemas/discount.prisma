@@ -109,7 +109,7 @@ model discount {
     userId                     String                   @map("user_id")
     /// @DtoRelationCanConnectOnCreate
     user                       user                     @relation(fields: [userId], references: [id])
-    code                       String
+    code                       String                   @unique @default(cuid())
     description                String
     startTime                  DateTime                 @map("start_time")
     endTime                    DateTime                 @map("end_time")
@@ -119,12 +119,15 @@ model discount {
     /// @DtoUpdateOptional
     point                      Int                      @default(0)
     applited                   Int                      @default(0)
-    stackable                  Boolean
+    stackable                  Boolean                  @default(false)
     discountTypeId             String                   @map("discount_type_id")
+    /// @DtoRelationCanConnectOnCreate
     discountType               discountType             @relation(fields: [discountTypeId], references: [id])
     discountEligibilityId      String                   @map("discount_eligibility_id")
+    /// @DtoRelationCanConnectOnCreate
     discountEligibility        discountEligibility      @relation(fields: [discountEligibilityId], references: [id])
     discountApplicationScopeId String                   @map("discount_application_scope_id")
+    /// @DtoRelationCanConnectOnCreate
     discountApplicationScope   discountApplicationScope @relation(fields: [discountApplicationScopeId], references: [id])
     createAt                   DateTime                 @default(now()) @map("create_at")
     /// @DtoCreateHidden
