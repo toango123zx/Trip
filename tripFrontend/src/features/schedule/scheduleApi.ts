@@ -16,4 +16,13 @@ export const scheduleApi = {
 		);
 		return data;
 	},
+
+	async deleteSchedule(scheduleId: string): Promise<TProductSchedule> {
+		const data = await api.delete<TProductSchedule>(
+			`/schedule/${scheduleId}`,
+			{},
+			EServer.Backend,
+		);
+		return data;
+	},
 };

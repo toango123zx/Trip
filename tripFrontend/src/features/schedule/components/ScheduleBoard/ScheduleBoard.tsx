@@ -12,12 +12,16 @@ type TSchedulesBoard = {
 	productId?: string;
 	data?: TProductSchedule[] | TRequestBodyCreateSchedule[];
 	pageSize?: number;
+	onViewDetailSchedule?: (
+		schedule: TRequestBodyCreateSchedule | TProductSchedule,
+	) => void;
 	className?: string;
 };
 
 export const SchedulesBoard = ({
 	data,
 	pageSize,
+	onViewDetailSchedule = (): void => {},
 	className,
 }: TSchedulesBoard): JSX.Element => {
 	const [searchText, setSearchText] = useState('');
@@ -140,8 +144,12 @@ export const SchedulesBoard = ({
 		},
 		{
 			title: 'Action',
-			render: () => (
-				<button type="button" className="text-blue-500 flex gap-2.5 items-center">
+			render: (schedule: TRequestBodyCreateSchedule | TProductSchedule) => (
+				<button
+					type="button"
+					onClick={() => onViewDetailSchedule(schedule)}
+					className="text-blue-500 flex gap-2.5 items-center"
+				>
 					<span>View detail </span>
 					<span className="h-fit">
 						<IoIosArrowRoundForward />

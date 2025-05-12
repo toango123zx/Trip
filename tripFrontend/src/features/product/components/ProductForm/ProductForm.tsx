@@ -1,5 +1,6 @@
 'use client';
 
+import { isCuid } from 'cuid';
 import { X, Save, Plus, Map, Trash2 } from 'lucide-react';
 import { JSX, useState, useEffect, useMemo } from 'react';
 import {
@@ -17,6 +18,7 @@ import { locationThunk } from '@/features/location';
 import {
 	ScheduleForm,
 	SchedulesBoard,
+	scheduleThunk,
 	TRequestBodyCreateSchedule,
 } from '@/features/schedule';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
@@ -73,7 +75,6 @@ type TSelect = {
 
 type TProductFormProps = {
 	form: UseFormReturn<TRequestBodyCreateProduct>;
-	// schedule?: TProductSchedule[];
 	schedules?: TProductSchedule[] | TRequestBodyCreateSchedule[];
 	setSchedules?: React.Dispatch<
 		React.SetStateAction<TProductSchedule[] | TRequestBodyCreateSchedule[]>
@@ -266,9 +267,11 @@ export const ProductForm = ({
 		onRemove();
 	};
 
+	const [isCreateSchedule, setIsCreateSchedule] = useState(false);
 	const [newSchedule, setNewSchedule] = useState<TRequestBodyCreateSchedule>(
 		{} as TRequestBodyCreateSchedule,
 	);
+
 	const handleAddScheduleOnClick = (): void => {
 		setNewSchedule({
 			id: new Date().getTime().toString(),
@@ -278,15 +281,37 @@ export const ProductForm = ({
 			endTime: new Date(),
 			endOrder: new Date(),
 		});
+		setIsCreateSchedule(true);
 		setIsOpenPopupScheduleUpdate(true);
 	};
-
 	const handlerAddScheduleInPopup = (schedule: TRequestBodyCreateSchedule): void => {
 		setSchedules((prev = []) => [schedule, ...prev]);
 		setIsOpenPopupScheduleUpdate(false);
 	};
 
 	const handleClosePopupScheduleUpdate = (): void => {
+		setIsOpenPopupScheduleUpdate(false);
+	};
+
+	const handleViewScheduleDetailOnClick = (
+		schedule: TRequestBodyCreateSchedule | TProductSchedule,
+	): void => {
+		setIsCreateSchedule(false);
+		setNewSchedule(schedule);
+		setIsOpenPopupScheduleUpdate(true);
+	};
+
+	const handleRemoveSchedule = (): void => {
+		if (schedules) {
+			setSchedules((prev) =>
+				prev.filter((schedule) => newSchedule.id !== schedule.id),
+			);
+		}
+		if (!isCuid(newSchedule.id)) {
+			setIsOpenPopupScheduleUpdate(false);
+			return;
+		}
+		dispatch(scheduleThunk.deleteSchedule(String(newSchedule.id)));
 		setIsOpenPopupScheduleUpdate(false);
 	};
 
@@ -444,7 +469,13 @@ export const ProductForm = ({
 							<div className=" items-center justify-center rounded-md border text-gray-500">
 								{/* No {title.toLowerCase()} have been added yet */}
 								{title === 'Schedules' ? (
-									<SchedulesBoard data={schedules} pageSize={5} />
+									<SchedulesBoard
+										data={schedules}
+										pageSize={5}
+										onViewDetailSchedule={
+											handleViewScheduleDetailOnClick
+										}
+									/>
 								) : (
 									title === 'Discounts' && <DiscountBoard data={[]} />
 								)}
@@ -456,8 +487,10 @@ export const ProductForm = ({
 							productName={watch('name')}
 							data={newSchedule}
 							setData={setNewSchedule}
-							onCancel={handleClosePopupScheduleUpdate}
+							isCreate={isCreateSchedule}
 							onSave={handlerAddScheduleInPopup}
+							onRemove={handleRemoveSchedule}
+							onCancel={handleClosePopupScheduleUpdate}
 						/>
 					)}
 				</form>

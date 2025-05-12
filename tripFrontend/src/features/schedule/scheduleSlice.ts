@@ -31,6 +31,19 @@ export const scheduleSlice = createSlice({
 			.addCase(scheduleThunk.createSchedule.rejected, (state, action) => {
 				state.loading = false;
 				state.error = String(action.error.message);
+			})
+			.addCase(scheduleThunk.deleteSchedule.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(scheduleThunk.deleteSchedule.fulfilled, (state, action) => {
+				state.loading = false;
+				state.scheduleDetail = action.payload;
+				state.error = null;
+			})
+			.addCase(scheduleThunk.deleteSchedule.rejected, (state, action) => {
+				state.loading = false;
+				state.error = String(action.error.message);
 			});
 	},
 });
