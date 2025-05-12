@@ -1,6 +1,7 @@
 import { HttpException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
+import { InfoDiscountStatusEnum } from '@prisma/client';
 import { HttpResponseBodySuccessDto, NotFoundException } from 'src/common';
 
 import { DiscountRepository } from '../../discount.repository';
@@ -21,6 +22,7 @@ export class GetDiscountByDiscountIdHandler
 		const discount = await this.discountRepository.findDiscountByDiscountId(
 			query.discountId,
 			query.status,
+			InfoDiscountStatusEnum.active,
 		);
 
 		if (!discount) {

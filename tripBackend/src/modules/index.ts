@@ -5,6 +5,7 @@ import { DiscountApplicationScopeModule } from './discountApplicationScope/disco
 import { DiscountEligibilityModule } from './discountEligibility/discountEligibility.module';
 import { DiscountTypeModule } from './discountType/discountType.module';
 import { HealthCheckModule } from './healthCheck/healthCheck.module';
+import { InfoDiscountModule } from './InfoDiscount/infoDiscount.module';
 import { LocationModule } from './location/location.module';
 import { ProductModule } from './product/product.module';
 import { ProductScheduleModule } from './productSchedule/productSchedule.module';
@@ -24,4 +25,5 @@ export const Modules = [
 	DiscountEligibilityModule,
 	DiscountApplicationScopeModule,
 	DiscountModule,
+	InfoDiscountModule,
 ];

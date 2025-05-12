@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsOptional, IsString } from 'class-validator';
-import { OrderByEnum } from 'src/common';
+import { ProductStatusEnum } from '@prisma/client';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { OrderByEnum, SearchDto } from 'src/common';
 
-export class ProductFilterRequestDto {
+export class ProductFilterRequestDto extends SearchDto {
 	@ApiProperty({
 		type: 'string',
 		enum: OrderByEnum,
@@ -108,6 +109,15 @@ export class ProductFilterRequestDto {
 	@IsOptional()
 	@IsString()
 	deletedAt?: OrderByEnum;
+	@ApiProperty({
+		type: 'string',
+		enum: ProductStatusEnum,
+		required: false,
+	})
+	@IsOptional()
+	@IsString()
+	@IsEnum(ProductStatusEnum)
+	statusSearch?: ProductStatusEnum;
 	@ApiProperty({
 		type: 'string',
 		enum: OrderByEnum,

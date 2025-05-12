@@ -21,6 +21,8 @@ import {
 } from '../discount/dtos';
 import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
+import { MyInformation } from '../user/decorators';
+import { UserInformationDto } from '../user/dtos';
 
 import {
 	CreateProductCommand,
@@ -38,6 +40,7 @@ import { GetProductByProductIdResponseDto } from './dtos/responses/getProductBBy
 import {
 	GetDiscountsByProductIdQuery,
 	GetProductByProductIdQuery,
+	GetProductsManagementQuery,
 	GetProductsQuery,
 } from './queries/implement';
 
@@ -54,6 +57,18 @@ export class ProductController {
 		@Query() filter?: ProductFilterRequestDto,
 	): Promise<HttpResponseBodyDto<GetProductsResponseDto[]>> {
 		return this.queryBus.execute(new GetProductsQuery(pagination, filter));
+	}
+
+	@Get('/management')
+	@AuthPermission(PermissionEnum.FindProductsForRole)
+	async getProductsManagement(
+		@Query() pagination: PaginationDto,
+		@MyInformation() myInformation: UserInformationDto,
+		@Query() filter?: ProductFilterRequestDto,
+	): Promise<HttpResponseBodyDto<GetProductsResponseDto[]>> {
+		return this.queryBus.execute(
+			new GetProductsManagementQuery(pagination, myInformation, filter),
+		);
 	}
 
 	@Get('/:productId')

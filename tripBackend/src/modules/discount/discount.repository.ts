@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { DiscountStatusEnum, InfoDiscountStatusEnum } from '@prisma/client';
+import {
+	DiscountStatusEnum,
+	InfoDiscountStatusEnum,
+	ProductScheduleStatusEnum,
+} from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
 import { CreateDiscountDto, DiscountEntity } from 'src/models';
 
@@ -131,7 +135,8 @@ export class DiscountRepository {
 
 	async findDiscountByDiscountId(
 		discountId: string,
-		status?: DiscountStatusEnum,
+		statusDiscount?: DiscountStatusEnum,
+		statusInfoDiscount?: InfoDiscountStatusEnum,
 	): Promise<DiscountEntity> {
 		return this.prismaService.discount.findFirst({
 			include: {
@@ -152,25 +157,67 @@ export class DiscountRepository {
 							},
 						},
 					},
+					where: {
+						status: statusInfoDiscount,
+					},
 				},
+				discountApplicationScope: true,
+				discountEligibility: true,
+				discountType: true,
 			},
 			where: {
 				id: discountId,
-				status: status,
+				status: statusDiscount,
 			},
 		});
 	}
 
 	async createDiscount(
 		discountInformation: CreateDiscountDto,
+		scheduleIds?: string[],
 	): Promise<DiscountEntity> {
 		const discount = await this.prismaService.discount.create({
+			include: {
+				user: true,
+				infoDiscount: {
+					include: {
+						productSchedule: {
+							include: {
+								product: {
+									include: {
+										supplier: {
+											include: {
+												user: true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				discountApplicationScope: true,
+				discountEligibility: true,
+				discountType: true,
+			},
 			data: {
 				...discountInformation,
 				user: {
 					connect: {
 						id: discountInformation.user.connect.id,
 					},
+				},
+				infoDiscount: {
+					create: scheduleIds?.map((scheduleId) => ({
+						productSchedule: {
+							connect: {
+								id: scheduleId,
+								status: {
+									not: ProductScheduleStatusEnum.canceled,
+								},
+							},
+						},
+					})),
 				},
 			},
 		});
@@ -198,6 +245,9 @@ export class DiscountRepository {
 						},
 					},
 				},
+				discountApplicationScope: true,
+				discountEligibility: true,
+				discountType: true,
 			},
 			where: {
 				id: discountId,

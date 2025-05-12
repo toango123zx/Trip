@@ -6,6 +6,7 @@ export enum PermissionEnum {
 	ResetUserPassword = 'reset_user_password',
 	LockUser = 'lock_user',
 	UnlockUser = 'unlock_user',
+	FindProductsForRole = 'find_products_for_role',
 	CreateProduct = 'create_product',
 	CreateProductSchedule = 'create_product_schedule',
 	UpdateProductInformation = 'update_product_information',
@@ -14,4 +15,5 @@ export enum PermissionEnum {
 	CreateDiscount = 'create_discount',
 	DeleteDiscountByDiscountId = 'delete_discount_by_discount_id',
 	FindDiscountsByUserId = 'find_discounts_by_user_id',
+	AsignProductSchedulesToDiscount = 'asign_product_schedules_to_discount',
 }

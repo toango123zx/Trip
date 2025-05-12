@@ -59,9 +59,18 @@ export class GetDiscountByDiscountIdResponseDto {
 	point: number;
 	applited: number;
 	stackable: boolean;
-	discountTypeId: string;
-	discountEligibilityId: string;
-	discountApplicationScopeId: string;
+	discountType: {
+		id: string;
+		name: string;
+	};
+	discountEligibility: {
+		id: string;
+		name: string;
+	};
+	discountApplicationScope: {
+		id: string;
+		name: string;
+	};
 	createAt: Date;
 	updateAt: Date;
 	deletedAt: Date | null;
@@ -89,9 +98,18 @@ export class GetDiscountByDiscountIdResponseDto {
 		this.point = discount.point;
 		this.applited = discount.applited;
 		this.stackable = discount.stackable;
-		this.discountTypeId = discount.discountTypeId;
-		this.discountEligibilityId = discount.discountEligibilityId;
-		this.discountApplicationScopeId = discount.discountApplicationScopeId;
+		this.discountType = {
+			id: discount.discountType.id,
+			name: discount.discountType.name,
+		};
+		this.discountEligibility = {
+			id: discount.discountEligibility.id,
+			name: discount.discountEligibility.name,
+		};
+		this.discountApplicationScope = {
+			id: discount.discountApplicationScope.id,
+			name: discount.discountApplicationScope.name,
+		};
 		this.createAt = discount.createAt;
 		this.updateAt = discount.updateAt;
 		this.deletedAt = discount.deletedAt;

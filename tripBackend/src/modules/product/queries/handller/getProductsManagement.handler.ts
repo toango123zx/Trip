@@ -1,23 +1,22 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { HttpResponseBodySuccessDto, IPaginationQuery } from 'src/common';
+import { HttpResponseBodySuccessDto, PaginationUtils } from 'src/common';
 
 import { GetProductsResponseDto, ProductOrderByDto } from '../../dtos';
 import { ProductRepository } from '../../product.repository';
-import { GetProductsQuery } from '../implement';
+import { GetProductsManagementQuery } from '../implement';
 
-@QueryHandler(GetProductsQuery)
-export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
+@QueryHandler(GetProductsManagementQuery)
+export class GetProductsManagementHandler
+	implements IQueryHandler<GetProductsManagementQuery>
+{
 	constructor(private readonly productRepository: ProductRepository) {}
 
 	async execute(
-		query: GetProductsQuery,
+		query: GetProductsManagementQuery,
 	): Promise<HttpResponseBodySuccessDto<GetProductsResponseDto[]>> {
-		const skip = (query.pagination.page - 1) * query.pagination.limit;
-		const pagination: IPaginationQuery = {
-			skip,
-			take: query.pagination.limit,
-		};
+		const { pagination, myInformation, filter } = query;
+		const page = new PaginationUtils().extractSkipTakeFromPagination(pagination);
 
 		const {
 			keyword,
@@ -26,7 +25,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			productCategoryName,
 			statusSearch,
 			...productFilter
-		} = query.filter;
+		} = filter;
 
 		const productOrderBy: ProductOrderByDto = {
 			...productFilter,
@@ -46,13 +45,11 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 		};
 		const [products, totalRecords] = await this.productRepository.findProducts(
 			keyword,
-			pagination,
-			undefined,
+			page,
+			myInformation.roleName.includes('admin') ? undefined : myInformation.id,
 			statusSearch,
 			productOrderBy,
 		);
-
-		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
 
 		const productInformation = products.map(
 			(product) => new GetProductsResponseDto(product),
@@ -61,12 +58,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 		return {
 			success: true,
 			data: productInformation,
-			pagination: {
-				totalItems: totalRecords,
-				itemsPerPage: products.length,
-				currentPage: query.pagination.page,
-				totalPages: totalPage,
-			},
+			pagination: page.convertPaginationResponseDtoFromTotalRecords(totalRecords),
 		};
 	}
 }
