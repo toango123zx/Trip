@@ -4,22 +4,25 @@ import { IoIosArrowRoundForward } from 'react-icons/io';
 
 import { getColumnSearchProps, TableView } from '@/components';
 import { cn } from '@/lib';
-import { TSchedule } from '@/types';
+import { TProductSchedule } from '@/types';
 
 type TSchedulesBoard = {
-	data?: TSchedule[];
+	productId?: string;
+	data?: TProductSchedule[];
+	pageSize?: number;
 	className?: string;
 };
 
 export const SchedulesBoard = ({
-	data = [],
+	data,
+	pageSize,
 	className,
 }: TSchedulesBoard): JSX.Element => {
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
 	const searchInput = useRef<InputRef>(null);
 
-	const columnTable: TableColumnsType<TSchedule> = [
+	const columnTable: TableColumnsType<TProductSchedule> = [
 		{
 			title: 'Schedule ID',
 			dataIndex: 'id',
@@ -27,29 +30,29 @@ export const SchedulesBoard = ({
 			width: '15%',
 			className: 'hidden',
 		},
-		{
-			title: 'Name',
-			dataIndex: 'productName',
-			key: 'name',
-			width: '15%',
-			...getColumnSearchProps<TSchedule>(
-				'productName',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
-			sorter: (a, b) => a.productName.length - b.productName.length,
-			sortDirections: ['descend', 'ascend'],
-		},
+		// {
+		// 	title: 'Name',
+		// 	dataIndex: 'productName',
+		// 	key: 'name',
+		// 	width: '15%',
+		// 	...getColumnSearchProps<TProductSchedule>(
+		// 		'productName',
+		// 		searchInput,
+		// 		searchText,
+		// 		setSearchText,
+		// 		searchedColumn,
+		// 		setSearchedColumn,
+		// 	),
+		// 	sorter: (a, b) => a.productName.length - b.productName.length,
+		// 	sortDirections: ['descend', 'ascend'],
+		// },
 		{
 			title: 'Start Time',
-			dataIndex: 'startDate',
-			key: 'startDate',
+			dataIndex: 'startTime',
+			key: 'startTime',
 			width: '15%',
-			...getColumnSearchProps<TSchedule>(
-				'startDate',
+			...getColumnSearchProps<TProductSchedule>(
+				'startTime',
 				searchInput,
 				searchText,
 				setSearchText,
@@ -57,16 +60,16 @@ export const SchedulesBoard = ({
 				setSearchedColumn,
 			),
 			sorter: (a, b) =>
-				new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+				new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
 			title: 'End Time',
-			dataIndex: 'startDate',
-			key: 'startDate',
+			dataIndex: 'endTime',
+			key: 'endTime',
 			width: '5%',
-			...getColumnSearchProps<TSchedule>(
-				'startDate',
+			...getColumnSearchProps<TProductSchedule>(
+				'endTime',
 				searchInput,
 				searchText,
 				setSearchText,
@@ -74,7 +77,7 @@ export const SchedulesBoard = ({
 				setSearchedColumn,
 			),
 			sorter: (a, b) =>
-				new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+				new Date(a.endTime).getTime() - new Date(b.endTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
@@ -82,7 +85,7 @@ export const SchedulesBoard = ({
 			dataIndex: 'booked',
 			key: 'booked',
 			width: '8%',
-			...getColumnSearchProps<TSchedule>(
+			...getColumnSearchProps<TProductSchedule>(
 				'booked',
 				searchInput,
 				searchText,
@@ -98,7 +101,7 @@ export const SchedulesBoard = ({
 			dataIndex: 'price',
 			key: 'price',
 			width: '8%',
-			...getColumnSearchProps<TSchedule>(
+			...getColumnSearchProps<TProductSchedule>(
 				'price',
 				searchInput,
 				searchText,
@@ -136,11 +139,13 @@ export const SchedulesBoard = ({
 			),
 		},
 	];
+
 	return (
-		<TableView<TSchedule>
+		<TableView<TProductSchedule>
 			className={cn(className)}
 			columnTable={columnTable}
 			data={data}
+			pageSize={pageSize}
 		/>
 	);
 };

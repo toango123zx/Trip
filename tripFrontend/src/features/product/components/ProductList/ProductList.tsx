@@ -1,6 +1,7 @@
 import { notification } from 'antd';
 import { JSX, useState } from 'react';
 import { IoIosAdd } from 'react-icons/io';
+import { useDispatch } from 'react-redux';
 
 import {
 	AddProduct,
@@ -10,7 +11,10 @@ import {
 	SchedulesBoard,
 } from '@/features';
 import { cn } from '@/lib';
+import { TReduxStoreDispatch } from '@/store';
 import { EProductStatus } from '@/types';
+
+import { productThunk } from '../../productThunk';
 
 enum EactiveTab {
 	product = 'product',
@@ -27,6 +31,9 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 	const [isOpenPopupAddProduct, setIsOpenPopupAddProduct] = useState(false);
 	const [isOpenPopupProductUpdate, setIsOpenPopupProductUpdate] = useState(false);
 	const [productId, setProductId] = useState<string>('');
+	const dispatch = useDispatch<TReduxStoreDispatch>();
+	const [pageProduct, setPageProduct] = useState<number>(1);
+	const PAGE_SIZE = 10;
 
 	const handleChangeTab = (tab: EactiveTab): void => {
 		setActiveTab(tab);
@@ -53,6 +60,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 	};
 
 	const handleClosePopup = (): void => {
+		dispatch(productThunk.getProducts({ page: pageProduct, limit: PAGE_SIZE }));
 		setIsOpenPopupAddProduct(false);
 		setIsOpenPopupProductUpdate(false);
 	};
@@ -127,6 +135,9 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 
 						{activeTab === EactiveTab.product && (
 							<ProductsBoard
+								page={pageProduct}
+								setPage={setPageProduct}
+								pageSize={PAGE_SIZE}
 								openProductUpdateOnClick={handleProductUpdateOnClick}
 							/>
 						)}

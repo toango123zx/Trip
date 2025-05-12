@@ -191,13 +191,15 @@ const exampleRates: TProductRate[] = [
 
 export const schedule1: TSchedule = {
 	id: '1',
-	startDate: 'Jan 6, 2024',
-	startTime: '7:30',
-	endDate: 'Jan 6, 2024',
+	startDate: new Date('Jan 6, 2024'),
+	startTime: 'Jan 6, 2024',
+	endDate: new Date('Jan 6, 2024'),
 	endTime: '21:30',
 	booked: 26,
 	status: 'Active',
-	price: '165.100',
+	price: Number('165.100'),
+	productName: 'Ba Na Hill',
+	cityName: 'Da Nang',
 };
 
 export const BaNa: TProductDetail = {
@@ -210,9 +212,9 @@ export const BaNa: TProductDetail = {
 	age: 7,
 	quantityCompleted: 0,
 	description: `Bà Nà Hills là một trong những điểm du lịch nổi bật và thu hút hàng đầu tại miền Trung Việt Nam, tọa lạc trên đỉnh núi Chúa, thuộc dãy Trường Sơn, cách trung tâm thành phố Đà Nẵng khoảng 25km về phía Tây Nam. Với độ cao hơn 1.400 mét so với mực nước biển, Bà Nà Hills sở hữu khí hậu đặc trưng bốn mùa trong một ngày, mát mẻ quanh năm, tạo nên một không gian nghỉ dưỡng lý tưởng giữa thiên nhiên hùng vĩ. Khu du lịch được xây dựng và phát triển theo phong cách châu Âu cổ điển, nổi bật với các công trình kiến trúc độc đáo như Làng Pháp – mô phỏng một ngôi làng Pháp cổ với những tòa lâu đài, nhà thờ, quảng trường được thiết kế tinh xảo và đầy tính nghệ thuật.
-  
+
   Điểm nhấn không thể bỏ qua tại Bà Nà Hills là Cầu Vàng – công trình kiến trúc nổi tiếng mang tầm quốc tế, được nâng đỡ bởi đôi bàn tay khổng lồ vươn ra từ sườn núi, tạo nên một khung cảnh vừa kỳ vĩ vừa huyền ảo giữa biển mây. Ngoài ra, du khách còn có thể ghé thăm vườn hoa Le Jardin D’Amour với muôn vàn loài hoa rực rỡ sắc màu, khám phá hầm rượu cổ Debay do người Pháp xây dựng từ năm 1923, hay tham gia các trò chơi giải trí hiện đại tại Fantasy Park – khu vui chơi trong nhà lớn nhất Việt Nam.
-  
+
   Không chỉ dừng lại ở cảnh quan và công trình kiến trúc, Bà Nà Hills còn mang đến những trải nghiệm văn hóa, lễ hội phong phú quanh năm như lễ hội rượu vang, lễ hội hoa, carnival đường phố... Tất cả hòa quyện tạo nên một không gian du lịch đầy màu sắc, thích hợp cho cả nghỉ dưỡng, khám phá, và chụp ảnh sống ảo. Nhờ sự kết hợp hài hòa giữa thiên nhiên và nhân tạo, giữa truyền thống và hiện đại, Bà Nà Hills xứng đáng là “chốn bồng lai tiên cảnh” trên đỉnh núi cao, là điểm đến không thể bỏ qua khi du lịch Đà Nẵng.`,
 	quantityRate: 4,
 	avgRate: 4,

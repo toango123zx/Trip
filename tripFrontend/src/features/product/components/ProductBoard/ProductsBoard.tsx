@@ -1,5 +1,5 @@
 import { InputRef, TableColumnsType } from 'antd';
-import { JSX, useState, useRef, useEffect } from 'react';
+import React, { JSX, useState, useRef, useEffect } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -11,11 +11,17 @@ import { EProductStatus, TPagination, TProductSumary } from '@/types';
 import { productThunk } from '../../productThunk';
 
 type TProductsBoard = {
+	page: number;
+	setPage: React.Dispatch<React.SetStateAction<number>>;
+	pageSize?: number;
 	openProductUpdateOnClick?: (productId: string, status: EProductStatus) => void;
 	className?: string;
 };
 
 export const ProductsBoard = ({
+	page,
+	setPage,
+	pageSize = 10,
 	openProductUpdateOnClick = (): void => {},
 	className,
 }: TProductsBoard): JSX.Element => {
@@ -26,18 +32,15 @@ export const ProductsBoard = ({
 	const pagination: TPagination = useSelector<TReduxStoreState, TPagination>(
 		(state: TReduxStoreState) => state.product.pagination,
 	);
-	const [page, setPage] = useState<number>(1);
-
-	const PAGE_SIZE = 10;
 
 	useEffect(() => {
 		dispatch(
 			productThunk.getProducts({
 				page: page,
-				limit: PAGE_SIZE,
+				limit: pageSize,
 			}),
 		);
-	}, [dispatch, page]);
+	}, [dispatch, page, pageSize]);
 
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');

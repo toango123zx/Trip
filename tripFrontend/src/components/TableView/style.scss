@@ -1,6 +1,9 @@
 .t-table-content {
     padding-bottom: 30px;
 }
+.ant-table-content {
+    padding: 0 !important;
+}
 
 th.ant-table-cell {
     background-color: #ffb57f !important;

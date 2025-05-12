@@ -49,9 +49,18 @@ const updateProductByProductId = createAsyncThunk(
 	},
 );
 
+const deleteProductByProductId = createAsyncThunk(
+	'product/deleteProductByProductId',
+	async (productId: string) => {
+		const data = await productApi.deleteProductByProductId(productId);
+		return data;
+	},
+);
+
 export const productThunk = {
 	getProducts,
 	getProductDetail,
 	createProduct,
 	updateProductByProductId,
+	deleteProductByProductId,
 };

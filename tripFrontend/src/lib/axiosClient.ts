@@ -97,30 +97,36 @@ const createApiClient = (baseURL: string, timeout: number): AxiosInstance => {
 				_retry?: boolean;
 			};
 
-			// If error is 401 (Unauthorized) and the request has not been retried yet
+			if (error.response?.status === 401) {
+				localStorage.removeItem('logged');
+				localStorage.removeItem('role');
+				window.location.href = '/auth/login';
+			}
+
 			if (
 				error.response?.status === 401 &&
 				!originalRequest._retry &&
 				localStorage.getItem('refreshToken')
 			) {
 				originalRequest._retry = true;
+				console.log('Refreshing token...');
 
 				try {
-					const refreshToken = localStorage.getItem('refreshToken');
-					const response = await apiClients.backend.post<{
-						accessToken: string;
-					}>('/auth/refresh', {
-						refreshToken,
-					});
-					const { accessToken } = response.data;
+					// const refreshToken = localStorage.getItem('refreshToken');
+					// const response = await apiClients.backend.post<{
+					// 	accessToken: string;
+					// }>('/auth/refresh', {
+					// 	refreshToken,
+					// });
+					// const { accessToken } = response.data;
 
-					localStorage.setItem('accessToken', accessToken);
+					// localStorage.setItem('accessToken', accessToken);
 
-					if (originalRequest.headers) {
-						originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-					}
+					// if (originalRequest.headers) {
+					// 	originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+					// }
 
-					return axios(originalRequest);
+					window.location.href = '/auth/login';
 				} catch (refreshError) {
 					localStorage.removeItem('accessToken');
 					localStorage.removeItem('refreshToken');

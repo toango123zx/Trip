@@ -90,7 +90,28 @@ export const ProductUpdate = ({
 		if (hasSubmitted && !loading && !error) {
 			onCancel();
 		}
+		if (error === 'Product deleted.') {
+			onCancel();
+		}
 	}, [hasSubmitted, loading, error, onCancel]);
 
-	return <ProductForm form={form} onSubmit={onSubmit} onCancel={onCancel} />;
+	useEffect(() => {
+		if (error === 'Product deleted.' || error === 'Resource not found productId') {
+			onCancel();
+		}
+	}, [error, onCancel]);
+
+	const onRemove = (): void => {
+		dispatch(productThunk.deleteProductByProductId(productId));
+		setHasSubmitted(true);
+	};
+	return (
+		<ProductForm
+			form={form}
+			onRemove={onRemove}
+			schedule={productDetail.productSchedule}
+			onSubmit={onSubmit}
+			onCancel={onCancel}
+		/>
+	);
 };
