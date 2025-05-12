@@ -6,6 +6,7 @@ import { DatabaseModule } from '../database/database.module';
 import { SupplierRepository } from '../supplier/supplier.repository';
 import { UserRepository } from '../user/user.repository';
 
+import { productScheduleCommandHandlers } from './commands/handlers';
 import { ProductScheduleController } from './productSchedule.controller';
 import { ProductScheduleRepository } from './productSchedule.repository';
 import { productScheduleQueryHandlers } from './queries/handlers';
@@ -18,6 +19,7 @@ import { productScheduleQueryHandlers } from './queries/handlers';
 		UserRepository,
 		SupplierRepository,
 		...productScheduleQueryHandlers,
+		...productScheduleCommandHandlers,
 	],
 	exports: [],
 })
