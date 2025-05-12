@@ -1,11 +1,13 @@
 import { notification } from 'antd';
+import { isCuid } from 'cuid';
 import { isEqual, pick } from 'lodash';
 import { JSX, useEffect, useRef, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ProductForm } from '@/features';
+import { ProductForm, scheduleThunk, TRequestBodyCreateSchedule } from '@/features';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
+import { TProductSchedule } from '@/types';
 
 import { TRequestBodyCreateProduct, TRequestBodyUpdateProduct } from '../../product.type';
 import { productThunk } from '../../productThunk';
@@ -28,6 +30,9 @@ export const ProductUpdate = ({
 	const { loading, error } = useSelector((state: TReduxStoreState) => state.product);
 
 	const initialValuesRef = useRef<TRequestBodyUpdateProduct>(null);
+	const [schedules, setSchedules] = useState<
+		TRequestBodyCreateSchedule[] | TProductSchedule[]
+	>([]);
 
 	const form = useForm<TRequestBodyCreateProduct>({
 		defaultValues: {
@@ -41,6 +46,11 @@ export const ProductUpdate = ({
 		dispatch(productThunk.getProductDetail(String(productId)));
 	}, [dispatch, productId]);
 
+	useEffect(() => {
+		if (productDetail?.productSchedule) {
+			setSchedules(productDetail.productSchedule);
+		}
+	}, [productDetail]);
 	useEffect(() => {
 		if (productDetail) {
 			const initialValues = {
@@ -76,10 +86,26 @@ export const ProductUpdate = ({
 				pick(data, Object.keys(initialValuesRef.current)),
 			)
 		) {
-			notification.error({
-				message: 'Error',
-				description: 'No changes detected.',
+			if (schedules.length === 0) {
+				notification.error({
+					message: 'Error',
+					description: 'No changes detected.',
+				});
+				return;
+			}
+			schedules.forEach((schedule) => {
+				if (!isCuid(schedule.id)) {
+					dispatch(
+						scheduleThunk.createSchedule({
+							productId: productDetail.id,
+							schedule,
+						}),
+					);
+				}
 			});
+			setSchedules([]);
+			setHasSubmitted(true);
+
 			return;
 		}
 		dispatch(productThunk.updateProductByProductId({ productId, product: data }));
@@ -109,7 +135,8 @@ export const ProductUpdate = ({
 		<ProductForm
 			form={form}
 			onRemove={onRemove}
-			schedule={productDetail.productSchedule}
+			schedules={schedules}
+			setSchedules={setSchedules}
 			onSubmit={onSubmit}
 			onCancel={onCancel}
 		/>

@@ -50,9 +50,7 @@ export const productApi = {
 	},
 
 	async deleteProductByProductId(productId: string): Promise<TProductDetail> {
-		const data = await api.delete<TProductDetail, TRequestBodyUpdateProduct>(
-			`/product/${productId}`,
-		);
+		const data = await api.delete<TProductDetail>(`/product/${productId}`);
 		return data;
 	},
 };

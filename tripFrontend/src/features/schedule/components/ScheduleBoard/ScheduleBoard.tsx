@@ -6,9 +6,11 @@ import { getColumnSearchProps, TableView } from '@/components';
 import { cn } from '@/lib';
 import { TProductSchedule } from '@/types';
 
+import { TRequestBodyCreateSchedule } from '../../schedule.type';
+
 type TSchedulesBoard = {
 	productId?: string;
-	data?: TProductSchedule[];
+	data?: TProductSchedule[] | TRequestBodyCreateSchedule[];
 	pageSize?: number;
 	className?: string;
 };
@@ -29,6 +31,7 @@ export const SchedulesBoard = ({
 			key: 'id',
 			width: '15%',
 			className: 'hidden',
+			render: (value: string | undefined) => value ?? '-',
 		},
 		// {
 		// 	title: 'Name',
@@ -62,6 +65,7 @@ export const SchedulesBoard = ({
 			sorter: (a, b) =>
 				new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
+			render: (value: Date) => new Date(value).toLocaleString(),
 		},
 		{
 			title: 'End Time',
@@ -79,6 +83,7 @@ export const SchedulesBoard = ({
 			sorter: (a, b) =>
 				new Date(a.endTime).getTime() - new Date(b.endTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
+			render: (value: Date) => new Date(value).toLocaleString(),
 		},
 		{
 			title: 'Booked',
@@ -95,6 +100,7 @@ export const SchedulesBoard = ({
 			),
 			sorter: (a, b) => a.booked - b.booked,
 			sortDirections: ['descend', 'ascend'],
+			render: (value: number | undefined) => value ?? 0,
 		},
 		{
 			title: 'Price',
@@ -121,9 +127,14 @@ export const SchedulesBoard = ({
 			sortDirections: ['descend', 'ascend'],
 			render: (text: string) => (
 				<span
-					className={`${text === 'active' ? 'text-green-500' : 'text-red-300'} font-semibold`}
+					className={`${text === 'waiting'
+							? 'text-amber-500'
+							: text === 'active'
+								? 'text-green-500'
+								: 'text-red-300'
+						} font-semibold`}
 				>
-					{text}
+					{text === undefined ? 'waiting' : text}
 				</span>
 			),
 		},
@@ -144,8 +155,9 @@ export const SchedulesBoard = ({
 		<TableView<TProductSchedule>
 			className={cn(className)}
 			columnTable={columnTable}
-			data={data}
+			data={data as TProductSchedule[]}
 			pageSize={pageSize}
+			pagination={(data?.length ?? 0) <= (pageSize ?? 0) ? false : true}
 		/>
 	);
 };
