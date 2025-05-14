@@ -23,10 +23,12 @@ import {
 	AssignProductSchedulesToDiscountCommand,
 	CreateDiscountCommand,
 	DeleteDiscountByDiscountIdCommand,
+	DeleteProductSchedulesToDiscountCommand,
 } from './commands/implements';
 import {
 	AssignProductSchedulesToDiscountRequestDto,
 	CreateDiscountRequestDto,
+	DeleteProductSchedulesToDiscountRequestDto,
 	DiscountFilterRequestDto,
 	GetDiscountByDiscountIdResponseDto,
 } from './dtos';
@@ -123,5 +125,20 @@ export class DiscountController {
 			new DeleteDiscountByDiscountIdCommand(discountId, myInformation),
 		);
 	}
-	
+	@Delete('/:discountId/delete-schedules')
+	@AuthPermission(PermissionEnum.DeleteDiscountByDiscountId)
+	async deleteProductSchedulesToDiscount(
+		@Param('discountId') discountId: string,
+		@Body()
+		deleteProductSchedulesToDiscount: DeleteProductSchedulesToDiscountRequestDto,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<GetDiscountByDiscountIdResponseDto>> {
+		return this.commandBus.execute(
+			new DeleteProductSchedulesToDiscountCommand(
+				discountId,
+				deleteProductSchedulesToDiscount.scheduleIds,
+				myInformation,
+			),
+		);
+	}
 }

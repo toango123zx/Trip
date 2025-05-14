@@ -1,24 +1,24 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { DiscountStatusEnum, ProductScheduleStatusEnum } from '@prisma/client';
+import { InfoDiscountStatusEnum } from '@prisma/client';
 import {
-	ConflictException,
 	HttpResponseBodySuccessDto,
 	NotFoundException,
 	OptionalException,
 } from 'src/common';
-import { InfoDiscountEntity } from 'src/models';
+import { DiscountEntity } from 'src/models';
 
 import { InfoDiscountRepository } from 'src/modules/InfoDiscount/infoDiscount.repository';
 import { ProductScheduleRepository } from 'src/modules/productSchedule/productSchedule.repository';
 
 import { DiscountRepository } from '../../discount.repository';
-import { AssignProductSchedulesToDiscountCommand } from '../implements';
+import { GetDiscountByDiscountIdResponseDto } from '../../dtos';
+import { DeleteProductSchedulesToDiscountCommand } from '../implements';
 
-@CommandHandler(AssignProductSchedulesToDiscountCommand)
-export class AssignProductSchedulesToDiscountHandler
-	implements ICommandHandler<AssignProductSchedulesToDiscountCommand>
+@CommandHandler(DeleteProductSchedulesToDiscountCommand)
+export class DeleteProductSchedulesToDiscountHandler
+	implements ICommandHandler<DeleteProductSchedulesToDiscountCommand>
 {
 	constructor(
 		private readonly productScheduleRepository: ProductScheduleRepository,
@@ -27,12 +27,14 @@ export class AssignProductSchedulesToDiscountHandler
 	) {}
 
 	async execute(
-		command: AssignProductSchedulesToDiscountCommand,
-	): Promise<HttpResponseBodySuccessDto<InfoDiscountEntity[]> | HttpException> {
+		command: DeleteProductSchedulesToDiscountCommand,
+	): Promise<
+		HttpResponseBodySuccessDto<GetDiscountByDiscountIdResponseDto> | HttpException
+	> {
 		const { discountId, productScheduleIds, myInformation } = command;
 		const discount = await this.discountRepository.findDiscountByDiscountId(
 			discountId,
-			DiscountStatusEnum.active,
+			InfoDiscountStatusEnum.active,
 		);
 		if (!discount) {
 			throw new NotFoundException('discountId');
@@ -43,31 +45,26 @@ export class AssignProductSchedulesToDiscountHandler
 				'You are not the owner of this discount',
 			);
 		}
-		const productSchedules =
-			await this.productScheduleRepository.findProductSchedulesByProductSchedulesId(
-				productScheduleIds,
-				ProductScheduleStatusEnum.active,
-			);
 
-		if (productSchedules.length !== productScheduleIds.length) {
+		const infoDiscount = discount.infoDiscount.filter((item) =>
+			productScheduleIds.includes(item.productScheduleId),
+		);
+		if (infoDiscount.length !== productScheduleIds.length) {
 			throw new NotFoundException('productScheduleId');
 		}
 
-		const exist = discount.infoDiscount.find((infoDiscount) =>
-			productScheduleIds.includes(infoDiscount.productScheduleId),
-		);
-		if (exist) {
-			throw new ConflictException('productScheduleId');
-		}
-
-		const InfoSchedules =
-			await this.infoDiscountRepository.createInfoDiscountForProductSchedules(
+		const infoSchedules =
+			await this.infoDiscountRepository.deleteInfoDiscountForProductSchedules(
 				discountId,
 				productScheduleIds,
 			);
+		const updateDiscount: DiscountEntity = {
+			...discount,
+			infoDiscount: infoSchedules,
+		};
 		return {
 			success: true,
-			data: InfoSchedules,
+			data: new GetDiscountByDiscountIdResponseDto(updateDiscount),
 		};
 	}
 }

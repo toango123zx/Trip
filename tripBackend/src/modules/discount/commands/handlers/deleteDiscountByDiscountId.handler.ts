@@ -1,5 +1,5 @@
 import { HttpException } from '@nestjs/common';
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { DiscountStatusEnum } from '@prisma/client';
 import {
@@ -12,6 +12,7 @@ import { DiscountRepository } from '../../discount.repository';
 import { GetDiscountByDiscountIdResponseDto } from '../../dtos';
 import { DeleteDiscountByDiscountIdCommand } from '../implements';
 
+@CommandHandler(DeleteDiscountByDiscountIdCommand)
 export class DeleteDiscountByDiscountIdHandler
 	implements ICommandHandler<DeleteDiscountByDiscountIdCommand>
 {

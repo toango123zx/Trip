@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { InfoDiscountStatusEnum } from '@prisma/client';
 import { InfoDiscountEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
@@ -18,6 +19,51 @@ export class InfoDiscountRepository {
 		}));
 		return this.prismaService.infoDiscount.createManyAndReturn({
 			data: infoDiscounts,
+		});
+	}
+
+	async deleteInfoDiscountForProductSchedules(
+		discountId: string,
+		productScheduleIds: string[],
+	): Promise<InfoDiscountEntity[]> {
+		return this.prismaService.infoDiscount.updateManyAndReturn({
+			include: {
+				productSchedule: {
+					include: {
+						product: {
+							include: {
+								productCategory: true,
+								supplier: {
+									include: {
+										user: {
+											include: {
+												role: true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				discount: {
+					include: {
+						user: true,
+						discountApplicationScope: true,
+						discountType: true,
+						discountEligibility: true,
+					},
+				},
+			},
+			where: {
+				discountId: discountId,
+				productScheduleId: {
+					in: productScheduleIds,
+				},
+			},
+			data: {
+				status: InfoDiscountStatusEnum.inactive,
+			},
 		});
 	}
 }

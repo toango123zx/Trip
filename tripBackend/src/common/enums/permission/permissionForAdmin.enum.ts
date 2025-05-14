@@ -8,6 +8,7 @@ export enum PermissionForAdminEnum {
 	ResetUserPassword = PermissionEnum.ResetUserPassword,
 	LockUser = PermissionEnum.LockUser,
 	UnlockUser = PermissionEnum.UnlockUser,
+	FindProductsForRole = PermissionEnum.FindProductsForRole,
 	CreateProduct = PermissionEnum.CreateProduct,
 	CreateProductSchedule = PermissionEnum.CreateProductSchedule,
 	UpdateProductInformation = PermissionEnum.UpdateProductInformation,
