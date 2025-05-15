@@ -343,12 +343,9 @@ export const DiscountForm = ({
 			}
 
 			if (flag) return;
-			if (addScheduleIds.length > 0) {
-				value.scheduleIds = addScheduleIds;
-			}
+			value.scheduleIds = addScheduleIds.length > 0 ? addScheduleIds : undefined;
 
 			onSave(value as TRequestBodyCreateDiscount);
-			onCancel();
 			return;
 		}
 

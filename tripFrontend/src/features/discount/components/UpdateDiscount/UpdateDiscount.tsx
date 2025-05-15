@@ -21,6 +21,9 @@ export const UpdateDiscount = ({
 	const discountDetail = useSelector(
 		(s: TReduxStoreState) => s.discount.discountDetail,
 	);
+	const loadingApi = useSelector((state: TReduxStoreState) => state.discount.loading);
+	const errorApi = useSelector((state: TReduxStoreState) => state.discount.error);
+	const [hasSubmitted, setHasSubmitted] = React.useState(false);
 
 	const form = useForm<TRequestBodyCreateDiscount>({});
 
@@ -48,8 +51,14 @@ export const UpdateDiscount = ({
 
 	const onRemove = (): void => {
 		dispatch(discountThunk.deleteDiscount(discountId));
-		onCancel();
+		setHasSubmitted(true);
 	};
+
+	useEffect(() => {
+		if (hasSubmitted && !loadingApi && errorApi == null) {
+			onCancel();
+		}
+	}, [hasSubmitted, loadingApi, errorApi, onCancel]);
 
 	return (
 		<div>

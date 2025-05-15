@@ -24,17 +24,17 @@ export const AddDiscount = ({
 	});
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const [hasSubmitted, setHasSubmitted] = useState(false);
-	const loadingApi = useSelector((s: TReduxStoreState) => s.product.loading);
-	const errorApi = useSelector((s: TReduxStoreState) => s.product.error);
+	const loadingApi = useSelector((s: TReduxStoreState) => s.discount.loading);
+	const errorApi = useSelector((s: TReduxStoreState) => s.discount.error);
 	const onSubmit: SubmitHandler<TRequestBodyCreateDiscount> = (
 		data: TRequestBodyCreateDiscount,
 	) => {
-		setHasSubmitted(true);
 		dispatch(discountThunk.createDiscount({ discount: data }));
+		setHasSubmitted(true);
 	};
 
 	useEffect(() => {
-		if (hasSubmitted && !loadingApi && !errorApi) {
+		if (hasSubmitted && !loadingApi && errorApi === null) {
 			onCancel();
 		}
 	}, [dispatch, hasSubmitted, loadingApi, errorApi, onCancel]);

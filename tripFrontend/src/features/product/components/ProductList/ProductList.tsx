@@ -102,6 +102,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 				dispatch(
 					discountThunk.getDiscountByUserId({
 						query: {
+							page: pageDiscount,
 							statusSearch: EDiscountStatus.active,
 						},
 					}),
