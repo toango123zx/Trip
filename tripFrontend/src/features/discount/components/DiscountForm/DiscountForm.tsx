@@ -473,9 +473,9 @@ export const DiscountForm = ({
 						name="stackable"
 						label="Stackable"
 						disabled={disabled}
+						defaultValue={watch('stackable')}
 						register={register}
 						errors={errors}
-						defaultValue={false}
 						validate={(value) => value === true || value === false}
 					/>
 

@@ -1,10 +1,11 @@
 import { Checkbox } from 'antd';
-import { JSX, useState } from 'react';
-import { FieldErrors, FieldValues, useForm, Path } from 'react-hook-form';
+import { JSX, useEffect, useState } from 'react';
+import { FieldErrors, FieldValues, Path, useForm } from 'react-hook-form';
 
 import { FieldErrorCustom } from '@/components/Error';
 
 import { Row } from '../Row';
+import './style.scss';
 
 type TCheckboxProps<T extends FieldValues> = {
 	name: Path<T>;
@@ -14,42 +15,50 @@ type TCheckboxProps<T extends FieldValues> = {
 	errors: FieldErrors<T>;
 	required?: boolean;
 	disabled?: boolean;
-	validate?: (value: string | number | boolean) => string | boolean;
+	validate?: (value: boolean) => string | boolean;
 };
 
 export const CheckboxForm = <T extends FieldValues>({
 	name,
 	label,
-	defaultValue,
+	defaultValue = false,
 	register,
 	errors,
 	required,
 	disabled = false,
 	validate,
 }: TCheckboxProps<T>): JSX.Element => {
-	const [checked, setChecked] = useState<boolean>(defaultValue || false);
-	const changeSelectBox = (): void => {
-		register(name as Path<T>, {
-			setValueAs: (value: boolean) => !value,
-		});
-		setChecked(!checked);
+	const [checked, setChecked] = useState(defaultValue);
+
+	useEffect(() => {
+		setChecked(defaultValue);
+	}, [defaultValue]);
+
+	const handleChange = (): void => {
+		setChecked((prev) => !prev);
 	};
+
 	return (
 		<Row label={label} required={required}>
 			<div>
 				<Checkbox
-					id={name as string}
-					aria-invalid={errors[name] ? 'true' : undefined}
-					aria-describedby={`${String(name)}-error`}
+					id={name}
+					aria-invalid={!!errors[name]}
+					aria-describedby={`${name}-error`}
 					checked={checked}
 					disabled={disabled}
-					className={`h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${disabled ? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop' : 'bg-white'}`}
-					{...register(name as Path<T>, {
-						...(required && { required: `${label} is required` }),
-						...(validate && { validate: validate }),
-						onChange: (e) => changeSelectBox(e),
+					className={`w-7 h-full border-gray-300 focus:outline-none ${
+						disabled
+							? 'bg-gray-100 border-none pl-2.5 cursor-not-allowed'
+							: 'bg-white'
+					}`}
+					{...register(name, {
+						required: required ? `${label} is required` : false,
+						validate,
+						setValueAs: () => checked,
+						onChange: handleChange,
 					})}
-				></Checkbox>
+				/>
 				<FieldErrorCustom id={name} errors={errors} />
 			</div>
 		</Row>
