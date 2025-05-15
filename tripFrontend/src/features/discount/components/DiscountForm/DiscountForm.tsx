@@ -5,6 +5,7 @@ import { UseFormReturn } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
+	CheckboxForm,
 	DateTimeField,
 	Input,
 	SelectBoxForm,
@@ -274,6 +275,7 @@ export const DiscountForm = ({
 			startTime: selectedSchedule.startTime,
 			endTime: selectedSchedule.endTime,
 			productName: selectedProduct?.name,
+
 			status: EInfoDiscountStatus.pendingAdd,
 		};
 
@@ -466,6 +468,15 @@ export const DiscountForm = ({
 						register={register}
 						errors={errors}
 						selectOption={discountApplicationScopesOption}
+					/>
+					<CheckboxForm<TRequestBodyCreateDiscount>
+						name="stackable"
+						label="Stackable"
+						disabled={disabled}
+						register={register}
+						errors={errors}
+						defaultValue={false}
+						validate={(value) => value === true || value === false}
 					/>
 
 					<div className="space-y-8">

@@ -62,6 +62,7 @@ export type TRequestBodyCreateDiscount = {
 	value: number;
 	quantity: number;
 	point: number;
+	stackable?: boolean;
 	discountTypeId: string;
 	discountEligibilityId: string;
 	discountApplicationScopeId: string;

@@ -17,6 +17,7 @@ export const AddDiscount = ({
 }: TAddDiscountProps): JSX.Element => {
 	const form = useForm<TRequestBodyCreateDiscount>({
 		defaultValues: {
+			stackable: false,
 			discountTypeId: 'cm9m9tn960005e56c8tmr6go9',
 			discountEligibilityId: 'cm9m9tn960005e56c8tmr6go9',
 			discountApplicationScopeId: 'cm9m9tn960005e56c8tmr6go9',

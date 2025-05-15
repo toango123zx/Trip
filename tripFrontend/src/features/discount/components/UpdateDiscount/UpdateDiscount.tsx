@@ -44,6 +44,7 @@ export const UpdateDiscount = ({
 				discountTypeId: discountDetail.discountType.id,
 				discountEligibilityId: discountDetail.discountEligibility.id,
 				discountApplicationScopeId: discountDetail.discountApplicationScope.id,
+				stackable: discountDetail.stackable,
 			};
 			form.reset(initialValues);
 		}
