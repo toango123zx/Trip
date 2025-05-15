@@ -11,7 +11,7 @@ import {
 	Textarea,
 	TSelectBoxOption,
 } from '@/components';
-import { discountThunk, ProductUpdate, SchedulesBoardInDicount } from '@/features';
+import { discountThunk, ProductUpdate, SchedulesBoardInDiscount } from '@/features';
 import { discountApplicationScopeThunk } from '@/features/discountApplicationScope';
 import { discountEligibilityThunk } from '@/features/discountEligibility';
 import { discountTypeThunk } from '@/features/discountType/discountTypeThunk';
@@ -325,12 +325,13 @@ export const DiscountForm = ({
 			setError({} as TError);
 			let flag = false;
 
-			if (discountTime.startTime <= new Date()) {
+			if (!discountTime.startTime || discountTime.startTime <= new Date()) {
 				setError((prev) => ({ ...prev, startTime: true }));
 				flag = true;
 			}
 
 			if (
+				!discountTime.endTime ||
 				discountTime.endTime <= new Date() ||
 				discountTime.endTime <= discountTime.startTime
 			) {
@@ -532,7 +533,7 @@ export const DiscountForm = ({
 					</div>
 
 					<div>
-						<SchedulesBoardInDicount
+						<SchedulesBoardInDiscount
 							schedules={schedules}
 							pageSize={5}
 							onRemove={handRemoveScheduleInDiscount}

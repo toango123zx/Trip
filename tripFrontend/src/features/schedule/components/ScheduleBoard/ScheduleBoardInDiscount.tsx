@@ -13,7 +13,7 @@ type TSchedulesBoardInDiscountProps = {
 	className?: string;
 };
 
-export const SchedulesBoardInDicount = ({
+export const SchedulesBoardInDiscount = ({
 	schedules,
 	pageSize,
 	onRemove = (): void => {},

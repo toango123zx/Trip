@@ -12,7 +12,7 @@ const getDiscountTypes = createAsyncThunk(
 	}: {
 		query?: TRequestQueryGetDiscountTypes;
 	}): Promise<[TDiscountTypeSumary[], TPagination?]> => {
-		const [data, pagination] = await discountTypeApi.getDiscountEligibilities(query);
+		const [data, pagination] = await discountTypeApi.getDiscountTypes(query);
 		return [data, pagination];
 	},
 );

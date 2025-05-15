@@ -65,10 +65,10 @@ export const LoginForm = (): JSX.Element => {
 	}, [dispatch, logged]);
 
 	useEffect(() => {
-		if (Object.keys(userInformation) && logged == true) {
+		if (Object.keys(userInformation).length > 0 && logged === true) {
 			localStorage.setItem('role', userInformation.roleName);
 		}
-	}, [dispatch, userInformation, logged]);
+	}, [userInformation, logged]);
 
 	return (
 		<div className="container mx-auto px-4 pt-8 pb-28 max-w-5xl">

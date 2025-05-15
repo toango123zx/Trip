@@ -4,7 +4,7 @@ import { TDiscountTypeSumary, TPagination } from '@/types';
 import { TRequestQueryGetDiscountTypes } from './discountType.type';
 
 export const discountTypeApi = {
-	async getDiscountEligibilities(
+	async getDiscountTypes(
 		query?: TRequestQueryGetDiscountTypes,
 	): Promise<[TDiscountTypeSumary[], TPagination?]> {
 		const response = await api.get<TDiscountTypeSumary[]>(

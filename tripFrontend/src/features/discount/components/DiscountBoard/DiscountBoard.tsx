@@ -1,14 +1,12 @@
 import { InputRef, TableColumnsType } from 'antd';
-import { JSX, useState, useRef, useEffect } from 'react';
+import { JSX, useState, useRef } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { getColumnSearchProps, PaginationTable, TableView } from '@/components';
 import { cn } from '@/lib';
-import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { EDiscountStatus, TDiscountDetail, TPagination } from '@/types';
-
-import { discountThunk } from '../../discountThunk';
+import { TReduxStoreState } from '@/store';
+import { TDiscountDetail, TPagination } from '@/types';
 
 type TDiscountBoard = {
 	data?: TDiscountDetail[];
@@ -30,21 +28,9 @@ export const DiscountBoard = ({
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
 	const searchInput = useRef<InputRef>(null);
-	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const pagination: TPagination = useSelector<TReduxStoreState, TPagination>(
 		(state: TReduxStoreState) => state.discount.pagination,
 	);
-
-	useEffect(() => {
-		dispatch(
-			discountThunk.getDiscountByUserId({
-				query: {
-					page: page,
-					statusSearch: EDiscountStatus.active,
-				},
-			}),
-		);
-	}, [dispatch, page, pageSize]);
 
 	const columnTable: TableColumnsType<TDiscountDetail> = [
 		{
