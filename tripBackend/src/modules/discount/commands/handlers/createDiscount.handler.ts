@@ -99,6 +99,7 @@ export class CreateDiscountHandler implements ICommandHandler<CreateDiscountComm
 			quantity: discountInformation.quantity,
 			value: discountInformation.value,
 			point: discountInformation.point || 0,
+			stackable: discountInformation.stackable || false,
 			user: {
 				connect: {
 					id: myInformation.id,

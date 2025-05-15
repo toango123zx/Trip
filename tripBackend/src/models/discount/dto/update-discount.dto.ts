@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { DiscountProviderTypeEnum } from '@prisma/client';
-import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UpdateDiscountDto {
 	@ApiProperty({
@@ -66,4 +66,12 @@ export class UpdateDiscountDto {
 	@IsOptional()
 	@IsInt()
 	point?: number;
+	@ApiProperty({
+		type: 'boolean',
+		default: false,
+		required: false,
+	})
+	@IsOptional()
+	@IsBoolean()
+	stackable?: boolean;
 }

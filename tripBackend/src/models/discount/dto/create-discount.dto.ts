@@ -3,6 +3,7 @@ import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { DiscountProviderTypeEnum } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
+	IsBoolean,
 	IsDateString,
 	IsInt,
 	IsNotEmpty,
@@ -126,6 +127,14 @@ export class CreateDiscountDto {
 	@IsOptional()
 	@IsInt()
 	point?: number;
+	@ApiProperty({
+		type: 'boolean',
+		default: false,
+		required: false,
+	})
+	@IsOptional()
+	@IsBoolean()
+	stackable?: boolean;
 	@ApiProperty({
 		type: CreateDiscountDiscountTypeRelationInputDto,
 	})

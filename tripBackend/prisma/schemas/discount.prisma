@@ -119,6 +119,8 @@ model discount {
     /// @DtoUpdateOptional
     point                      Int                      @default(0)
     applited                   Int                      @default(0)
+    /// @DtoCreateOptional
+    /// @DtoUpdateOptional
     stackable                  Boolean                  @default(false)
     discountTypeId             String                   @map("discount_type_id")
     /// @DtoRelationCanConnectOnCreate

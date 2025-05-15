@@ -40,7 +40,7 @@ export class CreateDiscountRequestDto extends OmitType(CreateDiscountDto, [
 	})
 	@IsOptional()
 	@IsBoolean()
-	stackable?: string;
+	stackable?: boolean;
 	@AutoTrim()
 	@IsNotEmpty()
 	@IsString()
