@@ -1,9 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import {
-	DiscountApplicationScopeStatusEnum,
-	DiscountTypeStatusEnum,
-} from '@prisma/client';
+import { DiscountApplicationScopeStatusEnum } from '@prisma/client';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { OrderByEnum, SearchDto } from 'src/common';
 
@@ -60,6 +57,6 @@ export class DiscountApplicationScopeFilterRequestDto extends SearchDto {
 	})
 	@IsOptional()
 	@IsString()
-	@IsEnum(DiscountTypeStatusEnum)
+	@IsEnum(DiscountApplicationScopeStatusEnum)
 	statusSearch: DiscountApplicationScopeStatusEnum;
 }

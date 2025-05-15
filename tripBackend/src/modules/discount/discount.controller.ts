@@ -68,7 +68,7 @@ export class DiscountController {
 	}
 
 	@Get('/:discountId/:productId/nonDiscountableSchedules/')
-	@AuthPermission(PermissionEnum.AsignProductSchedulesToDiscount)
+	@AuthPermission(PermissionEnum.AssignProductSchedulesToDiscount)
 	async getNonDiscountableSchedules(
 		@Param('discountId') discountId: string,
 		@Param('productId') productId: string,
@@ -99,7 +99,7 @@ export class DiscountController {
 	}
 
 	@Post('/:discountId/assign-schedules/')
-	@AuthPermission(PermissionEnum.AsignProductSchedulesToDiscount)
+	@AuthPermission(PermissionEnum.AssignProductSchedulesToDiscount)
 	async assignProductSchedulesToDiscount(
 		@Param('discountId') discountId: string,
 		@Body()
@@ -132,7 +132,7 @@ export class DiscountController {
 		@Body()
 		deleteProductSchedulesToDiscount: DeleteProductSchedulesToDiscountRequestDto,
 		@MyInformation() myInformation: UserInformationDto,
-	): Promise<HttpResponseBodyDto<GetDiscountByDiscountIdResponseDto>> {
+	): Promise<HttpResponseBodyDto<GetDiscountByDiscountIdResponseDto | HttpException>> {
 		return this.commandBus.execute(
 			new DeleteProductSchedulesToDiscountCommand(
 				discountId,

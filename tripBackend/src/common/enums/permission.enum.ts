@@ -15,5 +15,5 @@ export enum PermissionEnum {
 	CreateDiscount = 'create_discount',
 	DeleteDiscountByDiscountId = 'delete_discount_by_discount_id',
 	FindDiscountsByUserId = 'find_discounts_by_user_id',
-	AsignProductSchedulesToDiscount = 'asign_product_schedules_to_discount',
+	AssignProductSchedulesToDiscount = 'assign_product_schedules_to_discount',
 }
