@@ -1,3 +1,4 @@
 export enum DiscountApplicationScopeEnum {
-	All = 'All',
+	Bill = 'All',
+	Schedule = 'Schedule',
 }

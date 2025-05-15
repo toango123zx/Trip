@@ -1,4 +1,5 @@
 import { AuthModule } from './auth/auth.module';
+import { BillModule } from './bill/cart.module';
 import { CartModule } from './cart/cart.module';
 import { DatabaseModule } from './database/database.module';
 import { DiscountModule } from './discount/discount.module';
@@ -28,4 +29,5 @@ export const Modules = [
 	DiscountModule,
 	InfoDiscountModule,
 	CartModule,
+	BillModule,
 ];
