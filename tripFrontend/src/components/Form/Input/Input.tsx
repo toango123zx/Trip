@@ -37,7 +37,7 @@ export const Input = <T extends FieldValues>({
 				aria-describedby={`${String(id)}-error`}
 				defaultValue={defaultValue}
 				disabled={disabled}
-				className={`h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${disabled ? 'bg-gray-100 border-none pl-2.5' : 'bg-white'}`}
+				className={`h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${disabled ? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop' : 'bg-white'}`}
 				{...register(id as Path<T>, {
 					...(required && { required: `${label} is required` }),
 					...(type === 'number' && { valueAsNumber: true }),

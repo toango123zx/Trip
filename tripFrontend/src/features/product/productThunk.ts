@@ -18,6 +18,15 @@ const getProducts = createAsyncThunk(
 		return [data, pagination];
 	},
 );
+const getProductsManagement = createAsyncThunk(
+	'product/getProductsManagement',
+	async (
+		query?: TRequestQueryGetProducts,
+	): Promise<[TProductSumary[], TPagination?]> => {
+		const [data, pagination] = await productApi.getProductsManagement(query);
+		return [data, pagination];
+	},
+);
 
 const getProductDetail = createAsyncThunk(
 	'product/getProductDetail',
@@ -59,6 +68,7 @@ const deleteProductByProductId = createAsyncThunk(
 
 export const productThunk = {
 	getProducts,
+	getProductsManagement,
 	getProductDetail,
 	createProduct,
 	updateProductByProductId,

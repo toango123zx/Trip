@@ -14,6 +14,7 @@ type TSelectBox<T extends FieldValues> = {
 	name?: Path<T>;
 	label?: string;
 	selectOption?: TOption[];
+	disabled?: boolean;
 	register?: UseFormRegister<T>;
 	errors?: FieldErrors<T>;
 	onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -25,6 +26,7 @@ export const SelectBox = <T extends FieldValues>({
 	name,
 	label,
 	selectOption = [],
+	disabled = false,
 	register,
 	errors,
 	onChange = (): void => {},
@@ -43,6 +45,7 @@ export const SelectBox = <T extends FieldValues>({
 							setValueAs: (value) => value.trim(),
 						})
 					: {})}
+				disabled={disabled}
 				onChange={(e) => onChange && onChange(e)}
 				className={cn(
 					'rounded-4xl py-1 px-3.5 w-full focus:outline-none appearance-none',

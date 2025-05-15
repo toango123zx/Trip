@@ -61,6 +61,7 @@ const createApiClient = (baseURL: string, timeout: number): AxiosInstance => {
 		headers: {
 			'Content-Type': 'application/json',
 		},
+		withCredentials: true,
 		timeout,
 	});
 
@@ -218,8 +219,9 @@ export const api = {
 			});
 	},
 
-	delete: <T, Q = unknown>(
+	delete: <T, D = unknown, Q = unknown>(
 		url: string,
+		data?: D,
 		query?: Q,
 		service: keyof IApiClients = 'backend',
 		config?: AxiosRequestConfig,
@@ -229,6 +231,7 @@ export const api = {
 				...config,
 				withCredentials: true,
 				params: query,
+				data: data,
 			})
 			.then((response) => response.data.data)
 			.catch((error) => {

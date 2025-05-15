@@ -15,7 +15,7 @@ const Required = (): JSX.Element => (
 
 export const Row = ({ label, required, children, top }: TRow): JSX.Element => (
 	<div
-		className={`grid grid-cols-[260px_1fr] ${top ? 'items-start' : 'items-center'} mb-4`}
+		className={`w-full grid grid-cols-[260px_1fr] ${top ? 'items-start' : 'items-center'} mb-4`}
 	>
 		<label className="font-medium text-gray-800">
 			{label}

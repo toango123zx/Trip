@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 
 import { TRequestBodyCreateDiscount } from '../../discount.type';
-import { discoutnThunk } from '../../discountThunk';
+import { discountThunk } from '../../discountThunk';
 import { DiscountForm } from '../DiscountForm';
 
 type TAddDiscountProps = {
@@ -30,7 +30,7 @@ export const AddDiscount = ({
 		data: TRequestBodyCreateDiscount,
 	) => {
 		setHasSubmitted(true);
-		dispatch(discoutnThunk.createDiscount({ discount: data }));
+		dispatch(discountThunk.createDiscount({ discount: data }));
 	};
 
 	useEffect(() => {

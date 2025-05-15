@@ -10,6 +10,7 @@ export const DateTimeField = <T, K extends keyof T>({
 	label,
 	field,
 	value,
+	disabled = false,
 	error,
 	onChangeDate,
 	onChangeTime,
@@ -17,6 +18,7 @@ export const DateTimeField = <T, K extends keyof T>({
 	label: string;
 	field: FieldKey<T, K>;
 	value: Date;
+	disabled?: boolean;
 	error?: boolean;
 	onChangeDate: (d: Dayjs | null, f: FieldKey<T, K>) => void;
 	onChangeTime: (t: Dayjs | null, f: FieldKey<T, K>) => void;
@@ -28,6 +30,7 @@ export const DateTimeField = <T, K extends keyof T>({
 				<Space direction="vertical" className="w-full">
 					<DatePicker
 						value={dayjs(value)}
+						disabled={disabled}
 						onChange={(d) => onChangeDate(d, field)}
 						format="DD/MM/YYYY"
 						className="w-full text-2xl h-14"
@@ -38,6 +41,7 @@ export const DateTimeField = <T, K extends keyof T>({
 				<Space direction="vertical" className="w-full">
 					<TimePicker
 						value={dayjs(value)}
+						disabled={disabled}
 						onChange={(t) => onChangeTime(t, field)}
 						format="HH:mm"
 						className="w-full text-2xl h-14"
@@ -46,7 +50,7 @@ export const DateTimeField = <T, K extends keyof T>({
 				</Space>
 			</div>
 			<div className="pl-54 pt-2.5">
-				{error ? (
+				{!disabled && error ? (
 					field === 'startTime' ? (
 						<ErrorText
 							id="startTime"

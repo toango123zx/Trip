@@ -1,66 +1,52 @@
 import { InputRef, TableColumnsType } from 'antd';
+import { Trash2 } from 'lucide-react';
 import { JSX, useState, useRef } from 'react';
-import { IoIosArrowRoundForward } from 'react-icons/io';
 
 import { getColumnSearchProps, TableView } from '@/components';
+import { TAddScheduleInDiscount } from '@/features/discount/discount.type';
 import { cn } from '@/lib';
-import { TProductSchedule } from '@/types';
 
-import { TRequestBodyCreateSchedule } from '../../schedule.type';
-
-type TSchedulesBoard = {
-	productId?: string;
-	data?: TProductSchedule[] | TRequestBodyCreateSchedule[];
+type TSchedulesBoardInDiscountProps = {
+	schedules?: TAddScheduleInDiscount[];
 	pageSize?: number;
-	disabled?: boolean;
-	onViewDetailSchedule?: (
-		schedule: TRequestBodyCreateSchedule | TProductSchedule,
-	) => void;
+	onRemove?: (scheduleId: string) => void;
 	className?: string;
 };
 
-export const SchedulesBoard = ({
-	data,
+export const SchedulesBoardInDicount = ({
+	schedules,
 	pageSize,
-	disabled = false,
-	onViewDetailSchedule = (): void => {},
+	onRemove = (): void => {},
 	className,
-}: TSchedulesBoard): JSX.Element => {
+}: TSchedulesBoardInDiscountProps): JSX.Element => {
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
 	const searchInput = useRef<InputRef>(null);
 
-	const columnTable: TableColumnsType<TProductSchedule> = [
+	const columnTable: TableColumnsType<TAddScheduleInDiscount> = [
 		{
 			title: 'Schedule ID',
 			dataIndex: 'id',
 			key: 'id',
-			width: '15%',
+			width: '20%',
 			className: 'hidden',
 			render: (value: string | undefined) => value ?? '-',
 		},
-		// {
-		// 	title: 'Name',
-		// 	dataIndex: 'productName',
-		// 	key: 'name',
-		// 	width: '15%',
-		// 	...getColumnSearchProps<TProductSchedule>(
-		// 		'productName',
-		// 		searchInput,
-		// 		searchText,
-		// 		setSearchText,
-		// 		searchedColumn,
-		// 		setSearchedColumn,
-		// 	),
-		// 	sorter: (a, b) => a.productName.length - b.productName.length,
-		// 	sortDirections: ['descend', 'ascend'],
-		// },
+		{
+			title: 'Product name',
+			dataIndex: 'productName',
+			key: 'id',
+			width: '7%',
+			// className: 'hidden',
+			render: (value: string | undefined) => value ?? '-',
+		},
 		{
 			title: 'Start Time',
 			dataIndex: 'startTime',
 			key: 'startTime',
-			width: '15%',
-			...getColumnSearchProps<TProductSchedule>(
+			width: '7%',
+			className: 'text-center',
+			...getColumnSearchProps<TAddScheduleInDiscount>(
 				'startTime',
 				searchInput,
 				searchText,
@@ -77,8 +63,10 @@ export const SchedulesBoard = ({
 			title: 'End Time',
 			dataIndex: 'endTime',
 			key: 'endTime',
-			width: '5%',
-			...getColumnSearchProps<TProductSchedule>(
+			width: '4%',
+			className: 'text-center',
+
+			...getColumnSearchProps<TAddScheduleInDiscount>(
 				'endTime',
 				searchInput,
 				searchText,
@@ -95,8 +83,9 @@ export const SchedulesBoard = ({
 			title: 'Booked',
 			dataIndex: 'booked',
 			key: 'booked',
-			width: '8%',
-			...getColumnSearchProps<TProductSchedule>(
+			width: '15%',
+			className: 'text-center',
+			...getColumnSearchProps<TAddScheduleInDiscount>(
 				'booked',
 				searchInput,
 				searchText,
@@ -112,8 +101,9 @@ export const SchedulesBoard = ({
 			title: 'Price',
 			dataIndex: 'price',
 			key: 'price',
-			width: '8%',
-			...getColumnSearchProps<TProductSchedule>(
+			width: '10%',
+			className: 'text-center',
+			...getColumnSearchProps<TAddScheduleInDiscount>(
 				'price',
 				searchInput,
 				searchText,
@@ -128,37 +118,35 @@ export const SchedulesBoard = ({
 			title: 'Status',
 			dataIndex: 'status',
 			key: 'status',
-			width: '12%',
+			width: '8%',
+			className: 'text-center',
 			sorter: (a, b) => a.status.length - b.status.length,
 			sortDirections: ['descend', 'ascend'],
 			render: (text: string) => (
 				<span
 					className={`${
-						text === 'waiting'
-							? 'text-amber-500'
+						text == 'pending add'
+							? 'text-green-200'
 							: text === 'active'
 								? 'text-green-500'
 								: 'text-red-300'
 					} font-semibold`}
 				>
-					{text === undefined ? 'waiting' : text}
+					{text}
 				</span>
 			),
 		},
 		{
 			title: 'Action',
-			className: `${disabled ?? 'hover:cursor-no-drop'}`,
-			render: (schedule: TRequestBodyCreateSchedule | TProductSchedule) => (
+			// className:'flex justify-center',
+			render: (schedule: TAddScheduleInDiscount) => (
 				<button
 					type="button"
-					onClick={() =>
-						!disabled ? onViewDetailSchedule(schedule) : (): void => {}
-					}
-					className={`text-blue-500 flex gap-2.5 items-center`}
+					onClick={() => onRemove(schedule.schedulesId)}
+					className="flex gap-2.5 items-center mx-auto hover:text-red-500"
 				>
-					<span>View detail </span>
 					<span className="h-fit">
-						<IoIosArrowRoundForward />
+						<Trash2 className="h-7 w-7" />
 					</span>
 				</button>
 			),
@@ -166,12 +154,12 @@ export const SchedulesBoard = ({
 	];
 
 	return (
-		<TableView<TProductSchedule>
+		<TableView<TAddScheduleInDiscount>
 			className={cn(className)}
 			columnTable={columnTable}
-			data={data as TProductSchedule[]}
+			data={schedules as TAddScheduleInDiscount[]}
 			pageSize={pageSize}
-			pagination={(data?.length ?? 0) <= (pageSize ?? 0) ? false : true}
+			pagination={(schedules?.length ?? 0) <= (pageSize ?? 0) ? false : true}
 		/>
 	);
 };

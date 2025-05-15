@@ -1,7 +1,23 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
+import { EProductScheduleStatus } from '@/types';
+
 import { TRequestBodyCreateSchedule } from './schedule.type';
 import { scheduleApi } from './scheduleApi';
+
+const getScheduleByScheduleId = createAsyncThunk(
+	'schedule/getScheduleByScheduleId',
+	async ({
+		scheduleId,
+		status,
+	}: {
+		scheduleId: string;
+		status: EProductScheduleStatus;
+	}) => {
+		const data = await scheduleApi.getScheduleByScheduleId(scheduleId, status);
+		return data;
+	},
+);
 
 const createSchedule = createAsyncThunk(
 	'schedule/createSchedule',
@@ -26,6 +42,7 @@ const deleteSchedule = createAsyncThunk(
 );
 
 export const scheduleThunk = {
+	getScheduleByScheduleId,
 	createSchedule,
 	deleteSchedule,
 };

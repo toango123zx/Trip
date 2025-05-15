@@ -7,7 +7,6 @@ import { SubmitHandler, UseFormReturn } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Input, Row, Select, Textarea } from '@/components';
-import { DiscountBoard } from '@/features/discount';
 import { locationThunk } from '@/features/location';
 import {
 	ScheduleForm,
@@ -16,7 +15,7 @@ import {
 	TRequestBodyCreateSchedule,
 } from '@/features/schedule';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { TDiscountDetail, TProductSchedule } from '@/types';
+import { TProductSchedule } from '@/types';
 
 import { TRequestBodyCreateProduct } from '../../product.type';
 
@@ -26,19 +25,21 @@ type TProductFormProps = {
 	setSchedules?: React.Dispatch<
 		React.SetStateAction<TProductSchedule[] | TRequestBodyCreateSchedule[]>
 	>;
-	discounts?: TDiscountDetail[];
+	// discounts?: TDiscountDetail[];
 	remove?: boolean;
 	onRemove?: () => void;
 	onSubmit?: SubmitHandler<TRequestBodyCreateProduct>;
 	onCancel?: () => void;
+	disabled?: boolean;
 };
 
 export const ProductForm = ({
 	form,
 	schedules,
 	setSchedules = (): void => {},
-	discounts = [],
+	// discounts = [],
 	remove = true,
+	disabled = false,
 	onSubmit,
 	onRemove = (): void => {},
 	onCancel = (): void => {},
@@ -163,7 +164,7 @@ export const ProductForm = ({
 						>
 							<X className="h-5 w-5" /> Cancel
 						</button>
-						{remove && (
+						{!disabled && remove && (
 							<button
 								type="button"
 								onClick={handleRemoveOnClick}
@@ -172,13 +173,15 @@ export const ProductForm = ({
 								<Trash2 className="h-5 w-5" /> Remove
 							</button>
 						)}
-						<button
-							type="submit"
-							onClick={onSubmit && handleSubmit(onSubmit)}
-							className="flex h-10 items-center gap-1 rounded-md border border-orange-500 bg-orange-500  px-4 py-2 text-white hover:bg-orange-600"
-						>
-							<Save className="h-5 w-5" /> Save
-						</button>
+						{!disabled && (
+							<button
+								type="submit"
+								onClick={onSubmit && handleSubmit(onSubmit)}
+								className="flex h-10 items-center gap-1 rounded-md border border-orange-500 bg-orange-500  px-4 py-2 text-white hover:bg-orange-600"
+							>
+								<Save className="h-5 w-5" /> Save
+							</button>
+						)}
 					</div>
 				</header>
 
@@ -193,6 +196,7 @@ export const ProductForm = ({
 						required
 						register={register}
 						errors={errors}
+						disabled={disabled}
 					/>
 					<Select<TRequestBodyCreateProduct>
 						id="locationId"
@@ -203,6 +207,7 @@ export const ProductForm = ({
 						errors={errors}
 						options={options}
 						placeholder="Select location"
+						disabled={disabled}
 					/>
 					<Textarea<TRequestBodyCreateProduct>
 						id="description"
@@ -210,6 +215,7 @@ export const ProductForm = ({
 						register={register}
 						errors={errors}
 						required
+						disabled={disabled}
 					/>
 					<Input<TRequestBodyCreateProduct>
 						id="cityName"
@@ -218,7 +224,7 @@ export const ProductForm = ({
 						register={register}
 						errors={errors}
 						// required
-						disabled
+						disabled={disabled}
 					/>
 					<Input<TRequestBodyCreateProduct>
 						id="time"
@@ -228,6 +234,7 @@ export const ProductForm = ({
 						required
 						type="number"
 						validate={validateGreaterThanZero}
+						disabled={disabled}
 					/>
 					<Input<TRequestBodyCreateProduct>
 						id="quantityAvailable"
@@ -237,6 +244,7 @@ export const ProductForm = ({
 						required
 						type="number"
 						validate={validateGreaterThanZero}
+						disabled={disabled}
 					/>
 					<Input<TRequestBodyCreateProduct>
 						id="age"
@@ -246,6 +254,7 @@ export const ProductForm = ({
 						required
 						type="number"
 						validate={validateGreaterThanZero}
+						disabled={disabled}
 					/>
 
 					<Row label="Location On Map">
@@ -254,11 +263,13 @@ export const ProductForm = ({
 								id="locationOnMap"
 								type="text"
 								placeholder="Enter Coordinates or Select on Map"
-								className="h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none"
+								disabled={disabled}
+								className={`h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${disabled ? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop' : 'bg-white'}`}
 								{...register('locationOnMap')}
 							/>
 							<button
 								type="button"
+								disabled={disabled}
 								className="absolute right-0 top-1/2 -translate-y-1/2 transform"
 								aria-label="Open map"
 							>
@@ -271,27 +282,32 @@ export const ProductForm = ({
 						<h2 className="mb-3 text-xl font-bold">From our gallery</h2>
 						<button
 							type="button"
+							disabled={disabled}
 							className="flex h-[85px] w-[110px] items-center justify-center rounded-md bg-gray-200"
 						>
 							<Plus className="h-6 w-6 text-gray-500" />
 						</button>
 					</section>
 
-					{['Schedules', 'Discounts'].map((title) => (
+					{['Schedules'].map((title) => (
 						<section key={title} className="mb-6">
 							<div className="mb-3 flex items-center justify-between">
 								<h2 className="text-xl font-bold">{title}</h2>
-								<button
-									type="button"
-									onClick={
-										title === 'Schedules'
-											? (): void => handleAddScheduleOnClick()
-											: (): void => {}
-									}
-									className="flex h-10 items-center gap-1 rounded-full bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
-								>
-									<Plus className="h-4 w-4" /> ADD {title.toUpperCase()}
-								</button>
+								{!disabled && (
+									<button
+										type="button"
+										disabled={disabled}
+										onClick={
+											title === 'Schedules'
+												? (): void => handleAddScheduleOnClick()
+												: (): void => {}
+										}
+										className="flex h-10 items-center gap-1 rounded-full bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
+									>
+										<Plus className="h-4 w-4" /> ADD{' '}
+										{title.toUpperCase()}
+									</button>
+								)}
 							</div>
 
 							<div className=" items-center justify-center rounded-md border text-gray-500">
@@ -300,14 +316,16 @@ export const ProductForm = ({
 									<SchedulesBoard
 										data={schedules}
 										pageSize={5}
+										disabled={disabled}
 										onViewDetailSchedule={
 											handleViewScheduleDetailOnClick
 										}
 									/>
 								) : (
-									title === 'Discounts' && (
-										<DiscountBoard data={discounts} />
-									)
+									// title === 'Discounts' && (
+									// 	<DiscountBoard data={discounts} />
+									// )
+									<></>
 								)}
 							</div>
 						</section>

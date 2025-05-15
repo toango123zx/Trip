@@ -21,6 +21,7 @@ type TScheduleFormProps = {
 	data: TRequestBodyCreateSchedule;
 	setData: React.Dispatch<React.SetStateAction<TRequestBodyCreateSchedule>>;
 	isCreate?: boolean;
+	disabled?: boolean;
 	onSave?: (data: TRequestBodyCreateSchedule) => void;
 	onRemove?: () => void;
 	onCancel?: () => void;
@@ -56,6 +57,7 @@ export const ScheduleForm = ({
 	data,
 	setData,
 	isCreate = false,
+	disabled = false,
 	onSave = (): void => {},
 	onRemove = (): void => {},
 	onCancel,
@@ -131,7 +133,7 @@ export const ScheduleForm = ({
 						>
 							<X className="h-5 w-5" /> Cancel
 						</button>
-						{!isCreate && (
+						{!disabled && !isCreate && (
 							<button
 								type="button"
 								onClick={handleRemoveOnClick}
@@ -140,7 +142,7 @@ export const ScheduleForm = ({
 								<Trash2 className="h-5 w-5" /> Remove
 							</button>
 						)}
-						{isCreate && (
+						{!disabled && isCreate && (
 							<button
 								type="button"
 								onClick={handleSubmit}
@@ -158,8 +160,8 @@ export const ScheduleForm = ({
 						<input
 							type="text"
 							value={productName}
-							disabled
-							className="w-full p-3 bg-gray-200 border rounded-md"
+							disabled={true}
+							className={`w-full p-3 bg-gray-200 border rounded-md hover:cursor-no-drop`}
 						/>
 					</div>
 
@@ -167,13 +169,14 @@ export const ScheduleForm = ({
 						<label className="text-2xl font-medium">Price (VND)</label>
 						<CurrencyInput
 							value={String(data.price)}
-							groupSeparator="."
+							disabled={disabled}
+							// groupSeparator="."
 							decimalsLimit={0}
 							allowNegativeValue={false}
 							onValueChange={(val) =>
 								setData((prev) => ({ ...prev, price: Number(val || 0) }))
 							}
-							className="w-full p-3 border rounded-md"
+							className={`w-full p-3 border rounded-md ${disabled ? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop' : 'bg-white'}`}
 						/>
 						<div className="pl-50 pt-2.5 col-span-2">
 							{error.price && (
@@ -192,6 +195,7 @@ export const ScheduleForm = ({
 								label={cfg.label}
 								field={cfg.key}
 								value={data[cfg.key]}
+								disabled={disabled}
 								onChangeDate={(d, f) => d && updateField(d, f, true)}
 								onChangeTime={(t, f) => t && updateField(t, f, false)}
 								error={error[cfg.key]}
