@@ -8,12 +8,19 @@ import { UserRepository } from '../user/user.repository';
 
 import { CartController } from './cart.controller';
 import { CartRepository } from './cart.repository';
+import { CartCommandHandlers } from './commands/handlers';
 import { CartQueryHandlers } from './queries/handlers';
 
 @Module({
 	imports: [CqrsModule, DatabaseModule, AuthModule],
 	controllers: [CartController],
-	providers: [CartRepository, UserRepository, SupplierRepository, ...CartQueryHandlers],
+	providers: [
+		CartRepository,
+		UserRepository,
+		SupplierRepository,
+		...CartQueryHandlers,
+		...CartCommandHandlers,
+	],
 	exports: [],
 })
 export class CartModule {}

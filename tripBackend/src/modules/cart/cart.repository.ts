@@ -8,7 +8,7 @@ import { ProductOrderByDto } from '../product/dtos';
 
 @Injectable()
 export class CartRepository {
-	constructor(private readonly prismaService: PrismaService) { }
+	constructor(private readonly prismaService: PrismaService) {}
 
 	async getCartByUserId(
 		keyword: string,
@@ -147,6 +147,32 @@ export class CartRepository {
 			data: {
 				userId: userId,
 				productScheduleId: productScheduleId,
+			},
+		});
+	}
+
+	async deleteCart(userId: string, cartId: string): Promise<CartEntity> {
+		return this.prismaService.cart.delete({
+			include: {
+				productSchedule: {
+					include: {
+						product: {
+							include: {
+								productCategory: true,
+								supplier: {
+									include: {
+										user: true,
+									},
+								},
+								location: true,
+							},
+						},
+					},
+				},
+			},
+			where: {
+				id: cartId,
+				userId: userId,
 			},
 		});
 	}

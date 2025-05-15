@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Delete, Get, HttpException, Param, Query } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
 import { PaginationDto, HttpResponseBodyDto } from 'src/common';
@@ -7,6 +7,7 @@ import { Auth } from '../auth/decorators';
 import { MyInformation } from '../user/decorators';
 import { UserInformationDto } from '../user/dtos';
 
+import { DeleteScheduleInCartCommand } from './commands/implements';
 import { CartFilterRequestDto } from './dtos';
 import { GetCartResponseDto } from './dtos/responses/getCart.response';
 import { GetCartByUserIdQuery } from './queries/implements';
@@ -24,6 +25,17 @@ export class CartController {
 	): Promise<HttpResponseBodyDto<GetCartResponseDto[]>> {
 		return this.queryBus.execute(
 			new GetCartByUserIdQuery(pagination, myInformation, search),
+		);
+	}
+
+	@Delete('/:cartId')
+	@Auth()
+	async deleteScheduleInCart(
+		@Param('cartId') cartId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<GetCartResponseDto> | HttpException> {
+		return this.queryBus.execute(
+			new DeleteScheduleInCartCommand(cartId, myInformation),
 		);
 	}
 }
