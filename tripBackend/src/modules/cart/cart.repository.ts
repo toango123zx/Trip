@@ -69,4 +69,85 @@ export class CartRepository {
 		]);
 		return [carts, totalRecords];
 	}
+
+	async getCartByCartId(cartId: string, userId?: string): Promise<CartEntity> {
+		return this.prismaService.cart.findFirst({
+			include: {
+				productSchedule: {
+					include: {
+						product: {
+							include: {
+								productCategory: true,
+								supplier: {
+									include: {
+										user: true,
+									},
+								},
+								location: true,
+							},
+						},
+					},
+				},
+			},
+			where: {
+				id: cartId,
+				userId: userId,
+			},
+		});
+	}
+
+	async getCartByProductScheduleId(
+		productScheduleId: string,
+		userId: string,
+	): Promise<CartEntity> {
+		return this.prismaService.cart.findFirst({
+			include: {
+				productSchedule: {
+					include: {
+						product: {
+							include: {
+								productCategory: true,
+								supplier: {
+									include: {
+										user: true,
+									},
+								},
+								location: true,
+							},
+						},
+					},
+				},
+			},
+			where: {
+				productScheduleId: productScheduleId,
+				userId: userId,
+			},
+		});
+	}
+
+	async createCart(userId: string, productScheduleId: string): Promise<CartEntity> {
+		return this.prismaService.cart.create({
+			include: {
+				productSchedule: {
+					include: {
+						product: {
+							include: {
+								productCategory: true,
+								supplier: {
+									include: {
+										user: true,
+									},
+								},
+								location: true,
+							},
+						},
+					},
+				},
+			},
+			data: {
+				userId: userId,
+				productScheduleId: productScheduleId,
+			},
+		});
+	}
 }
