@@ -55,6 +55,12 @@ export const LoginForm = (): JSX.Element => {
 			return;
 		}
 		localStorage.setItem('logged', 'true');
+		
+		const userInfo = await dispatch(userThunk.getMe()).unwrap();
+		if (userInfo && userInfo.roleName) {
+			localStorage.setItem('role', userInfo.roleName);
+		}
+		
 		navigate('/');
 	};
 

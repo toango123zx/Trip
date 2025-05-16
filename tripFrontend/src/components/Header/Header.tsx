@@ -153,6 +153,7 @@ const UserProfileDropdown = ({
 	const handleLogout = (): void => {
 		localStorage.removeItem('logged');
 		localStorage.removeItem('role');
+		window.location.href = '/';
 	};
 
 	return (
@@ -304,7 +305,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 
 	return (
 		<header className={cn(className)}>
-			<div className="h-[152px] bg-transparent"></div>
+			<div className="md:h-[152px] h-[60px] bg-transparent"></div>
 			<div className="fixed top-0 w-full py-4 px-6 md:py-12 md:px-24 bg-gradient-to-b from-[#fffdea]/100 to-white/95">
 				<div className="max-w-[1728px] mx-auto flex justify-between md:justify-between items-center">
 					<Link to="/" className="flex items-center">

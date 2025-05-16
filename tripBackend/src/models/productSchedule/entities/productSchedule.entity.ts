@@ -1,11 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { ProductScheduleStatusEnum } from '@prisma/client';
-
-import { CartEntity } from '../../cart/entities/cart.entity';
-import { InfoBillEntity } from '../../infoBill/entities/infoBill.entity';
-import { InfoDiscountEntity } from '../../infoDiscount/entities/infoDiscount.entity';
+import { ApiProperty } from '@nestjs/swagger';
 import { ProductEntity } from '../../product/entities/product.entity';
+import { InfoBillEntity } from '../../infoBill/entities/infoBill.entity';
+import { CartEntity } from '../../cart/entities/cart.entity';
+import { InfoDiscountEntity } from '../../infoDiscount/entities/infoDiscount.entity';
 
 export class ProductScheduleEntity {
 	@ApiProperty({

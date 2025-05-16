@@ -115,7 +115,14 @@ export const ProductUpdate = ({
 
 			return;
 		}
-		dispatch(productThunk.updateProductByProductId({ productId, product: data }));
+		const formattedData = {
+			...data,
+			time: Number(data.time),
+			quantityAvailable: Number(data.quantityAvailable),
+			age: Number(data.age)
+		};
+		
+		dispatch(productThunk.updateProductByProductId({ productId, product: formattedData }));
 		setHasSubmitted(true);
 	};
 

@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-
 import { BillEntity } from '../../bill/entities/bill.entity';
 import { ProductScheduleEntity } from '../../productSchedule/entities/productSchedule.entity';
 

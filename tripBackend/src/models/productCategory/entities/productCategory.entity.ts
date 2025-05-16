@@ -1,7 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { ProductStatusEnum } from '@prisma/client';
-
+import { ApiProperty } from '@nestjs/swagger';
 import { ProductEntity } from '../../product/entities/product.entity';
 
 export class ProductCategoryEntity {

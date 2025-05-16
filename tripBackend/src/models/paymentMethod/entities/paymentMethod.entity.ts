@@ -1,7 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { PaymentMethodStatusEnum } from '@prisma/client';
-
+import { ApiProperty } from '@nestjs/swagger';
 import { BillEntity } from '../../bill/entities/bill.entity';
 
 export class PaymentMethodEntity {

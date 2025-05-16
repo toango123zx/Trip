@@ -26,3 +26,16 @@ button {
 .swiper-wrapper {
     padding-bottom: 35px;
 }
+
+#stackable-error.min-h-\[1\.25rem\].text-sm.text-red-600 {
+    display: none;
+}
+
+input:disabled {
+    background-color: #0000000a;
+    border: 1px solid #d9d9d9;
+}
+
+input {
+    padding: 4px 11px;
+}

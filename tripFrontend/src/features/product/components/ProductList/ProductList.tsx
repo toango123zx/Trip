@@ -1,6 +1,8 @@
 import { notification } from 'antd';
 import { JSX, useEffect, useState } from 'react';
 import { IoIosAdd } from 'react-icons/io';
+import { BiPackage, BiCalendar } from 'react-icons/bi';
+import { MdDiscount } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
@@ -116,136 +118,140 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 
 	return (
 		<section
-			className={cn('relative md:pt-0', className)}
-			ria-label="Product Management"
+			className={cn('relative w-full', className)}
+			aria-label="Product Management"
 		>
-			<div className="container mx-auto bg-white rounded-lg p-6 md:px-14 md:py-16 font-sans flex  flex-col">
+			<div className="container mx-auto bg-white rounded-lg shadow-lg p-3 sm:p-6 md:px-8 md:py-10 lg:px-10 lg:py-12 font-sans flex flex-col transition-all duration-300">
 				{/* Main Content */}
-				<main className="flex flex-1 gap-14 text-2xl">
-					{/* Sidebar */}
-					<div className="space-y-5 w-3/15 font-Montserrat">
+				<main className="flex flex-col md:flex-row flex-1 gap-4 md:gap-6 lg:gap-8">
+					{/* Sidebar - Always Visible */}
+					<div className="flex flex-row md:flex-col flex-wrap justify-center md:justify-start gap-2 md:gap-4 md:w-1/4 lg:w-1/5 font-Montserrat">
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
+							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
 								activeTab === 'product'
-									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100'
+									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
+									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
 							}`}
 							onClick={() => handleChangeTab(EactiveTab.product)}
 						>
-							Products
+							<BiPackage className="text-lg md:text-xl" />
+							<span className="text-xs sm:text-sm md:text-base">Products</span>
 						</button>
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
+							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
 								activeTab === 'schedule'
-									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100 '
+									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
+									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
 							}`}
 							onClick={() => handleChangeTab(EactiveTab.schedule)}
 						>
-							Schedules
+							<BiCalendar className="text-lg md:text-xl" />
+							<span className="text-xs sm:text-sm md:text-base">Schedules</span>
 						</button>
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
+							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
 								activeTab === 'discount'
-									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100 '
+									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
+									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
 							}`}
 							onClick={() => handleChangeTab(EactiveTab.discount)}
 						>
-							Discounts
+							<MdDiscount className="text-lg md:text-xl" />
+							<span className="text-xs sm:text-sm md:text-base">Discounts</span>
 						</button>
 					</div>
 
 					{/* Content Area */}
-					<div className="flex-1 rounded-lg bg-white p-6 shadow-md">
-						<div className="mb-3 flex items-center justify-end">
+					<div className="flex-1 rounded-xl bg-white p-3 sm:p-4 md:p-6 shadow-md border border-gray-100 transition-all duration-300">
+						<div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+							<h2 className="text-lg sm:text-xl font-semibold text-gray-800 flex items-center gap-2">
+								{activeTab === 'product' && (
+									<>
+										<BiPackage className="text-orange-500" />
+										<span>Products</span>
+									</>
+								)}
+								{activeTab === 'schedule' && (
+									<>
+										<BiCalendar className="text-orange-500" />
+										<span>Schedules</span>
+									</>
+								)}
+								{activeTab === 'discount' && (
+									<>
+										<MdDiscount className="text-orange-500" />
+										<span>Discounts</span>
+									</>
+								)}
+							</h2>
 							<div className="flex items-center gap-2">
 								{activeTab === 'product' && (
 									<button
 										type="button"
 										onClick={handleAddProductOnClick}
-										className={`
-                                        flex items-center justify-center
-                                        bg-orange-400 hover:bg-orange-500
-                                        text-white font-bold
-                                        py-1.5 px-2.5
-                                        rounded-full
-                                        transition duration-150 ease-in-out
-                                      `}
+										className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-orange-500 to-orange-400 text-white font-medium py-2 px-3 sm:px-4 rounded-full transition-all duration-300 hover:shadow-lg hover:from-orange-600 hover:to-orange-500 transform hover:-translate-y-0.5 w-full sm:w-auto"
 									>
-										<IoIosAdd className="w-5 h-full" />
-										<span className="font-Montserrat text-sm font-bold">
-											New Product
-										</span>
+										<IoIosAdd className="w-5 h-5" />
+										<span className="font-Montserrat text-sm">
+                                            Add Product
+                                        </span>
 									</button>
 								)}
 								{activeTab === 'discount' && (
 									<button
 										type="button"
 										onClick={handleAddDiscountOnClick}
-										className={`
-                                        flex items-center justify-center
-                                        bg-orange-400 hover:bg-orange-500
-                                        text-white font-bold
-                                        py-1.5 px-2.5
-                                        rounded-full
-                                        transition duration-150 ease-in-out
-                                      `}
+										className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-orange-500 to-orange-400 text-white font-medium py-2 px-3 sm:px-4 rounded-full transition-all duration-300 hover:shadow-lg hover:from-orange-600 hover:to-orange-500 transform hover:-translate-y-0.5 w-full sm:w-auto"
 									>
-										<IoIosAdd className="w-5 h-full" />
-										<span className="font-Montserrat text-sm font-bold">
-											New Discount
-										</span>
+										<IoIosAdd className="w-5 h-5" />
+										<span className="font-Montserrat text-sm">
+                                            Add Discount
+                                        </span>
 									</button>
 								)}
 							</div>
 						</div>
 
-						{activeTab === EactiveTab.product && (
-							<ProductsBoard
-								page={pageProduct}
-								setPage={setPageProduct}
-								pageSize={PAGE_SIZE}
-								openProductUpdateOnClick={handleProductUpdateOnClick}
-							/>
-						)}
-						{activeTab === EactiveTab.schedule && <SchedulesBoard />}
-						{activeTab === EactiveTab.discount && (
-							<DiscountBoard
-								onViewDetailDiscount={handleViewDiscountOnClick}
-								data={discounts}
-								page={pageDiscount}
-								setPage={setPageDiscount}
-							/>
-						)}
-					</div>
-					<div onClick={() => handleClosePopup()}>
-						{isOpenPopupAddProduct && (
-							<AddProduct onCancel={handleClosePopup} />
-						)}
-					</div>
-					<div>
-						{isOpenPopupProductUpdate && (
-							<ProductUpdate
-								productId={productId}
-								onCancel={handleClosePopup}
-							/>
-						)}
-					</div>
-					<div>
-						{isOpenPopupAddDiscount && (
-							<AddDiscount onCancel={handleClosePopup} />
-						)}
-					</div>
-					<div>
-						{isOpenPopupViewDiscount && (
-							<UpdateDiscount
-								discountId={discountId}
-								onCancel={handleClosePopup}
-							/>
-						)}
+						<div className="bg-gray-50 rounded-lg p-2 sm:p-4 transition-all duration-300 overflow-x-auto">
+							{activeTab === EactiveTab.product && (
+								<ProductsBoard
+									page={pageProduct}
+									setPage={setPageProduct}
+									pageSize={PAGE_SIZE}
+									openProductUpdateOnClick={handleProductUpdateOnClick}
+								/>
+							)}
+							{activeTab === EactiveTab.schedule && <SchedulesBoard />}
+							{activeTab === EactiveTab.discount && (
+								<DiscountBoard
+									onViewDetailDiscount={handleViewDiscountOnClick}
+									data={discounts}
+									page={pageDiscount}
+									setPage={setPageDiscount}
+								/>
+							)}
+						</div>
 					</div>
 				</main>
+
+				{/* Modals */}
+				{isOpenPopupAddProduct && <AddProduct onCancel={handleClosePopup} />}
+				{isOpenPopupProductUpdate && (
+					<ProductUpdate productId={productId} onCancel={handleClosePopup} />
+				)}
+				{isOpenPopupAddDiscount && (
+					<AddDiscount 
+						onCancel={handleClosePopup} 
+						open={isOpenPopupAddDiscount} 
+					/>
+				)}
+				{isOpenPopupViewDiscount && (
+					<UpdateDiscount
+						discountId={discountId}
+						onCancel={handleClosePopup}
+						open={isOpenPopupViewDiscount}
+					/>
+				)}
 			</div>
 		</section>
 	);

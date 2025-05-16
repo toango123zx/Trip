@@ -2,9 +2,10 @@ import { InputRef, TableColumnsType } from 'antd';
 import { JSX, useState, useRef } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 
-import { getColumnSearchProps, TableView } from '@/components';
+import { getColumnSearchProps } from '@/components';
+import { BaseTable, renderStatusBadge, formatDateTime } from '@/components/BaseTable/BaseTable';
 import { cn } from '@/lib';
-import { TProductSchedule } from '@/types';
+import { TProductSchedule, EProductScheduleStatus } from '@/types';
 
 import { TRequestBodyCreateSchedule } from '../../schedule.type';
 
@@ -18,6 +19,12 @@ type TSchedulesBoard = {
 	) => void;
 	className?: string;
 };
+
+const STATUS_MAP = {
+	waiting: { color: 'orange', label: 'Waiting' },
+	active: { color: 'green', label: 'Active' },
+	inactive: { color: 'red', label: 'Inactive' },
+} as const;
 
 export const SchedulesBoard = ({
 	data,
@@ -35,7 +42,6 @@ export const SchedulesBoard = ({
 			title: 'Schedule ID',
 			dataIndex: 'id',
 			key: 'id',
-			width: '15%',
 			className: 'hidden',
 			render: (value: string | undefined) => value ?? '-',
 		},
@@ -58,52 +64,22 @@ export const SchedulesBoard = ({
 		{
 			title: 'Start Time',
 			dataIndex: 'startTime',
-			key: 'startTime',
-			width: '15%',
-			...getColumnSearchProps<TProductSchedule>(
-				'startTime',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) =>
 				new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
-			render: (value: Date) => new Date(value).toLocaleString(),
+			render: (value: Date) => formatDateTime(value),
 		},
 		{
 			title: 'End Time',
 			dataIndex: 'endTime',
-			key: 'endTime',
-			width: '5%',
-			...getColumnSearchProps<TProductSchedule>(
-				'endTime',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) =>
 				new Date(a.endTime).getTime() - new Date(b.endTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
-			render: (value: Date) => new Date(value).toLocaleString(),
+			render: (value: Date) => formatDateTime(value),
 		},
 		{
 			title: 'Booked',
 			dataIndex: 'booked',
-			key: 'booked',
-			width: '8%',
-			...getColumnSearchProps<TProductSchedule>(
-				'booked',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) => a.booked - b.booked,
 			sortDirections: ['descend', 'ascend'],
 			render: (value: number | undefined) => value ?? 0,
@@ -111,16 +87,6 @@ export const SchedulesBoard = ({
 		{
 			title: 'Price',
 			dataIndex: 'price',
-			key: 'price',
-			width: '8%',
-			...getColumnSearchProps<TProductSchedule>(
-				'price',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) => a.price - b.price,
 			sortDirections: ['descend', 'ascend'],
 		},
@@ -128,22 +94,9 @@ export const SchedulesBoard = ({
 			title: 'Status',
 			dataIndex: 'status',
 			key: 'status',
-			width: '12%',
-			sorter: (a, b) => a.status.length - b.status.length,
+			sorter: (a, b) => (a.status?.length || 0) - (b.status?.length || 0),
 			sortDirections: ['descend', 'ascend'],
-			render: (text: string) => (
-				<span
-					className={`${
-						text === 'waiting'
-							? 'text-amber-500'
-							: text === 'active'
-								? 'text-green-500'
-								: 'text-red-300'
-					} font-semibold`}
-				>
-					{text === undefined ? 'waiting' : text}
-				</span>
-			),
+			render: (text: string) => renderStatusBadge(text || EProductScheduleStatus.active, STATUS_MAP),
 		},
 		{
 			title: 'Action',
@@ -166,12 +119,17 @@ export const SchedulesBoard = ({
 	];
 
 	return (
-		<TableView<TProductSchedule>
+		<BaseTable<TProductSchedule>
+			rowKey="id"
+			columns={columnTable}
+			dataSource={data as TProductSchedule[]}
 			className={cn(className)}
-			columnTable={columnTable}
-			data={data as TProductSchedule[]}
-			pageSize={pageSize}
-			pagination={(data?.length ?? 0) <= (pageSize ?? 0) ? false : true}
+			pagination={
+				(data?.length ?? 0) > (pageSize ?? 10) 
+				? { pageSize } 
+				: false
+			}
+			size="middle"
 		/>
 	);
 };

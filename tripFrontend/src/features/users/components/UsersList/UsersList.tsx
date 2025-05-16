@@ -5,7 +5,6 @@ import {
 	Input,
 	InputRef,
 	Space,
-	Table,
 	TableColumnsType,
 	TableColumnType,
 } from 'antd';
@@ -17,36 +16,13 @@ import { IoIosSearch } from 'react-icons/io';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { BaseTable } from '@/components/BaseTable/BaseTable';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TUser } from '@/types';
-
-import './style.scss';
 import { userThunk } from '../../userThunk';
 
-type TTable<T> = {
-	columnTable: TableColumnsType<T>;
-	data?: T[];
-	pageSize?: number;
-	className?: string;
-};
-
-const TableView = <T,>({
-	className,
-	columnTable,
-	pageSize = 10,
-	data,
-}: TTable<T>): JSX.Element => {
-	return (
-		<Table<T>
-			rowKey="id"
-			columns={columnTable}
-			dataSource={data}
-			pagination={{ pageSize: pageSize }}
-			className={cn(`relative md:pt-0`, className)}
-		/>
-	);
-};
+import './style.scss';
 
 type TUsersListProps = {
 	className?: string;
@@ -168,7 +144,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 			),
 	});
 
-	let columnTable: TableColumnsType<TUser> = [
+	const columnTable: TableColumnsType<TUser> = [
 		{
 			title: 'User ID',
 			dataIndex: 'id',
@@ -214,6 +190,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 				return feeA - feeB;
 			},
 			sortDirections: ['descend', 'ascend'],
+			className: activeTab !== 'supplier' ? 'hidden' : '',
 		},
 		{
 			title: 'Status',
@@ -232,6 +209,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 		},
 		{
 			title: 'Action',
+			key: 'action',
 			render: () => (
 				<button type="button" className="text-blue-500 flex gap-2.5 items-center">
 					<span>View detail</span>
@@ -242,10 +220,6 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 			),
 		},
 	];
-
-	if (activeTab == 'tourist' || activeTab == 'admin') {
-		columnTable = columnTable.filter((item) => item.title !== 'Fee');
-	}
 
 	useEffect(() => {
 		setFilteredUsers(users.filter((user) => user.roleName === activeTab));
@@ -261,7 +235,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 			className={cn('relative md:pt-0', className)}
 			aria-labelledby="attractions-rate"
 		>
-			<div className="container mx-auto bg-white rounded-lg p-6 md:px-14 md:py-16 font-sans flex  flex-col">
+			<div className="container mx-auto bg-white rounded-lg p-6 md:px-14 md:py-16 font-sans flex flex-col">
 				{/* Main Content */}
 				<main className="flex flex-1 gap-14 text-2xl">
 					{/* Sidebar */}
@@ -280,7 +254,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
 								activeTab === 'supplier'
 									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100 '
+									: 'bg-white text-gray-500 hover:bg-gray-100'
 							}`}
 							onClick={() => handleChangeTab('supplier')}
 						>
@@ -290,7 +264,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
 								activeTab === 'admin'
 									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100 '
+									: 'bg-white text-gray-500 hover:bg-gray-100'
 							}`}
 							onClick={() => handleChangeTab('admin')}
 						>
@@ -312,9 +286,11 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 						</div>
 
 						{/* Table */}
-						<TableView<TUser>
-							columnTable={columnTable}
-							data={filteredUsers}
+						<BaseTable<TUser>
+							rowKey="id"
+							columns={columnTable}
+							dataSource={filteredUsers}
+							className="w-full"
 						/>
 					</div>
 				</main>

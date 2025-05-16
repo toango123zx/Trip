@@ -37,8 +37,15 @@ export const AddProduct = ({
 	);
 
 	const onSubmit: SubmitHandler<TRequestBodyCreateProduct> = (data) => {
+		const formattedData = {
+			...data,
+			time: Number(data.time),
+			quantityAvailable: Number(data.quantityAvailable),
+			age: Number(data.age)
+		};
+		
 		setHasSubmitted(true);
-		dispatch(productThunk.createProduct(data));
+		dispatch(productThunk.createProduct(formattedData));
 	};
 
 	useEffect(() => {
@@ -80,6 +87,7 @@ export const AddProduct = ({
 				remove={false}
 				schedules={schedules}
 				setSchedules={setSchedules}
+				isCreate={true}
 				onSubmit={onSubmit}
 				onCancel={onCancel}
 			/>

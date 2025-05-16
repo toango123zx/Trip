@@ -1,12 +1,15 @@
 'use client';
 
 import { isCuid } from 'cuid';
-import { X, Save, Plus, Map, Trash2 } from 'lucide-react';
 import { JSX, useState, useEffect, useMemo } from 'react';
 import { SubmitHandler, UseFormReturn } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Input, Row, Select, Textarea } from '@/components';
+import { BaseForm } from '@/components/Form/BaseForm';
+import { FormInput } from '@/components/Form/FormInput';
+import { FormSelect } from '@/components/Form/FormSelect';
+import { FormTextarea } from '@/components/Form/FormTextarea';
+import { Plus } from 'lucide-react';
 import { locationThunk } from '@/features/location';
 import {
 	ScheduleForm,
@@ -18,6 +21,7 @@ import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TProductSchedule } from '@/types';
 
 import { TRequestBodyCreateProduct } from '../../product.type';
+import { EProductScheduleStatus } from '@/types/product.type';
 
 type TProductFormProps = {
 	form: UseFormReturn<TRequestBodyCreateProduct>;
@@ -26,11 +30,13 @@ type TProductFormProps = {
 		React.SetStateAction<TProductSchedule[] | TRequestBodyCreateSchedule[]>
 	>;
 	// discounts?: TDiscountDetail[];
+	isCreate?: boolean;
 	remove?: boolean;
 	onRemove?: () => void;
 	onSubmit?: SubmitHandler<TRequestBodyCreateProduct>;
 	onCancel?: () => void;
 	disabled?: boolean;
+	open?: boolean;
 };
 
 export const ProductForm = ({
@@ -38,18 +44,21 @@ export const ProductForm = ({
 	schedules,
 	setSchedules = (): void => {},
 	// discounts = [],
+	isCreate = false,
 	remove = true,
 	disabled = false,
+	open = true,
 	onSubmit,
 	onRemove = (): void => {},
 	onCancel = (): void => {},
 }: TProductFormProps): JSX.Element => {
 	const {
 		register,
-		handleSubmit,
 		setValue,
 		watch,
+		handleSubmit,
 		formState: { errors },
+		control,
 	} = form;
 
 	const dispatch = useDispatch<TReduxStoreDispatch>();
@@ -92,10 +101,6 @@ export const ProductForm = ({
 		return true;
 	};
 
-	const handleRemoveOnClick = (): void => {
-		onRemove();
-	};
-
 	const [isCreateSchedule, setIsCreateSchedule] = useState(false);
 	const [newSchedule, setNewSchedule] = useState<TRequestBodyCreateSchedule>(
 		{} as TRequestBodyCreateSchedule,
@@ -109,10 +114,12 @@ export const ProductForm = ({
 			startOrder: new Date(),
 			endTime: new Date(),
 			endOrder: new Date(),
+			status: EProductScheduleStatus.active,
 		});
 		setIsCreateSchedule(true);
 		setIsOpenPopupScheduleUpdate(true);
 	};
+
 	const handlerAddScheduleInPopup = (schedule: TRequestBodyCreateSchedule): void => {
 		setSchedules((prev = []) => [schedule, ...prev]);
 		setIsOpenPopupScheduleUpdate(false);
@@ -144,205 +151,254 @@ export const ProductForm = ({
 		setIsOpenPopupScheduleUpdate(false);
 	};
 
+	const handleSaveOnClick = (data: TRequestBodyCreateProduct): void => {
+		if (onSubmit) {
+			onSubmit(data);
+		}
+	};
+
 	return (
-		<div
-			className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 px-4 sm:px-20"
-			onClick={onCancel}
+		<BaseForm
+			title={isCreate ? 'Add Product' : 'Product Details'}
+			form={form}
+			isCreate={isCreate}
+			disabled={disabled}
+			open={open}
+			onSave={handleSaveOnClick}
+			onRemove={remove ? onRemove : undefined}
+			onCancel={onCancel}
 		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				className="max-h-[90vh] w-full max-w-7xl overflow-y-auto rounded-lg bg-white shadow-lg"
-			>
-				{/* Header */}
-				<header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-white px-6 py-4">
-					<h1 className="text-2xl font-bold">Add Product</h1>
-					<div className="flex gap-2">
-						<button
-							type="button"
-							onClick={onCancel}
-							className="flex h-10 items-center gap-1 rounded-md border bg-gray-50 px-4 py-2 hover:bg-gray-100"
-						>
-							<X className="h-5 w-5" /> Cancel
-						</button>
-						{!disabled && remove && (
-							<button
-								type="button"
-								onClick={handleRemoveOnClick}
-								className="flex h-10 items-center gap-1 rounded-md border border-red-500 bg-red-500 text-white px-4 py-2 hover:bg-red-700"
-							>
-								<Trash2 className="h-5 w-5" /> Remove
-							</button>
-						)}
-						{!disabled && (
-							<button
-								type="submit"
-								onClick={onSubmit && handleSubmit(onSubmit)}
-								className="flex h-10 items-center gap-1 rounded-md border border-orange-500 bg-orange-500  px-4 py-2 text-white hover:bg-orange-600"
-							>
-								<Save className="h-5 w-5" /> Save
-							</button>
-						)}
-					</div>
-				</header>
-
-				{/* Form */}
-				<form
-					className="px-6 pb-8 pt-6"
-					onSubmit={onSubmit && handleSubmit(onSubmit)}
-				>
-					<Input<TRequestBodyCreateProduct>
-						id="name"
-						label="Product Name"
-						required
-						register={register}
-						errors={errors}
-						disabled={disabled}
-					/>
-					<Select<TRequestBodyCreateProduct>
-						id="locationId"
-						label="Location On System"
-						required
-						defaultValue={watch('locationId')}
-						setValue={setValue}
-						errors={errors}
-						options={options}
-						placeholder="Select location"
-						disabled={disabled}
-					/>
-					<Textarea<TRequestBodyCreateProduct>
-						id="description"
-						label="Description"
-						register={register}
-						errors={errors}
-						required
-						disabled={disabled}
-					/>
-					<Input<TRequestBodyCreateProduct>
-						id="cityName"
-						label="Destination"
-						defaultValue={watch('cityName')}
-						register={register}
-						errors={errors}
-						// required
-						disabled={disabled}
-					/>
-					<Input<TRequestBodyCreateProduct>
-						id="time"
-						label="Time (Hour)"
-						register={register}
-						errors={errors}
-						required
-						type="number"
-						validate={validateGreaterThanZero}
-						disabled={disabled}
-					/>
-					<Input<TRequestBodyCreateProduct>
-						id="quantityAvailable"
-						label="Quantity (Person)"
-						register={register}
-						errors={errors}
-						required
-						type="number"
-						validate={validateGreaterThanZero}
-						disabled={disabled}
-					/>
-					<Input<TRequestBodyCreateProduct>
-						id="age"
-						label="Age"
-						register={register}
-						errors={errors}
-						required
-						type="number"
-						validate={validateGreaterThanZero}
-						disabled={disabled}
-					/>
-
-					<Row label="Location On Map">
-						<div className="relative">
-							<input
-								id="locationOnMap"
-								type="text"
-								placeholder="Enter Coordinates or Select on Map"
-								disabled={disabled}
-								className={`h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${disabled ? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop' : 'bg-white'}`}
-								{...register('locationOnMap')}
-							/>
-							<button
-								type="button"
-								disabled={disabled}
-								className="absolute right-0 top-1/2 -translate-y-1/2 transform"
-								aria-label="Open map"
-							>
-								<Map className="h-5 w-5 text-gray-500" />
-							</button>
-						</div>
-					</Row>
-
-					<section className="mb-6">
-						<h2 className="mb-3 text-xl font-bold">From our gallery</h2>
-						<button
-							type="button"
-							disabled={disabled}
-							className="flex h-[85px] w-[110px] items-center justify-center rounded-md bg-gray-200"
-						>
-							<Plus className="h-6 w-6 text-gray-500" />
-						</button>
-					</section>
-
-					{['Schedules'].map((title) => (
-						<section key={title} className="mb-6">
-							<div className="mb-3 flex items-center justify-between">
-								<h2 className="text-xl font-bold">{title}</h2>
-								{!disabled && (
-									<button
-										type="button"
-										disabled={disabled}
-										onClick={
-											title === 'Schedules'
-												? (): void => handleAddScheduleOnClick()
-												: (): void => {}
-										}
-										className="flex h-10 items-center gap-1 rounded-full bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
-									>
-										<Plus className="h-4 w-4" /> ADD{' '}
-										{title.toUpperCase()}
-									</button>
-								)}
-							</div>
-
-							<div className=" items-center justify-center rounded-md border text-gray-500">
-								{/* No {title.toLowerCase()} have been added yet */}
-								{title === 'Schedules' ? (
-									<SchedulesBoard
-										data={schedules}
-										pageSize={5}
-										disabled={disabled}
-										onViewDetailSchedule={
-											handleViewScheduleDetailOnClick
-										}
-									/>
-								) : (
-									// title === 'Discounts' && (
-									// 	<DiscountBoard data={discounts} />
-									// )
-									<></>
-								)}
-							</div>
-						</section>
-					))}
-					{isOpenPopupScheduleUpdate && (
-						<ScheduleForm
-							productName={watch('name')}
-							data={newSchedule}
-							setData={setNewSchedule}
-							isCreate={isCreateSchedule}
-							onSave={handlerAddScheduleInPopup}
-							onRemove={handleRemoveSchedule}
-							onCancel={handleClosePopupScheduleUpdate}
+			{/* --- Product Info --- */}
+			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+					<svg
+						className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M20 12H4"
 						/>
-					)}
-				</form>
+					</svg>
+					<span className="text-sm sm:text-base font-medium text-gray-800">
+						Basic Information
+					</span>
+				</div>
+
+				<FormInput
+					control={control}
+					name="name"
+					label="Product Name"
+					rules={{ required: 'Product Name is required' }}
+					disabled={disabled}
+				/>
+
+				<FormSelect
+					control={control}
+					name="locationId"
+					label="Location On System"
+					options={options}
+					rules={{ required: 'Location is required' }}
+					disabled={disabled}
+				/>
+
+				<FormTextarea
+					control={control}
+					name="description"
+					label="Description"
+					rules={{ required: 'Description is required' }}
+					disabled={disabled}
+				/>
 			</div>
-		</div>
+
+			{/* --- Destination Info --- */}
+			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+					<svg
+						className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M12 4v16m8-8H4"
+						/>
+					</svg>
+					<span className="text-sm sm:text-base font-medium text-gray-800">
+						Destination & Attributes
+					</span>
+				</div>
+
+				<FormInput
+					control={control}
+					name="cityName"
+					label="Destination"
+					disabled={true}
+				/>
+
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+					<FormInput
+						control={control}
+						name="time"
+						label="Time (Hour)"
+						type="number"
+						rules={{
+							required: 'Time is required',
+							validate: validateGreaterThanZero,
+						}}
+						disabled={disabled}
+					/>
+
+					<FormInput
+						control={control}
+						name="quantityAvailable"
+						label="Quantity (Person)"
+						type="number"
+						rules={{
+							required: 'Quantity is required',
+							validate: validateGreaterThanZero,
+						}}
+						disabled={disabled}
+					/>
+
+					<FormInput
+						control={control}
+						name="age"
+						label="Age"
+						type="number"
+						rules={{
+							required: 'Age is required',
+							validate: validateGreaterThanZero,
+						}}
+						disabled={disabled}
+					/>
+				</div>
+			</div>
+
+			{/* --- Location on Map --- */}
+			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
+				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+					<svg
+						className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2zm0 9s7-4.5 7-10a7 7 0 10-14 0c0 5.5 7 10 7 10z"
+						/>
+					</svg>
+					<span className="text-sm sm:text-base font-medium text-gray-800">
+						Location On Map
+					</span>
+				</div>
+
+				<input
+					id="locationOnMap"
+					type="text"
+					placeholder="Enter Coordinates or Select on Map"
+					disabled={disabled}
+					className={`h-9 sm:h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${
+						disabled
+							? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop'
+							: 'bg-white'
+					}`}
+					{...register('locationOnMap')}
+				/>
+			</div>
+
+			{/* --- Gallery --- */}
+			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
+				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+					<svg
+						className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M3 5h18M3 19h18M5 5v14m14-14v14"
+						/>
+					</svg>
+					<span className="text-sm sm:text-base font-medium text-gray-800">Gallery</span>
+				</div>
+
+				<button
+					type="button"
+					disabled={disabled}
+					className="flex h-[70px] sm:h-[85px] w-[90px] sm:w-[110px] items-center justify-center rounded-md bg-gray-200"
+				>
+					<Plus className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
+				</button>
+			</div>
+
+			{/* --- Schedules --- */}
+			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
+				<div className="flex items-center justify-between mb-2 sm:mb-3">
+					<div className="flex items-center gap-2 sm:gap-3">
+						<svg
+							className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+							/>
+						</svg>
+						<span className="text-sm sm:text-base font-medium text-gray-800">
+							Schedules
+						</span>
+					</div>
+
+					{!disabled && (
+						<button
+							type="button"
+							onClick={handleAddScheduleOnClick}
+							className="flex h-8 sm:h-10 items-center gap-1 rounded-full bg-orange-500 px-2 sm:px-4 py-1 sm:py-2 text-white text-xs sm:text-sm hover:bg-orange-600"
+						>
+							<Plus className="h-3 w-3 sm:h-4 sm:w-4" /> ADD SCHEDULES
+						</button>
+					)}
+				</div>
+
+				<div className="rounded-md bg-white p-1 sm:p-2 border border-gray-200 text-gray-700 overflow-x-auto">
+					<SchedulesBoard
+						data={schedules}
+						pageSize={5}
+						disabled={disabled}
+						onViewDetailSchedule={handleViewScheduleDetailOnClick}
+					/>
+				</div>
+			</div>
+
+			{isOpenPopupScheduleUpdate && (
+				<ScheduleForm
+					productName={watch('name')}
+					data={newSchedule}
+					setData={setNewSchedule}
+					isCreate={isCreateSchedule}
+					onSave={handlerAddScheduleInPopup}
+					onRemove={handleRemoveSchedule}
+					onCancel={handleClosePopupScheduleUpdate}
+				/>
+			)}
+		</BaseForm>
 	);
 };

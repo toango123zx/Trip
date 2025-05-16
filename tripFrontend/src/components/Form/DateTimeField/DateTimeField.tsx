@@ -1,4 +1,4 @@
-import { DatePicker, Space, TimePicker } from 'antd';
+import { DatePicker, TimePicker } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import { JSX } from 'react';
 
@@ -24,32 +24,40 @@ export const DateTimeField = <T, K extends keyof T>({
 	onChangeTime: (t: Dayjs | null, f: FieldKey<T, K>) => void;
 }): JSX.Element => {
 	return (
-		<div>
-			<div className="flex items-center gap-5">
-				<label className="text-2xl font-medium w-9/12">{label} Date</label>
-				<Space direction="vertical" className="w-full">
+		<div className="form-control">
+			<div className="flex flex-col md:flex-row md:items-center gap-4">
+				<div className="flex flex-col w-full">
+					<label className="label">
+						<span className="label-text">{label} Date</span>
+					</label>
 					<DatePicker
 						value={dayjs(value)}
 						disabled={disabled}
 						onChange={(d) => onChangeDate(d, field)}
 						format="DD/MM/YYYY"
-						className="w-full text-2xl h-14"
-						size="large"
+						className="w-full"
+						size="middle"
+						placeholder="Select date"
+						status={error ? 'error' : undefined}
 					/>
-				</Space>
-				<label className="text-2xl font-medium w-9/12">{label} Time</label>
-				<Space direction="vertical" className="w-full">
+				</div>
+				<div className="flex flex-col w-full">
+					<label className="label">
+						<span className="label-text">{label} Time</span>
+					</label>
 					<TimePicker
 						value={dayjs(value)}
 						disabled={disabled}
 						onChange={(t) => onChangeTime(t, field)}
 						format="HH:mm"
-						className="w-full text-2xl h-14"
-						size="large"
+						className="w-full"
+						size="middle"
+						placeholder="Select time"
+						status={error ? 'error' : undefined}
 					/>
-				</Space>
+				</div>
 			</div>
-			<div className="pl-54 pt-2.5">
+			<div className="pt-2">
 				{!disabled && error ? (
 					field === 'startTime' ? (
 						<ErrorText
