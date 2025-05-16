@@ -1,6 +1,5 @@
 'use client';
 
-import { DatePicker, TimePicker, Space } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import localeData from 'dayjs/plugin/localeData';
@@ -9,7 +8,7 @@ import { X, Save, Trash2 } from 'lucide-react';
 import React, { JSX, useState } from 'react';
 import CurrencyInput from 'react-currency-input-field';
 
-import { ErrorText } from '@/components';
+import { DateTimeField, ErrorText } from '@/components';
 
 import type { TRequestBodyCreateSchedule } from '../../schedule.type';
 
@@ -22,6 +21,7 @@ type TScheduleFormProps = {
 	data: TRequestBodyCreateSchedule;
 	setData: React.Dispatch<React.SetStateAction<TRequestBodyCreateSchedule>>;
 	isCreate?: boolean;
+	disabled?: boolean;
 	onSave?: (data: TRequestBodyCreateSchedule) => void;
 	onRemove?: () => void;
 	onCancel?: () => void;
@@ -42,66 +42,6 @@ const pickerConfigs: {
 	{ key: 'endOrder', label: 'End Order' },
 ];
 
-const DateTimeField = ({
-	label,
-	field,
-	value,
-	error,
-	onChangeDate,
-	onChangeTime,
-}: {
-	label: string;
-	field: FieldKey;
-	value: Date;
-	error?: boolean;
-	onChangeDate: (d: Dayjs | null, f: FieldKey) => void;
-	onChangeTime: (t: Dayjs | null, f: FieldKey) => void;
-}): JSX.Element => {
-	return (
-		<div>
-			<div className="flex items-center gap-5">
-				<label className="text-2xl font-medium w-9/12">{label} Date</label>
-				<Space direction="vertical" className="w-full">
-					<DatePicker
-						value={dayjs(value)}
-						onChange={(d) => onChangeDate(d, field)}
-						format="DD/MM/YYYY"
-						className="w-full text-2xl h-14"
-						size="large"
-					/>
-				</Space>
-				<label className="text-2xl font-medium w-9/12">{label} Time</label>
-				<Space direction="vertical" className="w-full">
-					<TimePicker
-						value={dayjs(value)}
-						onChange={(t) => onChangeTime(t, field)}
-						format="HH:mm"
-						className="w-full text-2xl h-14"
-						size="large"
-					/>
-				</Space>
-			</div>
-			<div className="pl-54 pt-2.5">
-				{error ? (
-					field === 'startTime' ? (
-						<ErrorText
-							id="startTime"
-							message="Start must be greater than current date"
-						/>
-					) : field === 'startOrder' ? (
-						<ErrorText
-							id="startOrder"
-							message="Start Order must be less than start time"
-						/>
-					) : (
-						<ErrorText message="The end date must be greater than the current date and greater than the start date and greater than the end order" />
-					)
-				) : null}
-			</div>
-		</div>
-	);
-};
-
 type TError = {
 	name: boolean;
 	price: boolean;
@@ -117,6 +57,7 @@ export const ScheduleForm = ({
 	data,
 	setData,
 	isCreate = false,
+	disabled = false,
 	onSave = (): void => {},
 	onRemove = (): void => {},
 	onCancel,
@@ -192,7 +133,7 @@ export const ScheduleForm = ({
 						>
 							<X className="h-5 w-5" /> Cancel
 						</button>
-						{!isCreate && (
+						{!disabled && !isCreate && (
 							<button
 								type="button"
 								onClick={handleRemoveOnClick}
@@ -201,7 +142,7 @@ export const ScheduleForm = ({
 								<Trash2 className="h-5 w-5" /> Remove
 							</button>
 						)}
-						{isCreate && (
+						{!disabled && isCreate && (
 							<button
 								type="button"
 								onClick={handleSubmit}
@@ -219,8 +160,8 @@ export const ScheduleForm = ({
 						<input
 							type="text"
 							value={productName}
-							disabled
-							className="w-full p-3 bg-gray-200 border rounded-md"
+							disabled={true}
+							className={`w-full p-3 bg-gray-200 border rounded-md hover:cursor-no-drop`}
 						/>
 					</div>
 
@@ -228,13 +169,14 @@ export const ScheduleForm = ({
 						<label className="text-2xl font-medium">Price (VND)</label>
 						<CurrencyInput
 							value={String(data.price)}
-							groupSeparator="."
+							disabled={disabled}
+							// groupSeparator="."
 							decimalsLimit={0}
 							allowNegativeValue={false}
 							onValueChange={(val) =>
 								setData((prev) => ({ ...prev, price: Number(val || 0) }))
 							}
-							className="w-full p-3 border rounded-md"
+							className={`w-full p-3 border rounded-md ${disabled ? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop' : 'bg-white'}`}
 						/>
 						<div className="pl-50 pt-2.5 col-span-2">
 							{error.price && (
@@ -248,11 +190,12 @@ export const ScheduleForm = ({
 
 					<div className="space-y-8">
 						{pickerConfigs.map((cfg) => (
-							<DateTimeField
+							<DateTimeField<TRequestBodyCreateSchedule, FieldKey>
 								key={cfg.key}
 								label={cfg.label}
 								field={cfg.key}
 								value={data[cfg.key]}
+								disabled={disabled}
 								onChangeDate={(d, f) => d && updateField(d, f, true)}
 								onChangeTime={(t, f) => t && updateField(t, f, false)}
 								error={error[cfg.key]}

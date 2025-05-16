@@ -1,22 +1,38 @@
 import { InputRef, TableColumnsType } from 'antd';
 import { JSX, useState, useRef } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
+import { useSelector } from 'react-redux';
 
-import { getColumnSearchProps, TableView } from '@/components';
+import { getColumnSearchProps, PaginationTable, TableView } from '@/components';
 import { cn } from '@/lib';
-import { TDiscount } from '@/types';
+import { TReduxStoreState } from '@/store';
+import { TDiscountDetail, TPagination } from '@/types';
 
 type TDiscountBoard = {
-	data?: TDiscount[];
+	data?: TDiscountDetail[];
+	page: number;
+	setPage: React.Dispatch<React.SetStateAction<number>>;
+	pageSize?: number;
+	onViewDetailDiscount?: (discount: TDiscountDetail) => void;
 	className?: string;
 };
 
-export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element => {
+export const DiscountBoard = ({
+	data = [],
+	page,
+	setPage,
+	pageSize,
+	onViewDetailDiscount = (): void => {},
+	className,
+}: TDiscountBoard): JSX.Element => {
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
 	const searchInput = useRef<InputRef>(null);
+	const pagination: TPagination = useSelector<TReduxStoreState, TPagination>(
+		(state: TReduxStoreState) => state.discount.pagination,
+	);
 
-	const columnTable: TableColumnsType<TDiscount> = [
+	const columnTable: TableColumnsType<TDiscountDetail> = [
 		{
 			title: 'Discount ID',
 			dataIndex: 'id',
@@ -29,7 +45,7 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 			dataIndex: 'name',
 			key: 'name',
 			width: '20%',
-			...getColumnSearchProps<TDiscount>(
+			...getColumnSearchProps<TDiscountDetail>(
 				'name',
 				searchInput,
 				searchText,
@@ -40,29 +56,29 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 			sorter: (a, b) => a.name.length - b.name.length,
 			sortDirections: ['descend', 'ascend'],
 		},
-		{
-			title: 'Product Name',
-			dataIndex: 'productName',
-			key: 'productName',
-			width: '15%',
-			...getColumnSearchProps<TDiscount>(
-				'productName',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
-			sorter: (a, b) => a.productName.length - b.productName.length,
-			sortDirections: ['descend', 'ascend'],
-		},
+		// {
+		// 	title: 'Product Name',
+		// 	dataIndex: 'productName',
+		// 	key: 'productName',
+		// 	width: '15%',
+		// 	...getColumnSearchProps<TDiscountDetail>(
+		// 		'productName',
+		// 		searchInput,
+		// 		searchText,
+		// 		setSearchText,
+		// 		searchedColumn,
+		// 		setSearchedColumn,
+		// 	),
+		// 	sorter: (a, b) => a.name.length - b.name.length,
+		// 	sortDirections: ['descend', 'ascend'],
+		// },
 		{
 			title: 'Start Time',
-			dataIndex: 'startDate',
-			key: 'startDate',
+			dataIndex: 'startTime',
+			key: 'startTime',
 			width: '15%',
-			...getColumnSearchProps<TDiscount>(
-				'startDate',
+			...getColumnSearchProps<TDiscountDetail>(
+				'startTime',
 				searchInput,
 				searchText,
 				setSearchText,
@@ -70,16 +86,17 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 				setSearchedColumn,
 			),
 			sorter: (a, b) =>
-				new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+				new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
+			render: (value: Date) => new Date(value).toLocaleString(),
 		},
 		{
 			title: 'End Time',
-			dataIndex: 'endDate',
-			key: 'endDate',
+			dataIndex: 'endTime',
+			key: 'endTime',
 			width: '5%',
-			...getColumnSearchProps<TDiscount>(
-				'endDate',
+			...getColumnSearchProps<TDiscountDetail>(
+				'endTime',
 				searchInput,
 				searchText,
 				setSearchText,
@@ -87,15 +104,16 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 				setSearchedColumn,
 			),
 			sorter: (a, b) =>
-				new Date(a.endDate).getTime() - new Date(b.endDate).getTime(),
+				new Date(a.endTime).getTime() - new Date(b.endTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
+			render: (value: Date) => new Date(value).toLocaleString(),
 		},
 		{
 			title: 'Quantity',
 			dataIndex: 'quantity',
 			key: 'quantity',
 			width: '5%',
-			...getColumnSearchProps<TDiscount>(
+			...getColumnSearchProps<TDiscountDetail>(
 				'quantity',
 				searchInput,
 				searchText,
@@ -111,7 +129,7 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 			dataIndex: 'value',
 			key: 'value',
 			width: '8%',
-			...getColumnSearchProps<TDiscount>(
+			...getColumnSearchProps<TDiscountDetail>(
 				'value',
 				searchInput,
 				searchText,
@@ -139,8 +157,12 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 		},
 		{
 			title: 'Action',
-			render: () => (
-				<button type="button" className="text-blue-500 flex gap-2.5 items-center">
+			render: (discount: TDiscountDetail) => (
+				<button
+					type="button"
+					onClick={() => onViewDetailDiscount(discount)}
+					className="text-blue-500 flex gap-2.5 items-center"
+				>
 					<span>View detail</span>
 					<span className="h-fit">
 						<IoIosArrowRoundForward />
@@ -149,11 +171,27 @@ export const DiscountBoard = ({ data, className }: TDiscountBoard): JSX.Element 
 			),
 		},
 	];
+
+	const handleChangePage = (nextPage: number): void => {
+		setPage(nextPage);
+	};
 	return (
-		<TableView<TDiscount>
-			className={cn(className)}
-			columnTable={columnTable}
-			data={data}
-		/>
+		<div>
+			<TableView<TDiscountDetail>
+				className={cn(className)}
+				columnTable={columnTable}
+				data={data}
+				pageSize={pageSize}
+				pagination={false}
+			/>
+			<div className="flex items-center justify-center">
+				{pagination.totalPages > 1 && (
+					<PaginationTable
+						pagination={{ ...pagination, currentPage: page }}
+						onPageChange={handleChangePage}
+					/>
+				)}
+			</div>
+		</div>
 	);
 };

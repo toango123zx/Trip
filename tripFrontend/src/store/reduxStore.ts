@@ -1,8 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { authSlice, scheduleSlice, userSlice } from '@/features';
+import {
+	authSlice,
+	scheduleSlice,
+	discountSlice,
+	productSlice,
+	userSlice,
+	discountTypeSlice,
+	discountApplicationScopeSlice,
+	discountEligibilitySlice,
+} from '@/features';
 import { locationSlice } from '@/features/location';
-import { productSlice } from '@/features/product';
 
 export const _reduxStore = configureStore({
 	reducer: {
@@ -11,6 +19,10 @@ export const _reduxStore = configureStore({
 		product: productSlice.reducer,
 		schedule: scheduleSlice.reducer,
 		user: userSlice.reducer,
+		discount: discountSlice.reducer,
+		discountType: discountTypeSlice.reducer,
+		discountApplicationScope: discountApplicationScopeSlice.reducer,
+		discountEligibility: discountEligibilitySlice.reducer,
 	},
 });
 

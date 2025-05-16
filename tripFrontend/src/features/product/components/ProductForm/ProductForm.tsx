@@ -3,17 +3,10 @@
 import { isCuid } from 'cuid';
 import { X, Save, Plus, Map, Trash2 } from 'lucide-react';
 import { JSX, useState, useEffect, useMemo } from 'react';
-import {
-	FieldErrors,
-	SubmitHandler,
-	useForm,
-	UseFormReturn,
-	UseFormSetValue,
-} from 'react-hook-form';
+import { SubmitHandler, UseFormReturn } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ComboBox } from '@/components';
-import { DiscountBoard } from '@/features/discount';
+import { Input, Row, Select, Textarea } from '@/components';
 import { locationThunk } from '@/features/location';
 import {
 	ScheduleForm,
@@ -26,191 +19,27 @@ import { TProductSchedule } from '@/types';
 
 import { TRequestBodyCreateProduct } from '../../product.type';
 
-type FieldErr = FieldErrors<TRequestBodyCreateProduct>;
-
-type TError = {
-	id: keyof TRequestBodyCreateProduct;
-	errors: FieldErr;
-};
-
-type TRow = {
-	label: string;
-	required?: boolean;
-	children: React.ReactNode;
-	top?: boolean;
-};
-
-type TInputProps = {
-	id: keyof TRequestBodyCreateProduct;
-	label: string;
-	defaultValue?: string;
-	register: ReturnType<typeof useForm<TRequestBodyCreateProduct>>['register'];
-	errors: FieldErr;
-	required?: boolean;
-	disabled?: boolean;
-	type?: string;
-	validate?: (value: string | number | boolean) => string | boolean;
-};
-
-type TTextareaProps = {
-	id: keyof TRequestBodyCreateProduct;
-	label: string;
-	register: ReturnType<typeof useForm<TRequestBodyCreateProduct>>['register'];
-	required?: boolean;
-	errors: FieldErr;
-};
-
-type TSelect = {
-	id: keyof TRequestBodyCreateProduct;
-	label: string;
-	setValue: UseFormSetValue<TRequestBodyCreateProduct>;
-	errors: FieldErr;
-	options: { id: string; value: string; label: string; city?: string }[];
-	required?: boolean;
-	placeholder?: string;
-	disabled?: boolean;
-	defaultValue?: string;
-	name?: keyof TRequestBodyCreateProduct;
-};
-
 type TProductFormProps = {
 	form: UseFormReturn<TRequestBodyCreateProduct>;
 	schedules?: TProductSchedule[] | TRequestBodyCreateSchedule[];
 	setSchedules?: React.Dispatch<
 		React.SetStateAction<TProductSchedule[] | TRequestBodyCreateSchedule[]>
 	>;
+	// discounts?: TDiscountDetail[];
 	remove?: boolean;
 	onRemove?: () => void;
 	onSubmit?: SubmitHandler<TRequestBodyCreateProduct>;
 	onCancel?: () => void;
-};
-
-const Required = (): JSX.Element => (
-	<span className="text-red-600" aria-hidden>
-		*
-	</span>
-);
-
-const ErrorText = ({ id, errors }: TError): JSX.Element => (
-	<p id={`${id}-error`} className="min-h-[1.25rem] text-sm text-red-600">
-		{errors[id]?.message as string}
-	</p>
-);
-
-const Row = ({ label, required, children, top }: TRow): JSX.Element => (
-	<div
-		className={`grid grid-cols-[260px_1fr] ${top ? 'items-start' : 'items-center'} mb-4`}
-	>
-		<label className="font-medium text-gray-800">
-			{label}
-			{required && <Required />}
-		</label>
-		{children}
-	</div>
-);
-
-const Input = ({
-	id,
-	label,
-	defaultValue,
-	register,
-	errors,
-	required,
-	disabled = false,
-	type = 'text',
-	validate,
-}: TInputProps): JSX.Element => (
-	<Row label={label} required={required}>
-		<div>
-			<input
-				id={id as string}
-				type={type}
-				aria-invalid={errors[id] ? 'true' : undefined}
-				aria-describedby={`${id}-error`}
-				defaultValue={defaultValue}
-				disabled={disabled}
-				className={`h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${disabled ? 'bg-gray-100 border-none pl-2.5' : 'bg-white'}`}
-				{...register(id, {
-					...(required && { required: `${label} is required` }),
-					...(type === 'number' && { valueAsNumber: true }),
-					...(validate && { validate: validate }),
-					setValueAs: (value) => value.trim(),
-				})}
-			/>
-			<ErrorText id={id} errors={errors} />
-		</div>
-	</Row>
-);
-
-const Textarea = ({
-	id,
-	label,
-	required,
-	register,
-	errors,
-}: TTextareaProps): JSX.Element => (
-	<Row label={label} top>
-		<div>
-			<textarea
-				id={id as string}
-				className="h-[100px] w-full rounded-md bg-white-100 p-4 border border-gray-300 focus:outline-none"
-				{...register(id, {
-					...(required && { required: `${label} is required` }),
-					setValueAs: (value) => value.trim(),
-				})}
-			/>
-			<ErrorText id={id} errors={errors} />
-		</div>
-	</Row>
-);
-
-const Select = ({
-	id,
-	label,
-	setValue,
-	errors,
-	options,
-	required,
-	placeholder,
-	disabled = false,
-	defaultValue,
-	name,
-}: TSelect): JSX.Element => {
-	const [selectedOption, setSelectedOption] = useState<{
-		id: string;
-		value: string;
-		label: string;
-		city?: string;
-	} | null>(null);
-
-	useEffect(() => {
-		const option = options.find((o) => o.label === defaultValue);
-		if (option) {
-			setSelectedOption(option);
-		}
-		const fieldName = name || id;
-		setValue(fieldName, selectedOption?.value || '');
-	}, [options, defaultValue, selectedOption, setValue, name, id]);
-
-	return (
-		<Row label={label} required={required}>
-			<ComboBox
-				options={options}
-				selectedOption={selectedOption}
-				setSelectedOption={setSelectedOption}
-				placeholder={placeholder}
-				disabled={disabled}
-			/>
-			<ErrorText id={id} errors={errors} />
-		</Row>
-	);
+	disabled?: boolean;
 };
 
 export const ProductForm = ({
 	form,
 	schedules,
 	setSchedules = (): void => {},
+	// discounts = [],
 	remove = true,
+	disabled = false,
 	onSubmit,
 	onRemove = (): void => {},
 	onCancel = (): void => {},
@@ -335,7 +164,7 @@ export const ProductForm = ({
 						>
 							<X className="h-5 w-5" /> Cancel
 						</button>
-						{remove && (
+						{!disabled && remove && (
 							<button
 								type="button"
 								onClick={handleRemoveOnClick}
@@ -344,13 +173,15 @@ export const ProductForm = ({
 								<Trash2 className="h-5 w-5" /> Remove
 							</button>
 						)}
-						<button
-							type="submit"
-							onClick={onSubmit && handleSubmit(onSubmit)}
-							className="flex h-10 items-center gap-1 rounded-md border border-orange-500 bg-orange-500  px-4 py-2 text-white hover:bg-orange-600"
-						>
-							<Save className="h-5 w-5" /> Save
-						</button>
+						{!disabled && (
+							<button
+								type="submit"
+								onClick={onSubmit && handleSubmit(onSubmit)}
+								className="flex h-10 items-center gap-1 rounded-md border border-orange-500 bg-orange-500  px-4 py-2 text-white hover:bg-orange-600"
+							>
+								<Save className="h-5 w-5" /> Save
+							</button>
+						)}
 					</div>
 				</header>
 
@@ -359,14 +190,15 @@ export const ProductForm = ({
 					className="px-6 pb-8 pt-6"
 					onSubmit={onSubmit && handleSubmit(onSubmit)}
 				>
-					<Input
+					<Input<TRequestBodyCreateProduct>
 						id="name"
 						label="Product Name"
 						required
 						register={register}
 						errors={errors}
+						disabled={disabled}
 					/>
-					<Select
+					<Select<TRequestBodyCreateProduct>
 						id="locationId"
 						label="Location On System"
 						required
@@ -375,24 +207,26 @@ export const ProductForm = ({
 						errors={errors}
 						options={options}
 						placeholder="Select location"
+						disabled={disabled}
 					/>
-					<Textarea
+					<Textarea<TRequestBodyCreateProduct>
 						id="description"
 						label="Description"
 						register={register}
 						errors={errors}
 						required
+						disabled={disabled}
 					/>
-					<Input
+					<Input<TRequestBodyCreateProduct>
 						id="cityName"
 						label="Destination"
 						defaultValue={watch('cityName')}
 						register={register}
 						errors={errors}
 						// required
-						disabled
+						disabled={disabled}
 					/>
-					<Input
+					<Input<TRequestBodyCreateProduct>
 						id="time"
 						label="Time (Hour)"
 						register={register}
@@ -400,8 +234,9 @@ export const ProductForm = ({
 						required
 						type="number"
 						validate={validateGreaterThanZero}
+						disabled={disabled}
 					/>
-					<Input
+					<Input<TRequestBodyCreateProduct>
 						id="quantityAvailable"
 						label="Quantity (Person)"
 						register={register}
@@ -409,8 +244,9 @@ export const ProductForm = ({
 						required
 						type="number"
 						validate={validateGreaterThanZero}
+						disabled={disabled}
 					/>
-					<Input
+					<Input<TRequestBodyCreateProduct>
 						id="age"
 						label="Age"
 						register={register}
@@ -418,6 +254,7 @@ export const ProductForm = ({
 						required
 						type="number"
 						validate={validateGreaterThanZero}
+						disabled={disabled}
 					/>
 
 					<Row label="Location On Map">
@@ -426,11 +263,13 @@ export const ProductForm = ({
 								id="locationOnMap"
 								type="text"
 								placeholder="Enter Coordinates or Select on Map"
-								className="h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none"
+								disabled={disabled}
+								className={`h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${disabled ? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop' : 'bg-white'}`}
 								{...register('locationOnMap')}
 							/>
 							<button
 								type="button"
+								disabled={disabled}
 								className="absolute right-0 top-1/2 -translate-y-1/2 transform"
 								aria-label="Open map"
 							>
@@ -443,27 +282,32 @@ export const ProductForm = ({
 						<h2 className="mb-3 text-xl font-bold">From our gallery</h2>
 						<button
 							type="button"
+							disabled={disabled}
 							className="flex h-[85px] w-[110px] items-center justify-center rounded-md bg-gray-200"
 						>
 							<Plus className="h-6 w-6 text-gray-500" />
 						</button>
 					</section>
 
-					{['Schedules', 'Discounts'].map((title) => (
+					{['Schedules'].map((title) => (
 						<section key={title} className="mb-6">
 							<div className="mb-3 flex items-center justify-between">
 								<h2 className="text-xl font-bold">{title}</h2>
-								<button
-									type="button"
-									onClick={
-										title === 'Schedules'
-											? (): void => handleAddScheduleOnClick()
-											: (): void => {}
-									}
-									className="flex h-10 items-center gap-1 rounded-full bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
-								>
-									<Plus className="h-4 w-4" /> ADD {title.toUpperCase()}
-								</button>
+								{!disabled && (
+									<button
+										type="button"
+										disabled={disabled}
+										onClick={
+											title === 'Schedules'
+												? (): void => handleAddScheduleOnClick()
+												: (): void => {}
+										}
+										className="flex h-10 items-center gap-1 rounded-full bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
+									>
+										<Plus className="h-4 w-4" /> ADD{' '}
+										{title.toUpperCase()}
+									</button>
+								)}
 							</div>
 
 							<div className=" items-center justify-center rounded-md border text-gray-500">
@@ -472,12 +316,16 @@ export const ProductForm = ({
 									<SchedulesBoard
 										data={schedules}
 										pageSize={5}
+										disabled={disabled}
 										onViewDetailSchedule={
 											handleViewScheduleDetailOnClick
 										}
 									/>
 								) : (
-									title === 'Discounts' && <DiscountBoard data={[]} />
+									// title === 'Discounts' && (
+									// 	<DiscountBoard data={discounts} />
+									// )
+									<></>
 								)}
 							</div>
 						</section>

@@ -32,6 +32,19 @@ export const productSlice = createSlice({
 				state.loading = false;
 				state.error = String(action.error.message);
 			})
+			.addCase(productThunk.getProductsManagement.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(productThunk.getProductsManagement.fulfilled, (state, action) => {
+				state.loading = false;
+				state.products = action.payload[0];
+				state.pagination = action.payload[1] || ({} as TPagination);
+			})
+			.addCase(productThunk.getProductsManagement.rejected, (state, action) => {
+				state.loading = false;
+				state.error = String(action.error.message);
+			})
 			.addCase(productThunk.getProductDetail.pending, (state) => {
 				state.loading = true;
 				state.error = null;

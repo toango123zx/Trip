@@ -18,6 +18,16 @@ export const productApi = {
 		);
 		return [response.data, response.pagination];
 	},
+	async getProductsManagement(
+		query?: TRequestQueryGetProducts,
+	): Promise<[TProductSumary[], TPagination?]> {
+		const response = await api.get<TProductSumary[]>(
+			'/product/management',
+			query,
+			EServer.Backend,
+		);
+		return [response.data, response.pagination];
+	},
 
 	async getProductDetail(productId: string): Promise<TProductDetail> {
 		const response = await api.get<TProductDetail>(

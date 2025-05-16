@@ -1,18 +1,21 @@
 import { notification } from 'antd';
-import { JSX, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { IoIosAdd } from 'react-icons/io';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
+	AddDiscount,
 	AddProduct,
 	DiscountBoard,
+	discountThunk,
 	ProductsBoard,
 	ProductUpdate,
 	SchedulesBoard,
+	UpdateDiscount,
 } from '@/features';
 import { cn } from '@/lib';
-import { TReduxStoreDispatch } from '@/store';
-import { EProductStatus } from '@/types';
+import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
+import { EDiscountStatus, EProductStatus, TDiscountDetail } from '@/types';
 
 import { productThunk } from '../../productThunk';
 
@@ -29,11 +32,30 @@ type ProductListProps = {
 export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 	const [activeTab, setActiveTab] = useState<EactiveTab>(EactiveTab.product);
 	const [isOpenPopupAddProduct, setIsOpenPopupAddProduct] = useState(false);
+	const [isOpenPopupAddDiscount, setIsOpenPopupAddDiscount] = useState(false);
+	const [isOpenPopupViewDiscount, setIsOpenPopupViewDiscount] = useState(false);
 	const [isOpenPopupProductUpdate, setIsOpenPopupProductUpdate] = useState(false);
 	const [productId, setProductId] = useState<string>('');
+	const [discountId, setDiscountId] = useState<string>('');
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const [pageProduct, setPageProduct] = useState<number>(1);
+	const [pageDiscount, setPageDiscount] = useState<number>(1);
 	const PAGE_SIZE = 10;
+
+	const discounts = useSelector((state: TReduxStoreState) => state.discount.discounts);
+
+	useEffect(() => {
+		if (activeTab === EactiveTab.discount) {
+			dispatch(
+				discountThunk.getDiscountByUserId({
+					query: {
+						page: pageDiscount,
+						statusSearch: EDiscountStatus.active,
+					},
+				}),
+			);
+		}
+	}, [dispatch, activeTab, pageDiscount]);
 
 	const handleChangeTab = (tab: EactiveTab): void => {
 		setActiveTab(tab);
@@ -59,10 +81,37 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 		}
 	};
 
+	const handleAddDiscountOnClick = (): void => {
+		setIsOpenPopupAddDiscount(true);
+	};
+
+	const handleViewDiscountOnClick = (discount: TDiscountDetail): void => {
+		setDiscountId(discount.id);
+		setIsOpenPopupViewDiscount(true);
+	};
+
 	const handleClosePopup = (): void => {
-		dispatch(productThunk.getProducts({ page: pageProduct, limit: PAGE_SIZE }));
-		setIsOpenPopupAddProduct(false);
-		setIsOpenPopupProductUpdate(false);
+		switch (activeTab) {
+			case EactiveTab.product:
+				dispatch(
+					productThunk.getProducts({ page: pageProduct, limit: PAGE_SIZE }),
+				);
+				setIsOpenPopupAddProduct(false);
+				setIsOpenPopupProductUpdate(false);
+				break;
+			case EactiveTab.discount:
+				dispatch(
+					discountThunk.getDiscountByUserId({
+						query: {
+							page: pageDiscount,
+							statusSearch: EDiscountStatus.active,
+						},
+					}),
+				);
+				setIsOpenPopupAddDiscount(false);
+				setIsOpenPopupViewDiscount(false);
+				break;
+		}
 	};
 
 	return (
@@ -130,6 +179,25 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 										</span>
 									</button>
 								)}
+								{activeTab === 'discount' && (
+									<button
+										type="button"
+										onClick={handleAddDiscountOnClick}
+										className={`
+                                        flex items-center justify-center
+                                        bg-orange-400 hover:bg-orange-500
+                                        text-white font-bold
+                                        py-1.5 px-2.5
+                                        rounded-full
+                                        transition duration-150 ease-in-out
+                                      `}
+									>
+										<IoIosAdd className="w-5 h-full" />
+										<span className="font-Montserrat text-sm font-bold">
+											New Discount
+										</span>
+									</button>
+								)}
 							</div>
 						</div>
 
@@ -142,7 +210,14 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 							/>
 						)}
 						{activeTab === EactiveTab.schedule && <SchedulesBoard />}
-						{activeTab === EactiveTab.discount && <DiscountBoard />}
+						{activeTab === EactiveTab.discount && (
+							<DiscountBoard
+								onViewDetailDiscount={handleViewDiscountOnClick}
+								data={discounts}
+								page={pageDiscount}
+								setPage={setPageDiscount}
+							/>
+						)}
 					</div>
 					<div onClick={() => handleClosePopup()}>
 						{isOpenPopupAddProduct && (
@@ -153,6 +228,19 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 						{isOpenPopupProductUpdate && (
 							<ProductUpdate
 								productId={productId}
+								onCancel={handleClosePopup}
+							/>
+						)}
+					</div>
+					<div>
+						{isOpenPopupAddDiscount && (
+							<AddDiscount onCancel={handleClosePopup} />
+						)}
+					</div>
+					<div>
+						{isOpenPopupViewDiscount && (
+							<UpdateDiscount
+								discountId={discountId}
 								onCancel={handleClosePopup}
 							/>
 						)}
