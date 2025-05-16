@@ -1,11 +1,13 @@
 .t-table-content {
     padding-bottom: 30px;
 }
+
 .ant-table-content {
     padding: 0 !important;
 }
 
 th.ant-table-cell {
+    text-align: center !important;
     background-color: #ffb57f !important;
     font-size: 18px;
     font-family: "Montserrat", sans-serif;
@@ -45,4 +47,3 @@ ul.ant-pagination {
 
     }
 }
-

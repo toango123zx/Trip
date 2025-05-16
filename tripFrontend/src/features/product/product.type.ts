@@ -1,4 +1,10 @@
-import { EArrange, TPagination, TProductDetail, TProductSumary } from '@/types';
+import {
+	EArrange,
+	EProductStatus,
+	TPagination,
+	TProductDetail,
+	TProductSumary,
+} from '@/types';
 
 export type TProductState = {
 	products: TProductSumary[];
@@ -11,6 +17,7 @@ export type TProductState = {
 export type TRequestQueryGetProducts = {
 	page?: number;
 	limit?: number;
+	keyword?: string;
 	name?: EArrange;
 	time?: EArrange;
 	quantityAvailable?: EArrange;
@@ -24,6 +31,7 @@ export type TRequestQueryGetProducts = {
 	createAt?: EArrange;
 	updateAt?: EArrange;
 	deletedAt?: EArrange;
+	statusSearch?: EProductStatus;
 	status?: EArrange;
 };
 

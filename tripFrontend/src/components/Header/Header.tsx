@@ -156,7 +156,7 @@ const UserProfileDropdown = ({
 	};
 
 	return (
-		<div className="origin-top-right absolute right-0 w-72 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none font-sans z-10">
+		<div className="origin-top-right absolute right-0 w-72 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none font-sans z-50">
 			<ul className="text-gray-700">
 				{menuItems.map((item) => (
 					<li key={item.id}>

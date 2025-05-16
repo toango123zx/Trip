@@ -12,6 +12,7 @@ type TSchedulesBoard = {
 	productId?: string;
 	data?: TProductSchedule[] | TRequestBodyCreateSchedule[];
 	pageSize?: number;
+	disabled?: boolean;
 	onViewDetailSchedule?: (
 		schedule: TRequestBodyCreateSchedule | TProductSchedule,
 	) => void;
@@ -21,6 +22,7 @@ type TSchedulesBoard = {
 export const SchedulesBoard = ({
 	data,
 	pageSize,
+	disabled = false,
 	onViewDetailSchedule = (): void => {},
 	className,
 }: TSchedulesBoard): JSX.Element => {
@@ -131,12 +133,13 @@ export const SchedulesBoard = ({
 			sortDirections: ['descend', 'ascend'],
 			render: (text: string) => (
 				<span
-					className={`${text === 'waiting'
+					className={`${
+						text === 'waiting'
 							? 'text-amber-500'
 							: text === 'active'
 								? 'text-green-500'
 								: 'text-red-300'
-						} font-semibold`}
+					} font-semibold`}
 				>
 					{text === undefined ? 'waiting' : text}
 				</span>
@@ -144,11 +147,14 @@ export const SchedulesBoard = ({
 		},
 		{
 			title: 'Action',
+			className: `${disabled ?? 'hover:cursor-no-drop'}`,
 			render: (schedule: TRequestBodyCreateSchedule | TProductSchedule) => (
 				<button
 					type="button"
-					onClick={() => onViewDetailSchedule(schedule)}
-					className="text-blue-500 flex gap-2.5 items-center"
+					onClick={() =>
+						!disabled ? onViewDetailSchedule(schedule) : (): void => {}
+					}
+					className={`text-blue-500 flex gap-2.5 items-center`}
 				>
 					<span>View detail </span>
 					<span className="h-fit">

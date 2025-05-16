@@ -108,8 +108,8 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 							</div>
 							<SelectBox
 								selectOption={[
-									{ id: '1', display: 'latest', value: 'latest' },
-									{ id: '2', display: 'oldest', value: 'oldest' },
+									{ id: '1', label: 'latest', value: 'latest' },
+									{ id: '2', label: 'oldest', value: 'oldest' },
 								]}
 								className="w-28 md:w-52 h-8 md:h-10 flex items-center justify-between px-4 md:px-6 text-sm md:text-2xl border border-black rounded-4xl bg-white focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150"
 							/>
