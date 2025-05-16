@@ -1,3 +1,9 @@
-import { GetDiscountsByProductIdHandler } from './getDiscountsByProductId.handler';
+import { GetDiscountByDiscountIdHandler } from './getDiscountByDiscountId.handler';
+import { GetDiscountsByUserIdHandler } from './getDiscountsByUserId.handler';
+import { GetNonDiscountableSchedulesHandler } from './getNonDiscountableSchedules.handler';
 
-export const DiscountQueryHandlers = [GetDiscountsByProductIdHandler];
+export const DiscountQueryHandlers = [
+	GetDiscountByDiscountIdHandler,
+	GetDiscountsByUserIdHandler,
+	GetNonDiscountableSchedulesHandler,
+];

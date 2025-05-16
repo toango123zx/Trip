@@ -64,6 +64,91 @@ export class ProductScheduleRepository {
 		return [productSchedules, totalRecords];
 	}
 
+	async findProductSchedulesByProductSchedulesId(
+		productSchedulesId: string[],
+		status?: ProductScheduleStatusEnum,
+	): Promise<ProductScheduleEntity[]> {
+		return this.prismaService.productSchedule.findMany({
+			include: {
+				product: true,
+			},
+			where: {
+				id: {
+					in: productSchedulesId,
+				},
+				status: status,
+			},
+		});
+	}
+
+	async findNonProductSchedulesByDiscountIdAndUserId(
+		discountId: string,
+		productId: string,
+		userId: string,
+		pagination: IPaginationQuery,
+		filter: ProductScheduleOrderByDto,
+		startTime?: Date,
+		endTime?: Date,
+	): Promise<[ProductScheduleEntity[], number]> {
+		const orderBy = filter
+			? new OrderBySearchDto().convertOrderByToORM<ProductScheduleOrderByDto>(
+					filter,
+				)
+			: [];
+		orderBy.push({
+			startTime: OrderByEnum.ASC,
+		});
+
+		const [productSchedules, totalRecords] = await Promise.all([
+			this.prismaService.productSchedule.findMany({
+				include: {
+					product: true,
+				},
+				where: {
+					product: {
+						id: productId,
+						supplier: {
+							userId: userId,
+						},
+					},
+					infoDiscount: {
+						none: {
+							discountId: discountId,
+						},
+					},
+					startTime: startTime,
+					endTime: endTime,
+					status: {
+						not: ProductScheduleStatusEnum.canceled,
+					},
+				},
+				orderBy: orderBy,
+				take: pagination.take,
+				skip: pagination.skip,
+			}),
+			this.prismaService.productSchedule.count({
+				where: {
+					product: {
+						supplier: {
+							userId: userId,
+						},
+					},
+					infoDiscount: {
+						none: {
+							discountId: discountId,
+						},
+					},
+					startTime: startTime,
+					endTime: endTime,
+					status: {
+						not: ProductScheduleStatusEnum.canceled,
+					},
+				},
+			}),
+		]);
+		return [productSchedules, totalRecords];
+	}
+
 	async findProductScheduleByProductScheduleId(
 		productScheduleId: string,
 		status?: ProductScheduleStatusEnum,

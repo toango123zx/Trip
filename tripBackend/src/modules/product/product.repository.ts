@@ -18,7 +18,10 @@ export class ProductRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
 	async findProducts(
+		keyword: string,
 		pagination: IPaginationQuery,
+		userId: string,
+		status?: ProductStatusEnum,
 		filter?: ProductOrderByDto,
 	): Promise<[ProductEntity[], number]> {
 		const orderBy = [];
@@ -59,11 +62,32 @@ export class ProductRepository {
 					location: true,
 					productCategory: true,
 				},
+				where: {
+					name: {
+						contains: keyword,
+						mode: 'insensitive',
+					},
+					supplier: {
+						userId: userId,
+					},
+					status: status,
+				},
 				skip: pagination.skip,
 				take: pagination.take,
 				orderBy: orderBy,
 			}),
-			this.prismaService.product.count(),
+			this.prismaService.product.count({
+				where: {
+					name: {
+						contains: filter.name,
+						mode: 'insensitive',
+					},
+					supplier: {
+						userId: userId,
+					},
+					status: status,
+				},
+			}),
 		]);
 		return [products, totalRecords];
 	}
@@ -80,7 +104,13 @@ export class ProductRepository {
 					},
 				},
 				productImage: true,
-				productSchedule: true,
+				productSchedule: {
+					where: {
+						status: {
+							not: ProductScheduleStatusEnum.canceled,
+						},
+					},
+				},
 				productRate: {
 					include: {
 						user: true,

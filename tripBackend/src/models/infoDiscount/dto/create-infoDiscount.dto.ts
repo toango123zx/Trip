@@ -45,5 +45,5 @@ export class CreateInfoDiscountDto {
 	@IsNotEmpty()
 	@ValidateNested()
 	@Type(() => CreateInfoDiscountProductScheduleRelationInputDto)
-	product_Schedule: CreateInfoDiscountProductScheduleRelationInputDto;
+	productSchedule: CreateInfoDiscountProductScheduleRelationInputDto;
 }

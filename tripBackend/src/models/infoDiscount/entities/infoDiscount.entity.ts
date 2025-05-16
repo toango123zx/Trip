@@ -27,7 +27,7 @@ export class InfoDiscountEntity {
 		type: () => ProductScheduleEntity,
 		required: false,
 	})
-	product_Schedule?: ProductScheduleEntity;
+	productSchedule?: ProductScheduleEntity;
 	@ApiProperty({
 		type: 'string',
 		format: 'date-time',

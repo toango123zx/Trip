@@ -1,1 +1,3 @@
-export * from './getDiscountsByProductId.query';
+export * from './getDiscountByDiscountId.query';
+export * from './getDiscountsByUserId.query';
+export * from './getNonDiscountableSchedules.query';

@@ -45,7 +45,7 @@ export class CreateInfoBillDto {
 	@IsNotEmpty()
 	@ValidateNested()
 	@Type(() => CreateInfoBillProductScheduleRelationInputDto)
-	product_Schedule: CreateInfoBillProductScheduleRelationInputDto;
+	productSchedule: CreateInfoBillProductScheduleRelationInputDto;
 	@ApiProperty({
 		type: 'integer',
 		format: 'int32',

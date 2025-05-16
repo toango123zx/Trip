@@ -6,6 +6,9 @@ import { DatabaseModule } from '../database/database.module';
 import { DiscountApplicationScopeRepository } from '../discountApplicationScope/discountApplicationScope.repository';
 import { DiscountEligibilityRepository } from '../discountEligibility/discountEligibility.repository';
 import { DiscountTypeRepository } from '../discountType/discountType.repository';
+import { InfoDiscountRepository } from '../InfoDiscount/infoDiscount.repository';
+import { ProductRepository } from '../product/product.repository';
+import { ProductScheduleRepository } from '../productSchedule/productSchedule.repository';
 import { SupplierRepository } from '../supplier/supplier.repository';
 import { UserRepository } from '../user/user.repository';
 
@@ -20,10 +23,13 @@ import { DiscountQueryHandlers } from './queries/handlers';
 	providers: [
 		UserRepository,
 		SupplierRepository,
+		ProductRepository,
+		ProductScheduleRepository,
 		DiscountTypeRepository,
 		DiscountEligibilityRepository,
 		DiscountApplicationScopeRepository,
 		DiscountRepository,
+		InfoDiscountRepository,
 		...DiscountQueryHandlers,
 		...DiscountCommandHandlers,
 	],

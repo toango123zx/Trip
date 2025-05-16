@@ -19,8 +19,14 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			take: query.pagination.limit,
 		};
 
-		const { locationName, city, productCategoryName, ...productFilter } =
-			query.filter;
+		const {
+			keyword,
+			locationName,
+			city,
+			productCategoryName,
+			statusSearch,
+			...productFilter
+		} = query.filter;
 
 		const productOrderBy: ProductOrderByDto = {
 			...productFilter,
@@ -39,7 +45,10 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			}),
 		};
 		const [products, totalRecords] = await this.productRepository.findProducts(
+			keyword,
 			pagination,
+			undefined,
+			statusSearch,
 			productOrderBy,
 		);
 

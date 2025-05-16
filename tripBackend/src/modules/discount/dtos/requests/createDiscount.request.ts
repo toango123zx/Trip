@@ -1,9 +1,9 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { AutoTrim } from 'src/common/decorators';
 import { CreateDiscountDto } from 'src/models';
-
 export class CreateDiscountRequestDto extends OmitType(CreateDiscountDto, [
 	'discountProviderType',
 	'discountType',
@@ -34,14 +34,28 @@ export class CreateDiscountRequestDto extends OmitType(CreateDiscountDto, [
 	@IsString()
 	discountEligibilityId: string;
 	@ApiProperty({
-		type: String,
-		required: true,
-		default: 'cm9m9tn960005e56c8tmr6go9',
+		type: Boolean,
+		required: false,
+		default: 'false',
 	})
+	@IsOptional()
+	@IsBoolean()
+	stackable?: boolean;
 	@AutoTrim()
 	@IsNotEmpty()
 	@IsString()
 	discountApplicationScopeId: string;
 	@IsOptional()
 	point?: number;
+	@ApiProperty({
+		type: String,
+		isArray: true,
+		required: false,
+	})
+	@IsOptional()
+	@IsArray()
+	@Type(() => String)
+	@IsString({ each: true })
+	@AutoTrim()
+	scheduleIds?: string[];
 }
