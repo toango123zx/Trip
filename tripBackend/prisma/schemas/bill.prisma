@@ -29,7 +29,7 @@ enum BillStatusEnum {
     cancel
     refunded
     waitingRefund @map("waiting_refund")
-    
+
     @@map("Bill_Status_Enum")
 }
 
@@ -82,8 +82,10 @@ model bill {
     /// @DtoRelationCanConnectOnCreate
     user                user           @relation(fields: [userId], references: [id])
     paymentMethodId     String         @map("payment_method_id")
+    /// @DtoRelationCanConnectOnCreate
     paymentMethod       paymentMethod  @relation(fields: [paymentMethodId], references: [id])
     transactionTargetId String         @map("transaction_id")
+    /// @DtoRelationCanCreateOnCreate
     transaction         transaction    @relation(fields: [transactionTargetId], references: [id])
     reductionPrice      Int            @map("reduction_price")
     totalPrice          Int            @map("total_price")
@@ -98,6 +100,7 @@ model bill {
     /// @DtoUpdateHidden
     status              BillStatusEnum @default(pending)
 
+    /// @DtoRelationCanCreateOnCreate
     infoBill         infoBill[]
     infoBillDiscount infoBillDiscount[]
     discountForBill  discountForBill[]
@@ -109,11 +112,11 @@ model infoBill {
     id                String          @id @default(cuid())
     /// @DtoUpdateHidden
     billId            String          @map("bill_id")
-    /// @DtoRelationCanConnectOnCreate
     bill              bill            @relation(fields: [billId], references: [id])
     productScheduleId String          @map("product_schedule_id")
     /// @DtoRelationCanConnectOnCreate
-    productSchedule  productSchedule @relation(fields: [productScheduleId], references: [id])
+    productSchedule   productSchedule @relation(fields: [productScheduleId], references: [id])
+    /// @minimum 0
     quantity          Int
 
     @@map("Info_Bill")

@@ -27,6 +27,7 @@ export class InfoBillEntity {
 	})
 	productSchedule?: ProductScheduleEntity;
 	@ApiProperty({
+		minimum: 0,
 		type: 'integer',
 		format: 'int32',
 	})

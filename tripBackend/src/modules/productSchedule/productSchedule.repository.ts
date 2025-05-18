@@ -67,18 +67,60 @@ export class ProductScheduleRepository {
 	async findProductSchedulesByProductSchedulesId(
 		productSchedulesId: string[],
 		status?: ProductScheduleStatusEnum,
-	): Promise<ProductScheduleEntity[]> {
-		return this.prismaService.productSchedule.findMany({
-			include: {
-				product: true,
-			},
-			where: {
-				id: {
-					in: productSchedulesId,
+		availabilityTime?: boolean,
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: ProductScheduleOrderByDto,
+	): Promise<[ProductScheduleEntity[], number]> {
+		const orderBy = filter
+			? new OrderBySearchDto().convertOrderByToORM<ProductScheduleOrderByDto>(
+					filter,
+				)
+			: [];
+		const [productSchedules, totalRecords] = await Promise.all([
+			this.prismaService.productSchedule.findMany({
+				include: {
+					product: true,
 				},
-				status: status,
-			},
-		});
+				where: {
+					id: {
+						in: productSchedulesId,
+					},
+					startOrder: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endOrder: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					status: status,
+				},
+				orderBy: orderBy,
+				take: pagination.take,
+				skip: pagination.skip,
+			}),
+			this.prismaService.productSchedule.count({
+				where: {
+					id: {
+						in: productSchedulesId,
+					},
+					startOrder: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endOrder: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					status: status,
+				},
+			}),
+		]);
+		return [productSchedules, totalRecords];
 	}
 
 	async findNonProductSchedulesByDiscountIdAndUserId(

@@ -7,7 +7,8 @@ import {
 	NotFoundException,
 } from 'src/common';
 
-import { BillRepository } from '../../cart.repository';
+import { BillRepository } from '../../bill.repository';
+import { BillDetailResponseDto } from '../../dtos';
 import { GetBillByBillIdQuery } from '../implements';
 
 @QueryHandler(GetBillByBillIdQuery)
@@ -16,9 +17,9 @@ export class GetBillByBillIdHandler implements IQueryHandler<GetBillByBillIdQuer
 
 	async execute(
 		query: GetBillByBillIdQuery,
-	): Promise<HttpResponseBodySuccessDto<any> | HttpException> {
+	): Promise<HttpResponseBodySuccessDto<BillDetailResponseDto> | HttpException> {
 		const { billId, myInformation } = query;
-		const bill = await this.billRepository.getBillByBillId(billId);
+		const bill = await this.billRepository.findBillByBillId(billId);
 
 		if (!bill) {
 			throw new NotFoundException('billId');
@@ -37,7 +38,7 @@ export class GetBillByBillIdHandler implements IQueryHandler<GetBillByBillIdQuer
 
 		return {
 			success: true,
-			data: bill,
+			data: new BillDetailResponseDto(bill),
 		};
 	}
 }
