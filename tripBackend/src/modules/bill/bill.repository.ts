@@ -4,6 +4,7 @@ import {
 	BillStatusEnum,
 	DiscountStatusEnum,
 	ProductScheduleStatusEnum,
+	TransactionStatusEnum,
 } from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
 import { BillEntity, CreateBillDto } from 'src/models';
@@ -110,13 +111,22 @@ export class BillRepository {
 										productSchedule: true,
 									},
 								},
+								discountEligibility: true,
+								discountApplicationScope: true,
+								discountType: true,
 							},
 						},
 					},
 				},
 				discountForBill: {
 					include: {
-						discount: true,
+						discount: {
+							include: {
+								discountEligibility: true,
+								discountApplicationScope: true,
+								discountType: true,
+							},
+						},
 					},
 				},
 				paymentMethod: true,
@@ -359,6 +369,26 @@ export class BillRepository {
 							},
 				},
 			});
+		});
+	}
+
+	async updatePaidBill(billId: string): Promise<BillEntity> {
+		return this.prismaService.bill.update({
+			where: {
+				id: billId,
+				status: BillStatusEnum.pending,
+				transaction: {
+					status: TransactionStatusEnum.pending,
+				},
+			},
+			data: {
+				status: BillStatusEnum.paid,
+				transaction: {
+					update: {
+						status: TransactionStatusEnum.success,
+					},
+				},
+			},
 		});
 	}
 }

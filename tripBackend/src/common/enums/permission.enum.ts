@@ -16,4 +16,5 @@ export enum PermissionEnum {
 	DeleteDiscountByDiscountId = 'delete_discount_by_discount_id',
 	FindDiscountsByUserId = 'find_discounts_by_user_id',
 	AssignProductSchedulesToDiscount = 'assign_product_schedules_to_discount',
+	UpdatePaidBill = 'update_paid_bill',
 }

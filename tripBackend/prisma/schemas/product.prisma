@@ -38,6 +38,7 @@ enum ProductRateStatusEnum {
 enum ProductScheduleStatusEnum {
     active
     full
+    completed
     canceled
 
     @@map("Product_Schedule_Status_Enum")

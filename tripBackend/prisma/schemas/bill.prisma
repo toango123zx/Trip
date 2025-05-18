@@ -16,6 +16,7 @@ enum TransactionTargetEnum {
 }
 
 enum TransactionStatusEnum {
+    pending
     completed
     canceled
 
@@ -24,7 +25,7 @@ enum TransactionStatusEnum {
 
 enum BillStatusEnum {
     done
-    paided
+    paid
     pending
     cancel
     refunded
@@ -68,7 +69,7 @@ model transaction {
     deletedAt         DateTime?             @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status            TransactionStatusEnum @default(completed)
+    status            TransactionStatusEnum @default(pending)
 
     bill bill[]
 

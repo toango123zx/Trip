@@ -18,4 +18,5 @@ export enum PermissionForAdminEnum {
 	DeleteDiscountByDiscountId = PermissionEnum.DeleteDiscountByDiscountId,
 	FindDiscountsByUserId = PermissionEnum.FindDiscountsByUserId,
 	AssignProductSchedulesToDiscount = PermissionEnum.AssignProductSchedulesToDiscount,
+	UpdatePaidBill = PermissionEnum.UpdatePaidBill,
 }

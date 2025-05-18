@@ -54,7 +54,7 @@ export class DeleteProductScheduleByProductScheduleIdResponseDto {
 				updateAt: info.bill.updateAt,
 				deletedAt: new Date(),
 				status:
-					info.bill.status === BillStatusEnum.paided
+					info.bill.status === BillStatusEnum.paid
 						? BillStatusEnum.waitingRefund
 						: BillStatusEnum.cancel,
 			})) || [];

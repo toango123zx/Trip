@@ -17,7 +17,7 @@ export class GetBillsByUserIdHandler implements IQueryHandler<GetBillsByUserIdQu
 		const { pagination, myInformation } = query;
 		const page = new PaginationUtils().extractSkipTakeFromPagination(pagination);
 		const { keyword, userIdSearch, statusSearch, ...billFilter } = query.filter;
-		const [bills, totalRecords] = await this.billRepository.getBillsByUserId(
+		const [bills, totalRecords] = await this.billRepository.findBillsByUserId(
 			page,
 			myInformation.id,
 			userIdSearch,

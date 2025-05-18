@@ -1,14 +1,23 @@
-import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Get,
+	HttpException,
+	Param,
+	Post,
+	Put,
+	Query,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { HttpResponseBodyDto, PaginationDto } from 'src/common';
+import { HttpResponseBodyDto, PaginationDto, PermissionEnum } from 'src/common';
 import { BillEntity } from 'src/models';
 
-import { Auth } from '../auth/decorators';
+import { Auth, AuthPermission } from '../auth/decorators';
 import { MyInformation } from '../user/decorators';
 import { UserInformationDto } from '../user/dtos';
 
-import { CreateBillCommand } from './commands/implements';
+import { CreateBillCommand, UpdatePaidBillCommand } from './commands/implements';
 import { CreateBillRequest, BillDetailResponseDto } from './dtos';
 import { BillFilterRequestDto } from './dtos/requests/billFilter.request';
 import { GetBillByBillIdQuery, GetBillsByUserIdQuery } from './queries/implements';
@@ -50,5 +59,13 @@ export class BillController {
 		return this.commandBus.execute(
 			new CreateBillCommand(myInformation, billInformation),
 		);
+	}
+
+	@Put('/:billId/paid')
+	@AuthPermission(PermissionEnum.UpdatePaidBill)
+	async updatePaidBill(
+		@Param('billId') billId: string,
+	): Promise<HttpResponseBodyDto<BillEntity | HttpException>> {
+		return this.commandBus.execute(new UpdatePaidBillCommand(billId));
 	}
 }
