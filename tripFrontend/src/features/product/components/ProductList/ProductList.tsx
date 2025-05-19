@@ -78,7 +78,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 			notification.error({
 				message: 'Error',
 				description: 'Product is inactive, cannot be updated.',
-				duration: 2,
+				duration: 3,
 			});
 		}
 	};

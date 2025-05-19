@@ -51,14 +51,21 @@ export const LoginForm = (): JSX.Element => {
 			notification.error({
 				message: 'Error',
 				description: 'Type returns about error',
+				duration: 3
 			});
 			return;
 		}
+		
+		// Lưu token vào localStorage
+		localStorage.setItem('token', data.accessToken);
 		localStorage.setItem('logged', 'true');
 		
 		const userInfo = await dispatch(userThunk.getMe()).unwrap();
 		if (userInfo && userInfo.roleName) {
 			localStorage.setItem('role', userInfo.roleName);
+		} else {
+			console.warn('UserInfo or roleName is missing:', userInfo ? JSON.stringify(userInfo) : 'userInfo is null');
+			localStorage.setItem('role', 'UNKNOWN');
 		}
 		
 		navigate('/');

@@ -40,7 +40,6 @@ export const AddDiscount = ({
 	const onSubmit: SubmitHandler<TRequestBodyCreateDiscount> = (
 		data: TRequestBodyCreateDiscount,
 	) => {
-		console.log('AddDiscount onSubmit called with data:', data);
 		dispatch(discountThunk.createDiscount({ discount: data }));
 		console.log('Dispatched createDiscount action');
 		setHasSubmitted(true);

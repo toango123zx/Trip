@@ -22,6 +22,8 @@ import { TProductSchedule } from '@/types';
 
 import { TRequestBodyCreateProduct } from '../../product.type';
 import { EProductScheduleStatus } from '@/types/product.type';
+import { cloudinaryService } from '@/services/cloudinaryService';
+import { notificationUtils } from '@/utils/notificationUtils';
 
 type TProductFormProps = {
 	form: UseFormReturn<TRequestBodyCreateProduct>;
@@ -37,6 +39,9 @@ type TProductFormProps = {
 	onCancel?: () => void;
 	disabled?: boolean;
 	open?: boolean;
+	generateLocationDescription?: (locationName: string) => Promise<void>;
+	locationDescription?: string;
+	isGeneratingDescription?: boolean;
 };
 
 export const ProductForm = ({
@@ -51,6 +56,9 @@ export const ProductForm = ({
 	onSubmit,
 	onRemove = (): void => {},
 	onCancel = (): void => {},
+	generateLocationDescription,
+	locationDescription,
+	isGeneratingDescription = false,
 }: TProductFormProps): JSX.Element => {
 	const {
 		register,
@@ -64,6 +72,7 @@ export const ProductForm = ({
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const locations = useSelector((s: TReduxStoreState) => s.location.locations);
 	const [isOpenPopupScheduleUpdate, setIsOpenPopupScheduleUpdate] = useState(false);
+	const [isUploading, setIsUploading] = useState(false);
 
 	useEffect(() => {
 		dispatch(locationThunk.getLocations());
@@ -86,6 +95,13 @@ export const ProductForm = ({
 		(): string => locations.find((l) => l.id === locationId)?.city || '',
 		[locations, locationId],
 	);
+
+	useEffect(() => {
+		const selectedLocation = locations.find((l) => l.id === locationId);
+		if (selectedLocation) {
+			localStorage.setItem('selectedLocation', JSON.stringify(selectedLocation));
+		}
+	}, [locationId, locations]);
 
 	useEffect(() => {
 		setValue('cityName', city);
@@ -157,6 +173,44 @@ export const ProductForm = ({
 		}
 	};
 
+	const description = watch('description');
+	useEffect(() => {
+	}, [description]);
+
+	const handleGenerateDescription = () => {
+		const selectedLocation = locations.find((l) => l.id === locationId);
+		if (selectedLocation && generateLocationDescription) {
+			generateLocationDescription(selectedLocation.displayName);
+		} else {
+			console.error('No location selected or generateLocationDescription not provided');
+		}
+	};
+
+	const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		try {
+			setIsUploading(true);
+			const imageUrl = await cloudinaryService.uploadImage(file);
+			
+			setValue('posterImageUrl', imageUrl, {
+				shouldValidate: true,
+				shouldDirty: true,
+				shouldTouch: true
+			});
+
+			notificationUtils.success({
+				message: 'Tải ảnh thành công',
+				description: 'Ảnh đã được tải lên thành công'
+			});
+		} catch (error) {
+			notificationUtils.error();
+		} finally {
+			setIsUploading(false);
+		}
+	};
+
 	return (
 		<BaseForm
 			title={isCreate ? 'Add Product' : 'Product Details'}
@@ -210,8 +264,34 @@ export const ProductForm = ({
 					control={control}
 					name="description"
 					label="Description"
-					rules={{ required: 'Description is required' }}
+					rules={{ 
+						required: 'Description is required',
+						minLength: {
+							value: 10,
+							message: 'Description must be at least 10 characters long'
+						}
+					}}
 					disabled={disabled}
+					value={description || locationDescription || ''}
+					onChange={(value) => {
+						setValue('description', value, { 
+							shouldValidate: true, 
+							shouldDirty: true,
+							shouldTouch: true
+						});
+					}}
+					extra={
+						generateLocationDescription ? (
+							<button
+								type="button"
+								onClick={handleGenerateDescription}
+								disabled={isGeneratingDescription}
+								className="ml-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+							>
+								{isGeneratingDescription ? 'Đang tạo...' : 'Tạo mô tả AI'}
+							</button>
+						) : null
+					}
 				/>
 			</div>
 
@@ -336,13 +416,44 @@ export const ProductForm = ({
 					<span className="text-sm sm:text-base font-medium text-gray-800">Gallery</span>
 				</div>
 
-				<button
-					type="button"
-					disabled={disabled}
-					className="flex h-[70px] sm:h-[85px] w-[90px] sm:w-[110px] items-center justify-center rounded-md bg-gray-200"
-				>
-					<Plus className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
-				</button>
+				<div className="flex items-center gap-4">
+					<input 
+						type="file" 
+						accept="image/*" 
+						onChange={handleImageUpload}
+						disabled={disabled || isUploading}
+						className="hidden" 
+						id="posterImageUpload"
+					/>
+					<label 
+						htmlFor="posterImageUpload" 
+						className="flex h-[70px] sm:h-[85px] w-[90px] sm:w-[110px] items-center justify-center rounded-md bg-gray-200 cursor-pointer"
+					>
+						{isUploading ? (
+							<span className="text-gray-500">Đang tải...</span>
+						) : (
+							<Plus className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
+						)}
+					</label>
+
+					{/* Preview ảnh nếu có */}
+					{watch('posterImageUrl') && (
+						<div className="relative">
+							<img 
+								src={watch('posterImageUrl')} 
+								alt="Poster" 
+								className="h-[70px] sm:h-[85px] w-[90px] sm:w-[110px] object-cover rounded-md"
+							/>
+							<button 
+								type="button" 
+								onClick={() => setValue('posterImageUrl', '')}
+								className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-xs"
+							>
+								X
+							</button>
+						</div>
+					)}
+				</div>
 			</div>
 
 			{/* --- Schedules --- */}

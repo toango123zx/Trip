@@ -1,4 +1,4 @@
-import { notification } from 'antd';
+import { notificationUtils } from '@/utils/notificationUtils';
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import {
@@ -47,11 +47,7 @@ const handleApiError = (error: AxiosError<IApiError>): void => {
 	}
 
 	// Display error message
-	notification.error({
-		message: 'Error',
-		description: errorMessage,
-		duration: 5,
-	});
+	notificationUtils.error();
 };
 
 // Factory function to create an API client with custom configurations
@@ -84,12 +80,7 @@ const createApiClient = (baseURL: string, timeout: number): AxiosInstance => {
 	client.interceptors.response.use(
 		(response) => {
 			if (response.status === 201) {
-				notification.success({
-					message: 'Success',
-					description: 'Created successfully',
-					placement: 'topRight',
-					duration: 5,
-				});
+				notificationUtils.success();
 			}
 			return response;
 		},
@@ -112,26 +103,10 @@ const createApiClient = (baseURL: string, timeout: number): AxiosInstance => {
 				originalRequest._retry = true;
 
 				try {
-					// const refreshToken = localStorage.getItem('refreshToken');
-					// const response = await apiClients.backend.post<{
-					// 	accessToken: string;
-					// }>('/auth/refresh', {
-					// 	refreshToken,
-					// });
-					// const { accessToken } = response.data;
-
-					// localStorage.setItem('accessToken', accessToken);
-
-					// if (originalRequest.headers) {
-					// 	originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-					// }
-
 					window.location.href = '/auth/login';
 				} catch (refreshError) {
 					localStorage.removeItem('accessToken');
 					localStorage.removeItem('refreshToken');
-
-					// Display error before redirecting
 
 					window.location.href = '/auth/login';
 					return Promise.reject(refreshError);
@@ -167,15 +142,54 @@ export const api = {
 		config?: AxiosRequestConfig,
 	): Promise<IApiResponse<T>> => {
 		return getApiClient(service)
-			.get<IApiResponse<T>>(url, {
+			.get<any>(url, {
 				...config,
 				withCredentials: true,
 				params: query,
 			})
-			.then((response) => response.data)
+			.then((response) => {
+				console.log('Raw API response:', response);
+				
+				// Xử lý các trường hợp response khác nhau
+				if (response.data) {
+					// Trường hợp response.data có cấu trúc { success, data, pagination }
+					if (response.data.success !== undefined) {
+						return {
+							success: response.data.success,
+							data: response.data.data,
+							pagination: response.data.pagination
+						};
+					}
+					
+					// Trường hợp response.data là mảng dữ liệu trực tiếp
+					return {
+						success: true,
+						data: response.data,
+						pagination: response.headers['x-pagination'] ? 
+							JSON.parse(response.headers['x-pagination']) : 
+							undefined
+					};
+				}
+				
+				// Trường hợp không có dữ liệu
+				throw new Error('No data in response');
+			})
 			.catch((error) => {
-				// Error is already handled in interceptor, just rethrow
-				throw error.response.data || { success: false, message: 'Network error' };
+				console.error('API get error:', error);
+				
+				// Nếu là lỗi từ response
+				if (error.response) {
+					throw error.response.data || { 
+						success: false, 
+						message: error.message || 'Network error' 
+					};
+				}
+				
+				// Lỗi khác
+				throw { 
+					success: false, 
+					message: error.message || 'Network error' 
+				};
 			});
 	},
 
@@ -187,15 +201,40 @@ export const api = {
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.post<IApiResponse<T>>(url, data, {
+			.post<any>(url, data, {
 				...config,
 				withCredentials: true,
 				params: query,
 			})
-			.then((response) => response.data.data)
+			.then((response) => {
+				console.log('Raw POST response:', response);
+				
+				if (response.data) {
+					// Trường hợp response.data có cấu trúc { success, data }
+					if (response.data.success !== undefined) {
+						return response.data.data;
+					}
+					
+					// Trường hợp response.data là dữ liệu trực tiếp
+					return response.data;
+				}
+				
+				throw new Error('No data in response');
+			})
 			.catch((error) => {
-				// Error is already handled in interceptor, just rethrow
-				throw error.response.data;
+				console.error('API post error:', error);
+				
+				if (error.response) {
+					throw error.response.data || { 
+						success: false, 
+						message: error.message || 'Network error' 
+					};
+				}
+				
+				throw { 
+					success: false, 
+					message: error.message || 'Network error' 
+				};
 			});
 	},
 
@@ -207,15 +246,40 @@ export const api = {
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.put<IApiResponse<T>>(url, data, {
+			.put<any>(url, data, {
 				...config,
 				withCredentials: true,
 				params: query,
 			})
-			.then((response) => response.data.data)
+			.then((response) => {
+				console.log('Raw PUT response:', response);
+				
+				if (response.data) {
+					// Trường hợp response.data có cấu trúc { success, data }
+					if (response.data.success !== undefined) {
+						return response.data.data;
+					}
+					
+					// Trường hợp response.data là dữ liệu trực tiếp
+					return response.data;
+				}
+				
+				throw new Error('No data in response');
+			})
 			.catch((error) => {
-				// Error is already handled in interceptor, just rethrow
-				throw error.response.data;
+				console.error('API put error:', error);
+				
+				if (error.response) {
+					throw error.response.data || { 
+						success: false, 
+						message: error.message || 'Network error' 
+					};
+				}
+				
+				throw { 
+					success: false, 
+					message: error.message || 'Network error' 
+				};
 			});
 	},
 
@@ -227,16 +291,41 @@ export const api = {
 		config?: AxiosRequestConfig,
 	): Promise<T> => {
 		return getApiClient(service)
-			.delete<IApiResponse<T>>(url, {
+			.delete<any>(url, {
 				...config,
 				withCredentials: true,
 				params: query,
 				data: data,
 			})
-			.then((response) => response.data.data)
+			.then((response) => {
+				console.log('Raw DELETE response:', response);
+				
+				if (response.data) {
+					// Trường hợp response.data có cấu trúc { success, data }
+					if (response.data.success !== undefined) {
+						return response.data.data;
+					}
+					
+					// Trường hợp response.data là dữ liệu trực tiếp
+					return response.data;
+				}
+				
+				throw new Error('No data in response');
+			})
 			.catch((error) => {
-				// Error is already handled in interceptor, just rethrow
-				throw error.response.data;
+				console.error('API delete error:', error);
+				
+				if (error.response) {
+					throw error.response.data || { 
+						success: false, 
+						message: error.message || 'Network error' 
+					};
+				}
+				
+				throw { 
+					success: false, 
+					message: error.message || 'Network error' 
+				};
 			});
 	},
 

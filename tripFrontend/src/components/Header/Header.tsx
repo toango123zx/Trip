@@ -157,33 +157,50 @@ const UserProfileDropdown = ({
 	};
 
 	return (
-		<div className="origin-top-right absolute right-0 w-72 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none font-sans z-50">
-			<ul className="text-gray-700">
-				{menuItems.map((item) => (
-					<li key={item.id}>
-						<a
-							href={item.href || '#'}
-							onClick={(e) => {
-								if (!item.href) e.preventDefault();
-								onItemClick(item.url);
-								if (item.id === 'logout') {
-									handleLogout();
-								}
-							}}
-							className={`flex items-center gap-4 px-4 py-2.5 text-sm font-medium transition-colors duration-150 text-gray-600 hover:bg-orange-500 hover:text-white rounded-md
-                						${item.id == 'logout' && 'bg-red-600 text-white hover:bg-red-700 rounded-md'}
-                						${item.label == 'Log out' ? '' : 'mx-0 my-0'}
-              							`}
-						>
-							<item.icon
-								className={`w-8 h-8  hover:text-white ${item.id == 'logout' && 'text-white'}`}
-							/>
-							<span className="text-3xl">{item.label}</span>
-						</a>
-					</li>
-				))}
+		<div className="absolute right-0 w-72 origin-top-right rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 font-sans z-50">
+			<ul className="divide-y divide-gray-100">
+				{menuItems.map((item) => {
+					const isLogout = item.id === 'logout';
+
+					return (
+						<li key={item.id}>
+							<a
+								href={item.href || '#'}
+								onClick={(e) => {
+									if (!item.href) e.preventDefault();
+									onItemClick(item.url);
+									if (isLogout) handleLogout();
+								}}
+								className={cn(
+									'group flex items-center gap-4 px-4 py-3 rounded-md transition-all duration-200 ease-in-out',
+									isLogout
+										? 'bg-red-600 text-white hover:bg-red-700'
+										: 'text-gray-700 hover:bg-orange-500 hover:text-white'
+								)}
+							>
+								<item.icon
+									className={cn(
+										'w-6 h-6 transition-colors duration-200 ease-in-out',
+										isLogout
+											? 'text-white'
+											: 'text-gray-500 group-hover:text-white'
+									)}
+								/>
+								<span
+									className={cn(
+										'text-lg font-medium transition-colors duration-200 ease-in-out',
+										isLogout ? 'text-white' : 'group-hover:text-white'
+									)}
+								>
+									{item.label}
+								</span>
+							</a>
+						</li>
+					);
+				})}
 			</ul>
 		</div>
+
 	);
 };
 
@@ -217,7 +234,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 
 	const menuItems: TMenuItem[] = useMemo(() => {
 		let items: TMenuItem[] = [
-			{ id: 'profile', label: 'Profile', url: '/users/me', icon: ProfileIcon },
+			{ id: 'profile', label: 'Profile', url: '/account', icon: ProfileIcon },
 			{ id: 'accounts', label: 'Accounts', url: '/users', icon: AccountsIcon },
 			{ id: 'products', label: 'Products', url: '/products', icon: ProductsIcon },
 			{
@@ -305,62 +322,61 @@ export const Header = ({ className }: Props): JSX.Element => {
 
 	return (
 		<header className={cn(className)}>
-			<div className="md:h-[152px] h-[60px] bg-transparent"></div>
-			<div className="fixed top-0 w-full py-4 px-6 md:py-12 md:px-24 bg-gradient-to-b from-[#fffdea]/100 to-white/95">
-				<div className="max-w-[1728px] mx-auto flex justify-between md:justify-between items-center">
+			<div className="h-[60px] md:h-[152px]" />
+
+			<div className="fixed top-0 w-full z-50 bg-gradient-to-b from-[#fffdea]/100 to-white/95 shadow-sm transition-all duration-300 py-4 px-6 md:py-12 md:px-24">
+				<div className="max-w-[1728px] mx-auto flex items-center justify-between">
+					{/* Logo */}
 					<Link to="/" className="flex items-center">
 						<img
 							src={logos.mainTravalidName}
 							alt="Travalid Logo"
-							className="h-5 md:h-14 md:p-2.5"
+							className="h-5 md:h-14 md:p-2.5 transition-all duration-300"
 						/>
 					</Link>
 
-					{/* Desktop Navigation */}
-					<nav className="hidden md:flex justify-start items-center gap-12 font-[Montserrat] text-2xl ">
+					{/* Desktop Nav */}
+					<nav className="hidden md:flex items-center gap-12 font-montserrat text-2xl">
 						{initialNavItems.map((item) => (
 							<Link
 								key={item.label}
 								to={item.href}
-								className="text-gray-800 hover:text-[#FF7A22] transition-colors duration-200"
+								className="text-gray-800 hover:text-[#FF7A22] transition-all duration-200"
 							>
 								{item.label}
 							</Link>
 						))}
 					</nav>
-					<div className="w-fit">
+
+					{/* User Section */}
+					<div className="flex items-center gap-4">
 						{isLogged ? (
-							<div className="hidden md:flex items-center space-x-4 ">
+							<div className="hidden md:flex items-center gap-4">
+								{/* Cart */}
 								<Link
 									to="/cart"
-									className="p-2 hover:text-orange-500 transition-colors"
+									className="p-2 hover:text-orange-500 transition-all"
 								>
-									<IoCartOutline className="h-8 w-8" />
+									<IoCartOutline className="h-7 w-7" />
 								</Link>
-								{/* Relative container for positioning the dropdown */}
-								<div
-									className="relative inline-block text-left"
-									ref={dropdownRef}
-								>
-									{/* Trigger Button */}
+
+								{/* Dropdown */}
+								<div className="relative" ref={dropdownRef}>
 									<button
 										ref={triggerRef}
 										type="button"
 										onClick={toggleDropdown}
-										className="p-2 hover:text-orange-500 transition-colors"
-										id="options-menu"
+										className="p-2 hover:text-orange-500 transition-all"
 										aria-haspopup="true"
 										aria-expanded={isOpen}
 									>
 										<FaRegUser className="h-7 w-7" />
 									</button>
 
+									{/* Dropdown Menu */}
 									<div
-										className={`transition ease-out duration-100 transform ${
-											isOpen
-												? 'opacity-100 scale-100'
-												: 'opacity-0 scale-95 pointer-events-none'
-										}`}
+										className={`absolute right-0 mt-2 origin-top-right transition-all transform ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+											}`}
 									>
 										{isOpen && (
 											<UserProfileDropdown
@@ -374,54 +390,61 @@ export const Header = ({ className }: Props): JSX.Element => {
 						) : (
 							<button
 								onClick={handleClickloginButton}
-								className="hidden md:block w-36 bg-orange-500 text-white py-3 rounded-3xl hover:bg-orange-600 text-xl text-center font-bold transition-colors duration-200"
+								className="hidden md:block w-36 bg-orange-500 text-white py-3 rounded-3xl hover:bg-orange-600 text-xl font-bold transition-all"
 							>
 								Login
 							</button>
 						)}
-					</div>
-					{/* Mobile Navigation Toggle */}
-					<button
-						className="md:hidden text-gray-800"
-						onClick={toggleMobileMenu}
-						aria-label="Toggle mobile menu"
-						aria-expanded={mobileMenuOpen}
-						aria-controls="mobile-menu"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={1.5}
-							stroke="currentColor"
-							className="w-6 h-6"
+
+						{/* Mobile Menu Toggle */}
+						<button
+							className="md:!hidden 123 text-gray-800"
+							onClick={toggleMobileMenu}
+							aria-label="Toggle mobile menu"
+							aria-expanded={mobileMenuOpen}
+							aria-controls="mobile-menu"
 						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-							/>
-						</svg>
-					</button>
-					{/* Mobile Menu */}
-					{mobileMenuOpen && (
-						<div className="md:hidden absolute top-12 left-0 right-0 bg-white p-4 shadow-md z-50">
-							<nav className="flex flex-col space-y-4">
-								{navItemsMobile.map((item) => (
-									<Link
-										key={item.label}
-										to={item.href}
-										className="text-gray-800 hover:text-[#FF7A22] transition-colors duration-200"
-										onClick={() => setMobileMenuOpen(false)}
-									>
-										{item.label}
-									</Link>
-								))}
-							</nav>
-						</div>
-					)}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="w-6 h-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								strokeWidth={1.5}
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+								/>
+							</svg>
+						</button>
+					</div>
 				</div>
+
+				{/* Mobile Menu */}
+				{mobileMenuOpen && (
+					<div
+						className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-sm shadow-lg z-40 animate-slideDown"
+						role="dialog"
+						aria-expanded={mobileMenuOpen}
+					>
+						<nav className="flex flex-col space-y-4 p-6">
+							{navItemsMobile.map((item) => (
+								<Link
+									key={item.label}
+									to={item.href}
+									onClick={() => setMobileMenuOpen(false)}
+									className="text-gray-800 text-lg font-medium hover:text-[#FF7A22] hover:bg-gray-100 rounded-lg py-3 px-4 transition-all duration-200"
+								>
+									{item.label}
+								</Link>
+							))}
+						</nav>
+					</div>
+				)}
 			</div>
 		</header>
+
 	);
 };

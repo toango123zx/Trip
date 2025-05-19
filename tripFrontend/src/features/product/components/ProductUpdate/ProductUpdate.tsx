@@ -40,11 +40,6 @@ export const ProductUpdate = ({
 	>([]);
 
 	const form = useForm<TRequestBodyCreateProduct>({
-		defaultValues: {
-			productCategoryId: 'clv2my35m0000t8z5h4xetnxu',
-			posterImageUrl:
-				'https://i.pinimg.com/474x/8b/29/2a/8b292a733fdfa13083d6b20cd2684fca.jpg',
-		},
 	});
 
 	useEffect(() => {
@@ -97,6 +92,7 @@ export const ProductUpdate = ({
 				notification.error({
 					message: 'Error',
 					description: 'No changes detected.',
+					duration: 3
 				});
 				return;
 			}
