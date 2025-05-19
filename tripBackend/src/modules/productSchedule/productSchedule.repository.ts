@@ -4,8 +4,14 @@ import {
 	BillStatusEnum,
 	InfoDiscountStatusEnum,
 	ProductScheduleStatusEnum,
+	TransactionStatusEnum,
 } from '@prisma/client';
-import { IPaginationQuery, OrderByEnum, OrderBySearchDto } from 'src/common';
+import {
+	DiscountTypeEnum,
+	IPaginationQuery,
+	OrderByEnum,
+	OrderBySearchDto,
+} from 'src/common';
 import { BillEntity, CreateProductScheduleDto, ProductScheduleEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
@@ -215,6 +221,267 @@ export class ProductScheduleRepository {
 	): Promise<ProductScheduleEntity> {
 		return this.prismaService.productSchedule.create({
 			data: scheduleInformation,
+		});
+	}
+
+	async updateCompletedProductScheduleByProductScheduleComplete(
+		productScheduleId: string,
+	): Promise<ProductScheduleEntity> {
+		return this.prismaService.$transaction(async (prisma) => {
+			const productSchedule = await prisma.productSchedule.update({
+				include: {
+					product: {
+						include: {
+							supplier: true,
+						},
+					},
+					infoBill: {
+						include: {
+							bill: true,
+						},
+					},
+				},
+				where: {
+					id: productScheduleId,
+					status: {
+						not: {
+							in: [
+								ProductScheduleStatusEnum.canceled,
+								ProductScheduleStatusEnum.completed,
+							],
+						},
+					},
+				},
+				data: {
+					status: ProductScheduleStatusEnum.completed,
+				},
+			});
+
+			const billIdsPaid: string[] = [];
+			const billIdsCancel: string[] = [];
+			productSchedule.infoBill.forEach((infoBill) => {
+				if (infoBill.bill.status === BillStatusEnum.pending) {
+					billIdsCancel.push(infoBill.bill.id);
+					return;
+				}
+				if (infoBill.bill.status === BillStatusEnum.paid) {
+					billIdsPaid.push(infoBill.bill.id);
+				}
+			});
+
+			if (billIdsCancel.length > 0) {
+				const billCancel = await prisma.bill.updateManyAndReturn({
+					include: {
+						transaction: true,
+					},
+					where: {
+						id: {
+							in: billIdsCancel,
+						},
+						infoBill: {
+							some: {
+								productSchedule: {
+									status: ProductScheduleStatusEnum.completed,
+								},
+							},
+						},
+						status: BillStatusEnum.pending,
+					},
+					data: {
+						status: BillStatusEnum.cancel,
+						deletedAt: new Date(),
+					},
+				});
+
+				const transactionIds = billCancel.map(
+					(bill: BillEntity) => bill.transaction.id,
+				);
+				await prisma.transaction.updateMany({
+					where: {
+						id: {
+							in: transactionIds,
+						},
+						status: TransactionStatusEnum.pending,
+					},
+					data: {
+						status: TransactionStatusEnum.canceled,
+						deletedAt: new Date(),
+					},
+				});
+
+				const billIdsCancelDb = await prisma.bill.findMany({
+					include: {
+						transaction: true,
+						infoBill: {
+							include: {
+								productSchedule: true,
+							},
+						},
+					},
+					where: {
+						id: {
+							in: billIdsCancel,
+						},
+						status: BillStatusEnum.cancel,
+					},
+				});
+
+				billIdsCancelDb.forEach((bill) => {
+					return bill.infoBill.map(async (info) => {
+						return await prisma.productSchedule.update({
+							where: {
+								id: info.productSchedule.id,
+							},
+							data: {
+								booked: {
+									decrement: info.quantity,
+								},
+							},
+						});
+					});
+				});
+			}
+			if (billIdsPaid.length > 0) {
+				await prisma.bill.updateManyAndReturn({
+					where: {
+						id: {
+							in: billIdsPaid,
+						},
+						infoBill: {
+							every: {
+								productSchedule: {
+									status: ProductScheduleStatusEnum.completed,
+								},
+							},
+						},
+						status: BillStatusEnum.paid,
+					},
+					data: {
+						status: BillStatusEnum.done,
+					},
+				});
+				await prisma.product.update({
+					where: {
+						id: productSchedule.productId,
+					},
+					data: {
+						quantityCompleted: {
+							increment: productSchedule.booked,
+						},
+					},
+				});
+
+				const billR = await prisma.bill.findMany({
+					include: {
+						infoBill: {
+							include: {
+								productSchedule: true,
+							},
+							where: {
+								productSchedule: {
+									id: productScheduleId,
+									status: ProductScheduleStatusEnum.completed,
+								},
+							},
+						},
+						infoBillDiscount: {
+							include: {
+								discount: {
+									include: {
+										infoDiscount: true,
+										user: true,
+										discountApplicationScope: true,
+										discountType: true,
+										discountEligibility: true,
+									},
+								},
+							},
+							where: {
+								discount: {
+									infoDiscount: {
+										some: {
+											productScheduleId: productScheduleId,
+										},
+									},
+								},
+							},
+						},
+						discountForBill: {
+							include: {
+								discount: {
+									include: {
+										user: true,
+										discountApplicationScope: true,
+										discountType: true,
+										discountEligibility: true,
+									},
+								},
+							},
+							where: {
+								discount: {
+									infoDiscount: {
+										some: {
+											productScheduleId: productScheduleId,
+										},
+									},
+								},
+							},
+						},
+					},
+
+					where: {
+						id: {
+							in: billIdsPaid,
+						},
+					},
+				});
+
+				let totalPrice = 0;
+				billR.forEach((bill) => {
+					let price = 0;
+					let quantity = 0;
+					const discountForProductSchedule = bill.infoBillDiscount.map(
+						(info) => info.discount,
+					);
+					const discountForBill = bill.discountForBill.map(
+						(info) => info.discount,
+					);
+					const discountApplied = [
+						...discountForProductSchedule,
+						...discountForBill,
+					];
+					bill.infoBill.map((info) => {
+						if (info.productScheduleId === productScheduleId) {
+							price += info.productSchedule.price * info.quantity;
+							quantity += info.quantity;
+						}
+					});
+					let discountPrice = 0;
+					discountApplied.forEach((discount) => {
+						if (discount.discountType.name === DiscountTypeEnum.Percentage) {
+							discountPrice += (price * discount.value) / 100;
+							return;
+						}
+						if (discount.discountType.name === DiscountTypeEnum.FixedAmount) {
+							discountPrice += discount.value * quantity;
+							return;
+						}
+					});
+					totalPrice += price - discountPrice;
+				});
+				prisma.user.update({
+					where: {
+						id: productSchedule.product.supplier.userId,
+					},
+					data: {
+						balance: {
+							increment: totalPrice,
+						},
+					},
+				});
+			}
+
+			return productSchedule;
 		});
 	}
 

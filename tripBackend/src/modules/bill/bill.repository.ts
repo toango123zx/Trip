@@ -6,8 +6,8 @@ import {
 	ProductScheduleStatusEnum,
 	TransactionStatusEnum,
 } from '@prisma/client';
-import { IPaginationQuery } from 'src/common';
-import { BillEntity, CreateBillDto } from 'src/models';
+import { DiscountTypeEnum, IPaginationQuery } from 'src/common';
+import { BillEntity, CreateBillDto, DiscountEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -242,20 +242,83 @@ export class BillRepository {
 					...discountIdsForProductSchedules,
 					discountIdForBill,
 				];
-				const discountsDb = await prisma.discount.updateManyAndReturn({
+
+				const discountsFind = await prisma.discount.findMany({
+					include: {
+						discountType: true,
+						discountEligibility: true,
+						discountApplicationScope: true,
+						infoDiscount: {
+							include: {
+								productSchedule: true,
+							},
+						},
+					},
 					where: {
 						id: {
 							in: discountIds,
 						},
-						// id: discountIds[0],
 						status: DiscountStatusEnum.active,
 					},
-					data: {
-						applited: {
-							increment: 1,
-						},
-					},
 				});
+				const discountFixAmount: { id: string; quantity: number }[] = [];
+				discountsFind.forEach((discount) => {
+					if (discount.discountType.name === DiscountTypeEnum.FixedAmount) {
+						discount.infoDiscount.forEach((infoDiscount) => {
+							bill.infoBill.create.forEach((infoBill) => {
+								if (
+									infoDiscount.productScheduleId ===
+									infoBill.productSchedule.connect.id
+								) {
+									discountFixAmount.push({
+										id: discount.id,
+										quantity: Number(infoBill.quantity),
+									});
+								}
+							});
+						});
+					}
+				});
+				const discountPercentIds: string[] = [];
+				discountsFind.forEach((discount) => {
+					if (discount.discountType.name === DiscountTypeEnum.Percentage) {
+						discountPercentIds.push(discount.id);
+					}
+				});
+				const discountsDb: DiscountEntity[] = [];
+				if (discountFixAmount.length > 0) {
+					discountFixAmount.forEach(async (discount) => {
+						const discountFixAmountUpdated = await prisma.discount.update({
+							where: {
+								id: discount.id,
+								status: DiscountStatusEnum.active,
+							},
+							data: {
+								applited: {
+									increment: Number(discount.quantity),
+								},
+							},
+						});
+						discountsDb.push(discountFixAmountUpdated);
+					});
+				}
+				if (discountPercentIds.length > 0) {
+					const discountPercentUpdated =
+						await prisma.discount.updateManyAndReturn({
+							where: {
+								id: {
+									in: discountPercentIds,
+								},
+								status: DiscountStatusEnum.active,
+							},
+							data: {
+								applited: {
+									increment: 1,
+								},
+							},
+						});
+					discountsDb.push(...discountPercentUpdated);
+				}
 
 				// check if discount is full
 				const discountIdsFull: string[] = [];
@@ -385,7 +448,7 @@ export class BillRepository {
 				status: BillStatusEnum.paid,
 				transaction: {
 					update: {
-						status: TransactionStatusEnum.success,
+						status: TransactionStatusEnum.completed,
 					},
 				},
 			},
