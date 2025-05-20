@@ -9,6 +9,8 @@ import {
 	discountTypeSlice,
 	discountApplicationScopeSlice,
 	discountEligibilitySlice,
+	cartSlice,
+	billSlice,
 } from '@/features';
 import { locationSlice } from '@/features/location';
 
@@ -23,6 +25,8 @@ export const _reduxStore = configureStore({
 		discountType: discountTypeSlice.reducer,
 		discountApplicationScope: discountApplicationScopeSlice.reducer,
 		discountEligibility: discountEligibilitySlice.reducer,
+		cart: cartSlice.reducer,
+		bill: billSlice.reducer,
 	},
 });
 

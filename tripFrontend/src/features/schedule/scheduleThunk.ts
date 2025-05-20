@@ -33,6 +33,14 @@ const createSchedule = createAsyncThunk(
 	},
 );
 
+const addScheduleToCart = createAsyncThunk(
+	'schedule/addScheduleToCart',
+	async (scheduleId: string) => {
+		const data = await scheduleApi.addScheduleToCart(scheduleId);
+		return data;
+	},
+);
+
 const deleteSchedule = createAsyncThunk(
 	'schedule/deleteSchedule',
 	async (scheduleId: string) => {
@@ -44,5 +52,6 @@ const deleteSchedule = createAsyncThunk(
 export const scheduleThunk = {
 	getScheduleByScheduleId,
 	createSchedule,
+	addScheduleToCart,
 	deleteSchedule,
 };
