@@ -454,4 +454,74 @@ export class BillRepository {
 			},
 		});
 	}
+
+	async cancelBillByBillId(billId: string): Promise<BillEntity> {
+		return this.prismaService.$transaction(async (prisma) => {
+			const bill = await prisma.bill.findFirst({
+				include: {
+					infoBill: {
+						include: {
+							productSchedule: true,
+						},
+					},
+				},
+				where: {
+					id: billId,
+					status: {
+						in: [BillStatusEnum.pending, BillStatusEnum.paid],
+					},
+				},
+			});
+			const billCancelled = await prisma.bill.update({
+				include: {
+					infoBill: {
+						include: {
+							productSchedule: true,
+						},
+					},
+				},
+				where: {
+					id: billId,
+					status: {
+						in: [BillStatusEnum.pending, BillStatusEnum.paid],
+					},
+				},
+				data: {
+					status: BillStatusEnum.cancel,
+					transaction: {
+						update: {
+							status: TransactionStatusEnum.canceled,
+						},
+					},
+				},
+			});
+			for (const infoBill of bill.infoBill) {
+				await prisma.productSchedule.update({
+					where: {
+						id: infoBill.productScheduleId,
+					},
+					data: {
+						booked: {
+							decrement: infoBill.quantity,
+						},
+					},
+				});
+			}
+
+			if (bill.status === BillStatusEnum.paid) {
+				await prisma.user.update({
+					where: {
+						id: bill.userId,
+					},
+					data: {
+						balance: {
+							increment: bill.totalPrice - bill.reductionPrice,
+						},
+					},
+				});
+			}
+
+			return billCancelled;
+		});
+	}
 }

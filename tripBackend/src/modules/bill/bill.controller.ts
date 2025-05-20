@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpException,
 	Param,
@@ -17,7 +18,11 @@ import { Auth, AuthPermission } from '../auth/decorators';
 import { MyInformation } from '../user/decorators';
 import { UserInformationDto } from '../user/dtos';
 
-import { CreateBillCommand, UpdatePaidBillCommand } from './commands/implements';
+import {
+	CancelBillByBillIdCommand,
+	CreateBillCommand,
+	UpdatePaidBillCommand,
+} from './commands/implements';
 import { CreateBillRequest, BillDetailResponseDto } from './dtos';
 import { BillFilterRequestDto } from './dtos/requests/billFilter.request';
 import { GetBillByBillIdQuery, GetBillsByUserIdQuery } from './queries/implements';
@@ -67,5 +72,16 @@ export class BillController {
 		@Param('billId') billId: string,
 	): Promise<HttpResponseBodyDto<BillEntity | HttpException>> {
 		return this.commandBus.execute(new UpdatePaidBillCommand(billId));
+	}
+
+	@Delete('/:billId')
+	@Auth()
+	async deleteBillByBillId(
+		@Param('billId') billId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<BillEntity> | HttpException> {
+		return this.commandBus.execute(
+			new CancelBillByBillIdCommand(billId, myInformation),
+		);
 	}
 }
