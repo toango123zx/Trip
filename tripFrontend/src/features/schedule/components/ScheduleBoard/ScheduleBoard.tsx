@@ -1,11 +1,17 @@
-import { InputRef, TableColumnsType } from 'antd';
+import { InputRef, TableColumnsType, notification } from 'antd';
 import { JSX, useState, useRef } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
+import { useDispatch } from 'react-redux';
 
-import { getColumnSearchProps } from '@/components';
-import { BaseTable, renderStatusBadge, formatDateTime } from '@/components/BaseTable/BaseTable';
+import {
+	BaseTable,
+	renderStatusBadge,
+	formatDateTime,
+} from '@/components/BaseTable/BaseTable';
 import { cn } from '@/lib';
 import { TProductSchedule, EProductScheduleStatus } from '@/types';
+import { scheduleThunk } from '../..';
+import { TReduxStoreDispatch } from '@/store';
 
 import { TRequestBodyCreateSchedule } from '../../schedule.type';
 
@@ -13,11 +19,14 @@ type TSchedulesBoard = {
 	productId?: string;
 	data?: TProductSchedule[] | TRequestBodyCreateSchedule[];
 	pageSize?: number;
+	page?: number;
 	disabled?: boolean;
 	onViewDetailSchedule?: (
 		schedule: TRequestBodyCreateSchedule | TProductSchedule,
 	) => void;
 	className?: string;
+	setPage?: (page: number) => void;
+	onDeleteSuccess?: () => void;
 };
 
 const STATUS_MAP = {
@@ -29,13 +38,37 @@ const STATUS_MAP = {
 export const SchedulesBoard = ({
 	data,
 	pageSize,
+	page,
 	disabled = false,
 	onViewDetailSchedule = (): void => {},
 	className,
+	setPage,
+	onDeleteSuccess,
 }: TSchedulesBoard): JSX.Element => {
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
 	const searchInput = useRef<InputRef>(null);
+	const dispatch = useDispatch<TReduxStoreDispatch>();
+
+	const handleDelete = async (scheduleId: string): Promise<void> => {
+		try {
+			await dispatch(scheduleThunk.deleteSchedule(scheduleId)).unwrap();
+			notification.success({
+				message: 'Success',
+				description: 'Schedule deleted successfully',
+				duration: 3,
+			});
+			if (onDeleteSuccess) {
+				onDeleteSuccess();
+			}
+		} catch (error) {
+			notification.error({
+				message: 'Error',
+				description: 'Failed to delete schedule',
+				duration: 3,
+			});
+		}
+	};
 
 	const columnTable: TableColumnsType<TProductSchedule> = [
 		{
@@ -45,22 +78,6 @@ export const SchedulesBoard = ({
 			className: 'hidden',
 			render: (value: string | undefined) => value ?? '-',
 		},
-		// {
-		// 	title: 'Name',
-		// 	dataIndex: 'productName',
-		// 	key: 'name',
-		// 	width: '15%',
-		// 	...getColumnSearchProps<TProductSchedule>(
-		// 		'productName',
-		// 		searchInput,
-		// 		searchText,
-		// 		setSearchText,
-		// 		searchedColumn,
-		// 		setSearchedColumn,
-		// 	),
-		// 	sorter: (a, b) => a.productName.length - b.productName.length,
-		// 	sortDirections: ['descend', 'ascend'],
-		// },
 		{
 			title: 'Start Time',
 			dataIndex: 'startTime',
@@ -96,24 +113,36 @@ export const SchedulesBoard = ({
 			key: 'status',
 			sorter: (a, b) => (a.status?.length || 0) - (b.status?.length || 0),
 			sortDirections: ['descend', 'ascend'],
-			render: (text: string) => renderStatusBadge(text || EProductScheduleStatus.active, STATUS_MAP),
+			render: (text: string) =>
+				renderStatusBadge(text || EProductScheduleStatus.active, STATUS_MAP),
 		},
 		{
 			title: 'Action',
 			className: `${disabled ?? 'hover:cursor-no-drop'}`,
 			render: (schedule: TRequestBodyCreateSchedule | TProductSchedule) => (
-				<button
-					type="button"
-					onClick={() =>
-						!disabled ? onViewDetailSchedule(schedule) : (): void => {}
-					}
-					className={`text-blue-500 flex gap-2.5 items-center`}
-				>
-					<span>View detail </span>
-					<span className="h-fit">
-						<IoIosArrowRoundForward />
-					</span>
-				</button>
+				<div className="flex gap-2 items-center">
+					<button
+						type="button"
+						onClick={() =>
+							!disabled ? onViewDetailSchedule(schedule) : (): void => {}
+						}
+						className={`text-blue-500 flex gap-2.5 items-center`}
+					>
+						<span>View detail </span>
+						<span className="h-fit">
+							<IoIosArrowRoundForward />
+						</span>
+					</button>
+					{!disabled && (
+						<button
+							type="button"
+							className="text-red-500 ml-2"
+							onClick={() => handleDelete(schedule.id)}
+						>
+							Delete
+						</button>
+					)}
+				</div>
 			),
 		},
 	];
@@ -124,11 +153,7 @@ export const SchedulesBoard = ({
 			columns={columnTable}
 			dataSource={data as TProductSchedule[]}
 			className={cn(className)}
-			pagination={
-				(data?.length ?? 0) > (pageSize ?? 10) 
-				? { pageSize } 
-				: false
-			}
+			pagination={(data?.length ?? 0) > (pageSize ?? 10) ? { pageSize } : false}
 			size="middle"
 		/>
 	);

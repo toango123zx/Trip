@@ -221,9 +221,9 @@ export const Header = ({ className }: Props): JSX.Element => {
 		() => [
 			{ label: 'Home', href: '/' },
 			{ label: 'Attractions', href: '/attractions' },
-			{ label: 'Services', href: '/services' },
+			// { label: 'Services', href: '/services' },
 			{ label: 'Sales', href: '/sales' },
-			{ label: 'Profile', href: '/user/me' },
+			// { label: 'Profile', href: '/user/me' },
 			{ label: 'Cart', href: '/cart' },
 			{ label: 'Contact', href: '/contact' },
 		],

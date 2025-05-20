@@ -14,6 +14,7 @@ import {
 	ProductUpdate,
 	SchedulesBoard,
 	UpdateDiscount,
+	scheduleThunk,
 } from '@/features';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
@@ -42,9 +43,12 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const [pageProduct, setPageProduct] = useState<number>(1);
 	const [pageDiscount, setPageDiscount] = useState<number>(1);
+	const [pageSchedule, setPageSchedule] = useState<number>(1);
 	const PAGE_SIZE = 10;
 
 	const discounts = useSelector((state: TReduxStoreState) => state.discount.discounts);
+	const schedules = useSelector((state: TReduxStoreState) => state.schedule.schedules);
+	const schedulePagination = useSelector((state: TReduxStoreState) => state.schedule.pagination);
 
 	useEffect(() => {
 		if (activeTab === EactiveTab.discount) {
@@ -58,6 +62,17 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 			);
 		}
 	}, [dispatch, activeTab, pageDiscount]);
+
+	useEffect(() => {
+		if (activeTab === EactiveTab.schedule) {
+			dispatch(
+				scheduleThunk.getSchedules({
+					page: pageSchedule,
+					limit: PAGE_SIZE,
+				}),
+			);
+		}
+	}, [dispatch, activeTab, pageSchedule]);
 
 	const handleChangeTab = (tab: EactiveTab): void => {
 		setActiveTab(tab);
@@ -221,7 +236,14 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 									openProductUpdateOnClick={handleProductUpdateOnClick}
 								/>
 							)}
-							{activeTab === EactiveTab.schedule && <SchedulesBoard />}
+							{activeTab === EactiveTab.schedule && (
+								<SchedulesBoard
+									data={schedules}
+									pageSize={PAGE_SIZE}
+									page={pageSchedule}
+									setPage={setPageSchedule}
+								/>
+							)}
 							{activeTab === EactiveTab.discount && (
 								<DiscountBoard
 									onViewDetailDiscount={handleViewDiscountOnClick}

@@ -7,11 +7,13 @@ import {
   FaPhone, 
   FaMapMarkerAlt, 
   FaEdit, 
-  FaLock 
+  FaLock,
+  FaCamera
 } from 'react-icons/fa';
 import { userService } from '../services/userService';
 import { MainLayout } from '@/layouts';
 import { notificationUtils } from '@/utils/notificationUtils';
+import { cloudinaryService } from '@/services/cloudinaryService';
 
 interface UserProfile {
   id: string;
@@ -39,6 +41,7 @@ const AccountPage: React.FC = () => {
     confirmPassword: ''
   });
   const [activeTab, setActiveTab] = useState<'profile' | 'password'>('profile');
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -137,18 +140,84 @@ const AccountPage: React.FC = () => {
     }
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!editMode) return; // Only allow upload in edit mode
+    
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const imageUrl = await cloudinaryService.uploadImage(file);
+      
+      // Update both formData and userProfile with new image URL
+      setFormData(prev => ({ ...prev, image: imageUrl }));
+      setUserProfile(prev => prev ? { ...prev, image: imageUrl } : null);
+      
+      notificationUtils.success({
+        message: 'Cập nhật ảnh thành công',
+        description: 'Ảnh đại diện đã được cập nhật'
+      });
+    } catch (error) {
+      notificationUtils.error();
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   if (!userProfile) return <div className="loading">Đang tải...</div>;
 
   return (
     <MainLayout>
       <div className="account-page-container">
         <div className="account-page-header">
-          <div className="profile-avatar">
+          <div className="profile-avatar relative group">
             <img 
-              src={'https://www.strasys.uk/wp-content/uploads/2022/02/Depositphotos_484354208_S.jpg'} 
+              src={userProfile.image || 'https://www.strasys.uk/wp-content/uploads/2022/02/Depositphotos_484354208_S.jpg'} 
               alt="Ảnh đại diện" 
-              className="avatar-image" 
+              className="avatar-image w-32 h-32 rounded-full object-cover" 
             />
+            {editMode && (
+  <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center group hover:bg-black/60 transition-colors duration-300">
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageUpload}
+      disabled={isUploading}
+      className="hidden"
+      id="avatarUpload"
+    />
+    <label
+      htmlFor="avatarUpload"
+      className="cursor-pointer flex items-center justify-center rounded-full p-3 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white transition duration-200"
+    >
+      {isUploading ? (
+        <svg
+          className="animate-spin h-6 w-6 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          ></path>
+        </svg>
+      ) : (
+        <FaCamera className="text-white text-2xl" />
+      )}
+    </label>
+  </div>
+)}
           </div>
           <div className="profile-header-info">
             <h1>{userProfile.name}</h1>

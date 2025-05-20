@@ -19,6 +19,20 @@ export const scheduleSlice = createSlice({
 	reducers: {},
 	extraReducers: (builder) => {
 		builder
+			.addCase(scheduleThunk.getSchedules.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(scheduleThunk.getSchedules.fulfilled, (state, action) => {
+				state.loading = false;
+				state.schedules = action.payload.data;
+				state.pagination = action.payload.pagination;
+				state.error = null;
+			})
+			.addCase(scheduleThunk.getSchedules.rejected, (state, action) => {
+				state.loading = false;
+				state.error = String(action.error.message);
+			})
 			.addCase(scheduleThunk.createSchedule.pending, (state) => {
 				state.loading = true;
 				state.error = null;

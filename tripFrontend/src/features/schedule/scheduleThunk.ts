@@ -5,6 +5,14 @@ import { EProductScheduleStatus } from '@/types';
 import { TRequestBodyCreateSchedule } from './schedule.type';
 import { scheduleApi } from './scheduleApi';
 
+const getSchedules = createAsyncThunk(
+	'schedule/getSchedules',
+	async (query?: { page?: number; limit?: number }) => {
+		const response = await scheduleApi.getSchedules(query);
+		return response;
+	},
+);
+
 const getScheduleByScheduleId = createAsyncThunk(
 	'schedule/getScheduleByScheduleId',
 	async ({
@@ -42,6 +50,7 @@ const deleteSchedule = createAsyncThunk(
 );
 
 export const scheduleThunk = {
+	getSchedules,
 	getScheduleByScheduleId,
 	createSchedule,
 	deleteSchedule,

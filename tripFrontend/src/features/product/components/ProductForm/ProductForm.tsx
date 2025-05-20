@@ -169,20 +169,24 @@ export const ProductForm = ({
 
 	const handleSaveOnClick = (data: TRequestBodyCreateProduct): void => {
 		if (onSubmit) {
-			onSubmit(data);
+			onSubmit({
+				...data,
+				productCategoryId: 'clv2my35m0000t8z5h4xetnxu',
+			});
 		}
 	};
 
 	const description = watch('description');
-	useEffect(() => {
-	}, [description]);
+	useEffect(() => {}, [description]);
 
 	const handleGenerateDescription = () => {
 		const selectedLocation = locations.find((l) => l.id === locationId);
 		if (selectedLocation && generateLocationDescription) {
 			generateLocationDescription(selectedLocation.displayName);
 		} else {
-			console.error('No location selected or generateLocationDescription not provided');
+			console.error(
+				'No location selected or generateLocationDescription not provided',
+			);
 		}
 	};
 
@@ -193,16 +197,16 @@ export const ProductForm = ({
 		try {
 			setIsUploading(true);
 			const imageUrl = await cloudinaryService.uploadImage(file);
-			
+
 			setValue('posterImageUrl', imageUrl, {
 				shouldValidate: true,
 				shouldDirty: true,
-				shouldTouch: true
+				shouldTouch: true,
 			});
 
 			notificationUtils.success({
 				message: 'Tải ảnh thành công',
-				description: 'Ảnh đã được tải lên thành công'
+				description: 'Ảnh đã được tải lên thành công',
 			});
 		} catch (error) {
 			notificationUtils.error();
@@ -264,20 +268,20 @@ export const ProductForm = ({
 					control={control}
 					name="description"
 					label="Description"
-					rules={{ 
+					rules={{
 						required: 'Description is required',
 						minLength: {
 							value: 10,
-							message: 'Description must be at least 10 characters long'
-						}
+							message: 'Description must be at least 10 characters long',
+						},
 					}}
 					disabled={disabled}
 					value={description || locationDescription || ''}
 					onChange={(value) => {
-						setValue('description', value, { 
-							shouldValidate: true, 
+						setValue('description', value, {
+							shouldValidate: true,
 							shouldDirty: true,
-							shouldTouch: true
+							shouldTouch: true,
 						});
 					}}
 					extra={
@@ -413,20 +417,22 @@ export const ProductForm = ({
 							d="M3 5h18M3 19h18M5 5v14m14-14v14"
 						/>
 					</svg>
-					<span className="text-sm sm:text-base font-medium text-gray-800">Gallery</span>
+					<span className="text-sm sm:text-base font-medium text-gray-800">
+						Gallery
+					</span>
 				</div>
 
 				<div className="flex items-center gap-4">
-					<input 
-						type="file" 
-						accept="image/*" 
+					<input
+						type="file"
+						accept="image/*"
 						onChange={handleImageUpload}
 						disabled={disabled || isUploading}
-						className="hidden" 
+						className="hidden"
 						id="posterImageUpload"
 					/>
-					<label 
-						htmlFor="posterImageUpload" 
+					<label
+						htmlFor="posterImageUpload"
 						className="flex h-[70px] sm:h-[85px] w-[90px] sm:w-[110px] items-center justify-center rounded-md bg-gray-200 cursor-pointer"
 					>
 						{isUploading ? (
@@ -438,18 +444,32 @@ export const ProductForm = ({
 
 					{/* Preview ảnh nếu có */}
 					{watch('posterImageUrl') && (
-						<div className="relative">
-							<img 
-								src={watch('posterImageUrl')} 
-								alt="Poster" 
-								className="h-[70px] sm:h-[85px] w-[90px] sm:w-[110px] object-cover rounded-md"
+						<div className="relative w-[90px] sm:w-[110px]">
+							<img
+								src={watch('posterImageUrl')}
+								alt="Poster"
+								className="h-[70px] sm:h-[85px] w-full object-cover rounded-lg shadow-md border border-gray-200"
 							/>
-							<button 
-								type="button" 
+							<button
+								type="button"
 								onClick={() => setValue('posterImageUrl', '')}
-								className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 text-xs"
+								className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 w-5 h-5 flex items-center justify-center shadow-sm transition"
+								title="Xóa ảnh"
 							>
-								X
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									className="h-3 w-3"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 18L18 6M6 6l12 12"
+									/>
+								</svg>
 							</button>
 						</div>
 					)}
