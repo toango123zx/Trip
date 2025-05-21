@@ -5,8 +5,6 @@ import {
 	DiscountStatusEnum,
 	InfoDiscountStatusEnum,
 	BillStatusEnum,
-	PaymentMethodStatusEnum,
-	TransactionStatusEnum,
 } from '@prisma/client';
 import { DiscountApplicationScopeEnum } from 'src/common';
 import {
@@ -201,7 +199,6 @@ const calculateBillInfo = (
 export class BillDetailResponseDto {
 	id: string;
 	userId: string;
-	paymentMethodId: string;
 	transactionTargetId: string;
 	reductionPrice: number;
 	totalPrice: number;
@@ -212,22 +209,6 @@ export class BillDetailResponseDto {
 	infoBill: InfoBillItem[] | [] | undefined;
 	infoBillDiscount: InfoBillDiscountItem[];
 	discountForBill: DiscountForBillItem[];
-	paymentMethod: {
-		id: string;
-		name: string;
-		description: string;
-		status: PaymentMethodStatusEnum;
-	};
-	transaction: {
-		id: string;
-		code: string;
-		description: string;
-		transactionTarget: string;
-		createAt: Date;
-		updateAt: Date;
-		deletedAt: Date | null;
-		status: TransactionStatusEnum;
-	};
 	user: {
 		id: string;
 		name: string;
@@ -255,7 +236,6 @@ export class BillDetailResponseDto {
 
 		this.id = bill.id;
 		this.userId = bill.userId;
-		this.paymentMethodId = bill.paymentMethodId;
 		this.transactionTargetId = bill.transactionTargetId;
 		this.reductionPrice = bill.reductionPrice;
 		this.totalPrice = bill.totalPrice;
@@ -425,24 +405,6 @@ export class BillDetailResponseDto {
 				},
 			})) || [];
 
-		this.paymentMethod = {
-			id: bill.paymentMethod.id,
-			name: bill.paymentMethod.name,
-			description: bill.paymentMethod.description,
-			status: bill.paymentMethod.status,
-		};
-		this.transaction = {
-			id: bill.transaction.id,
-			code: bill.transaction.code,
-			description: bill.transaction.description,
-			transactionTarget: bill.transaction.transactionTarget,
-			createAt: new Date(bill.transaction.createAt),
-			updateAt: new Date(bill.transaction.updateAt),
-			deletedAt: bill.transaction.deletedAt
-				? new Date(bill.transaction.deletedAt)
-				: null,
-			status: bill.transaction.status,
-		};
 		this.user = {
 			id: bill.user.id,
 			name: bill.user.name,

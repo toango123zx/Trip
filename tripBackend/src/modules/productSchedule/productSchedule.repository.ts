@@ -4,7 +4,6 @@ import {
 	BillStatusEnum,
 	InfoDiscountStatusEnum,
 	ProductScheduleStatusEnum,
-	TransactionStatusEnum,
 } from '@prisma/client';
 import {
 	DiscountTypeEnum,
@@ -270,10 +269,7 @@ export class ProductScheduleRepository {
 			});
 
 			if (billIdsCancel.length > 0) {
-				const billCancel = await prisma.bill.updateManyAndReturn({
-					include: {
-						transaction: true,
-					},
+				await prisma.bill.updateManyAndReturn({
 					where: {
 						id: {
 							in: billIdsCancel,
@@ -289,22 +285,6 @@ export class ProductScheduleRepository {
 					},
 					data: {
 						status: BillStatusEnum.cancel,
-						deletedAt: new Date(),
-					},
-				});
-
-				const transactionIds = billCancel.map(
-					(bill: BillEntity) => bill.transaction.id,
-				);
-				await prisma.transaction.updateMany({
-					where: {
-						id: {
-							in: transactionIds,
-						},
-						status: TransactionStatusEnum.pending,
-					},
-					data: {
-						status: TransactionStatusEnum.canceled,
 						deletedAt: new Date(),
 					},
 				});
@@ -469,7 +449,7 @@ export class ProductScheduleRepository {
 					});
 					totalPrice += price - discountPrice;
 				});
-				prisma.user.update({
+				await prisma.user.update({
 					where: {
 						id: productSchedule.product.supplier.userId,
 					},

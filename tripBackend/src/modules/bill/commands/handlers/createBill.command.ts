@@ -176,9 +176,9 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 			if (d.discountApplicationScope.name === DiscountApplicationScopeEnum.Bill) {
 				billDiscounts.push(d);
 			} else {
-				for (const { id } of d.infoDiscount) {
-					if (!schedDiscMap[id]) schedDiscMap[id] = [];
-					schedDiscMap[id]!.push(d);
+				for (const { productScheduleId } of d.infoDiscount) {
+					if (!schedDiscMap[productScheduleId]) schedDiscMap[productScheduleId] = [];
+					schedDiscMap[productScheduleId]!.push(d);
 				}
 			}
 		}
@@ -248,15 +248,7 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 		command: CreateBillCommand,
 	): Promise<HttpResponseBodySuccessDto<BillDetailResponseDto> | HttpException> {
 		const { myInformation, billInformation } = command;
-		const { schedules, discountIds, paymentMethodId } = billInformation;
-
-		const paymentMedthod =
-			await this.paymentMethodRepository.getPaymentMethodByPaymentMethodId(
-				paymentMethodId,
-			);
-		if (!paymentMedthod) {
-			throw new NotFoundException('paymentMethod');
-		}
+		const { schedules, discountIds } = billInformation;
 
 		if (new Set(discountIds).size !== discountIds.length) {
 			throw new OptionalException(HttpStatus.CONFLICT, 'Discount not available');
@@ -298,7 +290,7 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 		if (discountIds.length !== totalDiscountsInformation) {
 			throw new NotFoundException('discountId');
 		}
-		if (!this.validateDiscounts(discountsInformation)) {
+		if (!this.validateDiscounts(discountsInformation) && discountIds.length > 1) {
 			throw new ConflictException('discountId');
 		}
 
@@ -327,18 +319,7 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 			},
 			totalPrice: totalPrice,
 			reductionPrice: reductionPrice,
-			paymentMethod: {
-				connect: {
-					id: paymentMethodId,
-				},
-			},
-			transaction: {
-				create: {
-					code: new Date().getTime().toString(),
-					transactionTarget: TransactionTargetEnum.pay,
-					description: 'Pay bills',
-				},
-			},
+			transactionTargetId: TransactionTargetEnum.pay,
 			infoBill: {
 				create: infoBill.map((info) => ({
 					productSchedule: {
@@ -368,12 +349,13 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 			}
 		}
 
-		const billCreated = await this.billRepository.createBill1(
+		const billCreated = await this.billRepository.createBill(
 			bill,
 			scheduleIds,
 			discountForSchedule,
 			discountForBill,
 		);
+
 		return {
 			success: true,
 			data: new BillDetailResponseDto(billCreated),

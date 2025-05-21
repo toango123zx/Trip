@@ -129,7 +129,6 @@ export class BillRepository {
 						},
 					},
 				},
-				paymentMethod: true,
 				transaction: true,
 				user: true,
 			},
@@ -138,44 +137,8 @@ export class BillRepository {
 			},
 		});
 	}
-	async createBill(
-		userId: string,
-		productScheduleIds: string[],
-		quantity: number,
-		totalPrice: number,
-	): Promise<BillEntity> {
-		return this.prismaService.bill.create({
-			data: {
-				user: {
-					connect: {
-						id: userId,
-					},
-				},
-				infoBill: {
-					create: productScheduleIds.map((productScheduleId) => ({
-						productScheduleId: productScheduleId,
-						quantity: quantity,
-					})),
-				},
-				transaction: {
-					create: {
-						transactionTarget: 'deposit',
-						description: 'Deposit',
-						code: 'DEP-' + Date.now().toString(),
-					},
-				},
-				paymentMethod: {
-					connect: {
-						id: 'cma6ut8m70001e5sc91vb4dn9',
-					},
-				},
-				totalPrice: totalPrice,
-				reductionPrice: 0,
-			},
-		});
-	}
 
-	async createBill1(
+	async createBill(
 		bill: CreateBillDto,
 		productScheduleIds: string[],
 		discountIdsForProductSchedules: string[],
@@ -405,8 +368,6 @@ export class BillRepository {
 							},
 						},
 					},
-					paymentMethod: true,
-
 					transaction: true,
 					user: true,
 				},
@@ -441,16 +402,13 @@ export class BillRepository {
 				id: billId,
 				status: BillStatusEnum.pending,
 				transaction: {
-					status: TransactionStatusEnum.pending,
+					some: {
+						status: TransactionStatusEnum.completed,
+					},
 				},
 			},
 			data: {
 				status: BillStatusEnum.paid,
-				transaction: {
-					update: {
-						status: TransactionStatusEnum.completed,
-					},
-				},
 			},
 		});
 	}
@@ -488,11 +446,6 @@ export class BillRepository {
 				},
 				data: {
 					status: BillStatusEnum.cancel,
-					transaction: {
-						update: {
-							status: TransactionStatusEnum.canceled,
-						},
-					},
 				},
 			});
 			for (const infoBill of bill.infoBill) {

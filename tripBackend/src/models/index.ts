@@ -56,6 +56,8 @@ export * from './supplier/dto';
 export * from './supplier/entities';
 export * from './transaction/dto';
 export * from './transaction/entities';
+export * from './transactionSession/dto';
+export * from './transactionSession/entities';
 export * from './user/dto';
 export * from './user/entities';
 export * from './verifyEmail/dto';

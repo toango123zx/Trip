@@ -7,6 +7,7 @@ import { DiscountRepository } from '../discount/discount.repository';
 import { PaymentMethodRepository } from '../paymentMethod/paymentMethod.repository';
 import { ProductScheduleRepository } from '../productSchedule/productSchedule.repository';
 import { SupplierRepository } from '../supplier/supplier.repository';
+import { TransactionSessionRepository } from '../transactionSession/transactionSession.repository';
 import { UserRepository } from '../user/user.repository';
 
 import { BillController } from './bill.controller';
@@ -24,6 +25,7 @@ import { BillQueryHandlers } from './queries/handlers';
 		PaymentMethodRepository,
 		DiscountRepository,
 		BillRepository,
+		TransactionSessionRepository,
 		...BillQueryHandlers,
 		...BillCommandHandlers,
 	],

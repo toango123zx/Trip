@@ -18,7 +18,6 @@ export class DeleteProductScheduleByProductScheduleIdResponseDto {
 		id: string;
 		userId: string;
 		quantity: number;
-		paymentMethodId: string;
 		transactionTargetId: string;
 		reductionPrice: number;
 		totalPrice: number;
@@ -46,7 +45,6 @@ export class DeleteProductScheduleByProductScheduleIdResponseDto {
 				id: info.bill.id,
 				userId: info.bill.userId,
 				quantity: info.quantity,
-				paymentMethodId: info.bill.paymentMethodId,
 				transactionTargetId: info.bill.transactionTargetId,
 				reductionPrice: info.bill.reductionPrice,
 				totalPrice: info.bill.totalPrice,

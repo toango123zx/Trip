@@ -51,13 +51,4 @@ export class CreateBillRequest {
 	@IsArray()
 	@IsString({ each: true })
 	discountIds: string[];
-
-	@ApiProperty({
-		type: 'string',
-		required: true,
-		default: 'cma6ut8m70001e5sc91vb4dn9',
-	})
-	@IsNotEmpty()
-	@IsString()
-	paymentMethodId: string;
 }

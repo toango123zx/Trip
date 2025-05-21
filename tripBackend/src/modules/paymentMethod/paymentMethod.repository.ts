@@ -57,4 +57,16 @@ export class PaymentMethodRepository {
 			},
 		});
 	}
+
+	async getPaymentMethodByPaymentMethodName(
+		paymentMethodName: string,
+		status?: PaymentMethodStatusEnum,
+	): Promise<PaymentMethodEntity> {
+		return await this.prismaService.paymentMethod.findFirst({
+			where: {
+				name: paymentMethodName,
+				status: status,
+			},
+		});
+	}
 }

@@ -21,6 +21,7 @@ import { UserInformationDto } from '../user/dtos';
 import {
 	CancelBillByBillIdCommand,
 	CreateBillCommand,
+	PaymentBillByBillIdCommand,
 	UpdatePaidBillCommand,
 } from './commands/implements';
 import { CreateBillRequest, BillDetailResponseDto } from './dtos';
@@ -63,6 +64,17 @@ export class BillController {
 	): Promise<HttpResponseBodyDto<BillDetailResponseDto | HttpException>> {
 		return this.commandBus.execute(
 			new CreateBillCommand(myInformation, billInformation),
+		);
+	}
+
+	@Post('/:billId/payment')
+	@Auth()
+	async yaymentBillByBillId(
+		@Param('billId') billId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<BillDetailResponseDto | HttpException>> {
+		return this.commandBus.execute(
+			new PaymentBillByBillIdCommand(billId, myInformation),
 		);
 	}
 
