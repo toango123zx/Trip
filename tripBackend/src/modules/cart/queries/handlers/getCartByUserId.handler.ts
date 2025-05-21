@@ -7,7 +7,7 @@ import { GetCartResponseDto } from '../../dtos/responses/getCart.response';
 import { GetCartByUserIdQuery } from '../implements';
 
 @QueryHandler(GetCartByUserIdQuery)
-export class GetDiscountsByUserIdHandler implements IQueryHandler<GetCartByUserIdQuery> {
+export class GetCartsByUserIdHandler implements IQueryHandler<GetCartByUserIdQuery> {
 	constructor(private readonly cartRepository: CartRepository) {}
 
 	async execute(

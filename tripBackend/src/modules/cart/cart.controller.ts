@@ -1,5 +1,5 @@
 import { Controller, Delete, Get, HttpException, Param, Query } from '@nestjs/common';
-import { QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { PaginationDto, HttpResponseBodyDto } from 'src/common';
 
@@ -14,7 +14,10 @@ import { GetCartByUserIdQuery } from './queries/implements';
 
 @Controller('cart')
 export class CartController {
-	constructor(private readonly queryBus: QueryBus) {}
+	constructor(
+		private readonly queryBus: QueryBus,
+		private readonly commandBus: CommandBus,
+	) {}
 
 	@Get()
 	@Auth()
@@ -34,7 +37,7 @@ export class CartController {
 		@Param('cartId') cartId: string,
 		@MyInformation() myInformation: UserInformationDto,
 	): Promise<HttpResponseBodyDto<GetCartResponseDto> | HttpException> {
-		return this.queryBus.execute(
+		return this.commandBus.execute(
 			new DeleteScheduleInCartCommand(cartId, myInformation),
 		);
 	}

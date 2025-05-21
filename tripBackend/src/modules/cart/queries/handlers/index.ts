@@ -1,3 +1,3 @@
-import { GetDiscountsByUserIdHandler } from './getCartByUserId.handler';
+import { GetCartsByUserIdHandler } from './getCartByUserId.handler';
 
-export const CartQueryHandlers = [GetDiscountsByUserIdHandler];
+export const CartQueryHandlers = [GetCartsByUserIdHandler];
