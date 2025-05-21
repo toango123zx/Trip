@@ -17,14 +17,14 @@ export class DeleteScheduleInCartHandler
 	async execute(
 		command: DeleteScheduleInCartCommand,
 	): Promise<HttpResponseBodySuccessDto<GetCartResponseDto> | HttpException> {
-		const { cardId, myInformation } = command;
-		const cart = await this.cartRepository.getCartByCartId(cardId, myInformation.id);
+		const { cartId, myInformation } = command;
+		const cart = await this.cartRepository.getCartByCartId(cartId, myInformation.id);
 		if (!cart) {
 			throw new NotFoundException('cartId');
 		}
 
 		const cardDeleted = await this.cartRepository.deleteCart(
-			cardId,
+			cartId,
 			myInformation.id,
 		);
 		return {
