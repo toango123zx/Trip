@@ -16,6 +16,10 @@ import { ProductEntity, ProductScheduleEntity } from 'src/models';
 
 import { AuthPermission, AuthRole } from '../auth/decorators';
 import { DiscountFilterRequestDto, GetDiscountsResponseDto } from '../discount/dtos';
+import {
+	GetProductRatesResponseDto,
+	ProductRateFilterRequestDto,
+} from '../productRate/dto';
 import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
 import { MyInformation } from '../user/decorators';
@@ -38,6 +42,7 @@ import { GetProductByProductIdResponseDto } from './dtos/responses/getProductBBy
 import {
 	GetDiscountsByProductIdQuery,
 	GetProductByProductIdQuery,
+	GetProductRatesByProductIdQuery,
 	GetProductsManagementQuery,
 	GetProductsQuery,
 } from './queries/implement';
@@ -74,6 +79,17 @@ export class ProductController {
 		@Param('productId') productId: string,
 	): Promise<HttpResponseBodyDto<GetProductByProductIdResponseDto | HttpException>> {
 		return this.queryBus.execute(new GetProductByProductIdQuery(productId));
+	}
+
+	@Get('/:productId/rate')
+	async getProductRateByProductId(
+		@Param('productId') productId: string,
+		@Query() pagination: PaginationDto,
+		@Query() search?: ProductRateFilterRequestDto,
+	): Promise<HttpResponseBodyDto<GetProductRatesResponseDto[]> | HttpException> {
+		return this.queryBus.execute(
+			new GetProductRatesByProductIdQuery(productId, pagination, search),
+		);
 	}
 
 	@Get('/:productId/discount')
