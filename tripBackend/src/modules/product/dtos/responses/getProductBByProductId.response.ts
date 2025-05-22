@@ -8,6 +8,13 @@ export class GetProductByProductIdResponseDto extends GetProductsResponseDto {
 		url: string;
 	}[];
 
+	mapAddress: {
+		id: string;
+		url: string;
+		providerMap: string;
+		status: string;
+	};
+
 	productSchedule: {
 		id: string;
 		startTime: Date;
@@ -41,6 +48,14 @@ export class GetProductByProductIdResponseDto extends GetProductsResponseDto {
 			id: image.id,
 			url: image.url,
 		}));
+
+		this.mapAddress = {
+			id: product.mapAddress.id,
+			url: product.mapAddress.urlMap,
+			providerMap: product.mapAddress.providerMap.name,
+			status: product.mapAddress.status,
+		};
+
 		this.productSchedule = product.productSchedule.map((schedule) => ({
 			id: schedule.id,
 			startTime: schedule.startTime,
