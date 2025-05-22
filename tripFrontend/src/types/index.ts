@@ -1,4 +1,6 @@
 export * from './account.type';
+export * from './bill.type';
+export * from './cart.type';
 export * from './common.type';
 export * from './discount.type';
 export * from './discountApplicationScope.type';

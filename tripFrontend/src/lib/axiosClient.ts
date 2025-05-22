@@ -187,7 +187,7 @@ export const api = {
 			});
 	},
 
-	post: <T, D, Q = unknown>(
+	post: <T, D = unknown, Q = unknown>(
 		url: string,
 		data?: D,
 		query?: Q,

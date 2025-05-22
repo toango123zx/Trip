@@ -1,0 +1,43 @@
+export type TCartSummary = {
+	id: string;
+	userId: string;
+	productScheduleId: string;
+	scheduleId: string;
+	startTime: Date;
+	endTime: Date;
+	price: number;
+	booked: number;
+	startOrder: Date;
+	endOrder: Date;
+	ProductScheduleStatus: string;
+	product: {
+		id: string;
+		name: string;
+		posterImageUrl: string;
+		supplierId: string;
+		time: number;
+		quantityAvailable: number;
+		age: number;
+		quantityCompleted: number;
+		description: string;
+		quantityRate: number;
+		avgRate: number;
+		locationId: string;
+		locationName: string;
+		productCategoryId: string;
+		productCategoryName: string;
+		createAt: Date;
+		updateAt: Date;
+		deletedAt: Date | null;
+		status: string;
+		supplier: {
+			id: string;
+			userId: string;
+			name: string;
+			image: string;
+			status: string;
+			taxId: string;
+			fee: number;
+		};
+	};
+};

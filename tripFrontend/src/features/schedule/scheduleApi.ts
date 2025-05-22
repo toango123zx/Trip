@@ -1,5 +1,5 @@
 import { api, EServer } from '@/lib';
-import { EProductScheduleStatus, TProductSchedule } from '@/types';
+import { EProductScheduleStatus, TCartSummary, TProductSchedule } from '@/types';
 
 import { TRequestBodyCreateSchedule, TReSponseBodyScheduleDetail } from './schedule.type';
 
@@ -34,6 +34,16 @@ export const scheduleApi = {
 		const data = await api.post<TProductSchedule, TRequestBodyCreateSchedule>(
 			`/product/${productId}/schedule`,
 			schedule,
+			{},
+			EServer.Backend,
+		);
+		return data;
+	},
+
+	async addScheduleToCart(scheduleId: string): Promise<TCartSummary> {
+		const data = await api.post<TCartSummary>(
+			`/schedule/${scheduleId}/add-to-cart`,
+			{},
 			{},
 			EServer.Backend,
 		);
