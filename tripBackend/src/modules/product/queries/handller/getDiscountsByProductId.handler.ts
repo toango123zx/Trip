@@ -1,7 +1,7 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 
 import { HttpResponseBodySuccessDto, IPaginationQuery } from 'src/common';
-import { GetDiscountsByProductIdResponseDto } from 'src/modules/discount/dtos';
+import { GetDiscountsResponseDto } from 'src/modules/discount/dtos';
 
 import { DiscountRepository } from 'src/modules/discount/discount.repository';
 
@@ -15,7 +15,7 @@ export class GetDiscountsByProductIdHandler
 
 	async execute(
 		query: GetDiscountsByProductIdQuery,
-	): Promise<HttpResponseBodySuccessDto<GetDiscountsByProductIdResponseDto[]>> {
+	): Promise<HttpResponseBodySuccessDto<GetDiscountsResponseDto[]>> {
 		const skip = (query.pagination.page - 1) * query.pagination.limit;
 		const pagination: IPaginationQuery = {
 			skip,
@@ -35,7 +35,7 @@ export class GetDiscountsByProductIdHandler
 		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
 
 		const discountsInformation = discounts.map(
-			(discount) => new GetDiscountsByProductIdResponseDto(discount),
+			(discount) => new GetDiscountsResponseDto(discount),
 		);
 		return {
 			success: true,

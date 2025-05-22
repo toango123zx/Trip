@@ -4,31 +4,32 @@ import { HttpResponseBodySuccessDto, PaginationUtils } from 'src/common';
 
 import { DiscountRepository } from '../../discount.repository';
 import { GetDiscountsResponseDto } from '../../dtos';
-import { GetDiscountsByUserIdQuery } from '../implements';
+import { GetDiscountsQuery } from '../implements';
 
-@QueryHandler(GetDiscountsByUserIdQuery)
-export class GetDiscountsByUserIdHandler
-	implements IQueryHandler<GetDiscountsByUserIdQuery>
-{
+@QueryHandler(GetDiscountsQuery)
+export class GetDiscountsHandler implements IQueryHandler<GetDiscountsQuery> {
 	constructor(private readonly discountRepository: DiscountRepository) {}
 
 	async execute(
-		query: GetDiscountsByUserIdQuery,
+		query: GetDiscountsQuery,
 	): Promise<HttpResponseBodySuccessDto<GetDiscountsResponseDto[]>> {
-		const { myInformation, pagination, filter } = query;
-		const page = new PaginationUtils().extractSkipTakeFromPagination(pagination);
-		const { keyword, statusSearch, ...discountFilter } = filter;
-		const [discounts, totalRecords] =
-			await this.discountRepository.findDiscountsByUserId(
-				page,
-				myInformation.id,
-				keyword,
-				statusSearch,
-				discountFilter,
-			);
+		const page = new PaginationUtils().extractSkipTakeFromPagination(
+			query.pagination,
+		);
+		const { keyword, statusSearch, ...discountFilter } = query.filter;
+		const [discounts, totalRecords] = await this.discountRepository.findDiscounts(
+			undefined,
+			keyword,
+			statusSearch,
+			true,
+			page,
+			discountFilter,
+		);
+
 		const discountsInformation = discounts.map(
 			(discount) => new GetDiscountsResponseDto(discount),
 		);
+
 		return {
 			success: true,
 			data: discountsInformation,

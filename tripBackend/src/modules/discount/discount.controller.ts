@@ -31,10 +31,12 @@ import {
 	DeleteProductSchedulesToDiscountRequestDto,
 	DiscountFilterRequestDto,
 	GetDiscountByDiscountIdResponseDto,
+	GetDiscountsResponseDto,
 } from './dtos';
 import {
 	GetDiscountByDiscountIdQuery,
 	GetDiscountsByUserIdQuery,
+	GetDiscountsQuery,
 	GetNonDiscountableSchedulesQuery,
 } from './queries/implements';
 
@@ -46,12 +48,20 @@ export class DiscountController {
 	) {}
 
 	@Get()
-	@AuthPermission(PermissionEnum.FindDiscountsByUserId)
 	async getDiscounts(
+		@Query() pagination: PaginationDto,
+		@Query() search?: DiscountFilterRequestDto,
+	): Promise<HttpResponseBodyDto<GetDiscountsResponseDto[]>> {
+		return this.queryBus.execute(new GetDiscountsQuery(pagination, search));
+	}
+
+	@Get('/management')
+	@AuthPermission(PermissionEnum.FindDiscountsByUserId)
+	async getDiscountsByUserId(
 		@Query() pagination: PaginationDto,
 		@MyInformation() myInformation: UserInformationDto,
 		@Query() search?: DiscountFilterRequestDto,
-	): Promise<HttpResponseBodyDto<DiscountEntity[] | HttpException>> {
+	): Promise<HttpResponseBodyDto<GetDiscountsResponseDto[]>> {
 		return this.queryBus.execute(
 			new GetDiscountsByUserIdQuery(pagination, myInformation, search),
 		);

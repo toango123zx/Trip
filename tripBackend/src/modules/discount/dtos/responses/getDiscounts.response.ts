@@ -1,6 +1,6 @@
 import { DiscountEntity } from 'src/models';
 
-export class GetDiscountsByProductIdResponseDto {
+export class GetDiscountsResponseDto {
 	id: string;
 	name: string;
 	user: {
