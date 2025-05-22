@@ -24,7 +24,8 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
 		command: CreateProductCommand,
 	): Promise<HttpResponseBodySuccessDto<ProductEntity> | HttpException> {
 		const { createProductRequestDto, supplierInformation } = command;
-		const { locationId, productCategoryId, ...productData } = createProductRequestDto;
+		const { locationId, productCategoryId, productImageUrls, ...productData } =
+			createProductRequestDto;
 
 		const productCategory =
 			await this.productCategoryRepository.findProductCategoryByProductCategoryId(
@@ -44,6 +45,12 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
 		if (!productCategory || !location) {
 			throw new ConflictException('Product category or location not found');
 		}
+		const productImages = !(productImageUrls?.length !== 0)
+			? []
+			: productImageUrls.map((url) => ({
+					url: url,
+				}));
+
 		const product: CreateProductDto = {
 			...productData,
 			supplier: {

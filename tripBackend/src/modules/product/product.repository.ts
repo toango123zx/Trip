@@ -126,15 +126,29 @@ export class ProductRepository {
 		});
 	}
 
-	async createProduct(productInformation: CreateProductDto): Promise<ProductEntity> {
+	async createProduct(
+		productInformation: CreateProductDto,
+		productImageUrls: string[] = [],
+	): Promise<ProductEntity> {
 		return this.prismaService.product.create({
-			data: productInformation,
+			data: {
+				...productInformation,
+				productImage: {
+					createMany: {
+						data: productImageUrls.map((url) => ({
+							url: url,
+						})),
+					},
+				},
+			},
 		});
 	}
 
 	async updateProductByProductId(
 		productId: string,
 		productInformation: UpdateProductDto,
+		addProductImageUrls: string[] = [],
+		removeProductImageIds: string[] = [],
 	): Promise<ProductEntity> {
 		return this.prismaService.product.update({
 			include: {
@@ -149,7 +163,19 @@ export class ProductRepository {
 			where: {
 				id: productId,
 			},
-			data: productInformation,
+			data: {
+				...productInformation,
+				productImage: {
+					createMany: {
+						data: addProductImageUrls.map((url) => ({ url: url })),
+					},
+					deleteMany: {
+						id: {
+							in: removeProductImageIds,
+						},
+					},
+				},
+			},
 		});
 	}
 
