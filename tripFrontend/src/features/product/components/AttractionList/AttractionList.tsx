@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SelectBox } from '@/components';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
+import { TProductSumary } from '@/types';
 import { locations, optionSortAttraction } from '@/utils';
 
 import { TSearchAttraction } from '../../product.type';
@@ -28,10 +29,20 @@ export const AttractionList = ({
 	const attractions = useSelector((state: TReduxStoreState) => state.product.products);
 	const [selectOption, setSelectOption] = useState<string>('');
 	const [selectSort, setSelectSort] = useState<string>('desc');
+	const [at, setat] = useState<TProductSumary[]>([]);
 
 	useEffect(() => {
-		dispatch(productThunk.getProducts());
+		dispatch(
+			productThunk.getProducts({
+				page: 1,
+				limit: 100,
+			}),
+		);
 	}, [dispatch]);
+
+	useEffect(() => {
+		setat(attractions);
+	}, [attractions]);
 
 	const handleSortChange = (): void => {
 		setSelectSort((prev) => (prev === 'asc' ? 'desc' : 'asc'));
@@ -95,7 +106,7 @@ export const AttractionList = ({
 				<div>
 					<div className="w-full relative overflow-hidden pt-9 pb-14">
 						<div className="w-full grid grid-cols-2 md:grid-cols-3 gap-y-9 gap-x-5 transition-transform duration-300 ease-in-out">
-							{attractions.map((attraction) => (
+							{at.map((attraction) => (
 								<CardProduct
 									key={attraction.id}
 									product={attraction}

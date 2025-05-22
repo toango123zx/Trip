@@ -1,4 +1,5 @@
 export * from './auth';
+export * from './bill';
 export * from './cart';
 export * from './discount';
 export * from './discountApplicationScope';

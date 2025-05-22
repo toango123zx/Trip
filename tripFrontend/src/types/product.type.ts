@@ -115,9 +115,9 @@ export type TSchedule = {
 	productName: string;
 	cityName: string;
 	startDate: Date;
-	startTime: string;
+	// startTime: string;
 	endDate: Date;
-	endTime: string;
+	// endTime: string;
 	booked: number;
 	price: number;
 	status: string;

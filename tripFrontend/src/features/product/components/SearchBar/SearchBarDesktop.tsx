@@ -1,18 +1,23 @@
 'use client';
 
-import { JSX } from 'react';
+import React, { JSX, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { IoSearchOutline } from 'react-icons/io5';
+import { useDispatch } from 'react-redux';
 
 import { SelectBox } from '@/components';
 import { cn } from '@/lib';
+import { TReduxStoreDispatch } from '@/store';
 import { locations } from '@/utils';
 
 import { TSearchAttraction } from '../../product.type';
+import { productThunk } from '../../productThunk';
 import { Button } from '../Button';
 
 type TSeachBarDesktopProps = {
 	form: UseFormReturn<TSearchAttraction>;
+	keyword?: string;
+	setKeyword?: React.Dispatch<React.SetStateAction<string>>;
 	className?: string;
 };
 
@@ -20,13 +25,24 @@ export const SearchBarDesktop = ({
 	form,
 	className,
 }: TSeachBarDesktopProps): JSX.Element => {
-	const { register, handleSubmit } = form;
+	const [keyword, setKeyword] = useState<string>('');
 
+	const { register, handleSubmit } = form;
+	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const handlerSubmitOnClick = async (data: TSearchAttraction): Promise<void> => {
 		if (data.name) {
 			String(data.name).trim();
 		}
-		// Handle logic for search query
+	};
+
+	const onSearch = (): void => {
+		dispatch(
+			productThunk.getProducts({
+				keyword: keyword,
+				page: 1,
+				limit: 100,
+			}),
+		);
 	};
 
 	return (
@@ -52,6 +68,11 @@ export const SearchBarDesktop = ({
 									<input
 										type="text"
 										{...register('name')}
+										onChange={(e) => {
+											if (setKeyword) {
+												setKeyword(e.target.value);
+											}
+										}}
 										placeholder="Keyword here"
 										className="h-14 flex items-center bg-white border border-black rounded-lg px-4 py-2 w-fit focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150"
 									/>
@@ -98,6 +119,7 @@ export const SearchBarDesktop = ({
 									size="icon"
 									className="w-32 h-20 px-12 py-7 p-4 rounded-3xl"
 									type="submit"
+									onClick={onSearch}
 								>
 									<IoSearchOutline className="h-8 w-8 " />
 								</Button>
