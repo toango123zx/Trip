@@ -1,15 +1,29 @@
-import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
+import {
+	Controller,
+	Delete,
+	Get,
+	HttpException,
+	Param,
+	Post,
+	Query,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOperation } from '@nestjs/swagger';
 
 import { HttpResponseBodyDto, PaginationDto, PermissionEnum } from 'src/common';
 import { ProductScheduleEntity } from 'src/models';
 
-import { AuthPermission } from '../auth/decorators';
+import { Auth, AuthPermission } from '../auth/decorators';
+import { GetCartResponseDto } from '../cart/dtos/responses/getCart.response';
 import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
+import { MyInformation } from '../user/decorators';
+import { UserInformationDto } from '../user/dtos';
 
-import { DeleteProductScheduleByProductScheduleIdCommand } from './commands/implements';
+import {
+	AddToCartByProductScheduleIdCommand,
+	DeleteProductScheduleByProductScheduleIdCommand,
+} from './commands/implements';
 import {
 	DeleteProductScheduleByProductScheduleIdResponseDto,
 	GetProductScheduleByProductScheduleIdRequestDto,
@@ -51,6 +65,17 @@ export class ProductScheduleController {
 	): Promise<HttpResponseBodyDto<ProductScheduleEntity>> {
 		return this.queryBus.execute(
 			new GetProductScheduleByProductScheduleIdQuery(productScheduleId, filter),
+		);
+	}
+
+	@Post(':productScheduleId/add-to-cart')
+	@Auth()
+	async addProductScheduleToCart(
+		@Param('productScheduleId') productScheduleId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<GetCartResponseDto> | HttpException> {
+		return this.commandBus.execute(
+			new AddToCartByProductScheduleIdCommand(productScheduleId, myInformation),
 		);
 	}
 
