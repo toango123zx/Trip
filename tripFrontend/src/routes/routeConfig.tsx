@@ -6,11 +6,18 @@ import { productsRoutes } from './productsRoutes';
 import { usersRoutes } from './useRoutes';
 
 const HomePage = lazy(() => import('@/pages/Home'));
+const SalesPage = lazy(() => import('@/pages/SalesPage'));
 
 const AppRoutes = [
 	{
 		path: '/',
 		element: <HomePage />,
+	},
+	{
+		path: '/sales',
+		element: (
+			<SalesPage />
+		),
 	},
 	...authRoutes,
 	...usersRoutes,

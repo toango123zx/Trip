@@ -41,7 +41,6 @@ export const AddDiscount = ({
 		data: TRequestBodyCreateDiscount,
 	) => {
 		dispatch(discountThunk.createDiscount({ discount: data }));
-		console.log('Dispatched createDiscount action');
 		setHasSubmitted(true);
 	};
 

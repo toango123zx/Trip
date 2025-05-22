@@ -1,5 +1,5 @@
 import { InputRef, TableColumnsType, notification } from 'antd';
-import { JSX, useState, useRef } from 'react';
+import { JSX, useState, useRef, useEffect } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { useDispatch } from 'react-redux';
 
@@ -45,19 +45,31 @@ export const SchedulesBoard = ({
 	setPage,
 	onDeleteSuccess,
 }: TSchedulesBoard): JSX.Element => {
+	const [localData, setLocalData] = useState<TProductSchedule[] | TRequestBodyCreateSchedule[]>(data || []);
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
 	const searchInput = useRef<InputRef>(null);
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 
+	// Thêm useEffect để đồng bộ dữ liệu khi prop data thay đổi
+	useEffect(() => {
+		setLocalData(data || []);
+	}, [data]);
+
 	const handleDelete = async (scheduleId: string): Promise<void> => {
 		try {
 			await dispatch(scheduleThunk.deleteSchedule(scheduleId)).unwrap();
+			
+			// Cập nhật local state
+			const updatedData = localData.filter(schedule => schedule.id !== scheduleId);
+			setLocalData(updatedData);
+
 			notification.success({
 				message: 'Success',
 				description: 'Schedule deleted successfully',
 				duration: 3,
 			});
+			
 			if (onDeleteSuccess) {
 				onDeleteSuccess();
 			}
@@ -151,9 +163,9 @@ export const SchedulesBoard = ({
 		<BaseTable<TProductSchedule>
 			rowKey="id"
 			columns={columnTable}
-			dataSource={data as TProductSchedule[]}
+			dataSource={localData as TProductSchedule[]}
 			className={cn(className)}
-			pagination={(data?.length ?? 0) > (pageSize ?? 10) ? { pageSize } : false}
+			pagination={(localData?.length ?? 0) > (pageSize ?? 10) ? { pageSize } : false}
 			size="middle"
 		/>
 	);

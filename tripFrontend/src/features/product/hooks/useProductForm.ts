@@ -28,14 +28,11 @@ export const useProductForm = () => {
 
     try {
       geminiService.saveLocationName(locationName);
-      console.log('Saved location name to localStorage:', locationName);
 
       setIsGeneratingDescription(true);
       
-      console.log('Calling geminiService.generateTravelDescription...');
       const description = await geminiService.generateTravelDescription(locationName);
       
-      console.log('Generated Description:', description);
       
       form.setValue('description', description, { 
         shouldValidate: true, 
@@ -45,24 +42,21 @@ export const useProductForm = () => {
       
       setLocationDescription(description);
       
-      console.log('Current form description after setValue:', form.getValues('description'));
       
       notificationUtils.success();
 
       return description;
     } catch (error) {
-      console.error('Error in generateLocationDescription:', error);
       
       notificationUtils.error();
       throw error;
     } finally {
       setIsGeneratingDescription(false);
-      console.log('generateLocationDescription process completed');
+      ('generateLocationDescription process completed');
     }
   }, [form]);
 
   const clearLocationDescription = () => {
-    console.log('Clearing location description');
     
     geminiService.clearLocationName();
     setLocationDescription('');

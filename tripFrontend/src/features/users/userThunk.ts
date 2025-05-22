@@ -28,22 +28,9 @@ export const userThunk = {
 		'user/getMe',
 		async (_, { rejectWithValue }) => {
 			try {
-				console.log('Attempting to fetch user me...');
-				
-				// Log thông tin cookies trước khi request
-				console.log('Cookies before request:', document.cookie);
-				
 				const response = await axiosInstance.get('/user/me', {
 					timeout: 10000 // 10 giây timeout
 				});
-				
-				// Log thông tin response
-				console.log('User me response:', {
-					data: response.data,
-					headers: response.headers,
-					status: response.status
-				});
-				
 				return response.data.data;
 			} catch (error) {
 				console.error('Error in getMe:', error);
@@ -60,23 +47,10 @@ export const userThunk = {
 		'user/getUsers',
 		async (query, { rejectWithValue }) => {
 			try {
-				console.log('Fetching users with query:', query);
-				
-				// Log thông tin cookies trước khi request
-				console.log('Cookies before request:', document.cookie);
-				
 				const response = await axiosInstance.get('/user', { 
 					params: query,
 					timeout: 10000 // 10 giây timeout
 				});
-				
-				// Log thông tin response
-				console.log('Users response:', {
-					data: response.data,
-					headers: response.headers,
-					status: response.status
-				});
-				
 				return [response.data.data, response.data.pagination];
 			} catch (error) {
 				console.error('Error in getUsers:', error);
@@ -99,11 +73,9 @@ export const userThunk = {
 		'user/createUser',
 		async (userData, { rejectWithValue }) => {
 			try {
-				console.log('Creating user:', userData);
 				const response = await axiosInstance.post('/user', userData, {
 					timeout: 10000 // 10 giây timeout
 				});
-				console.log('Create user response:', response.data);
 				notificationUtils.success();
 				return response.data.data;
 			} catch (error) {
@@ -130,11 +102,9 @@ export const userThunk = {
 		'user/updateUser',
 		async ({ userId, ...userData }, { rejectWithValue }) => {
 			try {
-				console.log(`Updating user ${userId}:`, userData);
 				const response = await axiosInstance.put(`/user/${userId}`, userData, {
 					timeout: 10000 // 10 giây timeout
 				});
-				console.log('Update user response:', response.data);
 				notificationUtils.success();
 				return response.data.data;
 			} catch (error) {
@@ -152,11 +122,9 @@ export const userThunk = {
 		'user/lockUser',
 		async (userId, { rejectWithValue }) => {
 			try {
-				console.log(`Locking user ${userId}`);
 				const response = await axiosInstance.put(`/user/${userId}/lock`, {}, {
 					timeout: 10000 // 10 giây timeout
 				});
-				console.log('Lock user response:', response.data);
 				notificationUtils.success();
 				return response.data.data;
 			} catch (error) {
@@ -174,11 +142,9 @@ export const userThunk = {
 		'user/unlockUser',
 		async (userId, { rejectWithValue }) => {
 			try {
-				console.log(`Unlocking user ${userId}`);
 				const response = await axiosInstance.patch(`/user/${userId}/unlock`, {}, {
 					timeout: 10000 // 10 giây timeout
 				});
-				console.log('Unlock user response:', response.data);
 				notificationUtils.success();
 				return response.data.data;
 			} catch (error) {

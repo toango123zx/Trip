@@ -64,7 +64,6 @@ export const FormTextarea = <T extends FieldValues>({
                 onChange={(e) => {
                   field.onChange(e);
                   onChange?.(e.target.value);
-                  console.log('FormTextarea - onChange:', e.target.value);
                 }}
                 className={`w-full px-3 py-2 border rounded-md ${
                   error

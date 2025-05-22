@@ -323,10 +323,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 							type="button"
 							className="text-blue-500 flex gap-2.5 items-center"
 							onClick={() => {
-								console.log('Selected user for edit:', record);
-								
 								const userToEdit = users.find(user => user.id === record.id);
-								
 								if (userToEdit) {
 									setSelectedUser(userToEdit);
 									setIsOpenEditUserModal(true);

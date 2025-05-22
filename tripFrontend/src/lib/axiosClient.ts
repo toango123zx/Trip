@@ -148,11 +148,7 @@ export const api = {
 				params: query,
 			})
 			.then((response) => {
-				console.log('Raw API response:', response);
-				
-				// Xử lý các trường hợp response khác nhau
 				if (response.data) {
-					// Trường hợp response.data có cấu trúc { success, data, pagination }
 					if (response.data.success !== undefined) {
 						return {
 							success: response.data.success,
@@ -161,7 +157,6 @@ export const api = {
 						};
 					}
 					
-					// Trường hợp response.data là mảng dữ liệu trực tiếp
 					return {
 						success: true,
 						data: response.data,
@@ -171,7 +166,6 @@ export const api = {
 					};
 				}
 				
-				// Trường hợp không có dữ liệu
 				throw new Error('No data in response');
 			})
 			.catch((error) => {
@@ -207,15 +201,10 @@ export const api = {
 				params: query,
 			})
 			.then((response) => {
-				console.log('Raw POST response:', response);
-				
 				if (response.data) {
-					// Trường hợp response.data có cấu trúc { success, data }
 					if (response.data.success !== undefined) {
 						return response.data.data;
 					}
-					
-					// Trường hợp response.data là dữ liệu trực tiếp
 					return response.data;
 				}
 				
@@ -252,15 +241,10 @@ export const api = {
 				params: query,
 			})
 			.then((response) => {
-				console.log('Raw PUT response:', response);
-				
 				if (response.data) {
-					// Trường hợp response.data có cấu trúc { success, data }
 					if (response.data.success !== undefined) {
 						return response.data.data;
 					}
-					
-					// Trường hợp response.data là dữ liệu trực tiếp
 					return response.data;
 				}
 				
@@ -298,15 +282,10 @@ export const api = {
 				data: data,
 			})
 			.then((response) => {
-				console.log('Raw DELETE response:', response);
-				
 				if (response.data) {
-					// Trường hợp response.data có cấu trúc { success, data }
 					if (response.data.success !== undefined) {
 						return response.data.data;
 					}
-					
-					// Trường hợp response.data là dữ liệu trực tiếp
 					return response.data;
 				}
 				
