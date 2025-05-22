@@ -118,6 +118,11 @@ export class ProductRepository {
 				},
 				location: true,
 				productCategory: true,
+				mapAddress: {
+					include: {
+						providerMap: true,
+					},
+				},
 			},
 			where: {
 				id: productId,
@@ -149,6 +154,7 @@ export class ProductRepository {
 		productInformation: UpdateProductDto,
 		addProductImageUrls: string[] = [],
 		removeProductImageIds: string[] = [],
+		urlMap: string,
 	): Promise<ProductEntity> {
 		return this.prismaService.product.update({
 			include: {
@@ -173,6 +179,11 @@ export class ProductRepository {
 						id: {
 							in: removeProductImageIds,
 						},
+					},
+				},
+				mapAddress: {
+					update: {
+						urlMap: urlMap,
 					},
 				},
 			},

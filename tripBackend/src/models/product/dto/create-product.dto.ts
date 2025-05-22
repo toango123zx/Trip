@@ -3,6 +3,7 @@ import { IsInt, IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-val
 import { Type } from 'class-transformer';
 import { ConnectSupplierDto } from '../../supplier/dto/connect-supplier.dto';
 import { ConnectLocationDto } from '../../location/dto/connect-location.dto';
+import { CreateMapAddressDto } from '../../mapAddress/dto/create-mapAddress.dto';
 import { ConnectProductCategoryDto } from '../../productCategory/dto/connect-productCategory.dto';
 
 export class CreateProductSupplierRelationInputDto {
@@ -32,6 +33,26 @@ export class CreateProductProductCategoryRelationInputDto {
 	@Type(() => ConnectProductCategoryDto)
 	connect: ConnectProductCategoryDto;
 }
+export class CreateProductMapAddressRelationInputDto {
+	@ApiProperty({
+		type: CreateMapAddressDto,
+	})
+	@IsNotEmpty()
+	@ValidateNested()
+	@Type(() => CreateMapAddressDto)
+	create: CreateMapAddressDto;
+}
+export class CreateProductProductImageRelationInputDto {
+	@ApiProperty({
+		type: CreateProductImageDto,
+		isArray: true,
+	})
+	@IsNotEmpty()
+	@IsArray()
+	@ValidateNested({ each: true })
+	@Type(() => CreateProductImageDto)
+	create: CreateProductImageDto[];
+}
 
 @ApiExtraModels(
 	ConnectSupplierDto,
@@ -40,6 +61,10 @@ export class CreateProductProductCategoryRelationInputDto {
 	CreateProductLocationRelationInputDto,
 	ConnectProductCategoryDto,
 	CreateProductProductCategoryRelationInputDto,
+	CreateMapAddressDto,
+	CreateProductMapAddressRelationInputDto,
+	CreateProductImageDto,
+	CreateProductProductImageRelationInputDto,
 )
 export class CreateProductDto {
 	@ApiProperty({
@@ -105,4 +130,21 @@ export class CreateProductDto {
 	@ValidateNested()
 	@Type(() => CreateProductProductCategoryRelationInputDto)
 	productCategory: CreateProductProductCategoryRelationInputDto;
+	@ApiProperty({
+		required: false,
+		nullable: true,
+		type: CreateProductMapAddressRelationInputDto,
+	})
+	@IsOptional()
+	@ValidateNested()
+	@Type(() => CreateProductMapAddressRelationInputDto)
+	mapAddress?: CreateProductMapAddressRelationInputDto | null;
+	@ApiProperty({
+		required: false,
+		type: CreateProductProductImageRelationInputDto,
+	})
+	@IsOptional()
+	@ValidateNested()
+	@Type(() => CreateProductProductImageRelationInputDto)
+	productImage?: CreateProductProductImageRelationInputDto;
 }

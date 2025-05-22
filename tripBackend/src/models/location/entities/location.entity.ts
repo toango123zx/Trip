@@ -23,15 +23,6 @@ export class LocationEntity {
 	city: CityEnum;
 	@ApiProperty({
 		type: 'string',
-	})
-	mapAddressId: string;
-	@ApiProperty({
-		type: () => MapAddressEntity,
-		required: false,
-	})
-	mapAddress?: MapAddressEntity;
-	@ApiProperty({
-		type: 'string',
 		format: 'date-time',
 	})
 	createAt: Date;

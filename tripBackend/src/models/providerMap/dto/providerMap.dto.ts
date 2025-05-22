@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { ProviderMapStatusEnum } from '@prisma/client';
+
 export class ProviderMapDto {
 	@ApiProperty({
 		type: 'string',
@@ -29,4 +31,9 @@ export class ProviderMapDto {
 		nullable: true,
 	})
 	deletedAt: Date | null;
+	@ApiProperty({
+		enum: ProviderMapStatusEnum,
+		enumName: 'ProviderMapStatusEnum',
+	})
+	status: ProviderMapStatusEnum;
 }

@@ -2,6 +2,7 @@ import { ProductStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { SupplierEntity } from '../../supplier/entities/supplier.entity';
 import { LocationEntity } from '../../location/entities/location.entity';
+import { MapAddressEntity } from '../../mapAddress/entities/mapAddress.entity';
 import { ProductCategoryEntity } from '../../productCategory/entities/productCategory.entity';
 import { ProductImageEntity } from '../../productImage/entities/productImage.entity';
 import { ProductRateEntity } from '../../productRate/entities/productRate.entity';
@@ -105,6 +106,12 @@ export class ProductEntity {
 		enumName: 'ProductStatusEnum',
 	})
 	status: ProductStatusEnum;
+	@ApiProperty({
+		type: () => MapAddressEntity,
+		required: false,
+		nullable: true,
+	})
+	mapAddress?: MapAddressEntity | null;
 	@ApiProperty({
 		type: () => ProductImageEntity,
 		isArray: true,

@@ -10,6 +10,7 @@ export class CreateProductRequestDto extends OmitType(CreateProductDto, [
 	'location',
 	'productCategory',
 	'productImage',
+	'mapAddress',
 ]) {
 	@AutoTrim()
 	name: string;
@@ -29,6 +30,7 @@ export class CreateProductRequestDto extends OmitType(CreateProductDto, [
 	})
 	@IsNotEmpty()
 	@IsString()
+	@AutoTrim()
 	locationId: string;
 	@ApiProperty({
 		type: String,
@@ -36,6 +38,7 @@ export class CreateProductRequestDto extends OmitType(CreateProductDto, [
 	})
 	@IsNotEmpty()
 	@IsString()
+	@AutoTrim()
 	productCategoryId: string;
 	@ApiProperty({
 		type: String,
@@ -48,4 +51,12 @@ export class CreateProductRequestDto extends OmitType(CreateProductDto, [
 	@IsString({ each: true })
 	@AutoTrim()
 	productImageUrls?: string[];
+	@ApiProperty({
+		type: String,
+		required: true,
+	})
+	@IsNotEmpty()
+	@IsString()
+	@AutoTrim()
+	urlMap: string;
 }

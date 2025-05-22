@@ -23,6 +23,15 @@ export class MapAddressEntity {
 	providerMap?: ProviderMapEntity;
 	@ApiProperty({
 		type: 'string',
+	})
+	productId: string;
+	@ApiProperty({
+		type: () => ProductEntity,
+		required: false,
+	})
+	product?: ProductEntity;
+	@ApiProperty({
+		type: 'string',
 		format: 'date-time',
 	})
 	createAt: Date;
@@ -42,10 +51,4 @@ export class MapAddressEntity {
 		enumName: 'MapAddressStatusEnum',
 	})
 	status: MapAddressStatusEnum;
-	@ApiProperty({
-		type: () => LocationEntity,
-		required: false,
-		nullable: true,
-	})
-	location?: LocationEntity | null;
 }

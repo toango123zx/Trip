@@ -13,22 +13,8 @@ export class CreateMapAddressProviderMapRelationInputDto {
 	@Type(() => ConnectProviderMapDto)
 	connect: ConnectProviderMapDto;
 }
-export class CreateMapAddressLocationRelationInputDto {
-	@ApiProperty({
-		type: CreateLocationDto,
-	})
-	@IsNotEmpty()
-	@ValidateNested()
-	@Type(() => CreateLocationDto)
-	create: CreateLocationDto;
-}
 
-@ApiExtraModels(
-	ConnectProviderMapDto,
-	CreateMapAddressProviderMapRelationInputDto,
-	CreateLocationDto,
-	CreateMapAddressLocationRelationInputDto,
-)
+@ApiExtraModels(ConnectProviderMapDto, CreateMapAddressProviderMapRelationInputDto)
 export class CreateMapAddressDto {
 	@ApiProperty({
 		type: 'string',
@@ -43,13 +29,4 @@ export class CreateMapAddressDto {
 	@ValidateNested()
 	@Type(() => CreateMapAddressProviderMapRelationInputDto)
 	providerMap: CreateMapAddressProviderMapRelationInputDto;
-	@ApiProperty({
-		required: false,
-		nullable: true,
-		type: CreateMapAddressLocationRelationInputDto,
-	})
-	@IsOptional()
-	@ValidateNested()
-	@Type(() => CreateMapAddressLocationRelationInputDto)
-	location?: CreateMapAddressLocationRelationInputDto | null;
 }
