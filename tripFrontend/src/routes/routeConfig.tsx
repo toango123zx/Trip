@@ -2,6 +2,7 @@ import { lazy } from 'react';
 
 import { attractionRoutes } from './attractions';
 import { authRoutes } from './authRoutes';
+import { cartsRoutes } from './cartsRoutes';
 import { productsRoutes } from './productsRoutes';
 import { usersRoutes } from './useRoutes';
 
@@ -16,6 +17,7 @@ const AppRoutes = [
 	...usersRoutes,
 	...attractionRoutes,
 	...productsRoutes,
+	...cartsRoutes,
 ];
 
 export default AppRoutes;
