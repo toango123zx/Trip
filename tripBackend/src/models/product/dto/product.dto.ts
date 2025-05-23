@@ -47,8 +47,8 @@ export class ProductDto {
 	})
 	quantityRate: number;
 	@ApiProperty({
-		type: 'integer',
-		format: 'int32',
+		type: 'number',
+		format: 'float',
 	})
 	avgRate: number;
 	@ApiProperty({

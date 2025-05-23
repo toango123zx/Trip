@@ -72,16 +72,16 @@ model productCategory {
 }
 
 model providerMap {
-    id          String    @id @default(cuid())
+    id          String                @id @default(cuid())
     name        String
     description String
-    createAt    DateTime  @default(now()) @map("create_at")
+    createAt    DateTime              @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    updateAt    DateTime  @updatedAt @map("update_at")
+    updateAt    DateTime              @updatedAt @map("update_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    deletedAt   DateTime? @map("deleted_at")
+    deletedAt   DateTime?             @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
     status      ProviderMapStatusEnum @default(active)
@@ -149,7 +149,7 @@ model product {
     quantityCompleted Int               @default(0) @map("quantity_completed")
     description       String
     quantityRate      Int               @default(0) @map("quantity_rate")
-    avgRate           Int               @default(0) @map("avg_rate")
+    avgRate           Float             @default(0) @map("avg_rate")
     locationId        String            @map("location_id")
     /// @DtoRelationCanConnectOnCreate
     location          location          @relation(fields: [locationId], references: [id])
@@ -196,6 +196,7 @@ model productRate {
     /// @DtoUpdateHidden
     productId String                @map("product_id")
     /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanConnectOnCreate
     product   product               @relation(fields: [productId], references: [id])
     /// @DtoUpdateHidden
     userId    String                @map("user_id")
@@ -203,7 +204,7 @@ model productRate {
     user      user                  @relation(fields: [userId], references: [id])
     /// @maximum 5
     /// @minimum 0
-    star      Int                   @default(0)
+    star      Int
     comment   String
     /// @DtoCreateHidden
     /// @DtoUpdateHidden

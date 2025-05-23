@@ -21,7 +21,10 @@ export class GetBillsByUserIdHandler implements IQueryHandler<GetBillsByUserIdQu
 			page,
 			myInformation.id,
 			userIdSearch,
+			undefined,
+			undefined,
 			statusSearch,
+			undefined,
 			keyword,
 			billFilter,
 		);

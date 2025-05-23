@@ -14,7 +14,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { HttpResponseBodyDto, PaginationDto, PermissionEnum, RoleEnum } from 'src/common';
 import { ProductEntity, ProductScheduleEntity } from 'src/models';
 
-import { AuthPermission, AuthRole } from '../auth/decorators';
+import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
 import { DiscountFilterRequestDto, GetDiscountsResponseDto } from '../discount/dtos';
 import {
 	GetProductRatesResponseDto,
@@ -27,6 +27,7 @@ import { UserInformationDto } from '../user/dtos';
 
 import {
 	CreateProductCommand,
+	CreateProductRateByProductIdCommand,
 	CreateProductScheduleByProductIdCommand,
 	DeleteProductByProductIdCommand,
 	UpdateProductInformationByProductIdCommand,
@@ -37,6 +38,7 @@ import {
 	GetProductsResponseDto,
 	ProductFilterRequestDto,
 	UpdateProductInformationByProductIdRequestDto,
+	CreateProductRateByProductIdRequestDto,
 } from './dtos';
 import { GetProductByProductIdResponseDto } from './dtos/responses/getProductBByProductId.response';
 import {
@@ -126,6 +128,22 @@ export class ProductController {
 				productId,
 				productScheduleInformation,
 				supplierInformation,
+			),
+		);
+	}
+
+	@Post('/:productId/rate')
+	@Auth()
+	async createProductRateByProductId(
+		@Param('productId') productId: string,
+		@Body() productRateInformation: CreateProductRateByProductIdRequestDto,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<GetProductRatesResponseDto> | HttpException> {
+		return this.commandBus.execute(
+			new CreateProductRateByProductIdCommand(
+				productId,
+				productRateInformation,
+				myInformation,
 			),
 		);
 	}

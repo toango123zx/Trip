@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { AuthModule } from '../auth/auth.module';
+import { BillRepository } from '../bill/bill.repository';
 import { DatabaseModule } from '../database/database.module';
 import { DiscountRepository } from '../discount/discount.repository';
 import { LocationRepository } from '../location/location.repository';
@@ -30,6 +31,7 @@ import { ProductQueryHandlers } from './queries/handller';
 		ProductRateRepository,
 		ProductScheduleRepository,
 		DiscountRepository,
+		BillRepository,
 		...ProductQueryHandlers,
 		...ProductCommandHandlers,
 	],

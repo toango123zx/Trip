@@ -18,11 +18,14 @@ export class BillRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
 	async findBillsByUserId(
-		pagination: IPaginationQuery,
+		pagination: IPaginationQuery = {} as IPaginationQuery,
 		userIdTourist?: string,
 		userIdSupplier?: string,
-		status?: BillStatusEnum,
-		billIdFilter?: string,
+		productId?: string,
+		productScheduleId?: string,
+		billstatus?: BillStatusEnum,
+		productScheduleStatus?: ProductScheduleStatusEnum,
+		keyword?: string,
 		filter?: BillOrderByDto,
 	): Promise<[BillEntity[], number]> {
 		const orderBy = Object.entries(filter || {})
@@ -33,19 +36,22 @@ export class BillRepository {
 			this.prismaService.bill.findMany({
 				where: {
 					id: {
-						contains: billIdFilter,
+						contains: keyword,
 						mode: 'insensitive',
 					},
 					userId: userIdTourist,
-					status: status,
+					status: billstatus,
 					infoBill: {
 						some: {
 							productSchedule: {
+								id: productScheduleId,
 								product: {
+									id: productId,
 									supplier: {
 										userId: userIdSupplier,
 									},
 								},
+								status: productScheduleStatus,
 							},
 						},
 					},
@@ -57,19 +63,22 @@ export class BillRepository {
 			this.prismaService.bill.count({
 				where: {
 					id: {
-						contains: billIdFilter,
+						contains: keyword,
 						mode: 'insensitive',
 					},
 					userId: userIdTourist,
-					status: status,
+					status: billstatus,
 					infoBill: {
 						some: {
 							productSchedule: {
+								id: productScheduleId,
 								product: {
+									id: productId,
 									supplier: {
 										userId: userIdSupplier,
 									},
 								},
+								status: productScheduleStatus,
 							},
 						},
 					},
