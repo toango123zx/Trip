@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SelectBox } from '@/components';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
+import { TProductSumary } from '@/types';
 import { locations, optionSortAttraction } from '@/utils';
 import { EArrange } from '@/types';
 
@@ -26,26 +27,25 @@ export const AttractionList = ({
 }: TAttractionListProps): JSX.Element => {
 	const { setValue } = form;
 	const dispatch = useDispatch<TReduxStoreDispatch>();
-	const reduxAttractions = useSelector((state: TReduxStoreState) => state.product.products);
-	const [attractions, setAttractions] = useState<typeof reduxAttractions>([]);
-	const [selectOption, setSelectOption] = useState<keyof TSearchAttraction | ''>('');
+	const attractions = useSelector((state: TReduxStoreState) => state.product.products);
+	const [selectOption, setSelectOption] = useState<keyof TSearchAttraction>('name');
 	const [selectSort, setSelectSort] = useState<EArrange>(EArrange.desc);
+	const [at, setat] = useState<TProductSumary[]>([]);
 	const [page, setPage] = useState<number>(1);
 	const [hasMore, setHasMore] = useState<boolean>(true);
 
 	useEffect(() => {
-		dispatch(productThunk.getProducts({ page: 1, limit: 6 }));
+		dispatch(
+			productThunk.getProducts({
+				page: 1,
+				limit: 6,
+			}),
+		);
 	}, [dispatch]);
 
 	useEffect(() => {
-		setAttractions(prevAttractions => {
-			if (page === 1) {
-				return reduxAttractions;
-			}
-			const newAttractions = [...prevAttractions, ...reduxAttractions];
-			return newAttractions;
-		});
-	}, [reduxAttractions, page]);
+		setat(attractions);
+	}, [attractions]);
 
 	const handleSortChange = (): void => {
 		const newSort = selectSort === EArrange.asc ? EArrange.desc : EArrange.asc;
@@ -63,13 +63,12 @@ export const AttractionList = ({
 		setValue(selectedValue, selectSort);
 	};
 
-	const handleLoadMore = async () => {
+	const handleLoadMore = async (): Promise<void> => {
 		const nextPage = page + 1;
 		const result = await dispatch(
 			productThunk.getProducts({ 
 				page: nextPage, 
 				limit: 6,
-				[selectOption]: selectSort
 			})
 		);
 
@@ -77,6 +76,7 @@ export const AttractionList = ({
 			const newProducts = result.payload[0];
 			if (newProducts.length > 0) {
 				setPage(nextPage);
+				setat(prevAt => [...prevAt, ...newProducts]);
 			} else {
 				setHasMore(false);
 			}
@@ -134,7 +134,7 @@ export const AttractionList = ({
 				<div>
 					<div className="w-full relative overflow-hidden pt-9 pb-14">
 						<div className="w-full grid grid-cols-2 md:grid-cols-3 gap-y-9 gap-x-5 transition-transform duration-300 ease-in-out">
-							{attractions.map((attraction) => (
+							{at.map((attraction) => (
 								<CardProduct
 									key={attraction.id}
 									product={attraction}

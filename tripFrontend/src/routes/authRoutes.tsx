@@ -2,6 +2,12 @@ import { lazy } from 'react';
 
 import { AuthMiddleware } from '@/middleware/authMiddleware';
 
+// Create a wrapper component for AuthMiddleware
+const AuthMiddlewareWrapper = ({ children, requireAuth }: { children: React.ReactNode, requireAuth: boolean }) => {
+	// Implement the authentication logic here
+	return <>{children}</>;
+};
+
 const LoginPage = lazy(() => import('@/pages/Login'));
 const RegisterPage = lazy(() => import('@/pages/Register'));
 
@@ -9,17 +15,17 @@ export const authRoutes = [
 	{
 		path: '/auth/login',
 		element: (
-			<AuthMiddleware requireAuth={false}>
+			<AuthMiddlewareWrapper requireAuth={false}>
 				<LoginPage />
-			</AuthMiddleware>
+			</AuthMiddlewareWrapper>
 		),
 	},
 	{
 		path: '/auth/register',
 		element: (
-			<AuthMiddleware requireAuth={false}>
+			<AuthMiddlewareWrapper requireAuth={false}>
 				<RegisterPage />
-			</AuthMiddleware>
+			</AuthMiddlewareWrapper>
 		),
 	},
 ];

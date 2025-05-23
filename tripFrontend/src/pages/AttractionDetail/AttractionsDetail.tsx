@@ -24,7 +24,7 @@ const AttractionsDetail = (): JSX.Element => {
 	return (
 		<MainLayout>
 			<HeroAttractionsDetail value={componentName} tabOnChange={setComponentName} />
-			<div className="pb-28 md:p-8 bg-gray-100">{renderTabContent()}</div>
+			<div className="pb-28 bg-gray-100">{renderTabContent()}</div>
 		</MainLayout>
 	);
 };

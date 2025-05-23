@@ -224,7 +224,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 			// { label: 'Services', href: '/services' },
 			{ label: 'Sales', href: '/sales' },
 			// { label: 'Profile', href: '/user/me' },
-			{ label: 'Cart', href: '/cart' },
+			{ label: 'Cart', href: '/carts' },
 			{ label: 'Contact', href: '/contact' },
 		],
 		[],
@@ -354,7 +354,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 							<div className="hidden md:flex items-center gap-4">
 								{/* Cart */}
 								<Link
-									to="/cart"
+									to="/carts"
 									className="p-2 hover:text-orange-500 transition-all"
 								>
 									<IoCartOutline className="h-7 w-7" />

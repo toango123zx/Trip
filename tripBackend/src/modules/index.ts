@@ -1,4 +1,5 @@
 import { AuthModule } from './auth/auth.module';
+import { CartModule } from './cart/cart.module';
 import { DatabaseModule } from './database/database.module';
 import { DiscountModule } from './discount/discount.module';
 import { DiscountApplicationScopeModule } from './discountApplicationScope/discountApplicationScope.module';
@@ -26,4 +27,5 @@ export const Modules = [
 	DiscountApplicationScopeModule,
 	DiscountModule,
 	InfoDiscountModule,
+	CartModule,
 ];

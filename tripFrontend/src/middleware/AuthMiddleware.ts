@@ -5,7 +5,7 @@ interface AuthMiddlewareOptions {
   requiredRoles?: string[];
 }
 
-export const authMiddleware = (options: AuthMiddlewareOptions = {}) => {
+export const AuthMiddleware = (options: AuthMiddlewareOptions = {}) => {
   const { requireAuth = true, requiredRoles = [] } = options;
 
   return async (req: any, res: any, next: () => void) => {

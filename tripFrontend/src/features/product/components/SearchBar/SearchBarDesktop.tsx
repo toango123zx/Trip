@@ -1,12 +1,13 @@
 'use client';
 
-import { JSX } from 'react';
+import React, { JSX, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { IoSearchOutline } from 'react-icons/io5';
 import { useDispatch } from 'react-redux';
 
 import { SelectBox } from '@/components';
 import { cn } from '@/lib';
+import { TReduxStoreDispatch } from '@/store';
 import { locations } from '@/utils';
 import { TReduxStoreDispatch } from '@/store';
 import { Button } from '../Button';
@@ -16,6 +17,8 @@ import { productThunk } from '../../productThunk';
 
 type TSearchBarDesktopProps = {
 	form: UseFormReturn<TSearchAttraction>;
+	keyword?: string;
+	setKeyword?: React.Dispatch<React.SetStateAction<string>>;
 	className?: string;
 };
 
@@ -25,7 +28,6 @@ export const SearchBarDesktop = ({
 }: TSearchBarDesktopProps): JSX.Element => {
 	const { register, handleSubmit } = form;
 	const dispatch = useDispatch<TReduxStoreDispatch>();
-
 	const handlerSubmitOnClick = async (data: TSearchAttraction): Promise<void> => {
 		try {
 			const searchParams: TSearchAttraction = {};
