@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { ProductRateStatusEnum } from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
-import { ProductRateEntity } from 'src/models';
+import { CreateProductRateDto, ProductRateEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -50,5 +50,34 @@ export class ProductRateRepository {
 		]);
 
 		return [productRates, totalRecords];
+	}
+
+	async createProductRate(
+		productRate: CreateProductRateDto,
+		productAvgRate: number,
+	): Promise<ProductRateEntity> {
+		return this.prismaService.$transaction(async (prisma) => {
+			await prisma.product.update({
+				where: {
+					id: productRate.product.connect.id,
+				},
+				data: {
+					avgRate: productAvgRate,
+					quantityRate: {
+						increment: 1,
+					},
+				},
+			});
+			return await prisma.productRate.create({
+				data: {
+					...productRate,
+					user: {
+						connect: {
+							id: productRate.user.connect.id,
+						},
+					},
+				},
+			});
+		});
 	}
 }

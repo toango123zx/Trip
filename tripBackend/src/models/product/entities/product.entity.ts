@@ -63,8 +63,8 @@ export class ProductEntity {
 	})
 	quantityRate: number;
 	@ApiProperty({
-		type: 'integer',
-		format: 'int32',
+		type: 'number',
+		format: 'float',
 	})
 	avgRate: number;
 	@ApiProperty({

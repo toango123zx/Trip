@@ -45,6 +45,15 @@ export class CreateProductRateDto {
 	@Type(() => CreateProductRateUserRelationInputDto)
 	user: CreateProductRateUserRelationInputDto;
 	@ApiProperty({
+		minimum: 0,
+		maximum: 5,
+		type: 'integer',
+		format: 'int32',
+	})
+	@IsNotEmpty()
+	@IsInt()
+	star: number;
+	@ApiProperty({
 		type: 'string',
 	})
 	@IsNotEmpty()
