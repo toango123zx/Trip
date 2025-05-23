@@ -58,5 +58,6 @@ export class CreateProductRequestDto extends OmitType(CreateProductDto, [
 	@IsNotEmpty()
 	@IsString()
 	@AutoTrim()
+	@IsUrl()
 	urlMap: string;
 }

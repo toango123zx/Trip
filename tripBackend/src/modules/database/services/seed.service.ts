@@ -275,7 +275,7 @@ export class SeedService implements OnModuleInit {
 	private async seedProviderMap(): Promise<void> {
 		const PROVIDER_MAPS: string[] = Object.values(ProviderMapEnum);
 
-		const providerMaps = await this.prisma.paymentMethod.findMany();
+		const providerMaps = await this.prisma.providerMap.findMany();
 		const providerMapNamesDB = providerMaps.map((providerMap) => providerMap.name);
 		const providerMapNames = PROVIDER_MAPS.filter((providerMapName) => {
 			return !providerMapNamesDB.includes(providerMapName);

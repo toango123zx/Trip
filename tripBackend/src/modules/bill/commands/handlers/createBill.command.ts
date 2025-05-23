@@ -177,7 +177,8 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 				billDiscounts.push(d);
 			} else {
 				for (const { productScheduleId } of d.infoDiscount) {
-					if (!schedDiscMap[productScheduleId]) schedDiscMap[productScheduleId] = [];
+					if (!schedDiscMap[productScheduleId])
+						schedDiscMap[productScheduleId] = [];
 					schedDiscMap[productScheduleId]!.push(d);
 				}
 			}

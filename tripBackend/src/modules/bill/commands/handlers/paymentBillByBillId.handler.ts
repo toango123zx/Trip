@@ -21,12 +21,13 @@ import { PaymentBillByBillIdCommand } from '../implements';
 
 @CommandHandler(PaymentBillByBillIdCommand)
 export class PaymentBillByBillIdHandler
-	implements ICommandHandler<PaymentBillByBillIdCommand> {
+	implements ICommandHandler<PaymentBillByBillIdCommand>
+{
 	constructor(
 		private readonly billRepository: BillRepository,
 		private readonly paymentMethodRepository: PaymentMethodRepository,
 		private readonly transactionSessionRepository: TransactionSessionRepository,
-	) { }
+	) {}
 
 	async execute(
 		command: PaymentBillByBillIdCommand,
