@@ -1,5 +1,7 @@
-import { GenderUserEnum } from '@prisma/client';
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
+
+import { GenderUserEnum } from '@prisma/client';
+import { Type } from 'class-transformer';
 import {
 	IsDateString,
 	IsNotEmpty,
@@ -7,7 +9,7 @@ import {
 	IsString,
 	ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+
 import { ConnectRoleDto } from '../../role/dto/connect-role.dto';
 import { CreateSupplierDto } from '../../supplier/dto/create-supplier.dto';
 

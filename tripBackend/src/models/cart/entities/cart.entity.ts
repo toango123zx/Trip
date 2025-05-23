@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UserEntity } from '../../user/entities/user.entity';
+
 import { ProductScheduleEntity } from '../../productSchedule/entities/productSchedule.entity';
+import { UserEntity } from '../../user/entities/user.entity';
 
 export class CartEntity {
 	@ApiProperty({
