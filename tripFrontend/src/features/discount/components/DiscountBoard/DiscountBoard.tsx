@@ -3,7 +3,8 @@ import { JSX, useState, useRef } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { useSelector } from 'react-redux';
 
-import { getColumnSearchProps, PaginationTable, TableView } from '@/components';
+import { getColumnSearchProps } from '@/components';
+import { BaseTable, renderStatusBadge, formatDateTime } from '@/components/BaseTable/BaseTable';
 import { cn } from '@/lib';
 import { TReduxStoreState } from '@/store';
 import { TDiscountDetail, TPagination } from '@/types';
@@ -17,11 +18,16 @@ type TDiscountBoard = {
 	className?: string;
 };
 
+const STATUS_MAP = {
+	active: { color: 'green', label: 'Active' },
+	inactive: { color: 'red', label: 'Inactive' },
+} as const;
+
 export const DiscountBoard = ({
 	data = [],
 	page,
 	setPage,
-	pageSize,
+	pageSize = 10,
 	onViewDetailDiscount = (): void => {},
 	className,
 }: TDiscountBoard): JSX.Element => {
@@ -37,14 +43,12 @@ export const DiscountBoard = ({
 			title: 'Discount ID',
 			dataIndex: 'id',
 			key: 'id',
-			width: '20%',
 			className: 'hidden',
 		},
 		{
 			title: 'Discount Name',
 			dataIndex: 'name',
 			key: 'name',
-			width: '20%',
 			...getColumnSearchProps<TDiscountDetail>(
 				'name',
 				searchInput,
@@ -56,87 +60,31 @@ export const DiscountBoard = ({
 			sorter: (a, b) => a.name.length - b.name.length,
 			sortDirections: ['descend', 'ascend'],
 		},
-		// {
-		// 	title: 'Product Name',
-		// 	dataIndex: 'productName',
-		// 	key: 'productName',
-		// 	width: '15%',
-		// 	...getColumnSearchProps<TDiscountDetail>(
-		// 		'productName',
-		// 		searchInput,
-		// 		searchText,
-		// 		setSearchText,
-		// 		searchedColumn,
-		// 		setSearchedColumn,
-		// 	),
-		// 	sorter: (a, b) => a.name.length - b.name.length,
-		// 	sortDirections: ['descend', 'ascend'],
-		// },
 		{
 			title: 'Start Time',
 			dataIndex: 'startTime',
-			key: 'startTime',
-			width: '15%',
-			...getColumnSearchProps<TDiscountDetail>(
-				'startTime',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) =>
 				new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
-			render: (value: Date) => new Date(value).toLocaleString(),
+			render: (value: Date) => formatDateTime(value),
 		},
 		{
 			title: 'End Time',
 			dataIndex: 'endTime',
-			key: 'endTime',
-			width: '5%',
-			...getColumnSearchProps<TDiscountDetail>(
-				'endTime',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) =>
 				new Date(a.endTime).getTime() - new Date(b.endTime).getTime(),
 			sortDirections: ['descend', 'ascend'],
-			render: (value: Date) => new Date(value).toLocaleString(),
+			render: (value: Date) => formatDateTime(value),
 		},
 		{
 			title: 'Quantity',
 			dataIndex: 'quantity',
-			key: 'quantity',
-			width: '5%',
-			...getColumnSearchProps<TDiscountDetail>(
-				'quantity',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) => a.quantity - b.quantity,
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
 			title: 'Value',
 			dataIndex: 'value',
-			key: 'value',
-			width: '8%',
-			...getColumnSearchProps<TDiscountDetail>(
-				'value',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) => a.value - b.value,
 			sortDirections: ['descend', 'ascend'],
 		},
@@ -144,16 +92,7 @@ export const DiscountBoard = ({
 			title: 'Status',
 			dataIndex: 'status',
 			key: 'status',
-			width: '12%',
-			sorter: (a, b) => a.status.length - b.status.length,
-			sortDirections: ['descend', 'ascend'],
-			render: (text: string) => (
-				<span
-					className={`${text === 'active' ? 'text-green-500' : 'text-red-300'} font-semibold`}
-				>
-					{text}
-				</span>
-			),
+			render: (text: string) => renderStatusBadge(text, STATUS_MAP),
 		},
 		{
 			title: 'Action',
@@ -161,7 +100,7 @@ export const DiscountBoard = ({
 				<button
 					type="button"
 					onClick={() => onViewDetailDiscount(discount)}
-					className="text-blue-500 flex gap-2.5 items-center"
+					className="text-blue-500 flex gap-1 items-center"
 				>
 					<span>View detail</span>
 					<span className="h-fit">
@@ -175,23 +114,26 @@ export const DiscountBoard = ({
 	const handleChangePage = (nextPage: number): void => {
 		setPage(nextPage);
 	};
+
 	return (
 		<div>
-			<TableView<TDiscountDetail>
-				className={cn(className)}
-				columnTable={columnTable}
-				data={data}
-				pageSize={pageSize}
-				pagination={false}
+			<BaseTable<TDiscountDetail>
+				rowKey="id"
+				columns={columnTable}
+				dataSource={data}
+				className={cn('w-full', className)}
+				pagination={
+					pagination?.totalItems > pageSize
+					? {
+						current: page,
+						pageSize: pageSize,
+						total: pagination.totalItems,
+						onChange: handleChangePage,
+					}
+					: false
+				}
+				size="middle"
 			/>
-			<div className="flex items-center justify-center">
-				{pagination.totalPages > 1 && (
-					<PaginationTable
-						pagination={{ ...pagination, currentPage: page }}
-						onPageChange={handleChangePage}
-					/>
-				)}
-			</div>
 		</div>
 	);
 };

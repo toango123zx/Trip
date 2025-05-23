@@ -26,3 +26,261 @@ button {
 .swiper-wrapper {
     padding-bottom: 35px;
 }
+
+#stackable-error.min-h-\[1\.25rem\].text-sm.text-red-600 {
+    display: none;
+}
+
+input:disabled {
+    background-color: #0000000a;
+    border: 1px solid #d9d9d9;
+}
+
+input {
+    padding: 4px 11px;
+}
+
+.account-page {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+.account-page h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.profile-section,
+.password-section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.profile-info p,
+.profile-edit input,
+.password-change input {
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.error-message {
+    color: red;
+    background-color: #ffeeee;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.success-message {
+    color: green;
+    background-color: #eeffee;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+/* button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+} */
+/* 
+button:hover {
+    background-color: #45a049;
+} */
+
+/* Nâng cấp CSS cho trang tài khoản */
+.account-page-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 100%;
+}
+
+.account-page-header {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.profile-avatar {
+    margin-right: 2rem;
+}
+
+.avatar-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #ff7a22;
+}
+
+.profile-header-info h1 {
+    margin: 0;
+    color: #333;
+    font-size: 1.8rem;
+}
+
+.role-badge {
+    background-color: #ff7a22;
+    color: white;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+    margin-top: 0.5rem;
+}
+
+.account-page-tabs {
+    display: flex;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.tab-button.active {
+    background-color: #ff7a22;
+    color: white;
+}
+
+.tab-button:hover {
+    background-color: #ff9a4a;
+    color: white;
+}
+
+.profile-section,
+.password-section {
+    padding: 2rem;
+    background-color: white;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.info-icon {
+    margin-right: 1rem;
+    color: #ff7a22;
+    font-size: 1.2rem;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #ff7a22;
+}
+
+.edit-actions,
+.password-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.save-button,
+.change-password-button {
+    background-color: #ff7a22;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.save-button:hover,
+.change-password-button:hover {
+    background-color: #ff9a4a;
+}
+
+.cancel-button {
+    background-color: #6c757d;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.5rem;
+    color: #ff7a22;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slideDown {
+    animation: slideDown 0.3s ease-out forwards;
+}
+
+.ant-pagination-item{
+    background-color: transparent !important;
+}

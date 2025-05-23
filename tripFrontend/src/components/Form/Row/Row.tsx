@@ -15,9 +15,9 @@ const Required = (): JSX.Element => (
 
 export const Row = ({ label, required, children, top }: TRow): JSX.Element => (
 	<div
-		className={`w-full grid grid-cols-[260px_1fr] ${top ? 'items-start' : 'items-center'} mb-4`}
+		className={`w-full flex gap-2 ${top ? 'items-start' : 'items-center'} mb-4`}
 	>
-		<label className="font-medium text-gray-800">
+		<label className="text-gray-800">
 			{label}
 			{required && <Required />}
 		</label>

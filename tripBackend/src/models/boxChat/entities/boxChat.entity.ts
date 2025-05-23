@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-
 import { BoxChatMemberEntity } from '../../boxChatMember/entities/boxChatMember.entity';
 import { MessageEntity } from '../../message/entities/message.entity';
 

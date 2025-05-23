@@ -1,7 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { InfoDiscountStatusEnum } from '@prisma/client';
-
+import { ApiProperty } from '@nestjs/swagger';
 import { DiscountEntity } from '../../discount/entities/discount.entity';
 import { ProductScheduleEntity } from '../../productSchedule/entities/productSchedule.entity';
 

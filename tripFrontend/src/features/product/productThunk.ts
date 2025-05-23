@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { notificationUtils } from '@/utils/notificationUtils';
 
 import { TPagination, TProductDetail, TProductSumary } from '@/types';
 
@@ -14,10 +15,16 @@ const getProducts = createAsyncThunk(
 	async (
 		query?: TRequestQueryGetProducts,
 	): Promise<[TProductSumary[], TPagination?]> => {
-		const [data, pagination] = await productApi.getProducts(query);
-		return [data, pagination];
+		try {
+			const [data, pagination] = await productApi.getProducts(query);
+			return [data, pagination];
+		} catch (error) {
+			console.error('Lỗi trong productThunk getProducts:', error);
+			throw error;
+		}
 	},
 );
+
 const getProductsManagement = createAsyncThunk(
 	'product/getProductsManagement',
 	async (
@@ -38,9 +45,20 @@ const getProductDetail = createAsyncThunk(
 
 const createProduct = createAsyncThunk(
 	'product/createProduct',
-	async (product: TRequestBodyCreateProduct) => {
-		const data = await productApi.createProduct(product);
-		return data;
+	async (product: TRequestBodyCreateProduct, { rejectWithValue }) => {
+		try {
+			const data = await productApi.createProduct(product);
+			
+			// Sử dụng notification tạo sản phẩm thành công
+			notificationUtils.success();
+
+			return data;
+		} catch (error) {
+			// Sử dụng notification lỗi tạo sản phẩm
+			notificationUtils.error()
+
+			return rejectWithValue(error);
+		}
 	},
 );
 
@@ -52,9 +70,20 @@ const updateProductByProductId = createAsyncThunk(
 	}: {
 		productId: string;
 		product: TRequestBodyUpdateProduct;
-	}) => {
-		const data = await productApi.updateProductByProductId(productId, product);
-		return data;
+	}, { rejectWithValue }) => {
+		try {
+			const data = await productApi.updateProductByProductId(productId, product);
+			
+			// Sử dụng notification cụ thể cho product
+			notificationUtils.success();
+
+			return data;
+		} catch (error) {
+			// Sử dụng notification lỗi cho product
+			notificationUtils.error();
+
+			return rejectWithValue(error);
+		}
 	},
 );
 

@@ -1,8 +1,6 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-
-import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-
+import { Type } from 'class-transformer';
 import { ConnectProductDto } from '../../product/dto/connect-product.dto';
 import { ConnectUserDto } from '../../user/dto/connect-user.dto';
 

@@ -18,41 +18,45 @@ export const HeroAttractions = ({
 }: THeroAttractionsProps): JSX.Element => {
 	return (
 		<section
-			className={cn('bg-white py-6 md:py-12 relative md:pt-0', className)}
+			className={cn(
+				'relative bg-white py-6 md:py-12 md:pt-0 overflow-hidden',
+				className
+			)}
 			aria-labelledby="hero-attractions-heading"
 		>
-			<div className="relative max-h-[1080px] bg-cover bg-center">
-				<img
-					src={attractionsImages.backgroundHero}
-					alt="Scenic landscape of popular attractions"
-					className="hidden md:block w-screen h-[1080px] object-cover"
+			<div className="relative w-full h-[500px] md:h-[1080px]">
+				{/* Background image as background instead of <img> */}
+				<div
+					className="absolute inset-0 bg-cover bg-center"
+					style={{ backgroundImage: `url(${attractionsImages.backgroundHero})` }}
 				/>
-				<div className="hidden md:block container mx-auto px-4">
-					<div className="absolute w-full inset-0">
-						<div className="container h-full mx-auto px-4 relative z-10 flex justify-center items-center">
-							<div className="max-w-[1536px] w-full relative">
-								<p className="w-full text-[225px] text-center text-white/50  font-bold text-red ">
-									ATTRACTIONS
-								</p>
-								<h1 className="w-full absolute top-0 mt-32 text-7xl text-center font-bold text-black">
-									Discover your love
-								</h1>
-							</div>
-						</div>
-					</div>
+
+				{/* Overlay content */}
+				<div className="absolute inset-0 bg-black/30 z-0" />
+
+				{/* Text section */}
+				<div className="max-w-[1536px] w-full px-6 md:px-20 mx-auto relative grid justify-center">
+					<p className="w-full text-[60px] md:text-[225px] text-white/50 font-bold text-center">
+						ATTRACTIONS
+					</p>
+					<h1 className="text-3xl md:text-7xl text-center font-bold text-black w-full">
+						Discover your love
+					</h1>
 				</div>
-				<div className="relative md:absolute left-0 bottom-0 w-full flex justify-center z-10">
-					<div className="md:hidden">
-						<SearchBarMobile form={form} className="block md:hidden" />
-					</div>
-					<div className="hidden md:block">
-						<SearchBarDesktop
-							form={form}
-							className="hidden md:block rounded-4xl m-5"
-						/>
+
+				{/* Search bar */}
+				<div className="absolute left-0 bottom-0 w-full z-20 flex justify-center px-4">
+					<div className="w-full max-w-[1280px]">
+						<div className="md:hidden">
+							<SearchBarMobile form={form} />
+						</div>
+						<div className="hidden md:block">
+							<SearchBarDesktop form={form} className="rounded-4xl m-5" />
+						</div>
 					</div>
 				</div>
 			</div>
 		</section>
+
 	);
 };

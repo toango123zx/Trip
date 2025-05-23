@@ -1,10 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { PaymentMethodStatusEnum } from '@prisma/client';
-
 import { TransactionEntity } from '../../transaction/entities/transaction.entity';
 import { TransactionSessionEntity } from '../../transactionSession/entities/transactionSession.entity';
-
+import { ApiProperty } from '@nestjs/swagger';
+import { BillEntity } from '../../bill/entities/bill.entity';
 export class PaymentMethodEntity {
 	@ApiProperty({
 		type: 'string',

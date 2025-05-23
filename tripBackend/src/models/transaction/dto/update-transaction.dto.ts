@@ -1,7 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { TransactionTargetEnum } from '@prisma/client';
 import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateTransactionDto {
 	@ApiProperty({

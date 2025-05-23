@@ -1,7 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { AccountStatusEnum } from '@prisma/client';
-
+import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from '../../user/entities/user.entity';
 import { VerifyEmailEntity } from '../../verifyEmail/entities/verifyEmail.entity';
 

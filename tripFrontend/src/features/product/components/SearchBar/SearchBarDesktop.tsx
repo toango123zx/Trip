@@ -9,12 +9,13 @@ import { SelectBox } from '@/components';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch } from '@/store';
 import { locations } from '@/utils';
+import { TReduxStoreDispatch } from '@/store';
+import { Button } from '../Button';
 
 import { TSearchAttraction } from '../../product.type';
 import { productThunk } from '../../productThunk';
-import { Button } from '../Button';
 
-type TSeachBarDesktopProps = {
+type TSearchBarDesktopProps = {
 	form: UseFormReturn<TSearchAttraction>;
 	keyword?: string;
 	setKeyword?: React.Dispatch<React.SetStateAction<string>>;
@@ -24,110 +25,127 @@ type TSeachBarDesktopProps = {
 export const SearchBarDesktop = ({
 	form,
 	className,
-}: TSeachBarDesktopProps): JSX.Element => {
-	const [keyword, setKeyword] = useState<string>('');
-
+}: TSearchBarDesktopProps): JSX.Element => {
 	const { register, handleSubmit } = form;
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const handlerSubmitOnClick = async (data: TSearchAttraction): Promise<void> => {
-		if (data.name) {
-			String(data.name).trim();
-		}
-	};
+		try {
+			const searchParams: TSearchAttraction = {};
+			
+			// Xử lý name
+			if (data.name && data.name !== '') {
+				searchParams.name = data.name;
+			}
+			
+			// Xử lý locationName
+			if (data.locationName && data.locationName !== '') {
+				// Loại bỏ dấu phẩy thừa
+				searchParams.locationName = data.locationName.replace(/,+$/, '');
+			}
+			
+			// Xử lý giá
+			if (data.minPrice) {
+				searchParams.minPrice = Number(data.minPrice);
+			}
+			
+			if (data.maxPrice) {
+				searchParams.maxPrice = Number(data.maxPrice);
+			}
 
-	const onSearch = (): void => {
-		dispatch(
-			productThunk.getProducts({
-				keyword: keyword,
+			// Dispatch action search
+			await dispatch(productThunk.getProducts({
+				...searchParams,
 				page: 1,
-				limit: 100,
-			}),
-		);
+				limit: 6
+			}));
+		} catch (error) {
+			console.error('Lỗi khi tìm kiếm:', error);
+		}
 	};
 
 	return (
 		<section
-			className={cn('py-6 md:py-12', className)}
-			aria-label="Search for attractions"
+			className={cn('bg-white py-6 md:py-12 shadow-xl', className)}
+			aria-labelledby="search-bar-desktop"
 		>
-			<form onSubmit={handleSubmit(handlerSubmitOnClick)}>
-				{/* Background Image */}
-				<div className="relative px-2">
-					<div className="container mx-auto">
-						<div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-							<h2
-								id="search-heading"
-								className="text-xl md:text-2xl font-semibold text-center mb-6"
-							>
-								Find the Adventure of a lifetime
-							</h2>
+			<div className="max-w-7xl mx-auto">
+				<div className="rounded-2xl sm:px-8 backdrop-blur-sm">
+					<h2
+						id="search-heading"
+						className="text-xl sm:text-2xl lg:text-3xl font-bold text-center mb-6 text-gray-800 bg-gradient-to-r from-orange-500 to-orange-300 bg-clip-text text-transparent"
+					>
+						Find the Adventure of a Lifetime
+					</h2>
 
-							<div className="flex flex-col md:flex-row justify-between items-center gap-4">
-								{/* Keyword Input */}
-								<div className="">
+					<form onSubmit={handleSubmit(handlerSubmitOnClick)} aria-labelledby="search-heading">
+						<div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+							{/* Keyword */}
+							<div className="col-span-1">
+								<label htmlFor="name" className="sr-only">Keyword</label>
+								<input
+									{...register('name')}
+									id="name"
+									type="text"
+									placeholder="Keyword"
+									className="w-full h-12 px-5 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-200"
+								/>
+							</div>
+
+							{/* Location */}
+							<div className="col-span-1">
+								<label htmlFor="locationName" className="sr-only">Location</label>
+								<SelectBox
+									name="locationName"
+									selectOption={locations}
+									register={register}
+									className="w-full h-12 px-5 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-200 appearance-none"
+								/>
+							</div>
+
+							{/* Min Price */}
+							<div className="col-span-1">
+								<label htmlFor="minPrice" className="sr-only">Minimum Price</label>
+								<div className="relative h-12">
 									<input
-										type="text"
-										{...register('name')}
-										onChange={(e) => {
-											if (setKeyword) {
-												setKeyword(e.target.value);
-											}
-										}}
-										placeholder="Keyword here"
-										className="h-14 flex items-center bg-white border border-black rounded-lg px-4 py-2 w-fit focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150"
+										{...register('minPrice')}
+										id="minPrice"
+										placeholder="Min Price"
+										type="number"
+										className="w-full h-full px-5 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-200"
 									/>
+									<span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 text-sm">VND</span>
 								</div>
+							</div>
 
-								{/* Location Dropdown */}
-								<div className=" relative">
-									<SelectBox<TSearchAttraction>
-										name="locationName"
-										selectOption={locations}
-										register={register}
-										className="flex items-center justify-between h-14 px-3 py-2 rounded-md bg-white border border-black focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150"
+							{/* Max Price */}
+							<div className="col-span-1">
+								<label htmlFor="maxPrice" className="sr-only">Maximum Price</label>
+								<div className="relative h-12">
+									<input
+										{...register('maxPrice')}
+										id="maxPrice"
+										placeholder="Max Price"
+										type="number"
+										className="w-full h-full px-5 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-all duration-200"
 									/>
+									<span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 text-sm">VND</span>
 								</div>
+							</div>
 
-								{/* Min Price */}
-								<div className="md:col-span-1">
-									<div className="h-14 flex items-center bg-white border border-black rounded-lg px-4 py-2 w-fit focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150">
-										<input
-											placeholder="Min Price"
-											{...register('minPrice')}
-											className="flex-grow bg-transparent border-none outline-none text-gray-800 placeholder-gray-500 w-full appearance-none focus:ring-0"
-										/>
-										<span className="text-gray-600 pl-2 flex-shrink-0">
-											VND
-										</span>
-									</div>
-								</div>
-
-								{/* Max Price and Search Button */}
-								<div className="md:col-span-1">
-									<div className="h-14 flex items-center bg-white border border-black rounded-lg px-4 py-2 w-fit focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150">
-										<input
-											placeholder="Max Price"
-											{...register('maxPrice')}
-											className="flex-grow bg-transparent border-none outline-none text-gray-800 placeholder-gray-500 w-full appearance-none focus:ring-0"
-										/>
-										<span className="text-gray-600 pl-2 flex-shrink-0">
-											VND
-										</span>
-									</div>
-								</div>
+							{/* Search Button */}
+							<div className="col-span-1 flex justify-center lg:justify-end">
 								<Button
-									size="icon"
-									className="w-32 h-20 px-12 py-7 p-4 rounded-3xl"
 									type="submit"
-									onClick={onSearch}
+									className="w-full h-12 px-6 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
 								>
-									<IoSearchOutline className="h-8 w-8 " />
+									<IoSearchOutline className="h-5 w-5" />
+									Search
 								</Button>
 							</div>
 						</div>
-					</div>
+					</form>
 				</div>
-			</form>
+			</div>
 		</section>
 	);
 };

@@ -61,7 +61,7 @@ export const discountApi = {
 		return response.data;
 	},
 
-	async creatDiscount(discount: TRequestBodyCreateDiscount): Promise<TDiscount> {
+	async createDiscount(discount: TRequestBodyCreateDiscount): Promise<TDiscount> {
 		const response = await api.post<TDiscount, TRequestBodyCreateDiscount>(
 			`/discount`,
 			discount,

@@ -1,5 +1,4 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-
 import { Type } from 'class-transformer';
 import {
 	IsArray,

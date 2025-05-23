@@ -1,7 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { CityEnum, LocationStatusEnum } from '@prisma/client';
-
+import { ApiProperty } from '@nestjs/swagger';
 import { MapAddressEntity } from '../../mapAddress/entities/mapAddress.entity';
 import { ProductEntity } from '../../product/entities/product.entity';
 

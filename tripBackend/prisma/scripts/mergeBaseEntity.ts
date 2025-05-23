@@ -110,18 +110,15 @@ files.forEach((file) => {
 			}
 		});
 		if (!modelsUpdate.includes(modelName)) {
-			console.log(`⏩ Bỏ qua (không nằm trong danh sách cập nhật): ${modelName}`);
 			return match;
 		}
 
 		// Nếu thiếu trường thì mới cập nhật
 		if (missingFields.length === 0) {
-			console.log(`⏩ Bỏ qua (đã có BaseEntity): ${modelName}`);
 			return match; // Không thay đổi model nếu đã có đầy đủ các trường
 		}
 
 		hasChanges = true;
-		console.log(`✅ Cập nhật BaseEntity vào: ${modelName}`);
 
 		// Thêm các trường còn thiếu vào đầu model
 		const { part1, part2 } = splitText(modelBody);

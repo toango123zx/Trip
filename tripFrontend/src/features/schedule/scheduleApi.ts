@@ -4,6 +4,15 @@ import { EProductScheduleStatus, TCartSummary, TProductSchedule } from '@/types'
 import { TRequestBodyCreateSchedule, TReSponseBodyScheduleDetail } from './schedule.type';
 
 export const scheduleApi = {
+	async getSchedules(query?: { page?: number; limit?: number }): Promise<{ data: TProductSchedule[]; pagination: { totalItems: number; itemsPerPage: number; currentPage: number; totalPages: number } }> {
+		const response = await api.get<{ data: TProductSchedule[]; pagination: { totalItems: number; itemsPerPage: number; currentPage: number; totalPages: number } }>(
+			'/schedule',
+			query,
+			EServer.Backend,
+		);
+		return response;
+	},
+
 	async getScheduleByScheduleId(
 		scheduleId: string,
 		status: EProductScheduleStatus,
