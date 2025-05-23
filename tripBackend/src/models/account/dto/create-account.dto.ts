@@ -1,8 +1,6 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-
-import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-
+import { Type } from 'class-transformer';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 
 export class CreateAccountUserRelationInputDto {

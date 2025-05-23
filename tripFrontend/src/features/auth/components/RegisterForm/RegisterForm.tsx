@@ -36,7 +36,7 @@ export const RegisterForm = (): JSX.Element => {
 	const handlerSubmitClick = async (fromData: TRegisterFromInput): Promise<void> => {
 		try {
 			notification.config({
-				duration: 5,
+				duration: 3,
 			});
 			setIsSubmitting(true);
 			const registerInformation: TRequestBodyRegisterApi = {
@@ -51,6 +51,7 @@ export const RegisterForm = (): JSX.Element => {
 				notification.error({
 					message: 'Error',
 					description: 'Confirm passwords do not match',
+					duration: 3
 				});
 				return;
 			}
@@ -59,6 +60,7 @@ export const RegisterForm = (): JSX.Element => {
 				notification.error({
 					message: 'Error',
 					description: 'Invalid email address',
+					duration: 3
 				});
 				return;
 			}
@@ -73,6 +75,7 @@ export const RegisterForm = (): JSX.Element => {
 					message: 'Error',
 					description:
 						'Password must contain at least 1 number, 1 uppercase letter, 1 lowercase letter and 1 special character',
+					duration: 3
 				});
 				return;
 			}

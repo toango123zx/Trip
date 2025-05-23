@@ -10,6 +10,7 @@ import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TProductSumary } from '@/types';
 import { locations, optionSortAttraction } from '@/utils';
+import { EArrange } from '@/types';
 
 import { TSearchAttraction } from '../../product.type';
 import { productThunk } from '../../productThunk';
@@ -27,15 +28,17 @@ export const AttractionList = ({
 	const { setValue } = form;
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const attractions = useSelector((state: TReduxStoreState) => state.product.products);
-	const [selectOption, setSelectOption] = useState<string>('');
-	const [selectSort, setSelectSort] = useState<string>('desc');
+	const [selectOption, setSelectOption] = useState<keyof TSearchAttraction>('name');
+	const [selectSort, setSelectSort] = useState<EArrange>(EArrange.desc);
 	const [at, setat] = useState<TProductSumary[]>([]);
+	const [page, setPage] = useState<number>(1);
+	const [hasMore, setHasMore] = useState<boolean>(true);
 
 	useEffect(() => {
 		dispatch(
 			productThunk.getProducts({
 				page: 1,
-				limit: 100,
+				limit: 6,
 			}),
 		);
 	}, [dispatch]);
@@ -45,16 +48,41 @@ export const AttractionList = ({
 	}, [attractions]);
 
 	const handleSortChange = (): void => {
-		setSelectSort((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-		setValue(selectOption as keyof TSearchAttraction, selectSort);
+		const newSort = selectSort === EArrange.asc ? EArrange.desc : EArrange.asc;
+		setSelectSort(newSort);
+		if (selectOption) {
+			setValue(selectOption, newSort);
+		}
 	};
 
 	const handleSelectOptionOnChange = (
 		event: React.ChangeEvent<HTMLSelectElement>,
 	): void => {
-		const selectedValue = event.target.value;
+		const selectedValue = event.target.value as keyof TSearchAttraction;
 		setSelectOption(selectedValue);
-		setValue(selectedValue as keyof TSearchAttraction, selectSort);
+		setValue(selectedValue, selectSort);
+	};
+
+	const handleLoadMore = async (): Promise<void> => {
+		const nextPage = page + 1;
+		const result = await dispatch(
+			productThunk.getProducts({ 
+				page: nextPage, 
+				limit: 6,
+			})
+		);
+
+		if (productThunk.getProducts.fulfilled.match(result)) {
+			const newProducts = result.payload[0];
+			if (newProducts.length > 0) {
+				setPage(nextPage);
+				setat(prevAt => [...prevAt, ...newProducts]);
+			} else {
+				setHasMore(false);
+			}
+		} else {
+			setHasMore(false);
+		}
 	};
 
 	return (
@@ -64,7 +92,7 @@ export const AttractionList = ({
 		>
 			<div className="max-w-[1536px] mx-auto">
 				<div className="mb-8 flex flex-row justify-between items-center px-2">
-					<div className="relative"></div>
+					<div className="relative font-semibold text-4xl font-[Montserrat] text-left">List Attractions</div>
 					<div className="flex items-center gap-5">
 						{locations && (
 							<label
@@ -86,19 +114,19 @@ export const AttractionList = ({
 									{
 										label: (
 											<div className="w-full flex justify-center items-center">
-												{selectSort === 'desc' ? (
+												{selectSort === EArrange.desc ? (
 													<HiOutlineArrowNarrowUp className="h-4 w-4" />
 												) : (
 													<HiOutlineArrowNarrowDown className="h-4 w-4" />
 												)}
 											</div>
 										),
-										value: selectSort === 'asc' ? 'asc' : 'desc',
+										value: selectSort === EArrange.asc ? EArrange.asc : EArrange.desc,
 									},
 								]}
 								className="segmented-custom h-[56px] border-black bg-white border flex justify-center items-center"
 								onClick={handleSortChange}
-								defaultValue="desc"
+								defaultValue={EArrange.desc}
 							/>
 						</div>
 					</div>
@@ -116,14 +144,19 @@ export const AttractionList = ({
 						</div>
 					</div>
 				</div>
-				<div className="flex justify-center">
-					<button className="block w-36 bg-[#FF7A22] text-white py-3 rounded-3xl hover:bg-orange-600 text-xl text-center font-bold transition-colors duration-200">
-						<span className="flex flex-row items-center justify-center gap-2">
-							More
-							<MdExpandMore />
-						</span>
-					</button>
-				</div>
+				{hasMore && (
+					<div className="flex justify-center">
+						<button 
+							onClick={handleLoadMore}
+							className="block w-36 bg-[#FF7A22] text-white py-3 rounded-3xl hover:bg-orange-600 text-xl text-center font-bold transition-colors duration-200"
+						>
+							<span className="flex flex-row items-center justify-center gap-2">
+								More
+								<MdExpandMore />
+							</span>
+						</button>
+					</div>
+				)}
 			</div>
 		</section>
 	);

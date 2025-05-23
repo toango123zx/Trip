@@ -1,10 +1,8 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-
-import { Type } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
-
-import { CreateLocationDto } from '../../location/dto/create-location.dto';
+import { Type } from 'class-transformer';
 import { ConnectProviderMapDto } from '../../providerMap/dto/connect-providerMap.dto';
+import { CreateLocationDto } from '../../location/dto/create-location.dto';
 
 export class CreateMapAddressProviderMapRelationInputDto {
 	@ApiProperty({

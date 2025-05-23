@@ -20,6 +20,7 @@ export type TRequestBodyCreateSchedule = {
 	endTime: Date;
 	startOrder: Date;
 	endOrder: Date;
+	status?: EProductScheduleStatus;
 };
 
 export type TReSponseBodyScheduleDetail = {

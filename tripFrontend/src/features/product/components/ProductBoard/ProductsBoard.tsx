@@ -3,7 +3,8 @@ import React, { JSX, useState, useRef, useEffect } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { getColumnSearchProps, TableView, PaginationTable } from '@/components';
+import { BaseTable, renderStatusBadge, formatDateTime } from '@/components/BaseTable/BaseTable';
+import { getColumnSearchProps } from '@/components';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { EProductStatus, TPagination, TProductSumary } from '@/types';
@@ -17,6 +18,11 @@ type TProductsBoard = {
 	openProductUpdateOnClick?: (productId: string, status: EProductStatus) => void;
 	className?: string;
 };
+
+const STATUS_MAP = {
+	active: { color: 'green', label: 'Active' },
+	inactive: { color: 'red', label: 'Inactive' },
+} as const;
 
 export const ProductsBoard = ({
 	page,
@@ -48,17 +54,15 @@ export const ProductsBoard = ({
 
 	const columnTable: TableColumnsType<TProductSumary> = [
 		{
-			title: 'Product ID',
+			title: 'Mã sản phẩm',
 			dataIndex: 'id',
 			key: 'id',
-			width: '20%',
 			className: 'hidden',
 		},
 		{
-			title: 'Name',
+			title: 'Tên',
 			dataIndex: 'name',
 			key: 'name',
-			width: '12%',
 			...getColumnSearchProps<TProductSumary>(
 				'name',
 				searchInput,
@@ -71,10 +75,9 @@ export const ProductsBoard = ({
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
-			title: 'City',
+			title: 'Thành phố',
 			dataIndex: 'city',
 			key: 'city',
-			width: '8%',
 			...getColumnSearchProps(
 				'city',
 				searchInput,
@@ -90,57 +93,33 @@ export const ProductsBoard = ({
 			title: 'Time',
 			dataIndex: 'time',
 			key: 'time',
-			width: '8%',
 			sorter: (a, b) => a.time - b.time,
 			sortDirections: ['descend', 'ascend'],
+			render: (value: Date) => formatDateTime(value),
 		},
 		{
-			title: 'Quantity',
+			title: 'Số lượng',
 			dataIndex: 'quantityAvailable',
-			key: 'quantityAvailable',
-			width: '8%',
-			...getColumnSearchProps(
-				'quantityAvailable',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) => a.quantityAvailable - b.quantityAvailable,
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
-			title: 'Complete',
+			title: 'Hoàn thành',
 			dataIndex: 'quantityCompleted',
-			key: 'quantityCompleted',
-			...getColumnSearchProps(
-				'quantityCompleted',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) => a.quantityCompleted - b.quantityCompleted,
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
-			title: 'Status',
+			title: 'Trạng thái',
 			dataIndex: 'status',
 			key: 'status',
 			sorter: (a, b) => a.status.length - b.status.length,
 			sortDirections: ['descend', 'ascend'],
-			render: (text: string) => (
-				<span
-					className={`${text === 'active' ? 'text-green-500' : 'text-red-300'} font-semibold`}
-				>
-					{text}
-				</span>
-			),
+			render: (text: string) => renderStatusBadge(text, STATUS_MAP),
 		},
 		{
-			title: 'Action',
+			title: 'Thao tác',
+			key: 'action',
 			render: (_, record: TProductSumary) => (
 				<button
 					type="button"
@@ -150,9 +129,9 @@ export const ProductsBoard = ({
 							EProductStatus[record.status as keyof typeof EProductStatus],
 						)
 					}
-					className="text-blue-500 flex gap-2.5 items-center"
+					className="text-blue-500 flex gap-1 items-center"
 				>
-					<span>View detail</span>
+					<span>Xem chi tiết</span>
 					<span className="h-fit">
 						<IoIosArrowRoundForward />
 					</span>
@@ -167,20 +146,23 @@ export const ProductsBoard = ({
 
 	return (
 		<div>
-			<TableView<TProductSumary>
-				className={cn(className)}
-				columnTable={columnTable}
-				data={products}
-				pagination={false}
+			<BaseTable<TProductSumary>
+				rowKey="id"
+				columns={columnTable}
+				dataSource={products}
+				className={cn('w-full', className)}
+				pagination={
+					pagination?.totalItems > pageSize 
+					? {
+						current: page,
+						pageSize: pageSize,
+						total: pagination.totalItems,
+						onChange: handleChangePage,
+					} 
+					: false
+				}
+				size="middle"
 			/>
-			<div className="flex items-center justify-center">
-				{pagination.totalPages > 1 && (
-					<PaginationTable
-						pagination={{ ...pagination, currentPage: page }}
-						onPageChange={handleChangePage}
-					/>
-				)}
-			</div>
 		</div>
 	);
 };

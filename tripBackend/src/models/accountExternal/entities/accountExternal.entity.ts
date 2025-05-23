@@ -1,7 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { AccountExternalStatusEnum, ProviderAccountExternalEnum } from '@prisma/client';
-
+import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from '../../user/entities/user.entity';
 
 export class AccountExternalEntity {

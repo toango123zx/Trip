@@ -4,10 +4,11 @@ import dayjs, { Dayjs } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import localeData from 'dayjs/plugin/localeData';
 import weekday from 'dayjs/plugin/weekday';
-import { X, Save, Trash2 } from 'lucide-react';
-import React, { JSX, useState } from 'react';
-import CurrencyInput from 'react-currency-input-field';
+import { JSX, useState, useEffect, useRef } from 'react';
+import { useForm } from 'react-hook-form';
 
+import { BaseForm } from '@/components/Form/BaseForm';
+import { FormInput } from '@/components/Form/FormInput';
 import { DateTimeField, ErrorText } from '@/components';
 
 import type { TRequestBodyCreateSchedule } from '../../schedule.type';
@@ -43,13 +44,11 @@ const pickerConfigs: {
 ];
 
 type TError = {
-	name: boolean;
 	price: boolean;
 	startTime: boolean;
 	endTime: boolean;
 	startOrder: boolean;
 	endOrder: boolean;
-	message: string;
 };
 
 export const ScheduleForm = ({
@@ -60,8 +59,40 @@ export const ScheduleForm = ({
 	disabled = false,
 	onSave = (): void => {},
 	onRemove = (): void => {},
-	onCancel,
+	onCancel = (): void => {},
 }: TScheduleFormProps): JSX.Element => {
+	const form = useForm<TRequestBodyCreateSchedule>({
+		defaultValues: data,
+	});
+	
+	const { control, setValue, watch, getValues } = form;
+	const isInitialMount = useRef(true);
+	const prevDataRef = useRef(data);
+	
+	// Synchronize form data with component state only on initial mount or when data prop changes
+	useEffect(() => {
+		if (data && JSON.stringify(data) !== JSON.stringify(prevDataRef.current)) {
+			Object.keys(data).forEach((key) => {
+				setValue(key as keyof TRequestBodyCreateSchedule, data[key as keyof TRequestBodyCreateSchedule]);
+			});
+			prevDataRef.current = data;
+		}
+	}, [data, setValue]);
+
+	// Watch price changes and update component state, but prevent unnecessary updates
+	const price = watch("price");
+	useEffect(() => {
+		if (isInitialMount.current) {
+			isInitialMount.current = false;
+			return;
+		}
+		
+		const numPrice = Number(price);
+		if (!isNaN(numPrice) && numPrice > 0 && numPrice !== data.price) {
+			setData((prev) => ({ ...prev, price: numPrice }));
+		}
+	}, [price, setData, data.price]);
+	
 	const updateField = (dateOrTime: Dayjs, field: FieldKey, isDate: boolean): void => {
 		setData((prev) => {
 			const d = new Date(prev[field]);
@@ -76,10 +107,13 @@ export const ScheduleForm = ({
 
 	const [error, setError] = useState<TError>({} as TError);
 
-	const handleSubmit = (e: React.FormEvent): void => {
+	const handleSaveOnClick = (): void => {
 		setError({} as TError);
 		let flag = false;
-		if (data.price <= 0) {
+		
+		const formValues = getValues();
+		
+		if (formValues.price <= 0) {
 			setError((prev) => ({ ...prev, price: true }));
 			flag = true;
 		}
@@ -106,104 +140,91 @@ export const ScheduleForm = ({
 		if (flag) {
 			return;
 		}
-		e.preventDefault();
+		
 		onSave?.(data);
 	};
-
-	const handleRemoveOnClick = (): void => {
-		onRemove();
+	
+	const validateGreaterThanZero = (value: string | number | boolean): string | boolean => {
+		const numValue = Number(value);
+		return isNaN(numValue) || numValue <= 0 ? 'Price must be greater than 0' : true;
 	};
 
 	return (
-		<div
-			className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 px-4 sm:px-20"
-			onClick={onCancel}
+		<BaseForm
+			title={isCreate ? 'New Schedule' : 'Schedule Details'}
+			form={form}
+			isCreate={isCreate}
+			disabled={!isCreate || disabled}
+			open={true}
+			onSave={isCreate ? handleSaveOnClick : undefined}
+			onRemove={isCreate ? onRemove : undefined}
+			onCancel={onCancel}
 		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				className="w-full max-w-5xl bg-white rounded-lg overflow-hidden"
-			>
-				<header className="flex items-center justify-between px-6 py-4 border-b">
-					<h1 className="text-2xl font-bold">New Schedule</h1>
-					<div className="flex gap-2">
-						<button
-							type="button"
-							onClick={onCancel}
-							className="flex items-center gap-1 px-4 py-2 border rounded-md bg-gray-50 hover:bg-gray-100"
-						>
-							<X className="h-5 w-5" /> Cancel
-						</button>
-						{!disabled && !isCreate && (
-							<button
-								type="button"
-								onClick={handleRemoveOnClick}
-								className="flex items-center gap-1 rounded-md border border-red-500 bg-red-500 text-white px-4 py-2 hover:bg-red-700"
-							>
-								<Trash2 className="h-5 w-5" /> Remove
-							</button>
-						)}
-						{!disabled && isCreate && (
-							<button
-								type="button"
-								onClick={handleSubmit}
-								className="flex items-center gap-1 px-4 py-2 border bg-orange-500 text-white rounded-md hover:bg-orange-600"
-							>
-								<Save className="h-5 w-5" /> Save
-							</button>
-						)}
-					</div>
-				</header>
+			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-6">
+				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+					<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+					</svg>
+					<span className="text-sm sm:text-base font-medium text-gray-800">Product Name</span>
+				</div>
+				<input
+					type="text"
+					value={productName}
+					disabled={true}
+					className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base bg-white border border-gray-300 rounded-md hover:cursor-not-allowed shadow-sm"
+				/>
+			</div>
 
-				<div className="p-6 space-y-8 pb-10">
-					<div className="grid grid-cols-[185px_1fr] gap-4 items-center">
-						<label className="text-2xl font-medium">Product Name</label>
-						<input
-							type="text"
-							value={productName}
-							disabled={true}
-							className={`w-full p-3 bg-gray-200 border rounded-md hover:cursor-no-drop`}
-						/>
-					</div>
+			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-6">
+				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+					<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+					</svg>
+					<span className="text-sm sm:text-base font-medium text-gray-800">Price (VND)</span>
+				</div>
+				<FormInput
+					control={control}
+					name="price"
+					type="number"
+					disabled={!isCreate || disabled}
+					placeholder="Enter price value"
+					status={error.price ? 'error' : undefined}
+					rules={{
+						required: 'Price is required',
+						validate: validateGreaterThanZero,
+						min: { value: 0.01, message: 'Price must be greater than 0' }
+					}}
+				/>
+				{error.price && (
+					<ErrorText id="price" message="Price must be greater than 0" />
+				)}
+			</div>
 
-					<div className="grid grid-cols-[185px_1fr] gap-x-4 items-center">
-						<label className="text-2xl font-medium">Price (VND)</label>
-						<CurrencyInput
-							value={String(data.price)}
-							disabled={disabled}
-							// groupSeparator="."
-							decimalsLimit={0}
-							allowNegativeValue={false}
-							onValueChange={(val) =>
-								setData((prev) => ({ ...prev, price: Number(val || 0) }))
-							}
-							className={`w-full p-3 border rounded-md ${disabled ? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop' : 'bg-white'}`}
-						/>
-						<div className="pl-50 pt-2.5 col-span-2">
-							{error.price && (
-								<ErrorText
-									id={'price'}
-									message="Price must be greater than 0"
-								/>
-							)}
-						</div>
-					</div>
-
-					<div className="space-y-8">
-						{pickerConfigs.map((cfg) => (
+			<div className="space-y-3 sm:space-y-6 bg-gray-50 p-3 sm:p-4 rounded-lg">
+				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-4">
+					<svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+					</svg>
+					<h3 className="text-sm sm:text-base font-medium text-gray-800">Schedule Times</h3>
+				</div>
+				
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+					{pickerConfigs.map((cfg) => (
+						<div key={cfg.key} className="p-2 sm:p-3 bg-white border border-gray-200 rounded-md shadow-sm">
 							<DateTimeField<TRequestBodyCreateSchedule, FieldKey>
 								key={cfg.key}
 								label={cfg.label}
 								field={cfg.key}
 								value={data[cfg.key]}
-								disabled={disabled}
+								disabled={!isCreate || disabled}
 								onChangeDate={(d, f) => d && updateField(d, f, true)}
 								onChangeTime={(t, f) => t && updateField(t, f, false)}
 								error={error[cfg.key]}
 							/>
-						))}
-					</div>
+						</div>
+					))}
 				</div>
 			</div>
-		</div>
+		</BaseForm>
 	);
 };
