@@ -1,6 +1,7 @@
 import { TransactionStatusEnum, TransactionTargetEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { BillEntity } from '../../bill/entities/bill.entity';
+import { PaymentMethodEntity } from '../../paymentMethod/entities/paymentMethod.entity';
 
 export class TransactionEntity {
 	@ApiProperty({
@@ -10,11 +11,50 @@ export class TransactionEntity {
 	@ApiProperty({
 		type: 'string',
 	})
-	code: string;
+	billId: string;
+	@ApiProperty({
+		type: () => BillEntity,
+		required: false,
+	})
+	bill?: BillEntity;
+	@ApiProperty({
+		type: 'string',
+	})
+	transactionSessionCode: string;
+	@ApiProperty({
+		type: 'string',
+	})
+	paymentMethodId: string;
+	@ApiProperty({
+		type: () => PaymentMethodEntity,
+		required: false,
+	})
+	paymentMethod?: PaymentMethodEntity;
+	@ApiProperty({
+		type: 'integer',
+		format: 'int32',
+	})
+	amount: number;
+	@ApiProperty({
+		type: 'string',
+	})
+	bankCode: string;
+	@ApiProperty({
+		type: 'string',
+	})
+	cardType: string;
 	@ApiProperty({
 		type: 'string',
 	})
 	description: string;
+	@ApiProperty({
+		type: 'string',
+	})
+	BankTransactionCode: string;
+	@ApiProperty({
+		type: 'string',
+	})
+	transactionCode: string;
 	@ApiProperty({
 		enum: TransactionTargetEnum,
 		enumName: 'TransactionTargetEnum',
@@ -41,10 +81,4 @@ export class TransactionEntity {
 		enumName: 'TransactionStatusEnum',
 	})
 	status: TransactionStatusEnum;
-	@ApiProperty({
-		type: () => BillEntity,
-		isArray: true,
-		required: false,
-	})
-	bill?: BillEntity[];
 }

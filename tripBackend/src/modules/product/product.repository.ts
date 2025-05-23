@@ -219,7 +219,7 @@ export class ProductRepository {
 			});
 			product.productSchedule.forEach((schedule) => {
 				schedule.infoBill.forEach((info) => {
-					if (info.bill.status === BillStatusEnum.paided) {
+					if (info.bill.status === BillStatusEnum.paid) {
 						return billsIdWaitingRefund.push(info.bill.id);
 					}
 					billsIdCancel.push(info.bill.id);

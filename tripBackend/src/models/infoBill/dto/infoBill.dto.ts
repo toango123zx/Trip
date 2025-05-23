@@ -6,6 +6,7 @@ export class InfoBillDto {
 	})
 	id: string;
 	@ApiProperty({
+		minimum: 0,
 		type: 'integer',
 		format: 'int32',
 	})

@@ -13,9 +13,11 @@ export enum PermissionForAdminEnum {
 	CreateProductSchedule = PermissionEnum.CreateProductSchedule,
 	UpdateProductInformation = PermissionEnum.UpdateProductInformation,
 	FindProductScheduleBySupplierId = PermissionEnum.FindProductScheduleBySupplierId,
+	UpdateCompletedProductSchedule = PermissionEnum.UpdateCompletedProductSchedule,
 	DeleteProductScheduleByProductScheduleId = PermissionEnum.DeleteProductScheduleByProductScheduleId,
 	CreateDiscount = PermissionEnum.CreateDiscount,
 	DeleteDiscountByDiscountId = PermissionEnum.DeleteDiscountByDiscountId,
 	FindDiscountsByUserId = PermissionEnum.FindDiscountsByUserId,
 	AssignProductSchedulesToDiscount = PermissionEnum.AssignProductSchedulesToDiscount,
+	UpdatePaidBill = PermissionEnum.UpdatePaidBill,
 }

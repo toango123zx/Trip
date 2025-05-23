@@ -7,6 +7,10 @@ export class BillDto {
 	})
 	id: string;
 	@ApiProperty({
+		type: 'string',
+	})
+	transactionTargetId: string;
+	@ApiProperty({
 		type: 'integer',
 		format: 'int32',
 	})

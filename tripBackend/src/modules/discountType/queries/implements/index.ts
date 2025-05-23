@@ -1,1 +1,1 @@
-export * from './getDiscountTypes.query';
+export * from './GetDiscountTypes.query';

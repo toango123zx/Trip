@@ -1,7 +1,8 @@
 import { PaymentMethodStatusEnum } from '@prisma/client';
+import { TransactionEntity } from '../../transaction/entities/transaction.entity';
+import { TransactionSessionEntity } from '../../transactionSession/entities/transactionSession.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { BillEntity } from '../../bill/entities/bill.entity';
-
 export class PaymentMethodEntity {
 	@ApiProperty({
 		type: 'string',
@@ -37,9 +38,15 @@ export class PaymentMethodEntity {
 	})
 	status: PaymentMethodStatusEnum;
 	@ApiProperty({
-		type: () => BillEntity,
+		type: () => TransactionEntity,
 		isArray: true,
 		required: false,
 	})
-	bill?: BillEntity[];
+	transaction?: TransactionEntity[];
+	@ApiProperty({
+		type: () => TransactionSessionEntity,
+		isArray: true,
+		required: false,
+	})
+	transactionSession?: TransactionSessionEntity[];
 }

@@ -5,6 +5,7 @@ import {
 	HttpException,
 	Param,
 	Post,
+	Put,
 	Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -23,6 +24,7 @@ import { UserInformationDto } from '../user/dtos';
 import {
 	AddToCartByProductScheduleIdCommand,
 	DeleteProductScheduleByProductScheduleIdCommand,
+	UpdateCompletedProductScheduleByProductScheduleCompleteCommand,
 } from './commands/implements';
 import {
 	DeleteProductScheduleByProductScheduleIdResponseDto,
@@ -76,6 +78,20 @@ export class ProductScheduleController {
 	): Promise<HttpResponseBodyDto<GetCartResponseDto> | HttpException> {
 		return this.commandBus.execute(
 			new AddToCartByProductScheduleIdCommand(productScheduleId, myInformation),
+		);
+	}
+
+	@Put(':productScheduleId/completed')
+	@AuthPermission(PermissionEnum.UpdateCompletedProductSchedule)
+	async updateCompletedProductSchedule(
+		@Param('productScheduleId') productScheduleId: string,
+		@SupplierInformation() supplierInformation: SupplierInformationDto,
+	): Promise<HttpResponseBodyDto<ProductScheduleEntity | HttpException>> {
+		return this.commandBus.execute(
+			new UpdateCompletedProductScheduleByProductScheduleCompleteCommand(
+				productScheduleId,
+				supplierInformation,
+			),
 		);
 	}
 

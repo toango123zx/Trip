@@ -133,6 +133,85 @@ export class DiscountRepository {
 		return [discounts, totalRecords];
 	}
 
+	async findDiscountsByDiscountIds(
+		discountIds: string[],
+		userIds?: string[],
+		scheduleIds?: string[],
+		status?: DiscountStatusEnum,
+		statusInfoDiscount?: InfoDiscountStatusEnum,
+		availabilityTime?: boolean,
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: DiscountOrderByDto,
+	): Promise<[DiscountEntity[], number]> {
+		const orderBy = Object.entries(filter || {})
+			.filter(([_, value]) => Boolean(value))
+			.map(([key, value]) => ({ [key]: value }));
+		const [discounts, totalRecords] = await Promise.all([
+			this.prismaService.discount.findMany({
+				include: {
+					user: true,
+					infoDiscount: {
+						include: {
+							productSchedule: {
+								include: {
+									product: true,
+								},
+							},
+						},
+						where: {
+							status: statusInfoDiscount,
+						},
+					},
+					discountApplicationScope: true,
+					discountEligibility: true,
+					discountType: true,
+				},
+				where: {
+					id: { in: discountIds },
+					userId: { in: userIds },
+					startTime: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endTime: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					infoDiscount: {
+						some: {
+							productScheduleId: { in: scheduleIds },
+						},
+					},
+					status: status,
+				},
+				skip: pagination.skip,
+				take: pagination.take,
+				orderBy: orderBy,
+			}),
+			this.prismaService.discount.count({
+				where: {
+					id: { in: discountIds },
+					userId: { in: userIds },
+					startTime: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endTime: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					status: status,
+				},
+			}),
+		]);
+
+		return [discounts, totalRecords];
+	}
+
 	async findDiscountByDiscountId(
 		discountId: string,
 		statusDiscount?: DiscountStatusEnum,

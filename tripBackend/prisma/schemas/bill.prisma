@@ -16,6 +16,7 @@ enum TransactionTargetEnum {
 }
 
 enum TransactionStatusEnum {
+    pending
     completed
     canceled
 
@@ -24,13 +25,26 @@ enum TransactionStatusEnum {
 
 enum BillStatusEnum {
     done
-    paided
+    paid
     pending
     cancel
     refunded
     waitingRefund @map("waiting_refund")
-    
+
     @@map("Bill_Status_Enum")
+}
+
+model transactionSession {
+    id              String        @id @default(cuid())
+    billId          String
+    /// @DtoRelationCanConnectOnCreate
+    /// @DtoUpdateHidden
+    bill            bill          @relation(fields: [billId], references: [id])
+    paymentMethodId String        @map("payment_method_id")
+    /// @DtoRelationCanConnectOnCreate
+    paymentMethod   paymentMethod @relation(fields: [paymentMethodId], references: [id])
+
+    @@map("Transaction_Session")
 }
 
 model paymentMethod {
@@ -48,29 +62,43 @@ model paymentMethod {
     /// @DtoUpdateHidden
     status      PaymentMethodStatusEnum @default(active)
 
-    bill bill[]
+    transaction        transaction[]
+    transactionSession transactionSession[]
 
-    @@map("payment_Method")
+    @@map("Payment_Method")
 }
 
 model transaction {
-    id                String                @id @default(cuid())
+    id                   String                @id @default(cuid())
+    billId               String
+    /// @DtoRelationCanConnectOnCreate
+    bill                 bill                  @relation(fields: [billId], references: [id])
+    transactionSessionCode String
+    paymentMethodId      String                @map("payment_method_id")
+    /// @DtoRelationCanConnectOnCreate
+    paymentMethod        paymentMethod         @relation(fields: [paymentMethodId], references: [id])
     /// @DtoUpdateHidden
-    code              String
-    description       String
-    transactionTarget TransactionTargetEnum @map("transaction_target")
-    createAt          DateTime              @default(now()) @map("create_at")
+    amount               Int
+    /// @DtoUpdateHidden
+    bankCode             String                @map("bank_code")
+    /// @DtoUpdateHidden
+    cardType             String                @map("card_type")
+    description          String
+    /// @DtoUpdateHidden
+    BankTransactionCode  String                @map("bank_transaction_code")
+    /// @DtoUpdateHidden
+    transactionCode      String                @map("transaction_code")
+    transactionTarget    TransactionTargetEnum @map("transaction_target")
+    createAt             DateTime              @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    updateAt          DateTime              @updatedAt @map("update_at")
+    updateAt             DateTime              @updatedAt @map("update_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    deletedAt         DateTime?             @map("deleted_at")
-    /// @DtoCreateHidden
+    deletedAt            DateTime?             @map("deleted_at")
+    /// @DtoCreateOptional
     /// @DtoUpdateHidden
-    status            TransactionStatusEnum @default(completed)
-
-    bill bill[]
+    status               TransactionStatusEnum @default(pending)
 
     @@map("Transaction")
 }
@@ -81,10 +109,7 @@ model bill {
     userId              String         @map("userId")
     /// @DtoRelationCanConnectOnCreate
     user                user           @relation(fields: [userId], references: [id])
-    paymentMethodId     String         @map("payment_method_id")
-    paymentMethod       paymentMethod  @relation(fields: [paymentMethodId], references: [id])
     transactionTargetId String         @map("transaction_id")
-    transaction         transaction    @relation(fields: [transactionTargetId], references: [id])
     reductionPrice      Int            @map("reduction_price")
     totalPrice          Int            @map("total_price")
     createAt            DateTime       @default(now()) @map("create_at")
@@ -98,9 +123,12 @@ model bill {
     /// @DtoUpdateHidden
     status              BillStatusEnum @default(pending)
 
-    infoBill         infoBill[]
-    infoBillDiscount infoBillDiscount[]
-    discountForBill  discountForBill[]
+    /// @DtoRelationCanCreateOnCreate
+    infoBill           infoBill[]
+    infoBillDiscount   infoBillDiscount[]
+    discountForBill    discountForBill[]
+    transaction        transaction[]
+    transactionSession transactionSession[]
 
     @@map("Bill")
 }
@@ -109,11 +137,11 @@ model infoBill {
     id                String          @id @default(cuid())
     /// @DtoUpdateHidden
     billId            String          @map("bill_id")
-    /// @DtoRelationCanConnectOnCreate
     bill              bill            @relation(fields: [billId], references: [id])
     productScheduleId String          @map("product_schedule_id")
     /// @DtoRelationCanConnectOnCreate
-    productSchedule  productSchedule @relation(fields: [productScheduleId], references: [id])
+    productSchedule   productSchedule @relation(fields: [productScheduleId], references: [id])
+    /// @minimum 0
     quantity          Int
 
     @@map("Info_Bill")

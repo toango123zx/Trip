@@ -1,11 +1,12 @@
 import { BillStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserEntity } from '../../user/entities/user.entity';
-import { PaymentMethodEntity } from '../../paymentMethod/entities/paymentMethod.entity';
-import { TransactionEntity } from '../../transaction/entities/transaction.entity';
+import { DiscountForBillEntity } from '../../discountForBill/entities/discountForBill.entity';
 import { InfoBillEntity } from '../../infoBill/entities/infoBill.entity';
 import { InfoBillDiscountEntity } from '../../infoBillDiscount/entities/infoBillDiscount.entity';
-import { DiscountForBillEntity } from '../../discountForBill/entities/discountForBill.entity';
+import { PaymentMethodEntity } from '../../paymentMethod/entities/paymentMethod.entity';
+import { TransactionEntity } from '../../transaction/entities/transaction.entity';
+import { TransactionSessionEntity } from '../../transactionSession/entities/transactionSession.entity';
+import { UserEntity } from '../../user/entities/user.entity';
 
 export class BillEntity {
 	@ApiProperty({
@@ -24,21 +25,7 @@ export class BillEntity {
 	@ApiProperty({
 		type: 'string',
 	})
-	paymentMethodId: string;
-	@ApiProperty({
-		type: () => PaymentMethodEntity,
-		required: false,
-	})
-	paymentMethod?: PaymentMethodEntity;
-	@ApiProperty({
-		type: 'string',
-	})
 	transactionTargetId: string;
-	@ApiProperty({
-		type: () => TransactionEntity,
-		required: false,
-	})
-	transaction?: TransactionEntity;
 	@ApiProperty({
 		type: 'integer',
 		format: 'int32',
@@ -88,4 +75,16 @@ export class BillEntity {
 		required: false,
 	})
 	discountForBill?: DiscountForBillEntity[];
+	@ApiProperty({
+		type: () => TransactionEntity,
+		isArray: true,
+		required: false,
+	})
+	transaction?: TransactionEntity[];
+	@ApiProperty({
+		type: () => TransactionSessionEntity,
+		isArray: true,
+		required: false,
+	})
+	transactionSession?: TransactionSessionEntity[];
 }

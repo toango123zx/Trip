@@ -1,0 +1,99 @@
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpException,
+	Param,
+	Post,
+	Put,
+	Query,
+} from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+
+import { HttpResponseBodyDto, PaginationDto, PermissionEnum } from 'src/common';
+import { BillEntity } from 'src/models';
+
+import { Auth, AuthPermission } from '../auth/decorators';
+import { MyInformation } from '../user/decorators';
+import { UserInformationDto } from '../user/dtos';
+
+import {
+	CancelBillByBillIdCommand,
+	CreateBillCommand,
+	PaymentBillByBillIdCommand,
+	UpdatePaidBillCommand,
+} from './commands/implements';
+import { CreateBillRequest, BillDetailResponseDto } from './dtos';
+import { BillFilterRequestDto } from './dtos/requests/billFilter.request';
+import { GetBillByBillIdQuery, GetBillsByUserIdQuery } from './queries/implements';
+
+@Controller('bill')
+export class BillController {
+	constructor(
+		private readonly queryBus: QueryBus,
+		private readonly commandBus: CommandBus,
+	) {}
+
+	@Get()
+	@Auth()
+	async getBillsByUserId(
+		@Query() pagination: PaginationDto,
+		@MyInformation() myInformation: UserInformationDto,
+		@Query() filter?: BillFilterRequestDto,
+	): Promise<HttpResponseBodyDto<BillEntity[]>> {
+		return this.queryBus.execute(
+			new GetBillsByUserIdQuery(pagination, myInformation, filter),
+		);
+	}
+
+	@Get('/:billId')
+	@Auth()
+	async getBillByBillId(
+		@Param('billId') billId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<BillDetailResponseDto> | HttpException> {
+		return this.queryBus.execute(new GetBillByBillIdQuery(billId, myInformation));
+	}
+
+	@Post()
+	@Auth()
+	async createBill(
+		@MyInformation() myInformation: UserInformationDto,
+		@Body() billInformation: CreateBillRequest,
+	): Promise<HttpResponseBodyDto<BillDetailResponseDto | HttpException>> {
+		return this.commandBus.execute(
+			new CreateBillCommand(myInformation, billInformation),
+		);
+	}
+
+	@Post('/:billId/payment')
+	@Auth()
+	async yaymentBillByBillId(
+		@Param('billId') billId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<BillDetailResponseDto | HttpException>> {
+		return this.commandBus.execute(
+			new PaymentBillByBillIdCommand(billId, myInformation),
+		);
+	}
+
+	@Put('/:billId/paid')
+	@AuthPermission(PermissionEnum.UpdatePaidBill)
+	async updatePaidBill(
+		@Param('billId') billId: string,
+	): Promise<HttpResponseBodyDto<BillEntity | HttpException>> {
+		return this.commandBus.execute(new UpdatePaidBillCommand(billId));
+	}
+
+	@Delete('/:billId')
+	@Auth()
+	async deleteBillByBillId(
+		@Param('billId') billId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<BillEntity> | HttpException> {
+		return this.commandBus.execute(
+			new CancelBillByBillIdCommand(billId, myInformation),
+		);
+	}
+}
