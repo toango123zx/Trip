@@ -1,6 +1,6 @@
 import React, { JSX, useEffect, useMemo, useRef, useState } from 'react';
-import { BsBookmarkCheck } from 'react-icons/bs';
-import { FaStar, FaRegStar } from 'react-icons/fa';
+import { BsBookmarkCheck, BsCalendar, BsClock } from 'react-icons/bs';
+import { FaStar, FaRegStar, FaCheck } from 'react-icons/fa';
 import { IoLocationOutline } from 'react-icons/io5';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { RiCalendarScheduleLine } from 'react-icons/ri';
@@ -9,17 +9,14 @@ import { useParams } from 'react-router-dom';
 import { Pagination, Navigation, Autoplay, Mousewheel } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
+import { scheduleThunk } from '@/features/schedule';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { TSchedule } from '@/types';
-import { schedule1 } from '@/utils';
+import { EProductScheduleStatus, TProductSchedule } from '@/types';
 
 import { productThunk } from '../../productThunk';
 
-type TStarIconProps = {
-	filled: boolean;
-};
-
+type TStarIconProps = { filled: boolean };
 const StarIcon = ({ filled }: TStarIconProps): JSX.Element =>
 	filled ? (
 		<FaStar className="w-4 h-4 text-yellow-400" />
@@ -27,12 +24,7 @@ const StarIcon = ({ filled }: TStarIconProps): JSX.Element =>
 		<FaRegStar className="w-4 h-4 text-gray-300" />
 	);
 
-type TImageFallbackProps = {
-	src: string;
-	alt: string;
-	className?: string;
-};
-
+type TImageFallbackProps = { src: string; alt: string; className?: string };
 const ImageFallback = ({ src, alt, className }: TImageFallbackProps): JSX.Element => (
 	<img
 		src={src}
@@ -47,104 +39,192 @@ const ImageFallback = ({ src, alt, className }: TImageFallbackProps): JSX.Elemen
 );
 
 type TScheduleCardProps = {
-	schedule: TSchedule;
+	schedule: TProductSchedule;
 	className?: string;
+	isInCart?: boolean;
+	onDetailsClick?: () => void;
 };
 
-const ScheduleCard = ({ schedule, className }: TScheduleCardProps): JSX.Element => {
-	const statusColor = schedule.status === 'Active' ? 'text-green-500' : 'text-gray-500';
+const ScheduleCard = ({
+	schedule,
+	className,
+	isInCart = false,
+	onDetailsClick,
+}: TScheduleCardProps): JSX.Element => {
+	const statusColor =
+		schedule.status === EProductScheduleStatus.active
+			? 'text-green-500'
+			: 'text-gray-500';
+	const dispatch = useDispatch<TReduxStoreDispatch>();
+	const [isAddedToCart, setIsAddedToCart] = useState(isInCart);
 
-	const renderInfoSection = (
-		icon: 'calendar' | 'document' | 'check',
-		label: string,
-		value: string,
-	): JSX.Element => (
-		<div className="flex items-center gap-1.5 md:gap-5">
-			<RiCalendarScheduleLine
-				type={icon}
-				className="w-6 md:w-14 h-full text-gray-700"
-			/>
-			<div className="flex flex-col gap-1 md:gap-2.5">
-				<p className="tex-xs md:text-2xl text-gray-500">{label}</p>
-				<p className="text-sm md:text-3xl font-bold text-black">{value}</p>
-			</div>
-		</div>
-	);
+	const addScheduleInCart = (): void => {
+		dispatch(scheduleThunk.addScheduleToCart(schedule.id));
+		setIsAddedToCart(true);
+	};
+
+	const formatDateTime = (
+		date: string,
+	): {
+		date: string;
+		time: string;
+		dayOfWeek: string;
+	} => {
+		const dateObj = new Date(date);
+		return {
+			date: dateObj.toLocaleDateString('vi-VN', {
+				day: '2-digit',
+				month: '2-digit',
+				year: 'numeric',
+			}),
+			time: dateObj.toLocaleTimeString('vi-VN', {
+				hour: '2-digit',
+				minute: '2-digit',
+			}),
+			dayOfWeek: dateObj.toLocaleDateString('vi-VN', { weekday: 'long' }),
+		};
+	};
+
+	const startDateTime = formatDateTime(schedule.startTime);
+	const endDateTime = formatDateTime(schedule.endTime);
+	const startOrderDateTime = formatDateTime(schedule.startOrder);
+	const endOrderDateTime = formatDateTime(schedule.endOrder);
+
+	const bookingPercentage = schedule.booked;
+
 	return (
 		<section
-			className={cn('bg-gray-100 relative md:pt-	0', className)}
-			aria-labelledby="hero-attractions-heading"
+			className={cn(
+				'bg-white rounded-2xl overflow-hidden transition-all duration-300 ease-in-out',
+				'shadow-sm hover:shadow-md border border-gray-100',
+				className,
+			)}
 		>
-			<div className="h-fit bg-gray-100 font-Montserrat text-lg md:text-xl">
-				<div className="container mx-auto bg-white rounded-lg shadow-lg">
-					<div className="bg-white rounded-xl shadow-md p-4 md:py-9 md:px-24 w-full mx-auto">
-						{/* <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4"> */}
-						<div className="w-full md:flex md:flex-row md:justify-between md:gap-8">
-							<div className="w-full md:max-w-8/12 grid grid-cols-2 grid-row-3 md:grid-rows-2 gap-x-8 gap-y-5 md:gap-y-11 ">
-								{/* Left Column: Start Date & Booked */}
-								{renderInfoSection(
-									'calendar',
-									'Start Date',
-									`${schedule.startTime} | ${schedule.startDate}`,
-								)}
-								{renderInfoSection(
-									'calendar',
-									'End Date',
-									`${schedule.endTime} | ${schedule.endDate}`,
-								)}
-								<div className="flex items-center gap-1.5 md:gap-5">
-									<BsBookmarkCheck className="w-6 md:w-14 h-full text-gray-700" />
-									<div className="flex flex-col gap-1 md:gap-2.5">
-										<p className="text-xs md:text-2xl text-gray-500">
-											Booked
-										</p>
-										<p className="text-sm md:text-3xl font-bold text-black">
-											{schedule.booked.toString()}
-										</p>
-									</div>
-								</div>
-								<div className="w-full md:hidden row-span-2 flex-col space-y-3 sm:w-auto pt-2 sm:pt-0 justify-center items-center gap-10">
-									<div className="text-[32px] font-bold text-orange-400">
-										<span className="text-center mr-2.5">
-											{schedule.price}
-										</span>
-										<span className="w-full text-base text-center">
-											VND
-										</span>
-									</div>
-									<button
-										className="bg-orange-400 hover:bg-orange-600 text-white font-semibold rounded-full transition duration-150 ease-in-out w-full sm:w-auto text-2xl px-11 py-1.5"
-										aria-label="Add item"
-									>
-										Add
-									</button>
-								</div>
-								<div className="flex items-center gap-2.5 md:gap-5">
-									<IoCheckmarkCircleOutline
-										type="check"
-										className={`w-6 md:w-14 h-full ${statusColor}`}
-									/>
-									<p
-										className={`text-sm font-bold md:text-4xl md:font-medium ${statusColor}`}
-									>
-										{schedule.status}
-									</p>
-								</div>
+			{/* Header with date range */}
+			<div className="bg-gradient-to-r from-blue-50 to-orange-50 p-5 border-b border-gray-100">
+				<div className="flex items-center justify-between">
+					<div>
+						<p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+							Tour Dates
+						</p>
+						<h3 className="text-xl font-bold text-gray-800 mt-1">
+							{startDateTime.date} - {endDateTime.date}
+						</h3>
+					</div>
+				</div>
+			</div>
 
-								{/* Right Column: Price & Add Button */}
+			<div className="p-5">
+				{/* Time cards */}
+				<div className="grid grid-cols-2 gap-3 mb-6">
+					<div className="bg-gray-50 p-3 rounded-lg">
+						<div className="flex items-center gap-2 text-gray-500 mb-1">
+							<BsClock className="w-4 h-4" />
+							<span className="text-xs font-medium">Start Time</span>
+						</div>
+						<p className="text-sm font-semibold text-gray-800">
+							{startDateTime.time}
+						</p>
+					</div>
+
+					<div className="bg-gray-50 p-3 rounded-lg">
+						<div className="flex items-center gap-2 text-gray-500 mb-1">
+							<BsClock className="w-4 h-4" />
+							<span className="text-xs font-medium">End Time</span>
+						</div>
+						<p className="text-sm font-semibold text-gray-800">
+							{endDateTime.time}
+						</p>
+					</div>
+
+					<div className="bg-blue-50 p-3 rounded-lg">
+						<div className="flex items-center gap-2 text-blue-500 mb-1">
+							<IoCheckmarkCircleOutline className="w-4 h-4" />
+							<span className="text-xs font-medium">Booking Opens</span>
+						</div>
+						<p className="text-sm font-semibold text-gray-800">
+							{startOrderDateTime.date} {startOrderDateTime.time}
+						</p>
+					</div>
+
+					<div className="bg-red-50 p-3 rounded-lg">
+						<div className="flex items-center gap-2 text-red-500 mb-1">
+							<IoCheckmarkCircleOutline className="w-4 h-4" />
+							<span className="text-xs font-medium">Booking Closes</span>
+						</div>
+						<p className="text-sm font-semibold text-gray-800">
+							{endOrderDateTime.date} {endOrderDateTime.time}
+						</p>
+					</div>
+				</div>
+
+				{/* Booking status - Updated to show number of people */}
+				<div className="mb-6 bg-gray-50 p-4 rounded-lg">
+					<div className="flex items-center justify-between">
+						<div className="flex items-center gap-3">
+							<div className="bg-orange-100 p-2 rounded-full">
+								<BsBookmarkCheck className="w-4 h-4 text-orange-600" />
 							</div>
-							<div className="w-full hidden md:flex flex-col space-y-3 sm:w-auto pt-2 sm:pt-0 justify-center items-center gap-10 text-center">
-								<div className="text-6xl font-bold text-orange-400">
-									{schedule.price} <span>VND</span>
-								</div>
-								<button
-									className="bg-orange-400 hover:bg-orange-600 text-white font-semibold rounded-full transition duration-150 ease-in-out w-full sm:w-auto text-4xl px-20 py-3.5"
-									aria-label="Add item"
-								>
-									Add
-								</button>
+							<div>
+								<p className="text-xs font-medium text-gray-500">
+									Booked Participants
+								</p>
+								<p className="text-lg font-bold text-gray-800">
+									{schedule.booked}{' '}
+									<span className="text-sm font-normal text-gray-500">
+										people
+									</span>
+								</p>
 							</div>
 						</div>
+						<div className="text-sm text-gray-500">
+							{schedule.capacity && (
+								<span>of {schedule.capacity} total</span>
+							)}
+						</div>
+					</div>
+				</div>
+
+				{/* Price and actions */}
+				<div className="flex items-center justify-between border-t border-gray-100 pt-5">
+					<div>
+						<p className="text-xs text-gray-500 mb-1">From</p>
+						<p className="text-2xl font-bold text-orange-600">
+							{new Intl.NumberFormat('vi-VN').format(schedule.price)} ₫
+						</p>
+					</div>
+
+					<div className="flex gap-3">
+						{onDetailsClick && (
+							<button
+								onClick={onDetailsClick}
+								className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+							>
+								<RiCalendarScheduleLine className="w-4 h-4" />
+								Details
+							</button>
+						)}
+
+						<button
+							onClick={addScheduleInCart}
+							disabled={isAddedToCart}
+							className={cn(
+								'px-6 py-2 rounded-lg text-sm font-semibold transition-colors',
+								'flex items-center gap-2',
+								isAddedToCart
+									? 'bg-green-100 text-green-700 border border-green-200'
+									: 'bg-orange-500 text-white hover:bg-orange-600',
+							)}
+						>
+							{isAddedToCart ? (
+								<>
+									<FaCheck className="w-4 h-4" />
+									Added
+								</>
+							) : (
+								'Book Now'
+							)}
+						</button>
 					</div>
 				</div>
 			</div>
@@ -152,13 +232,7 @@ const ScheduleCard = ({ schedule, className }: TScheduleCardProps): JSX.Element 
 	);
 };
 
-type TAttractionsInformationProps = {
-	className?: string;
-};
-
-export const AttractionsInformation: React.FC = ({
-	className,
-}: TAttractionsInformationProps) => {
+export const AttractionsInformation: React.FC = () => {
 	const { attractionId } = useParams();
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const { productDetail: data } = useSelector(
@@ -167,17 +241,17 @@ export const AttractionsInformation: React.FC = ({
 
 	const [showAllImages, setShowAllImages] = useState(false);
 	const [showFullDesc, setShowFullDesc] = useState(false);
-	const swiperRef = useRef<import('swiper').Swiper | null>(null);
-	// ...existing code...
+	const swiperRef = useRef<unknown>(null);
 
 	useEffect(() => {
 		if (attractionId) dispatch(productThunk.getProductDetail(attractionId));
 	}, [attractionId, dispatch]);
 
 	const truncatedDesc = useMemo(() => {
-		return data.description?.length > 530
-			? data.description.slice(0, 530) + '...'
-			: data.description || '';
+		if (!data.description) return '';
+		return data.description.length > 300
+			? data.description.slice(0, 300) + '...'
+			: data.description;
 	}, [data.description]);
 
 	const stars = useMemo(
@@ -192,130 +266,140 @@ export const AttractionsInformation: React.FC = ({
 
 	const info = [
 		{ label: 'Destination', value: data.city },
-		{ label: 'Time', value: `${data.time} hours` },
-		{ label: 'Quantity', value: data.quantityAvailable },
-		{ label: 'Count complete', value: data.quantityCompleted },
+		{ label: 'Duration', value: `${data.time} hours` },
+		{ label: 'Available', value: data.quantityAvailable },
+		{ label: 'Completed', value: data.quantityCompleted },
 	];
 
-	const schedule = [schedule1, schedule1, schedule1, schedule1, schedule1, schedule1];
-
 	return (
-		<section
-			className={cn('relative md:pt-0', className)}
-			aria-labelledby="hero-attractions-heading"
-		>
-			<div className="h-fit font-Montserrat text-lg md:text-xl">
-				<div className="container mx-auto bg-white rounded-lg shadow-lg p-6 md:px-14 md:py-16">
-					{/* Header */}
-					<div className="mb-6 border-b border-gray-200 pb-6">
-						<div className="flex justify-between items-center">
-							<h1 className="text-4xl md:text-6xl font-bold text-gray-900">
+		<section className="relative">
+			{/* Main Content */}
+			<div className="container mx-auto bg-white rounded-lg shadow-sm p-6 md:p-8">
+				{/* Header */}
+				<div className="mb-6 pb-6">
+					<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+						<div>
+							<h1 className="text-2xl md:text-4xl font-bold text-gray-900">
 								{data.name}
 							</h1>
-							<div className="flex items-center gap-2.5 text-gray-500 text-sm md:text-4xl">
-								<IoLocationOutline />
-								<span>{data.city}</span>
+							<div className="flex items-center gap-2 text-gray-500 mt-2">
+								<IoLocationOutline className="text-orange-500" />
+								<span className="text-sm md:text-base">{data.city}</span>
 							</div>
 						</div>
-						<div className="flex items-center gap-2 text-sm md:text-2xl text-gray-500">
-							<div className="hidden md:flex gap-1">{stars}</div>
-							<div className="md:hidden flex gap-1.5 items-center">
-								<StarIcon filled={data.avgRate > 0} />
-								<span>{data.avgRate}</span>
+						<div className="flex items-center gap-2 text-gray-500">
+							<div className="flex gap-1 items-center">
+								{stars}
+								<span className="ml-1 text-sm md:text-base">
+									{data.avgRate}
+								</span>
 							</div>
-							<span>({data.quantityRate} review)</span>
+							<span className="text-sm md:text-base">
+								({data.quantityRate} reviews)
+							</span>
 						</div>
-					</div>
-
-					{/* Mobile Swiper */}
-					<div className="md:hidden py-4">
-						<Swiper
-							modules={[Pagination, Navigation, Autoplay, Mousewheel]}
-							onSwiper={(swiper) => {
-								swiperRef.current = swiper;
-							}}
-							slidesPerView={(window.innerWidth - 40) / 230}
-							loop={false}
-							speed={600}
-							autoplay={{ delay: 3500, disableOnInteraction: false }}
-							pagination={{ clickable: true, dynamicBullets: true }}
-							mousewheel
-							a11y={{
-								prevSlideMessage: 'Previous slide',
-								nextSlideMessage: 'Next slide',
-							}}
-						>
-							{data.productImage?.map((img, i) => (
-								<SwiperSlide key={img.id || i}>
-									<div className="w-[200px] aspect-[4/3] bg-gray-200 rounded-md overflow-hidden">
-										<ImageFallback
-											src={img.url}
-											alt={`Image ${i + 1}`}
-											className="w-full h-full object-cover"
-										/>
-									</div>
-								</SwiperSlide>
-							))}
-						</Swiper>
-					</div>
-
-					{/* Description */}
-					<div className="md:my-8 text-gray-700 leading-relaxed md:text-3xl">
-						<p>{showFullDesc ? data.description : truncatedDesc}</p>
-						{data.description && data.description.length > 530 && (
-							<button
-								className="mt-2 text-orange-600 hover:underline md:text-2xl font-medium"
-								onClick={() => setShowFullDesc(!showFullDesc)}
-							>
-								{showFullDesc ? 'See less' : 'See more'}
-							</button>
-						)}
-					</div>
-
-					{/* Detail Info */}
-					<div className="max-w-xl mb-8 grid grid-cols-2 gap-x-1 gap-y-5 text-xl md:text-[28px]">
-						{info.map(({ label, value }) => (
-							<React.Fragment key={label}>
-								<div className="font-semibold text-orange-600">
-									{label}
-								</div>
-								<div className="text-gray-800">{value}</div>
-							</React.Fragment>
-						))}
-					</div>
-
-					{/* Gallery */}
-					<div className="hidden md:block pt-8 border-t border-gray-200">
-						<h2 className="text-5xl font-semibold text-gray-900 mb-11">
-							From our gallery
-						</h2>
-						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-							{visibleImages?.map((img, i) => (
-								<ImageFallback
-									key={img.id || i}
-									src={img.url}
-									alt={`Gallery image ${i + 1}`}
-									className="w-full h-48 object-cover rounded-lg shadow hover:shadow-lg transition-shadow duration-300"
-								/>
-							))}
-						</div>
-						{data.productImage?.length > 3 && (
-							<div className="mt-12 text-center text-3xl font-extrabold">
-								<button
-									onClick={() => setShowAllImages(!showAllImages)}
-									className="text-orange-600 hover:underline focus:outline-none"
-								>
-									{showAllImages ? 'See less' : 'See more'}
-								</button>
-							</div>
-						)}
 					</div>
 				</div>
+
+				{/* Mobile Swiper */}
+				<div className="md:hidden mb-6">
+					<Swiper
+						modules={[Pagination, Navigation, Autoplay, Mousewheel]}
+						onSwiper={(swiper) => (swiperRef.current = swiper)}
+						slidesPerView={1}
+						spaceBetween={20}
+						loop={false}
+						speed={600}
+						autoplay={{ delay: 3500, disableOnInteraction: false }}
+						pagination={{ clickable: true, dynamicBullets: true }}
+						mousewheel
+					>
+						{data.productImage?.map((img, i) => (
+							<SwiperSlide key={img.id || i}>
+								<div className="w-full aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden">
+									<ImageFallback
+										src={img.url}
+										alt={`Image ${i + 1}`}
+										className="w-full h-full object-cover"
+									/>
+								</div>
+							</SwiperSlide>
+						))}
+					</Swiper>
+				</div>
+
+				{/* Description */}
+				<div className="mb-8 text-gray-700 leading-relaxed text-sm md:text-base">
+					<p>{showFullDesc ? data.description : truncatedDesc}</p>
+					{data.description?.length > 300 && (
+						<button
+							className="mt-3 text-orange-600 hover:underline font-medium text-sm md:text-base"
+							onClick={(): void => setShowFullDesc((v) => !v)}
+						>
+							{showFullDesc ? 'Show less' : 'Read more'}
+						</button>
+					)}
+				</div>
+
+				{/* Detail Info */}
+				<div className="mb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+					{info.map(({ label, value }) => (
+						<div key={label} className="bg-gray-50 p-4 rounded-lg">
+							<div className="text-xs text-gray-500 uppercase tracking-wider">
+								{label}
+							</div>
+							<div className="text-base font-semibold text-gray-800 mt-1">
+								{value}
+							</div>
+						</div>
+					))}
+				</div>
+
+				{/* Gallery */}
+				<div className="pt-8 border-t border-gray-200">
+					<h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">
+						Gallery
+					</h2>
+					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+						{visibleImages?.map((img, i) => (
+							<div
+								key={img.id || i}
+								className="group relative overflow-hidden rounded-lg"
+							>
+								<ImageFallback
+									src={img.url}
+									alt={`Gallery image ${i + 1}`}
+									className="w-full h-48 md:h-64 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+								/>
+								<div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
+							</div>
+						))}
+					</div>
+					{data.productImage?.length > 3 && (
+						<div className="mt-6 text-center">
+							<button
+								onClick={() => setShowAllImages((v) => !v)}
+								className="text-orange-600 hover:underline focus:outline-none font-medium"
+							>
+								{showAllImages ? 'Show less' : 'View more photos'}
+							</button>
+						</div>
+					)}
+				</div>
 			</div>
-			<div className="bg-gray-100 flex flex-col gap-8 md:gap-16 md:pb-24 py-10 md:p-8">
-				{schedule.map((schedule, index) => (
-					<ScheduleCard key={index} schedule={schedule} />
-				))}
+
+			{/* Schedules */}
+			<div className="container mx-auto px-4 md:px-0">
+				<div className="bg-gray-50 rounded-lg p-6 md:p-8 my-8">
+					<h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">
+						Available Schedules
+					</h2>
+					<div className="space-y-4">
+						{data.productSchedule?.map((sched) => (
+							<ScheduleCard key={sched.id} schedule={sched} />
+						))}
+					</div>
+				</div>
 			</div>
 		</section>
 	);

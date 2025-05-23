@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-
 import { IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateProductDto {

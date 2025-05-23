@@ -1,17 +1,13 @@
+import { Button } from 'antd';
 import { Dayjs } from 'dayjs';
-import { Save, Trash2, X } from 'lucide-react';
 import { JSX, useEffect, useState } from 'react';
-import { UseFormReturn } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { UseFormReturn } from 'react-hook-form';
 
-import {
-	CheckboxForm,
-	DateTimeField,
-	Input,
-	SelectBoxForm,
-	Textarea,
-	TSelectBoxOption,
-} from '@/components';
+import { BaseForm } from '@/components/Form/BaseForm';
+import { FormInput } from '@/components/Form/FormInput';
+import { FormSelect } from '@/components/Form/FormSelect';
+import { DateTimeField, CheckboxForm } from '@/components';
 import { discountThunk, ProductUpdate, SchedulesBoardInDiscount } from '@/features';
 import { discountApplicationScopeThunk } from '@/features/discountApplicationScope';
 import { discountEligibilityThunk } from '@/features/discountEligibility';
@@ -29,6 +25,12 @@ import {
 } from '@/types';
 
 import { TAddScheduleInDiscount, TRequestBodyCreateDiscount } from '../../discount.type';
+
+type TSelectBoxOption = {
+	id: string;
+	label: string;
+	value: string;
+};
 
 type FieldKey = keyof Pick<TRequestBodyCreateDiscount, 'startTime' | 'endTime'>;
 
@@ -55,6 +57,7 @@ type TDiscountFormProps = {
 	discountId?: string;
 	isCreate?: boolean;
 	disabled?: boolean;
+	open?: boolean;
 	onSave?: (data: TRequestBodyCreateDiscount) => void;
 	onRemove?: () => void;
 	onCancel?: () => void;
@@ -65,17 +68,12 @@ export const DiscountForm = ({
 	discountId,
 	isCreate = false,
 	disabled = false,
-	onSave = (): void => {},
-	onRemove = (): void => {},
-	onCancel = (): void => {},
+	open = false,
+	onSave = () => {},
+	onRemove = () => {},
+	onCancel = () => {},
 }: TDiscountFormProps): JSX.Element => {
-	const {
-		register,
-		handleSubmit,
-		setValue,
-		formState: { errors },
-		watch,
-	} = form;
+	const { control, watch, setValue } = form;
 
 	const [discountTime, setDiscountTime] = useState<DiscountTimeField>(
 		{} as DiscountTimeField,
@@ -275,7 +273,6 @@ export const DiscountForm = ({
 			startTime: selectedSchedule.startTime,
 			endTime: selectedSchedule.endTime,
 			productName: selectedProduct?.name,
-
 			status: EInfoDiscountStatus.pendingAdd,
 		};
 
@@ -327,16 +324,19 @@ export const DiscountForm = ({
 			setError({} as TError);
 			let flag = false;
 
-			if (!discountTime.startTime || discountTime.startTime <= new Date()) {
+			// Validate start time
+			const now = new Date();
+			now.setSeconds(0, 0); // Reset seconds and milliseconds for fair comparison
+
+			const startTime = value.startTime;
+			if (!startTime) {
 				setError((prev) => ({ ...prev, startTime: true }));
 				flag = true;
 			}
 
-			if (
-				!discountTime.endTime ||
-				discountTime.endTime <= new Date() ||
-				discountTime.endTime <= discountTime.startTime
-			) {
+			// Validate end time
+			const endTime = value.endTime;
+			if (!endTime || (startTime && endTime <= startTime)) {
 				setError((prev) => ({ ...prev, endTime: true }));
 				flag = true;
 			}
@@ -345,215 +345,343 @@ export const DiscountForm = ({
 				setValue('quantity', 0);
 			}
 
-			if (flag) return;
+			if (flag) {
+				console.error('Validation failed:', { startTime, endTime });
+				return;
+			}
+
+			// Add schedule IDs if available
 			value.scheduleIds = addScheduleIds.length > 0 ? addScheduleIds : undefined;
 
-			onSave(value as TRequestBodyCreateDiscount);
+			try {
+				onSave(value as TRequestBodyCreateDiscount);
+			} catch (error) {
+				console.error('Error saving discount:', error);
+			}
 			return;
 		}
 
+		// Handle update case
 		if (!isCreate && discountId) {
-			handleChangeInfoDiscount();
-			onCancel();
+			try {
+				handleChangeInfoDiscount();
+				onCancel();
+			} catch (error) {
+				console.error('Error updating discount:', error);
+			}
 			return;
 		}
 	};
 
 	return (
-		<div
-			className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 px-4 sm:px-20"
-			onClick={onCancel}
-		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				className="w-full max-w-7xl max-h-11/12 overflow-y-auto bg-white rounded-lg overflow-hidden"
+		<>
+			<BaseForm
+				title={isCreate ? 'Thêm khuyến mãi' : 'Chi tiết khuyến mãi'}
+				form={form}
+				isCreate={isCreate}
+				disabled={isCreate ? disabled : false}
+				open={open}
+				onSave={isCreate ? handleSaveOnClick : undefined}
+				onRemove={onRemove}
+				onCancel={onCancel}
 			>
-				<header className="sticky top-0 z-10 flex items-center justify-between bg-white px-6 py-4 border-b">
-					<h1 className="text-2xl font-bold">New Discount</h1>
-					<div className="flex gap-2">
-						<button
-							type="button"
-							onClick={onCancel}
-							className="flex items-center gap-1 px-4 py-2 border rounded-md bg-gray-50 hover:bg-gray-100"
+				{/* --- Basic Information --- */}
+				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+					<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+						<svg
+							className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
 						>
-							<X className="h-5 w-5" /> Cancel
-						</button>
-						{!isCreate && (
-							<button
-								type="button"
-								onClick={onRemove}
-								className="flex items-center gap-1 rounded-md border border-red-500 bg-red-500 text-white px-4 py-2 hover:bg-red-700"
-							>
-								<Trash2 className="h-5 w-5" /> Remove
-							</button>
-						)}
-						<button
-							type="button"
-							onClick={handleSubmit(handleSaveOnClick)}
-							className="flex items-center gap-1 px-4 py-2 border bg-orange-500 text-white rounded-md hover:bg-orange-600"
-						>
-							<Save className="h-5 w-5" /> Save
-						</button>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
+						</svg>
+						<span className="text-sm sm:text-base font-medium text-gray-800">
+							Thông tin cơ bản
+						</span>
 					</div>
-				</header>
 
-				<form
-					onSubmit={handleSubmit(handleSaveOnClick)}
-					className="p-6 space-y-8 pb-10"
-				>
-					<Input<TRequestBodyCreateDiscount>
-						id="name"
-						label="Name"
-						required
-						disabled={disabled}
-						register={register}
-						errors={errors}
-					/>
-					<Textarea<TRequestBodyCreateDiscount>
-						id="description"
-						label="Description"
-						disabled={disabled}
-						register={register}
-						errors={errors}
-						required
-					/>
-					<Input<TRequestBodyCreateDiscount>
-						id="value"
-						label="Value"
-						disabled={disabled}
-						register={register}
-						errors={errors}
-						required
-						type="number"
-						validate={validateGreaterThanZero}
-					/>
-					<Input<TRequestBodyCreateDiscount>
-						id="quantity"
-						label="Quantity"
-						disabled={disabled}
-						register={register}
-						errors={errors}
-						required
-						type="number"
-						validate={validateGreaterThanZero}
-					/>
-					<Input<TRequestBodyCreateDiscount>
-						id="point"
-						label="Point"
-						disabled={disabled}
-						register={register}
-						errors={errors}
-						type="number"
-					/>
-					<SelectBoxForm<TRequestBodyCreateDiscount>
-						name="discountTypeId"
-						label="Type"
-						disabled={disabled}
-						register={register}
-						errors={errors}
-						selectOption={discountTypesOption}
-					/>
-					<SelectBoxForm<TRequestBodyCreateDiscount>
-						name="discountEligibilityId"
-						label="Eligibility"
-						disabled={disabled}
-						register={register}
-						errors={errors}
-						selectOption={discountEligibilitiesOption}
-					/>
-					<SelectBoxForm<TRequestBodyCreateDiscount>
-						name="discountApplicationScopeId"
-						label="Application Scope"
-						disabled={disabled}
-						register={register}
-						errors={errors}
-						selectOption={discountApplicationScopesOption}
-					/>
-					<CheckboxForm<TRequestBodyCreateDiscount>
-						name="stackable"
-						label="Stackable"
-						disabled={disabled}
-						defaultValue={watch('stackable')}
-						register={register}
-						errors={errors}
-						validate={(value) => value === true || value === false}
+					<FormInput
+						control={control}
+						name="name"
+						label="Tên khuyến mãi"
+						disabled={!isCreate && disabled}
+						rules={{ required: 'Tên khuyến mãi là bắt buộc' }}
 					/>
 
-					<div className="space-y-8">
+					<FormInput
+						control={control}
+						name="description"
+						label="Mô tả"
+						disabled={!isCreate && disabled}
+						rules={{ required: 'Mô tả là bắt buộc' }}
+					/>
+				</div>
+
+				{/* --- Value Information --- */}
+				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+					<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+						<svg
+							className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+							/>
+						</svg>
+						<span className="text-sm sm:text-base font-medium text-gray-800">
+							Thông tin giá trị
+						</span>
+					</div>
+
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+						<FormInput
+							control={control}
+							name="value"
+							label="Giá trị"
+							type="number"
+							disabled={!isCreate && disabled}
+							rules={{
+								required: 'Giá trị là bắt buộc',
+								validate: validateGreaterThanZero,
+							}}
+						/>
+						
+						<FormInput
+							control={control}
+							name="quantity"
+							label="Số lượng"
+							type="number"
+							disabled={!isCreate && disabled}
+							rules={{
+								required: 'Số lượng là bắt buộc',
+								validate: validateGreaterThanZero,
+							}}
+						/>
+						
+						<FormInput
+							control={control}
+							name="point"
+							label="Điểm"
+							type="number"
+							disabled={!isCreate && disabled}
+						/>
+					</div>
+				</div>
+
+				{/* --- Rules & Options --- */}
+				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+					<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+						<svg
+							className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+							/>
+						</svg>
+						<span className="text-sm sm:text-base font-medium text-gray-800">
+							Điều kiện áp dụng
+						</span>
+					</div>
+
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4">
+						<FormSelect
+							control={control}
+							name="discountTypeId"
+							label="Loại khuyến mãi"
+							options={discountTypesOption || []}
+							disabled={!isCreate && disabled}
+						/>
+						<FormSelect
+							control={control}
+							name="discountEligibilityId"
+							label="Điều kiện áp dụng"
+							options={discountEligibilitiesOption || []}
+							disabled={!isCreate && disabled}
+						/>
+						<FormSelect
+							control={control}
+							name="discountApplicationScopeId"
+							label="Phạm vi áp dụng"
+							options={discountApplicationScopesOption || []}
+							disabled={!isCreate && disabled}
+						/>
+					</div>
+
+					<div className="mt-2">
+						<CheckboxForm
+							name="stackable"
+							label="Có thể áp dụng cùng lúc"
+							disabled={!isCreate && disabled}
+							defaultValue={watch('stackable')}
+							register={form.register}
+							errors={form.formState.errors}
+							validate={(value) => value === true || value === false}
+						/>
+					</div>
+				</div>
+
+				{/* --- Time Period --- */}
+				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+					<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+						<svg
+							className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+							/>
+						</svg>
+						<span className="text-sm sm:text-base font-medium text-gray-800">
+							Thời gian áp dụng
+						</span>
+					</div>
+
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
 						{pickerConfigs.map((cfg) => (
 							<DateTimeField<TRequestBodyCreateDiscount, FieldKey>
 								key={cfg.key}
 								label={cfg.label}
 								field={cfg.key}
 								value={form.getValues(cfg.key)}
-								disabled={disabled}
+								disabled={!isCreate && disabled}
 								onChangeDate={(d, f) => d && updateField(d, f, true)}
 								onChangeTime={(t, f) => t && updateField(t, f, false)}
 								error={error[cfg.key]}
 							/>
 						))}
+					</div>
+				</div>
 
-						<div className="w-full flex items-start gap-2 ">
-							<div className="flex-1">
-								<SelectBoxForm<TRequestBodyCreateDiscount>
-									name="productId"
-									label="Product"
-									register={register}
-									errors={errors}
-									selectOption={productOption}
-									onChange={changeProductId}
+				{/* --- Product Selection --- */}
+				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+					<div className="flex items-center justify-between mb-1 sm:mb-2">
+						<div className="flex items-center gap-2 sm:gap-3">
+							<svg
+								className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"
 								/>
-							</div>
-							<button
-								type="button"
-								onClick={handleOpenPopupProductDetail}
-								className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-							>
-								Detail
-							</button>
-						</div>
-
-						<div className="w-full flex items-start gap-2">
-							<div className="flex-1">
-								<SelectBoxForm<TRequestBodyCreateDiscount>
-									name="scheduleIds"
-									label="Schedules"
-									onChange={() =>
-										setChangeScheduleOption(!changeScheduleOption)
-									}
-									register={register}
-									errors={errors}
-									selectOption={scheduleOption}
-								/>
-							</div>
-							<button
-								type="button"
-								onClick={handAddScheduleInDiscount}
-								className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-							>
-								+
-							</button>
-							<button
-								type="button"
-								onClick={handleOpenScheduleDetail}
-								className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-							>
-								Detail
-							</button>
+							</svg>
+							<span className="text-sm sm:text-base font-medium text-gray-800">
+								Sản phẩm áp dụng
+							</span>
 						</div>
 					</div>
 
-					<div>
+					<div className="flex flex-col sm:flex-row sm:items-end gap-3">
+						<div className="flex-1">
+							<FormSelect
+								control={control}
+								name="productId"
+								label="Chọn sản phẩm"
+								options={productOption}
+								onChange={changeProductId}
+								disabled={!isCreate && disabled}
+							/>
+						</div>
+						<Button
+							color="primary"
+							variant="outlined"
+							className="w-full sm:w-auto"
+							onClick={handleOpenPopupProductDetail}
+						>
+							Chi tiết
+						</Button>
+					</div>
+				</div>
+
+				{/* --- Schedule Selection --- */}
+				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+					<div className="flex items-center justify-between mb-1 sm:mb-2">
+						<div className="flex items-center gap-2 sm:gap-3">
+							<svg
+								className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+								/>
+							</svg>
+							<span className="text-sm sm:text-base font-medium text-gray-800">
+								Lịch trình áp dụng
+							</span>
+						</div>
+					</div>
+
+					<div className="flex flex-col sm:flex-row sm:items-end gap-3 mb-3">
+						<div className="flex-1">
+							<FormSelect
+								control={control}
+								name="scheduleIds"
+								label="Chọn lịch trình"
+								options={scheduleOption}
+								onChange={() => setChangeScheduleOption(!changeScheduleOption)}
+								disabled={!isCreate && disabled}
+							/>
+						</div>
+						<div className="flex gap-2 w-full sm:w-auto">
+							<Button 
+								type="primary" 
+								onClick={handAddScheduleInDiscount}
+								className="flex-1 sm:flex-none"
+							>
+								Thêm
+							</Button>
+							<Button
+								color="primary"
+								variant="outlined"
+								onClick={handleOpenScheduleDetail}
+								className="flex-1 sm:flex-none"
+							>
+								Chi tiết
+							</Button>
+						</div>
+					</div>
+
+					<div className="rounded-md bg-white p-1 sm:p-2 border border-gray-200 text-gray-700 overflow-x-auto">
 						<SchedulesBoardInDiscount
 							schedules={schedules}
 							pageSize={5}
 							onRemove={handRemoveScheduleInDiscount}
 						/>
 					</div>
-				</form>
-			</div>
+				</div>
+			</BaseForm>
 
-			{/* Use React Portals for modals to avoid form nesting */}
 			{isOpenPopupProductDetail && productId && (
 				<ProductUpdate
 					productId={String(productId)}
@@ -573,6 +701,6 @@ export const DiscountForm = ({
 					onCancel={handleCloseScheduleDetail}
 				/>
 			)}
-		</div>
+		</>
 	);
 };

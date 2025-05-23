@@ -1,6 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { CityEnum } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateLocationDto {

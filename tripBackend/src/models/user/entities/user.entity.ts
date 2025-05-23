@@ -1,17 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { GenderUserEnum, UserStatusEnum } from '@prisma/client';
-
-import { AccountEntity } from '../../account/entities/account.entity';
-import { AccountExternalEntity } from '../../accountExternal/entities/accountExternal.entity';
-import { BillEntity } from '../../bill/entities/bill.entity';
-import { BoxChatMemberEntity } from '../../boxChatMember/entities/boxChatMember.entity';
-import { CartEntity } from '../../cart/entities/cart.entity';
-import { DiscountEntity } from '../../discount/entities/discount.entity';
-import { MessageEntity } from '../../message/entities/message.entity';
-import { ProductRateEntity } from '../../productRate/entities/productRate.entity';
+import { ApiProperty } from '@nestjs/swagger';
 import { RoleEntity } from '../../role/entities/role.entity';
 import { SupplierEntity } from '../../supplier/entities/supplier.entity';
+import { ProductRateEntity } from '../../productRate/entities/productRate.entity';
+import { AccountExternalEntity } from '../../accountExternal/entities/accountExternal.entity';
+import { AccountEntity } from '../../account/entities/account.entity';
+import { BillEntity } from '../../bill/entities/bill.entity';
+import { CartEntity } from '../../cart/entities/cart.entity';
+import { DiscountEntity } from '../../discount/entities/discount.entity';
+import { BoxChatMemberEntity } from '../../boxChatMember/entities/boxChatMember.entity';
+import { MessageEntity } from '../../message/entities/message.entity';
 
 export class UserEntity {
 	@ApiProperty({

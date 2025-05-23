@@ -56,40 +56,69 @@ export const HeroAttractionsDetail = ({
 				<div className="w-full md:mt-[-168px]">
 					<div className="w-full flex justify-center pt-5 md:p-1 font-Montserrat text-center text-lg md:text-2xl font-bold">
 						<div className="container z-10">
-							<div
-								onClick={(e) => handleTabChange(e)}
-								className="w-full p-0.5 bg-gray-200 grid grid-cols-3 gap-x-1 md:gap-x-3 rounded-lg shadow-md font-semibold"
-							>
-								<button
-									className={`hidden py-6 md:py-16 md:flex items-center justify-center rounded-md transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-500 focus:bg-white focus:text-orange-600 hover:bg-gray-200 hover:text-gray-700 focus:shadow-lg ${value == 'information' && classSelected}`}
-									value={'information'}
-								>
-									<IoMdInformationCircle className="w-6 h-full mr-2.5" />
-									Information
-								</button>
-								<button
-									className={`md:hidden py-6 md:py-16 md:bg-gray-300 flex items-center justify-center rounded-md transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-500 focus:bg-white focus:text-orange-600 hover:bg-gray-200 hover:text-gray-700 focus:shadow-lg ${value == 'information' && classSelected}`}
-									value={'information'}
-								>
-									<IoMdInformationCircle className="w-6 h-full mr-2.5" />
-									Infor
-								</button>
+							<div className="w-full bg-gray-100 p-1 rounded-xl shadow-inner">
+								<div className="grid grid-cols-3 gap-1">
+									{/* Information Tab */}
+									<button
+										onClick={(e) => handleTabChange(e)}
+										value="information"
+										className={`
+        flex items-center justify-center py-4 md:py-5 rounded-lg transition-all
+        duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-orange-400
+        hover:bg-gray-50 active:scale-[0.98]
+        ${
+			value === 'information'
+				? 'bg-white shadow-md text-orange-600 font-bold'
+				: 'text-gray-600 font-medium'
+		}
+      `}
+									>
+										<IoMdInformationCircle className="w-5 h-5 md:w-6 md:h-6 mr-2" />
+										<span className="hidden md:inline">
+											Information
+										</span>
+										<span className="md:hidden">Info</span>
+									</button>
 
-								<button
-									className={`py-6 md:py-16  flex items-center justify-center rounded-md transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-500 hover:bg-gray-200 hover:text-gray-700 focus:text-orange-600 focus:bg-white focus:shadow-sm ${value == 'rate' && classSelected}`}
-									value={'rate'}
-								>
-									<BiSolidMessageDetail className="w-6 h-full mr-2.5" />
-									Ratings
-								</button>
+									{/* Ratings Tab */}
+									<button
+										onClick={(e) => handleTabChange(e)}
+										value="rate"
+										className={`
+        flex items-center justify-center py-4 md:py-5 rounded-lg transition-all
+        duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-orange-400
+        hover:bg-gray-50 active:scale-[0.98]
+        ${
+			value === 'rate'
+				? 'bg-white shadow-md text-orange-600 font-bold'
+				: 'text-gray-600 font-medium'
+		}
+      `}
+									>
+										<BiSolidMessageDetail className="w-5 h-5 md:w-6 md:h-6 mr-2" />
+										<span className="hidden md:inline">Ratings</span>
+										<span className="md:hidden">Rate</span>
+									</button>
 
-								<button
-									className={`py-6 md:py-16 flex items-center justify-center rounded-md transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-orange-500 hover:bg-gray-200 hover:text-gray-700 focus:text-orange-600 focus:bg-white focus:shadow-sm ${value == 'supplier' && classSelected}`}
-									value={'supplier'}
-								>
-									<FaHouseUser className="w-6 h-full mr-2.5" />
-									Supplier
-								</button>
+									{/* Supplier Tab */}
+									<button
+										onClick={(e) => handleTabChange(e)}
+										value="supplier"
+										className={`
+        flex items-center justify-center py-4 md:py-5 rounded-lg transition-all
+        duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-orange-400
+        hover:bg-gray-50 active:scale-[0.98]
+        ${
+			value === 'supplier'
+				? 'bg-white shadow-md text-orange-600 font-bold'
+				: 'text-gray-600 font-medium'
+		}
+      `}
+									>
+										<FaHouseUser className="w-5 h-5 md:w-6 md:h-6 mr-2" />
+										<span>Supplier</span>
+									</button>
+								</div>
 							</div>
 						</div>
 					</div>

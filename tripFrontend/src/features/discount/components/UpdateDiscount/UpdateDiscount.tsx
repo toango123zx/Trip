@@ -10,11 +10,13 @@ import { DiscountForm } from '../DiscountForm';
 
 type TUpdateDiscountProps = {
 	discountId: string;
+	open: boolean;
 	onCancel?: () => void;
 };
 
 export const UpdateDiscount = ({
 	discountId,
+	open,
 	onCancel = (): void => {},
 }: TUpdateDiscountProps): JSX.Element => {
 	const dispatch = useDispatch<TReduxStoreDispatch>();
@@ -62,15 +64,14 @@ export const UpdateDiscount = ({
 	}, [hasSubmitted, loadingApi, errorApi, onCancel]);
 
 	return (
-		<div>
-			<DiscountForm
-				discountId={discountId}
-				form={form}
-				disabled={true}
-				isCreate={false}
-				onCancel={onCancel}
-				onRemove={onRemove}
-			/>
-		</div>
+		<DiscountForm
+			discountId={discountId}
+			form={form}
+			disabled={true}
+			isCreate={false}
+			onCancel={onCancel}
+			onRemove={onRemove}
+			open={open}
+		/>
 	);
 };

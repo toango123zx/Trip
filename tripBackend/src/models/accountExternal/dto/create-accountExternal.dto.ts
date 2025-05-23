@@ -1,9 +1,7 @@
-import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-
 import { ProviderAccountExternalEnum } from '@prisma/client';
-import { Type } from 'class-transformer';
+import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
-
+import { Type } from 'class-transformer';
 import { ConnectUserDto } from '../../user/dto/connect-user.dto';
 
 export class CreateAccountExternalUserRelationInputDto {

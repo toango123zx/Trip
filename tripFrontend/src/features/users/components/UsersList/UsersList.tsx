@@ -5,57 +5,72 @@ import {
 	Input,
 	InputRef,
 	Space,
-	Table,
 	TableColumnsType,
 	TableColumnType,
+	Modal,
+	Form,
+	Select,
+	notification,
+	DatePicker,
 } from 'antd';
 import { FilterDropdownProps } from 'antd/es/table/interface';
 import { Plus } from 'lucide-react';
 import { JSX, useEffect, useRef, useState } from 'react';
 import Highlighter from 'react-highlight-words';
 import { IoIosSearch } from 'react-icons/io';
-import { IoIosArrowRoundForward } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
-
+import { FaEdit, FaLock, FaUnlock, FaUserFriends, FaUserTie, FaUserShield } from 'react-icons/fa';
+import { BaseTable } from '@/components/BaseTable/BaseTable';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { TUser } from '@/types';
-
-import './style.scss';
+import { EUserRole, EUserStatus, TUser } from '@/types/user.type';
 import { userThunk } from '../../userThunk';
-
-type TTable<T> = {
-	columnTable: TableColumnsType<T>;
-	data?: T[];
-	pageSize?: number;
-	className?: string;
-};
-
-const TableView = <T,>({
-	className,
-	columnTable,
-	pageSize = 10,
-	data,
-}: TTable<T>): JSX.Element => {
-	return (
-		<Table<T>
-			rowKey="id"
-			columns={columnTable}
-			dataSource={data}
-			pagination={{ pageSize: pageSize }}
-			className={cn(`relative md:pt-0`, className)}
-		/>
-	);
-};
+import { Popover } from 'antd';
+import { notificationUtils } from '@/utils/notificationUtils';
+import './style.scss';
 
 type TUsersListProps = {
 	className?: string;
 };
 
+// Các type cho modal
+type AddUserModalProps = {
+	open: boolean;
+	onCancel: () => void;
+	onSubmit: (values: {
+		username: string;
+		password: string;
+		email: string;
+		name: string;
+		roleName: EUserRole;
+	}) => void;
+};
+
+type EditUserModalProps = {
+	open: boolean;
+	onCancel: () => void;
+	onSubmit: (values: {
+		email?: string;
+		name?: string;
+		phoneNumber?: string | null;
+		address?: string | null;
+		dateOfBirth?: Date | null;
+		gender?: 'male' | 'female' | 'other' | null;
+		roleName?: EUserRole;
+	}) => void;
+	initialValues: {
+		email: string;
+		name: string;
+		phoneNumber?: string | null;
+		address?: string | null;
+		dateOfBirth?: Date | null;
+		gender?: 'male' | 'female' | 'other' | null;
+		roleName?: EUserRole;
+	};
+};
+
 export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
-	const [activeTab, setActiveTab] = useState<'admin' | 'supplier' | 'tourist'>(
-		'tourist',
-	);
+	const [activeTab, setActiveTab] = useState<EUserRole>(EUserRole.tourist);
 	const searchInput = useRef<InputRef>(null);
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
@@ -64,10 +79,26 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 	const users: TUser[] = useSelector<TReduxStoreState, TUser[]>(
 		(state: TReduxStoreState) => state.user.users,
 	);
+	const [isOpenAddUserModal, setIsOpenAddUserModal] = useState(false);
+	const [isOpenEditUserModal, setIsOpenEditUserModal] = useState(false);
+	const [selectedUser, setSelectedUser] = useState<TUser | null>(null);
+	const [page, setPage] = useState<number>(1);
+	const PAGE_SIZE = 10;
+	const [totalUsers, setTotalUsers] = useState<number>(0);
 
 	useEffect(() => {
-		dispatch(userThunk.getUsers({}));
-	}, [dispatch]);
+		dispatch(userThunk.getUsers({
+			page,
+			limit: PAGE_SIZE
+		}));
+	}, [dispatch, page]);
+
+	useEffect(() => {
+		// Filter users based on active tab after receiving users from API
+		const filtered = users.filter((user) => user.roleName === activeTab);
+		setFilteredUsers(filtered);
+		setTotalUsers(filtered.length);
+	}, [users, activeTab]);
 
 	type DataIndex = keyof TUser;
 
@@ -144,9 +175,9 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 		onFilter: (value, record) =>
 			record[dataIndex] !== null && record[dataIndex] !== undefined
 				? record[dataIndex]
-						.toString()
-						.toLowerCase()
-						.includes((value as string).toLowerCase())
+					.toString()
+					.toLowerCase()
+					.includes((value as string).toLowerCase())
 				: false,
 		filterDropdownProps: {
 			onOpenChange(open): void {
@@ -168,7 +199,81 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 			),
 	});
 
-	let columnTable: TableColumnsType<TUser> = [
+	const handleChangeTab = (tab: EUserRole): void => {
+		setActiveTab(tab);
+		setPage(1);
+	};
+
+	const handleAddUser = async (values: {
+		username: string;
+		password: string;
+		email: string;
+		name: string;
+		roleName: EUserRole;
+	}) => {
+		try {
+			await dispatch(userThunk.createUser(values));
+			setIsOpenAddUserModal(false);
+			dispatch(userThunk.getUsers({
+				page,
+				limit: PAGE_SIZE
+			}));
+		} catch (error) {
+			notificationUtils.error();
+		}
+	};
+
+	const handleEditUser = async (values: {
+		email?: string;
+		name?: string;
+		phoneNumber?: string | null;
+		address?: string | null;
+		dateOfBirth?: Date | null;
+		gender?: 'male' | 'female' | 'other' | null;
+		roleName?: EUserRole;
+	}) => {
+		if (!selectedUser) return;
+
+		try {
+			await dispatch(userThunk.updateUser({
+				userId: selectedUser.id,
+				...values
+			}));
+			setIsOpenEditUserModal(false);
+			dispatch(userThunk.getUsers({
+				page,
+				limit: PAGE_SIZE
+			}));
+		} catch (error) {
+			notificationUtils.error();
+		}
+	};
+
+	const handleLockUser = async (userId: string) => {
+		try {
+			await dispatch(userThunk.lockUser(userId));
+			dispatch(userThunk.getUsers({
+				page,
+				limit: PAGE_SIZE
+			}));
+		} catch (error) {
+			notificationUtils.error();
+		}
+	};
+
+	const handleUnlockUser = async (userId: string) => {
+		try {
+			await dispatch(userThunk.unlockUser(userId));
+			dispatch(userThunk.getUsers({
+				page,
+				limit: PAGE_SIZE
+			}));
+		} catch (error) {
+			notificationUtils.error();
+		}
+	};
+
+	const columnTable: TableColumnsType<TUser> = [
 		{
 			title: 'User ID',
 			dataIndex: 'id',
@@ -180,7 +285,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 			title: 'Email',
 			dataIndex: 'email',
 			key: 'email',
-			width: '20%',
+			width: '25%',
 			...getColumnSearchProps('email'),
 			sorter: (a, b) => a.email.length - b.email.length,
 			sortDirections: ['descend', 'ascend'],
@@ -189,42 +294,20 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 			title: 'Name',
 			dataIndex: 'name',
 			key: 'name',
-			width: '20%',
+			width: '25%',
 			...getColumnSearchProps('name'),
 			sorter: (a, b) => a.name.length - b.name.length,
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
-			title: 'Date of birth',
-			dataIndex: 'dateOfBirth',
-			key: 'dateOfBirth',
-			...getColumnSearchProps('dateOfBirth'),
-			sorter: (a, b) =>
-				new Date(a.dateOfBirth ?? 0).getTime() -
-				new Date(b.dateOfBirth ?? 0).getTime(),
-			sortDirections: ['descend', 'ascend'],
-		},
-		{
-			title: 'Fee',
-			dataIndex: ['supplier', 'fee'],
-			key: 'fee',
-			sorter: (a, b): number => {
-				const feeA = a.supplier?.fee || 0;
-				const feeB = b.supplier?.fee || 0;
-				return feeA - feeB;
-			},
-			sortDirections: ['descend', 'ascend'],
-		},
-		{
 			title: 'Status',
 			dataIndex: 'status',
-			key: 'status',
-			...getColumnSearchProps('status'),
-			sorter: (a, b) => a.status.length - b.status.length,
-			sortDirections: ['descend', 'ascend'],
 			render: (text: string) => (
-				<span
-					className={`${text === 'active' ? 'text-green-500' : 'text-red-300'} font-semibold`}
+				<span 
+					className={`
+						font-semibold 
+						${text === 'active' ? 'text-green-500' : 'text-red-500'}
+					`}
 				>
 					{text}
 				</span>
@@ -232,93 +315,369 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 		},
 		{
 			title: 'Action',
-			render: () => (
-				<button type="button" className="text-blue-500 flex gap-2.5 items-center">
-					<span>View detail</span>
-					<span className="h-fit">
-						<IoIosArrowRoundForward />
-					</span>
-				</button>
+			key: 'action',
+			render: (_, record) => (
+				<div className="flex gap-2">
+					<Popover content="Edit user" trigger="hover">
+						<button
+							type="button"
+							className="text-blue-500 flex gap-2.5 items-center"
+							onClick={() => {
+								const userToEdit = users.find(user => user.id === record.id);
+								if (userToEdit) {
+									setSelectedUser(userToEdit);
+									setIsOpenEditUserModal(true);
+								} else {
+									notificationUtils.error();
+								}
+							}}
+						>
+							<FaEdit className="h-5 w-5" />
+						</button>
+					</Popover>
+					{record.status === 'active' && (
+						<Popover content="Lock user" trigger="hover">
+							<button
+								type="button"
+								className="text-red-500 flex gap-2.5 items-center"
+								onClick={() => handleLockUser(record.id)}
+							>
+								<FaLock className="h-5 w-5" />
+							</button>
+						</Popover>
+					)}
+					{record.status === 'locked' && (
+						<Popover content="Unlock user" trigger="hover">
+							<button
+								type="button"
+								className="text-green-500 flex gap-2.5 items-center"
+								onClick={() => handleUnlockUser(record.id)}
+							>
+								<FaUnlock className="h-5 w-5" />
+							</button>
+						</Popover>
+					)}
+				</div>
 			),
 		},
 	];
 
-	if (activeTab == 'tourist' || activeTab == 'admin') {
-		columnTable = columnTable.filter((item) => item.title !== 'Fee');
-	}
-
-	useEffect(() => {
-		setFilteredUsers(users.filter((user) => user.roleName === activeTab));
-	}, [users, activeTab]);
-
-	const handleChangeTab = (tab: 'admin' | 'supplier' | 'tourist'): void => {
-		setActiveTab(tab);
-		setFilteredUsers(users.filter((user) => user.roleName === tab));
-	};
-
 	return (
 		<section
-			className={cn('relative md:pt-0', className)}
-			aria-labelledby="attractions-rate"
+			className={cn('relative w-full', className)}
+			aria-label="User Management"
 		>
-			<div className="container mx-auto bg-white rounded-lg p-6 md:px-14 md:py-16 font-sans flex  flex-col">
+			<div className="container mx-auto bg-white rounded-lg shadow-lg p-3 sm:p-6 md:px-8 md:py-10 lg:px-10 lg:py-12 font-sans flex flex-col transition-all duration-300">
 				{/* Main Content */}
-				<main className="flex flex-1 gap-14 text-2xl">
-					{/* Sidebar */}
-					<div className="space-y-5 w-3/15 font-Montserrat">
+				<main className="flex flex-col md:flex-row flex-1 gap-4 md:gap-6 lg:gap-8">
+					{/* Sidebar - Always Visible */}
+					<div className="flex flex-row md:flex-col flex-wrap justify-center md:justify-start gap-2 md:gap-4 md:w-1/4 lg:w-1/5 font-Montserrat">
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
-								activeTab === 'tourist'
-									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100'
+							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
+								activeTab === EUserRole.tourist
+									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
+									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
 							}`}
-							onClick={() => handleChangeTab('tourist')}
+							onClick={() => handleChangeTab(EUserRole.tourist)}
 						>
-							Tourist
+							<FaUserFriends className="text-lg md:text-xl" />
+							<span className="text-xs sm:text-sm md:text-base">Tourists</span>
 						</button>
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
-								activeTab === 'supplier'
-									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100 '
+							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
+								activeTab === EUserRole.supplier
+									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
+									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
 							}`}
-							onClick={() => handleChangeTab('supplier')}
+							onClick={() => handleChangeTab(EUserRole.supplier)}
 						>
-							Suppliers
+							<FaUserTie className="text-lg md:text-xl" />
+							<span className="text-xs sm:text-sm md:text-base">Suppliers</span>
 						</button>
 						<button
-							className={`w-full rounded-2xl py-3 px-9 text-left font-medium shadow-md ${
-								activeTab === 'admin'
-									? 'bg-[#ff6b0a] text-white'
-									: 'bg-white text-gray-500 hover:bg-gray-100 '
+							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
+								activeTab === EUserRole.admin
+									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
+									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
 							}`}
-							onClick={() => handleChangeTab('admin')}
+							onClick={() => handleChangeTab(EUserRole.admin)}
 						>
-							Admins
+							<FaUserShield className="text-lg md:text-xl" />
+							<span className="text-xs sm:text-sm md:text-base">Admins</span>
 						</button>
 					</div>
 
 					{/* Content Area */}
-					<div className="flex-1 rounded-lg bg-white p-6 shadow-md">
-						<div className="mb-4 flex items-center justify-between">
-							<h2 className="text-lg font-semibold text-gray-500">
-								{activeTab}
+					<div className="flex-1 rounded-xl bg-white p-3 sm:p-4 md:p-6 shadow-md border border-gray-100 transition-all duration-300">
+						<div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+							<h2 className="text-lg sm:text-xl font-semibold text-gray-800 flex items-center gap-2">
+								{activeTab === EUserRole.tourist && (
+									<>
+										<FaUserFriends className="text-orange-500" />
+										<span>Tourists</span>
+									</>
+								)}
+								{activeTab === EUserRole.supplier && (
+									<>
+										<FaUserTie className="text-orange-500" />
+										<span>Suppliers</span>
+									</>
+								)}
+								{activeTab === EUserRole.admin && (
+									<>
+										<FaUserShield className="text-orange-500" />
+										<span>Admins</span>
+									</>
+								)}
 							</h2>
 							<div className="flex items-center gap-2">
-								<button className="rounded-md border border-gray-300 p-1 shadow-sm">
-									<Plus className="h-4 w-4 text-gray-600" />
+								<button
+									type="button"
+									onClick={() => setIsOpenAddUserModal(true)}
+									className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-orange-500 to-orange-400 text-white font-medium py-2 px-3 sm:px-4 rounded-full transition-all duration-300 hover:shadow-lg hover:from-orange-600 hover:to-orange-500 transform hover:-translate-y-0.5 w-full sm:w-auto"
+								>
+									<Plus className="w-5 h-5" />
+									<span className="font-Montserrat text-sm">
+										Add User
+									</span>
 								</button>
 							</div>
 						</div>
 
-						{/* Table */}
-						<TableView<TUser>
-							columnTable={columnTable}
-							data={filteredUsers}
-						/>
+						<div className="bg-gray-50 rounded-lg p-2 sm:p-4 transition-all duration-300 overflow-x-auto">
+							<BaseTable<TUser>
+								rowKey="id"
+								columns={columnTable}
+								dataSource={filteredUsers}
+								className="w-full"
+								pagination={{
+									current: page,
+									pageSize: PAGE_SIZE,
+									total: totalUsers,
+									onChange: (newPage) => setPage(newPage)
+								}}
+							/>
+						</div>
 					</div>
 				</main>
+
+				{/* Modals */}
+				<AddUserModal
+					open={isOpenAddUserModal}
+					onCancel={() => setIsOpenAddUserModal(false)}
+					onSubmit={handleAddUser}
+				/>
+				{selectedUser && (
+					<EditUserModal
+						open={isOpenEditUserModal}
+						onCancel={() => setIsOpenEditUserModal(false)}
+						onSubmit={handleEditUser}
+						initialValues={{
+							email: selectedUser.email,
+							name: selectedUser.name,
+							phoneNumber: selectedUser.phoneNumber,
+							address: selectedUser.address,
+							dateOfBirth: selectedUser.dateOfBirth,
+							gender: selectedUser.gender,
+							roleName: selectedUser.roleName
+						}}
+					/>
+				)}
 			</div>
 		</section>
+	);
+};
+
+// Modal components
+const AddUserModal: React.FC<AddUserModalProps> = ({ open, onCancel, onSubmit }) => {
+	const [form] = Form.useForm();
+
+	const handleSubmit = async () => {
+		try {
+			const values = await form.validateFields();
+			onSubmit(values);
+			form.resetFields(); // Reset form sau khi submit thành công
+		} catch (error) {
+			console.error('Validation failed:', error);
+		}
+	};
+
+	return (
+		<Modal
+			title="Thêm Người Dùng Mới"
+			open={open}
+			onOk={handleSubmit}
+			onCancel={() => {
+				onCancel();
+				form.resetFields(); // Reset form khi đóng modal
+			}}
+		>
+			<Form form={form} layout="vertical">
+				<Form.Item
+					name="username"
+					label="Tên Đăng Nhập"
+					rules={[
+						{ required: true, message: 'Vui lòng nhập tên đăng nhập' },
+						{ min: 4, message: 'Tên đăng nhập phải có ít nhất 4 ký tự' }
+					]}
+				>
+					<Input />
+				</Form.Item>
+				<Form.Item
+					name="password"
+					label="Mật Khẩu"
+					rules={[
+						{ required: true, message: 'Vui lòng nhập mật khẩu' },
+						{ min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự' }
+					]}
+				>
+					<Input.Password />
+				</Form.Item>
+				<Form.Item
+					name="email"
+					label="Email"
+					rules={[
+						{ required: true, message: 'Vui lòng nhập email' },
+						{ type: 'email', message: 'Email không hợp lệ' }
+					]}
+				>
+					<Input />
+				</Form.Item>
+				<Form.Item
+					name="name"
+					label="Tên Người Dùng"
+					rules={[
+						{ required: true, message: 'Vui lòng nhập tên người dùng' },
+						{ min: 2, message: 'Tên phải có ít nhất 2 ký tự' }
+					]}
+				>
+					<Input />
+				</Form.Item>
+				<Form.Item
+					name="roleName"
+					label="Vai Trò"
+					rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}
+				>
+					<Select>
+						<Select.Option value={EUserRole.tourist}>Tourist</Select.Option>
+						<Select.Option value={EUserRole.supplier}>Supplier</Select.Option>
+						<Select.Option value={EUserRole.admin}>Admin</Select.Option>
+					</Select>
+				</Form.Item>
+			</Form>
+		</Modal>
+	);
+};
+
+const EditUserModal: React.FC<EditUserModalProps> = ({ 
+	open, 
+	onCancel, 
+	onSubmit, 
+	initialValues 
+}) => {
+	const [form] = Form.useForm();
+
+	// Reset form khi mở modal hoặc thay đổi initialValues
+	useEffect(() => {
+		if (open) {
+			form.resetFields();
+			form.setFieldsValue(initialValues);
+		}
+	}, [open, initialValues, form]);
+
+	const handleSubmit = async () => {
+		try {
+			const values = await form.validateFields();
+			onSubmit(values);
+			form.resetFields(); // Reset form sau khi submit thành công
+		} catch (error) {
+			console.error('Validation failed:', error);
+		}
+	};
+
+	return (
+		<Modal
+			title="Chỉnh Sửa Người Dùng"
+			open={open}
+			onOk={handleSubmit}
+			onCancel={() => {
+				onCancel();
+				form.resetFields(); // Reset form khi đóng modal
+			}}
+		>
+			<Form
+				form={form}
+				layout="vertical"
+				initialValues={initialValues}
+			>
+				<Form.Item
+					name="email"
+					label="Email"
+					rules={[
+						{ required: true, message: 'Vui lòng nhập email' },
+						{ type: 'email', message: 'Email không hợp lệ' }
+					]}
+				>
+					<Input />
+				</Form.Item>
+				<Form.Item
+					name="name"
+					label="Tên Đầy Đủ"
+					rules={[
+						{ required: true, message: 'Vui lòng nhập tên đầy đủ' },
+						{ min: 2, message: 'Tên phải có ít nhất 2 ký tự' }
+					]}
+				>
+					<Input />
+				</Form.Item>
+				<Form.Item
+					name="phoneNumber"
+					label="Số Điện Thoại"
+					rules={[
+						{ 
+							pattern: /^(0[1-9][0-9]{8})$/, 
+							message: 'Số điện thoại không hợp lệ' 
+						}
+					]}
+				>
+					<Input placeholder="Nhập số điện thoại (không bắt buộc)" />
+				</Form.Item>
+				<Form.Item
+					name="address"
+					label="Địa Chỉ"
+				>
+					<Input placeholder="Nhập địa chỉ (không bắt buộc)" />
+				</Form.Item>
+				<Form.Item
+					name="dateOfBirth"
+					label="Ngày Sinh"
+				>
+					<DatePicker 
+						style={{ width: '100%' }} 
+						placeholder="Chọn ngày sinh (không bắt buộc)" 
+					/>
+				</Form.Item>
+				<Form.Item
+					name="gender"
+					label="Giới Tính"
+				>
+					<Select placeholder="Chọn giới tính (không bắt buộc)">
+						<Select.Option value="male">Nam</Select.Option>
+						<Select.Option value="female">Nữ</Select.Option>
+						<Select.Option value="other">Khác</Select.Option>
+					</Select>
+				</Form.Item>
+				<Form.Item
+					name="roleName"
+					label="Vai Trò"
+				>
+					<Select placeholder="Chọn vai trò (không bắt buộc)">
+						<Select.Option value={EUserRole.tourist}>Tourist</Select.Option>
+						<Select.Option value={EUserRole.supplier}>Supplier</Select.Option>
+						<Select.Option value={EUserRole.admin}>Admin</Select.Option>
+					</Select>
+				</Form.Item>
+			</Form>
+		</Modal>
 	);
 };

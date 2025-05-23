@@ -11,12 +11,23 @@ export const productApi = {
 	async getProducts(
 		query?: TRequestQueryGetProducts,
 	): Promise<[TProductSumary[], TPagination?]> {
-		const response = await api.get<TProductSumary[]>(
-			'/product',
-			query,
-			EServer.Backend,
-		);
-		return [response.data, response.pagination];
+		try {
+			const safeQuery = query || {};
+			const response = await api.get<TProductSumary[]>(
+				'/product',
+				{
+					...safeQuery,
+					page: safeQuery.page || 1,
+					limit: safeQuery.limit || 6
+				},
+				EServer.Backend,
+			);
+
+			return [response.data, response.pagination];
+		} catch (error) {
+			console.error('Lỗi khi gọi API getProducts:', error);
+			throw error;
+		}
 	},
 	async getProductsManagement(
 		query?: TRequestQueryGetProducts,

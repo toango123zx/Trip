@@ -1,6 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-
 import { GenderUserEnum, UserStatusEnum } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDto {
 	@ApiProperty({

@@ -11,3 +11,10 @@ export * from './pagination.type';
 export * from './product.type';
 export * from './responseBackend.type';
 export * from './user.type';
+
+export type TRequestQueryGetUsers = {
+    page?: number;
+    limit?: number;
+    search?: string;
+    roleName?: 'tourist' | 'supplier' | 'admin';
+};

@@ -1,7 +1,5 @@
-import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-
 import { DiscountProviderTypeEnum } from '@prisma/client';
-import { Type } from 'class-transformer';
+import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import {
 	IsBoolean,
 	IsDateString,
@@ -11,11 +9,11 @@ import {
 	IsString,
 	ValidateNested,
 } from 'class-validator';
-
-import { ConnectDiscountApplicationScopeDto } from '../../discountApplicationScope/dto/connect-discountApplicationScope.dto';
-import { ConnectDiscountEligibilityDto } from '../../discountEligibility/dto/connect-discountEligibility.dto';
-import { ConnectDiscountTypeDto } from '../../discountType/dto/connect-discountType.dto';
+import { Type } from 'class-transformer';
 import { ConnectUserDto } from '../../user/dto/connect-user.dto';
+import { ConnectDiscountTypeDto } from '../../discountType/dto/connect-discountType.dto';
+import { ConnectDiscountEligibilityDto } from '../../discountEligibility/dto/connect-discountEligibility.dto';
+import { ConnectDiscountApplicationScopeDto } from '../../discountApplicationScope/dto/connect-discountApplicationScope.dto';
 
 export class CreateDiscountUserRelationInputDto {
 	@ApiProperty({
