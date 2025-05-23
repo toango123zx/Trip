@@ -1,5 +1,7 @@
-import { DiscountApplicationScopeStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { DiscountApplicationScopeStatusEnum } from '@prisma/client';
+
 import { DiscountEntity } from '../../discount/entities/discount.entity';
 
 export class DiscountApplicationScopeEntity {

@@ -1,5 +1,6 @@
-import { ProductRateStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { ProductRateStatusEnum } from '@prisma/client';
 
 export class ProductRateDto {
 	@ApiProperty({

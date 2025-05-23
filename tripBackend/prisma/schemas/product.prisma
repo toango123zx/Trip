@@ -197,6 +197,7 @@ model productRate {
     productId String                @map("product_id")
     /// @DtoRelationCanConnectOnCreate
     /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanUpdateOnUpdate
     product   product               @relation(fields: [productId], references: [id])
     /// @DtoUpdateHidden
     userId    String                @map("user_id")

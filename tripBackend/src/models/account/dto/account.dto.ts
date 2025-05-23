@@ -1,5 +1,6 @@
-import { AccountStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { AccountStatusEnum } from '@prisma/client';
 
 export class AccountDto {
 	@ApiProperty({
