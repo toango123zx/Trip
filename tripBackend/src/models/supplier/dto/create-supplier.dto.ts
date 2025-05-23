@@ -1,6 +1,8 @@
 import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
 import { Type } from 'class-transformer';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+
 import { ConnectUserDto } from '../../user/dto/connect-user.dto';
 
 export class CreateSupplierUserRelationInputDto {

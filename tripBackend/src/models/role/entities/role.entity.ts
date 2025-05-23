@@ -1,5 +1,7 @@
-import { RoleStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { RoleStatusEnum } from '@prisma/client';
+
 import { InfoPermissionEntity } from '../../infoPermission/entities/infoPermission.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 

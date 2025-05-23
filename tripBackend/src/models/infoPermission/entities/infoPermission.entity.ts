@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { RoleEntity } from '../../role/entities/role.entity';
+
 import { PermissionEntity } from '../../permission/entities/permission.entity';
+import { RoleEntity } from '../../role/entities/role.entity';
 
 export class InfoPermissionEntity {
 	@ApiProperty({

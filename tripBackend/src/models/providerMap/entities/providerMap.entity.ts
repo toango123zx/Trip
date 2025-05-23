@@ -1,4 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+
+import { ProviderMapStatusEnum } from '@prisma/client';
+
 import { MapAddressEntity } from '../../mapAddress/entities/mapAddress.entity';
 
 export class ProviderMapEntity {

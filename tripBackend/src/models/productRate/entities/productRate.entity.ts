@@ -1,5 +1,7 @@
-import { ProductRateStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { ProductRateStatusEnum } from '@prisma/client';
+
 import { ProductEntity } from '../../product/entities/product.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 

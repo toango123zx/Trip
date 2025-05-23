@@ -52,6 +52,22 @@ export class ProductRateRepository {
 		return [productRates, totalRecords];
 	}
 
+	async findProductRateByProductRateId(
+		productRateId: string,
+		productRateStatus?: ProductRateStatusEnum,
+	): Promise<ProductRateEntity> {
+		return this.prismaService.productRate.findFirst({
+			include: {
+				user: true,
+				product: true,
+			},
+			where: {
+				id: productRateId,
+				status: productRateStatus,
+			},
+		});
+	}
+
 	async createProductRate(
 		productRate: CreateProductRateDto,
 		productAvgRate: number,
@@ -74,6 +90,39 @@ export class ProductRateRepository {
 					user: {
 						connect: {
 							id: productRate.user.connect.id,
+						},
+					},
+				},
+			});
+		});
+	}
+
+	async updateDeleteProductRate(
+		productRateId: string,
+		productAvgRate: number,
+	): Promise<ProductRateEntity> {
+		return this.prismaService.$transaction(async (prisma) => {
+			return await prisma.productRate.update({
+				include: {
+					user: true,
+					product: true,
+				},
+				where: {
+					id: productRateId,
+					status: {
+						not: ProductRateStatusEnum.removed,
+					},
+				},
+				data: {
+					status: ProductRateStatusEnum.removed,
+					updateAt: new Date(),
+					deletedAt: new Date(),
+					product: {
+						update: {
+							avgRate: productAvgRate,
+							quantityRate: {
+								decrement: 1,
+							},
 						},
 					},
 				},
