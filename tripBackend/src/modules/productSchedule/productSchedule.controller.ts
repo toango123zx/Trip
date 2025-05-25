@@ -19,7 +19,7 @@ import { GetCartResponseDto } from '../cart/dtos/responses/getCart.response';
 import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
 import { MyInformation } from '../user/decorators';
-import { UserInformationDto } from '../user/dtos';
+import { UserFilterRequestDto, UserInformationDto } from '../user/dtos';
 
 import {
 	AddToCartByProductScheduleIdCommand,
@@ -29,11 +29,13 @@ import {
 import {
 	DeleteProductScheduleByProductScheduleIdResponseDto,
 	GetProductScheduleByProductScheduleIdRequestDto,
+	GetUsersByProductScheduleIdResponseDto,
 	ProductScheduleFilterRequestDto,
 } from './dtos';
 import {
 	GetProductScheduleByProductScheduleIdQuery,
 	GetProductSchedulesBySupplierIdQuery,
+	GetUsersByProductScheduleIdQuery,
 } from './queries/implements';
 
 @Controller('schedule')
@@ -67,6 +69,24 @@ export class ProductScheduleController {
 	): Promise<HttpResponseBodyDto<ProductScheduleEntity>> {
 		return this.queryBus.execute(
 			new GetProductScheduleByProductScheduleIdQuery(productScheduleId, filter),
+		);
+	}
+
+	@Get(':productScheduleId/users')
+	@AuthPermission(PermissionEnum.FindUsersInProductScheduleByProductScheduleId)
+	async getUsersByProductScheduleId(
+		@Param('productScheduleId') productScheduleId: string,
+		@MyInformation() myInformation: UserInformationDto,
+		@Query() pagination: PaginationDto,
+		@Query() filter?: UserFilterRequestDto,
+	): Promise<HttpResponseBodyDto<GetUsersByProductScheduleIdResponseDto[]>> {
+		return this.queryBus.execute(
+			new GetUsersByProductScheduleIdQuery(
+				productScheduleId,
+				myInformation,
+				pagination,
+				filter,
+			),
 		);
 	}
 
