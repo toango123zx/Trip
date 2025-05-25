@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { Prisma, UserStatusEnum } from '@prisma/client';
+import {
+	BillStatusEnum,
+	Prisma,
+	ProductScheduleStatusEnum,
+	UserStatusEnum,
+} from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
 import {
 	AccountEntity,
@@ -51,6 +56,86 @@ export class UserRepository {
 				orderBy: filter,
 			}),
 			this.prismaService.user.count(),
+		]);
+		return [users, totalRecords];
+	}
+
+	async findUsersInProductSchedulebyProductScheduleId(
+		productScheduleId: string,
+		productScheduleStatus?: ProductScheduleStatusEnum[],
+		billStatus?: BillStatusEnum[],
+		userStatus?: UserStatusEnum[],
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: UserOrderByDto,
+	): Promise<[UserEntity[], number]> {
+		const orderBy = filter
+			? Object.entries(filter)
+					.filter(([_, value]) => value)
+					.map(([key, value]) => ({ [key]: value }))
+			: [];
+		const [users, totalRecords] = await Promise.all([
+			this.prismaService.user.findMany({
+				include: {
+					bill: {
+						include: {
+							infoBill: {
+								where: {
+									productScheduleId: productScheduleId,
+								},
+							},
+						},
+					},
+				},
+				where: {
+					status: {
+						in: userStatus,
+					},
+					bill: {
+						some: {
+							infoBill: {
+								some: {
+									productSchedule: {
+										id: productScheduleId,
+										status: {
+											in: productScheduleStatus,
+										},
+									},
+								},
+							},
+							status: {
+								in: billStatus,
+							},
+						},
+					},
+				},
+				take: pagination.take,
+				skip: pagination.skip,
+				orderBy: orderBy,
+			}),
+			this.prismaService.user.count({
+				where: {
+					status: {
+						in: userStatus,
+					},
+					bill: {
+						some: {
+							infoBill: {
+								some: {
+									productSchedule: {
+										id: productScheduleId,
+										status: {
+											in: productScheduleStatus,
+										},
+									},
+								},
+							},
+							status: {
+								in: billStatus,
+							},
+						},
+					},
+				},
+			}),
 		]);
 		return [users, totalRecords];
 	}
