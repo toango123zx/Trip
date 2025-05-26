@@ -20,7 +20,8 @@
 		"test:e2e": "jest --config ./test/jest-e2e.json",
 		"db:push": "npx prisma db push",
 		"db:generate-dto": "npx prisma generate",
-		"db:add-base": "tsx ./prisma/scripts/mergeBaseEntity.ts"
+		"db:add-base": "tsx ./prisma/scripts/mergeBaseEntity.ts",
+		"db:seed": "npx prisma db seed"
 	},
 	"dependencies": {
 		"@brakebein/prisma-generator-nestjs-dto": "^1.23.3",
@@ -90,7 +91,8 @@
 		"testEnvironment": "node"
 	},
 	"prisma": {
-		"schema": "prisma/schemas"
+		"schema": "prisma/schemas",
+		"seed": "ts-node -r tsconfig-paths/register src/modules/mockData/service/index.ts"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [

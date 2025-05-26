@@ -22,7 +22,7 @@ module.exports = {
     node: true, // Cấu hình môi trường Node.js
     jest: true, // Cấu hình môi trường Jest
   },
-  ignorePatterns: ['.eslintrc.js', 'src/main.ts', 'pnpm-lock.yaml'], // Bỏ qua linting cho .eslintrc.js và src/main.ts
+  ignorePatterns: ['.eslintrc.js', 'src/main.ts', 'pnpm-lock.yaml', 'src/modules/mockData'], // Bỏ qua linting cho .eslintrc.js và src/main.ts
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'error', // Yêu cầu định nghĩa kiểu trả về hàm
     '@typescript-eslint/explicit-module-boundary-types': 'error', // Yêu cầu định nghĩa kiểu rõ ràng cho boundary module

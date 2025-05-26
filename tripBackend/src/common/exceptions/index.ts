@@ -4,4 +4,5 @@ export * from './internalServerError.exception';
 export * from './notFound.exception';
 export * from './optional.exceptions';
 export * from './unauthorized.exception';
+export * from './unprocessableEntity.exception';
 export * from './validation.exception';
