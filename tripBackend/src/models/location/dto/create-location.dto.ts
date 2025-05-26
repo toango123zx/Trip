@@ -34,11 +34,4 @@ export class CreateLocationDto {
 	})
 	@IsNotEmpty()
 	city: CityEnum;
-	@ApiProperty({
-		type: CreateLocationMapAddressRelationInputDto,
-	})
-	@IsNotEmpty()
-	@ValidateNested()
-	@Type(() => CreateLocationMapAddressRelationInputDto)
-	mapAddress: CreateLocationMapAddressRelationInputDto;
 }

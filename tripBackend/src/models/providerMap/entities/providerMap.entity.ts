@@ -31,6 +31,11 @@ export class ProviderMapEntity {
 	})
 	deletedAt: Date | null;
 	@ApiProperty({
+		enum: ProviderMapStatusEnum,
+		enumName: 'ProviderMapStatusEnum',
+	})
+	status: ProviderMapStatusEnum;
+	@ApiProperty({
 		type: () => MapAddressEntity,
 		isArray: true,
 		required: false,

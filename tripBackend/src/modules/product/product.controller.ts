@@ -12,13 +12,10 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { HttpResponseBodyDto, PaginationDto, PermissionEnum, RoleEnum } from 'src/common';
-import { ProductEntity, ProductScheduleEntity, UpdateProductDto } from 'src/models';
+import { ProductEntity, ProductScheduleEntity } from 'src/models';
 
 import { AuthPermission, AuthRole } from '../auth/decorators';
-import {
-	DiscountFilterRequestDto,
-	GetDiscountsByProductIdResponseDto,
-} from '../discount/dtos';
+import { DiscountFilterRequestDto, GetDiscountsResponseDto } from '../discount/dtos';
 import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
 import { MyInformation } from '../user/decorators';
@@ -35,6 +32,7 @@ import {
 	CreateProductRequestDto,
 	GetProductsResponseDto,
 	ProductFilterRequestDto,
+	UpdateProductInformationByProductIdRequestDto,
 } from './dtos';
 import { GetProductByProductIdResponseDto } from './dtos/responses/getProductBByProductId.response';
 import {
@@ -83,7 +81,7 @@ export class ProductController {
 		@Param('productId') productId: string,
 		@Query() pagination: PaginationDto,
 		@Query() search?: DiscountFilterRequestDto,
-	): Promise<HttpResponseBodyDto<GetDiscountsByProductIdResponseDto[]>> {
+	): Promise<HttpResponseBodyDto<GetDiscountsResponseDto[]>> {
 		return this.queryBus.execute(
 			new GetDiscountsByProductIdQuery(productId, pagination, search),
 		);
@@ -120,7 +118,7 @@ export class ProductController {
 	@AuthPermission(PermissionEnum.UpdateProductInformation)
 	async updateProductInformationByProductId(
 		@Param('productId') productId: string,
-		@Body() productInformationRequest: UpdateProductDto,
+		@Body() productInformationRequest: UpdateProductInformationByProductIdRequestDto,
 		@SupplierInformation() supplierInformation: SupplierInformationDto,
 	): Promise<HttpResponseBodyDto<GetProductsResponseDto | HttpException>> {
 		return this.commandBus.execute(

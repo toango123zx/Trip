@@ -9,6 +9,7 @@ import {
 	PermissionForSupplierEnum,
 	RoleEnum,
 } from 'src/common';
+import { ProviderMapEnum } from 'src/common/enums/providerMap.enum';
 
 import { PrismaService } from './prisma.service';
 
@@ -25,6 +26,7 @@ export class SeedService implements OnModuleInit {
 		await this.seedDiscountEligibilities();
 		await this.seedDiscountApplicationScopes();
 		await this.seedPaymentMethod();
+		await this.seedProviderMap();
 	}
 
 	private async seedRoles(): Promise<void> {
@@ -266,6 +268,27 @@ export class SeedService implements OnModuleInit {
 		}));
 		await this.prisma.paymentMethod.createMany({
 			data: paymentMethodData,
+		});
+
+		return;
+	}
+	private async seedProviderMap(): Promise<void> {
+		const PROVIDER_MAPS: string[] = Object.values(ProviderMapEnum);
+
+		const providerMaps = await this.prisma.providerMap.findMany();
+		const providerMapNamesDB = providerMaps.map((providerMap) => providerMap.name);
+		const providerMapNames = PROVIDER_MAPS.filter((providerMapName) => {
+			return !providerMapNamesDB.includes(providerMapName);
+		});
+		if (providerMapNames.length === 0) {
+			return;
+		}
+		const providerMapData = providerMapNames.map((providerMapName) => ({
+			name: providerMapName,
+			description: providerMapName.replaceAll('_', ' '),
+		}));
+		await this.prisma.providerMap.createMany({
+			data: providerMapData,
 		});
 
 		return;

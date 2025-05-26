@@ -1,2 +1,2 @@
 export * from './getDiscountByDiscountId.Detailresponse';
-export * from './getDiscountsByProductId.response';
+export * from './getDiscounts.response';

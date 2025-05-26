@@ -7,6 +7,7 @@ import { DiscountRepository } from '../discount/discount.repository';
 import { LocationRepository } from '../location/location.repository';
 import { ProductCategoryRepository } from '../productCategory/productCategory.repository';
 import { ProductScheduleRepository } from '../productSchedule/productSchedule.repository';
+import { ProviderMapRepository } from '../providerMap/providerMap.repository';
 import { SupplierRepository } from '../supplier/supplier.repository';
 import { UserRepository } from '../user/user.repository';
 
@@ -22,6 +23,7 @@ import { ProductQueryHandlers } from './queries/handller';
 		UserRepository,
 		SupplierRepository,
 		ProductRepository,
+		ProviderMapRepository,
 		LocationRepository,
 		ProductCategoryRepository,
 		ProductScheduleRepository,
