@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: 'https://trip-backend-v0.onrender.com',
+    baseURL: 'https://trip-fzu1.onrender.com',
     withCredentials: true, // Quan trọng để gửi cookies cross-origin
 });
 

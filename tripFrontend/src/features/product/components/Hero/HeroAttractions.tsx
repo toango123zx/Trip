@@ -45,7 +45,7 @@ export const HeroAttractions = ({
 				</div>
 
 				{/* Search bar */}
-				<div className="absolute left-0 bottom-0 w-full z-20 flex justify-center px-4">
+				<div className="absolute left-0 bottom-0 w-full flex justify-center px-4">
 					<div className="w-full max-w-[1280px]">
 						<div className="md:hidden">
 							<SearchBarMobile form={form} />

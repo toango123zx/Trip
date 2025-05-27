@@ -153,6 +153,7 @@ const UserProfileDropdown = ({
 	const handleLogout = (): void => {
 		localStorage.removeItem('logged');
 		localStorage.removeItem('role');
+		localStorage.removeItem('accessToken')
 		window.location.href = '/';
 	};
 

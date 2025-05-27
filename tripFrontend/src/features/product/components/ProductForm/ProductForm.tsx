@@ -42,6 +42,7 @@ type TProductFormProps = {
 	generateLocationDescription?: (locationName: string) => Promise<void>;
 	locationDescription?: string;
 	isGeneratingDescription?: boolean;
+	productImageUrls?: string[];
 };
 
 export const ProductForm = ({
@@ -59,6 +60,7 @@ export const ProductForm = ({
 	generateLocationDescription,
 	locationDescription,
 	isGeneratingDescription = false,
+	productImageUrls = [],
 }: TProductFormProps): JSX.Element => {
 	const {
 		register,
@@ -168,18 +170,31 @@ export const ProductForm = ({
 	};
 
 	const handleSaveOnClick = (data: TRequestBodyCreateProduct): void => {
+		// Log toàn bộ dữ liệu trước khi submit
+		console.log('ProductForm - Submit Data:', {
+			...data,
+			productCategoryId: 'clv2my35m0000t8z5h4xetnxu',
+			posterImageUrl: data.posterImageUrl || '',
+			productImageUrls: data.productImageUrls || [],
+			urlMap: data.urlMap || '',
+		});
+
 		if (onSubmit) {
-			onSubmit({
+			const submitData = {
 				...data,
 				productCategoryId: 'clv2my35m0000t8z5h4xetnxu',
-			});
+				posterImageUrl: data.posterImageUrl || '',
+				productImageUrls: data.productImageUrls || [],
+				urlMap: data.urlMap || '',
+			};
+			onSubmit(submitData);
 		}
 	};
 
 	const description = watch('description');
 	useEffect(() => {}, [description]);
 
-	const handleGenerateDescription = () => {
+	const handleGenerateDescription = (): void => {
 		const selectedLocation = locations.find((l) => l.id === locationId);
 		if (selectedLocation && generateLocationDescription) {
 			generateLocationDescription(selectedLocation.displayName);
@@ -190,14 +205,33 @@ export const ProductForm = ({
 		}
 	};
 
-	const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
-		if (!file) return;
+	const handlePosterImageUpload = async (
+		event: React.ChangeEvent<HTMLInputElement>,
+	): Promise<void> => {
+		const files = event.target.files;
+		if (!files || files.length === 0) return;
+
+		const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+		const maxFileSize = 5 * 1024 * 1024; // 5MB
+
+		const file = files[0]; // Chỉ lấy ảnh đầu tiên
+
+		// Validate file
+		if (!validImageTypes.includes(file.type) || file.size > maxFileSize) {
+			notificationUtils.error({
+				message: 'Upload Error',
+				description: 'Invalid file type or size. Only JPEG, PNG, GIF, WebP are allowed, max 5MB.',
+			});
+			return;
+		}
 
 		try {
 			setIsUploading(true);
-			const imageUrl = await cloudinaryService.uploadImage(file);
+			
+			// Upload single image
+			const [imageUrl] = await cloudinaryService.uploadImages(files);
 
+			// Set poster image
 			setValue('posterImageUrl', imageUrl, {
 				shouldValidate: true,
 				shouldDirty: true,
@@ -205,14 +239,122 @@ export const ProductForm = ({
 			});
 
 			notificationUtils.success({
-				message: 'Tải ảnh thành công',
-				description: 'Ảnh đã được tải lên thành công',
+				message: 'Upload Successful',
+				description: 'Poster image uploaded successfully',
 			});
 		} catch (error) {
-			notificationUtils.error();
+			console.error('Image upload error:', error);
+			notificationUtils.error({
+				message: 'Upload Failed',
+				description: 'Unable to upload image. Please try again.',
+			});
 		} finally {
 			setIsUploading(false);
+			if (event.target) {
+				event.target.value = '';
+			}
 		}
+	};
+
+	const handleProductImagesUpload = async (
+		event: React.ChangeEvent<HTMLInputElement>,
+	): Promise<void> => {
+		const files = event.target.files;
+		if (!files || files.length === 0) return;
+
+		const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+		const maxFileSize = 5 * 1024 * 1024; // 5MB
+
+		// Validate files
+		const invalidFiles = Array.from(files).filter((file) => 
+			!validImageTypes.includes(file.type) || file.size > maxFileSize
+		);
+
+		if (invalidFiles.length > 0) {
+			const errorMessages = invalidFiles.map((file) => {
+				if (!validImageTypes.includes(file.type)) {
+					return `${file.name}: Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.`;
+				}
+				if (file.size > maxFileSize) {
+					return `${file.name}: File too large. Maximum size is 5MB.`;
+				}
+				return '';
+			});
+
+			notificationUtils.error({
+				message: 'Upload Error',
+				description: errorMessages.join('\n'),
+			});
+			return;
+		}
+
+		try {
+			setIsUploading(true);
+			
+			// Get existing images to append to
+			const existingImages = watch('productImageUrls') || [];
+			
+			// Upload new images
+			const newImageUrls = await cloudinaryService.uploadImages(files);
+			
+			// Combine existing and new images (no limit)
+			const combinedImages = [...existingImages, ...newImageUrls];
+
+			setValue('productImageUrls', combinedImages, {
+				shouldValidate: true,
+				shouldDirty: true,
+				shouldTouch: true,
+			});
+
+			notificationUtils.success({
+				message: 'Upload Successful',
+				description: `${newImageUrls.length} image(s) uploaded successfully`,
+			});
+		} catch (error) {
+			console.error('Image upload error:', error);
+			notificationUtils.error({
+				message: 'Upload Failed',
+				description: 'Unable to upload images. Please try again.',
+			});
+		} finally {
+			setIsUploading(false);
+			if (event.target) {
+				event.target.value = '';
+			}
+		}
+	};
+
+	useEffect(() => {
+		// Log chi tiết để kiểm tra dữ liệu productImage và isCreate
+		console.log('ProductForm - productImage (type):', typeof productImageUrls);
+		console.log(
+			'ProductForm - productImage (JSON):',
+			JSON.stringify(productImageUrls),
+		);
+		console.log('ProductForm - productImage (length):', productImageUrls?.length);
+		console.log('ProductForm - isCreate:', isCreate);
+
+		// Nếu không phải chế độ tạo mới và có productImage, set giá trị cho productImageUrls
+		if (!isCreate && productImageUrls && productImageUrls.length > 0) {
+			const imageUrls = productImageUrls.map((img) => {
+				console.log('ProductForm - individual image:', img);
+				return img;
+			});
+			console.log('ProductForm - imageUrls:', imageUrls);
+			setValue('productImageUrls', imageUrls, {
+				shouldValidate: true,
+				shouldDirty: true,
+				shouldTouch: true,
+			});
+		}
+	}, [isCreate, productImageUrls, setValue]);
+
+	const handleRemovePosterImage = (): void => {
+		setValue('posterImageUrl', '', {
+			shouldValidate: true,
+			shouldDirty: true,
+			shouldTouch: true,
+		});
 	};
 
 	return (
@@ -388,7 +530,7 @@ export const ProductForm = ({
 				</div>
 
 				<input
-					id="locationOnMap"
+					id="urlMap"
 					type="text"
 					placeholder="Enter Coordinates or Select on Map"
 					disabled={disabled}
@@ -397,11 +539,11 @@ export const ProductForm = ({
 							? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop'
 							: 'bg-white'
 					}`}
-					{...register('locationOnMap')}
+					{...register('urlMap')}
 				/>
 			</div>
 
-			{/* --- Gallery --- */}
+			{/* --- Gallery - Poster Image */}
 			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
 				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
 					<svg
@@ -422,38 +564,40 @@ export const ProductForm = ({
 					</span>
 				</div>
 
-				<div className="flex items-center gap-4">
+				<div className="flex flex-wrap items-center gap-4">
 					<input
 						type="file"
 						accept="image/*"
-						onChange={handleImageUpload}
+						onChange={handlePosterImageUpload}
 						disabled={disabled || isUploading}
 						className="hidden"
 						id="posterImageUpload"
 					/>
 					<label
 						htmlFor="posterImageUpload"
-						className="flex h-[70px] sm:h-[85px] w-[90px] sm:w-[110px] items-center justify-center rounded-md bg-gray-200 cursor-pointer"
+						className="flex h-[70px] sm:h-[85px] w-[90px] sm:w-[110px] items-center justify-center rounded-md bg-gray-200 cursor-pointer hover:bg-gray-300 transition"
 					>
 						{isUploading ? (
 							<span className="text-gray-500">Đang tải...</span>
 						) : (
-							<Plus className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
+							<>
+								<Plus className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
+								<span className="sr-only">Upload Poster Image</span>
+							</>
 						)}
 					</label>
 
-					{/* Preview ảnh nếu có */}
 					{watch('posterImageUrl') && (
-						<div className="relative w-[90px] sm:w-[110px]">
+						<div className="relative w-[90px] sm:w-[110px] group">
 							<img
 								src={watch('posterImageUrl')}
-								alt="Poster"
-								className="h-[70px] sm:h-[85px] w-full object-cover rounded-lg shadow-md border border-gray-200"
+								alt="Poster Image"
+								className="h-[70px] sm:h-[85px] w-full object-cover rounded-lg shadow-md border border-gray-200 group-hover:opacity-75 transition"
 							/>
 							<button
 								type="button"
-								onClick={() => setValue('posterImageUrl', '')}
-								className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 w-5 h-5 flex items-center justify-center shadow-sm transition"
+								onClick={handleRemovePosterImage}
+								className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 w-5 h-5 flex items-center justify-center shadow-sm transition opacity-0 group-hover:opacity-100"
 								title="Xóa ảnh"
 							>
 								<svg
@@ -474,6 +618,109 @@ export const ProductForm = ({
 						</div>
 					)}
 				</div>
+			</div>
+
+			{/* --- List Images - Multiple Images */}
+			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
+				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+					<svg
+						className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M3 5h18a2 2 0 012 2v10a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2z"
+						/>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M3 15l4-4a2 2 0 012.828 0l2 2L17 9l4 6"
+						/>
+					</svg>
+					<span className="text-sm sm:text-base font-medium text-gray-800">
+						List Images
+					</span>
+				</div>
+
+				<div className="flex flex-wrap items-center gap-4">
+					<input
+						type="file"
+						accept="image/*"
+						multiple
+						onChange={handleProductImagesUpload}
+						disabled={disabled || isUploading}
+						className="hidden"
+						id="productImagesUpload"
+					/>
+					<label
+						htmlFor="productImagesUpload"
+						className="flex h-[70px] sm:h-[85px] w-[90px] sm:w-[110px] items-center justify-center rounded-md bg-gray-200 cursor-pointer hover:bg-gray-300 transition"
+					>
+						{isUploading ? (
+							<span className="text-gray-500">Đang tải...</span>
+						) : (
+							<>
+								<Plus className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
+								<span className="sr-only">Upload Product Images</span>
+							</>
+						)}
+					</label>
+
+					{watch('productImageUrls')?.map((imageUrl, index) => {
+						console.log(`ProductForm - productImageUrls[${index}]:`, imageUrl);
+						return (
+							<div key={index} className="relative w-[90px] sm:w-[110px] group">
+								<img
+									src={imageUrl}
+									alt={`Product Image ${index + 1}`}
+									className="h-[70px] sm:h-[85px] w-full object-cover rounded-lg shadow-md border border-gray-200 group-hover:opacity-75 transition"
+								/>
+								<button
+									type="button"
+									onClick={() => {
+										const currentImages = watch('productImageUrls') || [];
+										setValue(
+											'productImageUrls',
+											currentImages.filter((_, i) => i !== index),
+											{
+												shouldValidate: true,
+												shouldDirty: true,
+												shouldTouch: true,
+											},
+										);
+									}}
+									className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 w-5 h-5 flex items-center justify-center shadow-sm transition opacity-0 group-hover:opacity-100"
+									title="Xóa ảnh"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-3 w-3"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M6 18L18 6M6 6l12 12"
+										/>
+									</svg>
+								</button>
+							</div>
+						);
+					})}
+				</div>
+				{watch('productImageUrls') && watch('productImageUrls')!.length > 0 && (
+					<p className="text-sm text-gray-500 mt-2">
+						{watch('productImageUrls')!.length} image(s) uploaded
+					</p>
+				)}
 			</div>
 
 			{/* --- Schedules --- */}

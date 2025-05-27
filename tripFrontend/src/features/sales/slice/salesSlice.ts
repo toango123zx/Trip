@@ -47,7 +47,7 @@ export const fetchSales = createAsyncThunk(
   'sales/fetchSales',
   async (page: number = 1, { rejectWithValue }) => {
     try {
-      const response = await axios.get('https://trip-backend-v0.onrender.com/discount', {
+      const response = await axios.get('https://trip-fzu1.onrender.com/discount', {
         withCredentials: true,
         params: { 
           page,

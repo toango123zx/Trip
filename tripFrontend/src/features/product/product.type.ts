@@ -46,6 +46,8 @@ export type TRequestBodyCreateProduct = {
 	cityName: string;
 	productCategoryId: string;
 	locationOnMap: string;
+	productImageUrls?: string[];
+	urlMap?: string;
 };
 
 export type TRequestBodyUpdateProduct = {

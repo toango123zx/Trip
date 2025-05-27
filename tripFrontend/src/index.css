@@ -87,28 +87,6 @@ input {
     margin-bottom: 15px;
 }
 
-/* button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    margin: 5px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-
-} */
-/* 
-button:hover {
-    background-color: #45a049;
-} */
-
-/* Nâng cấp CSS cho trang tài khoản */
 .account-page-container {
     max-width: 800px;
     margin: 2rem auto;
@@ -281,6 +259,18 @@ button:hover {
     animation: slideDown 0.3s ease-out forwards;
 }
 
-.ant-pagination-item{
+.ant-pagination-item {
     background-color: transparent !important;
+}
+
+.swiper-button-prev:after,
+.swiper-button-next:after {
+    font-size: 16px !important;
+    color: black;
+}
+
+.swiper-button-prev:hover .swiper-button-prev,
+.swiper-button-next:hover .swiper-button-next {
+    color: #000000;
+    background: #ff6900;
 }

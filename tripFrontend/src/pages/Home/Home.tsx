@@ -1,6 +1,6 @@
-import type React from 'react';
+import React from 'react';
 
-import { HeroHome, Services, Stats, TopDestinations } from '@/features/product';
+import { HeroHome, Services, Stats, TopDestinations, TourBookingFeatures } from '@/features/product';
 import { MainLayout } from '@/layouts';
 import { stat } from '@/utils/fakeData/stat';
 
@@ -10,6 +10,7 @@ const Home: React.FC = () => {
 			<HeroHome />
 			<Services />
 			<TopDestinations />
+			<TourBookingFeatures />
 			<Stats stats={stat} />
 		</MainLayout>
 	);
