@@ -72,7 +72,9 @@ export class DiscountController {
 	async getDiscountsAvailableByScheduleIds(
 		@Query('scheduleIds') scheduleIds: string[],
 		@Query() filter?: DiscountFilterRequestDto,
-	): Promise<HttpResponseBodyDto<GetDiscountsResponseDto[] | HttpException>> {
+	): Promise<
+		HttpResponseBodyDto<GetDiscountByDiscountIdResponseDto[] | HttpException>
+	> {
 		return this.queryBus.execute(
 			new GetDiscountsAvailableByScheduleIdsQuery(scheduleIds, filter),
 		);

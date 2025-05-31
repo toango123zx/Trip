@@ -12,7 +12,7 @@ import {
 	OptionalException,
 } from 'src/common';
 import { vnpay } from 'src/configs';
-import { CreateTransactionDto } from 'src/models';
+import { BillEntity, CreateTransactionDto } from 'src/models';
 import { parseDate } from 'vnpay';
 
 import { TransactionSessionRepository } from 'src/modules/transactionSession/transactionSession.repository';
@@ -31,7 +31,7 @@ export class CheckBillPaymentByVnpayHandler
 
 	async execute(
 		query: CheckBillPaymentByVnpayQuery,
-	): Promise<HttpResponseBodySuccessDto<string> | HttpException> {
+	): Promise<HttpResponseBodySuccessDto<BillEntity> | HttpException> {
 		const { verifyIpn } = query;
 		const transactionSession =
 			await this.transactionSessionRepository.findTransactionSession(
@@ -98,17 +98,21 @@ export class CheckBillPaymentByVnpayHandler
 				status: TransactionStatusEnum.completed,
 			};
 
-			await this.transactionRepository.createTransactionSuccess(transaction);
+			const transactionCreated =
+				await this.transactionRepository.createTransactionSuccess(transaction);
 
 			return {
 				success: true,
-				data: 'Transaction is success',
+				data: transactionCreated.bill,
 			};
 		} catch (error) {
 			await this.transactionSessionRepository.deleteTranasactionSession(
 				transactionSession.id,
 			);
-			throw error;
+			throw {
+				message: error,
+				data: transactionSession.bill,
+			};
 		}
 	}
 }

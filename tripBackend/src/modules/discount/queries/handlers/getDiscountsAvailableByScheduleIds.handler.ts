@@ -1,13 +1,13 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { ProductScheduleStatusEnum } from '@prisma/client';
+import { InfoDiscountStatusEnum, ProductScheduleStatusEnum } from '@prisma/client';
 import { HttpResponseBodySuccessDto, OptionalException } from 'src/common';
 
 import { ProductScheduleRepository } from 'src/modules/productSchedule/productSchedule.repository';
 
 import { DiscountRepository } from '../../discount.repository';
-import { GetDiscountsResponseDto } from '../../dtos';
+import { GetDiscountByDiscountIdResponseDto } from '../../dtos';
 import { GetDiscountsAvailableByScheduleIdsQuery } from '../implements';
 
 @QueryHandler(GetDiscountsAvailableByScheduleIdsQuery)
@@ -21,7 +21,9 @@ export class GetDiscountsAvailableByScheduleIdsHandler
 
 	async execute(
 		query: GetDiscountsAvailableByScheduleIdsQuery,
-	): Promise<HttpResponseBodySuccessDto<GetDiscountsResponseDto[]> | HttpException> {
+	): Promise<
+		HttpResponseBodySuccessDto<GetDiscountByDiscountIdResponseDto[]> | HttpException
+	> {
 		let { scheduleIds } = query;
 		if (typeof scheduleIds === 'string') {
 			scheduleIds = [scheduleIds];
@@ -49,17 +51,20 @@ export class GetDiscountsAvailableByScheduleIdsHandler
 			);
 		}
 
-		const [discounts] = await this.discountRepository.findDiscounts(
-			scheduleIds,
-			keyword,
-			statusSearch,
-			true,
-			undefined,
-			discountFilter,
-		);
+		const [discounts] =
+			await this.discountRepository.findDiscountsByProductScheduleIds(
+				scheduleIds,
+				undefined,
+				statusSearch,
+				InfoDiscountStatusEnum.active,
+				true,
+				keyword,
+				undefined,
+				discountFilter,
+			);
 
 		const discountsInformation = discounts.map(
-			(discount) => new GetDiscountsResponseDto(discount),
+			(discount) => new GetDiscountByDiscountIdResponseDto(discount),
 		);
 
 		return {

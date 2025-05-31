@@ -209,11 +209,16 @@ export class BillRepository {
 				});
 			}
 			if (discountIdsForProductSchedules.length > 0 || discountIdForBill) {
+				const discountIds = [];
 				// update applited discount and get data discount
-				const discountIds = [
-					...discountIdsForProductSchedules,
-					discountIdForBill,
-				];
+
+				if (discountIdsForProductSchedules.length > 0) {
+					discountIds.push(...discountIdsForProductSchedules);
+				}
+
+				if (discountIdForBill) {
+					discountIds.push(discountIdForBill);
+				}
 
 				const discountsFind = await prisma.discount.findMany({
 					include: {
@@ -295,7 +300,7 @@ export class BillRepository {
 				// check if discount is full
 				const discountIdsFull: string[] = [];
 				discountsDb.forEach((discount) => {
-					if (discount.quantity >= discount.applited) {
+					if (discount.quantity <= discount.applited) {
 						discountIdsFull.push(discount.id);
 					}
 				});
