@@ -11,6 +11,7 @@ import { InfoDiscountModule } from './InfoDiscount/infoDiscount.module';
 import { LocationModule } from './location/location.module';
 import { PaymentMethodModule } from './paymentMethod/paymentMethod.module';
 import { ProductModule } from './product/product.module';
+import { ProductRateModule } from './productRate/productRate.module';
 import { ProductScheduleModule } from './productSchedule/productSchedule.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { TransactionModule } from './transaction/transaction.module';
@@ -25,6 +26,7 @@ export const Modules = [
 	SupplierModule,
 	LocationModule,
 	ProductModule,
+	ProductRateModule,
 	ProductScheduleModule,
 	DiscountTypeModule,
 	DiscountEligibilityModule,

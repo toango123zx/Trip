@@ -1,5 +1,6 @@
-import { DiscountTypeStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { DiscountTypeStatusEnum } from '@prisma/client';
 
 export class DiscountTypeDto {
 	@ApiProperty({

@@ -14,8 +14,12 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { HttpResponseBodyDto, PaginationDto, PermissionEnum, RoleEnum } from 'src/common';
 import { ProductEntity, ProductScheduleEntity } from 'src/models';
 
-import { AuthPermission, AuthRole } from '../auth/decorators';
+import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
 import { DiscountFilterRequestDto, GetDiscountsResponseDto } from '../discount/dtos';
+import {
+	GetProductRatesResponseDto,
+	ProductRateFilterRequestDto,
+} from '../productRate/dto';
 import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
 import { MyInformation } from '../user/decorators';
@@ -23,6 +27,7 @@ import { UserInformationDto } from '../user/dtos';
 
 import {
 	CreateProductCommand,
+	CreateProductRateByProductIdCommand,
 	CreateProductScheduleByProductIdCommand,
 	DeleteProductByProductIdCommand,
 	UpdateProductInformationByProductIdCommand,
@@ -33,11 +38,13 @@ import {
 	GetProductsResponseDto,
 	ProductFilterRequestDto,
 	UpdateProductInformationByProductIdRequestDto,
+	CreateProductRateByProductIdRequestDto,
 } from './dtos';
 import { GetProductByProductIdResponseDto } from './dtos/responses/getProductBByProductId.response';
 import {
 	GetDiscountsByProductIdQuery,
 	GetProductByProductIdQuery,
+	GetProductRatesByProductIdQuery,
 	GetProductsManagementQuery,
 	GetProductsQuery,
 } from './queries/implement';
@@ -76,6 +83,17 @@ export class ProductController {
 		return this.queryBus.execute(new GetProductByProductIdQuery(productId));
 	}
 
+	@Get('/:productId/rate')
+	async getProductRateByProductId(
+		@Param('productId') productId: string,
+		@Query() pagination: PaginationDto,
+		@Query() search?: ProductRateFilterRequestDto,
+	): Promise<HttpResponseBodyDto<GetProductRatesResponseDto[]> | HttpException> {
+		return this.queryBus.execute(
+			new GetProductRatesByProductIdQuery(productId, pagination, search),
+		);
+	}
+
 	@Get('/:productId/discount')
 	async getDiscountsByProductId(
 		@Param('productId') productId: string,
@@ -110,6 +128,22 @@ export class ProductController {
 				productId,
 				productScheduleInformation,
 				supplierInformation,
+			),
+		);
+	}
+
+	@Post('/:productId/rate')
+	@Auth()
+	async createProductRateByProductId(
+		@Param('productId') productId: string,
+		@Body() productRateInformation: CreateProductRateByProductIdRequestDto,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<GetProductRatesResponseDto> | HttpException> {
+		return this.commandBus.execute(
+			new CreateProductRateByProductIdCommand(
+				productId,
+				productRateInformation,
+				myInformation,
 			),
 		);
 	}

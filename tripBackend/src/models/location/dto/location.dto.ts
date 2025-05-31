@@ -1,5 +1,6 @@
-import { CityEnum, LocationStatusEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { CityEnum, LocationStatusEnum } from '@prisma/client';
 
 export class LocationDto {
 	@ApiProperty({
