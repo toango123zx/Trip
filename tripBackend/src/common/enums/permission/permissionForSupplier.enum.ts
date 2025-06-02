@@ -6,6 +6,8 @@ export enum PermissionForSupplierEnum {
 	CreateProductSchedule = PermissionEnum.CreateProductSchedule,
 	UpdateProductInformation = PermissionEnum.UpdateProductInformation,
 	FindProductScheduleBySupplierId = PermissionEnum.FindProductScheduleBySupplierId,
+	FindUsersInProductScheduleByProductScheduleId = PermissionEnum.FindUsersInProductScheduleByProductScheduleId,
+	UpdateCompletedProductSchedule = PermissionEnum.UpdateCompletedProductSchedule,
 	DeleteProductScheduleByProductScheduleId = PermissionEnum.DeleteProductScheduleByProductScheduleId,
 	CreateDiscount = PermissionEnum.CreateDiscount,
 	DeleteDiscountByDiscountId = PermissionEnum.DeleteDiscountByDiscountId,

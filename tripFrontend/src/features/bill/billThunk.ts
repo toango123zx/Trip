@@ -7,22 +7,31 @@ import { CreateBillRequestDto, TRequestQueryGetBills } from './bill.type';
 import { billApi } from './billApi';
 
 const getBillByUserId = createAsyncThunk(
-	'bill/getBillByUserId',
-	async (query?: TRequestQueryGetBills): Promise<[TBillSumary[], TPagination?]> => {
-		const [data, pagination] = await billApi.getBillByUserId(query);
-		return [data, pagination];
-	},
+  'bill/getBillByUserId',
+  async (query?: TRequestQueryGetBills): Promise<[TBillSumary[], TPagination?]> => {
+    const [data, pagination] = await billApi.getBillByUserId(query);
+    return [data, pagination];
+  },
 );
 
 const createBill = createAsyncThunk(
-	'bill/createBill',
-	async (bill: CreateBillRequestDto): Promise<TBill> => {
-		const data = await billApi.creatBill(bill);
-		return data;
-	},
+  'bill/createBill',
+  async (bill: CreateBillRequestDto): Promise<TBill> => {
+    const data = await billApi.createBill(bill);
+    return data;
+  },
+);
+
+const paymentBillByBillId = createAsyncThunk(
+  'bill/payment',
+  async (billId: string): Promise<string> => {
+    const data = await billApi.paymentBillByBillId(billId);
+    return data;
+  },
 );
 
 export const billThunk = {
-	getBillByUserId,
-	createBill,
+  getBillByUserId,
+  createBill,
+  paymentBillByBillId,
 };

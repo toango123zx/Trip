@@ -94,7 +94,7 @@ export class ProductRepository {
 
 	async findProductByProductId(
 		productId: string,
-		prodcutStatus?: ProductStatusEnum,
+		productStatus?: ProductStatusEnum,
 	): Promise<ProductEntity> {
 		return this.prismaService.product.findFirst({
 			include: {
@@ -118,23 +118,43 @@ export class ProductRepository {
 				},
 				location: true,
 				productCategory: true,
+				mapAddress: {
+					include: {
+						providerMap: true,
+					},
+				},
 			},
 			where: {
 				id: productId,
-				status: prodcutStatus,
+				status: productStatus,
 			},
 		});
 	}
 
-	async createProduct(productInformation: CreateProductDto): Promise<ProductEntity> {
+	async createProduct(
+		productInformation: CreateProductDto,
+		productImageUrls: string[] = [],
+	): Promise<ProductEntity> {
 		return this.prismaService.product.create({
-			data: productInformation,
+			data: {
+				...productInformation,
+				productImage: {
+					createMany: {
+						data: productImageUrls.map((url) => ({
+							url: url,
+						})),
+					},
+				},
+			},
 		});
 	}
 
 	async updateProductByProductId(
 		productId: string,
 		productInformation: UpdateProductDto,
+		addProductImageUrls: string[] = [],
+		removeProductImageIds: string[] = [],
+		urlMap: string,
 	): Promise<ProductEntity> {
 		return this.prismaService.product.update({
 			include: {
@@ -149,7 +169,24 @@ export class ProductRepository {
 			where: {
 				id: productId,
 			},
-			data: productInformation,
+			data: {
+				...productInformation,
+				productImage: {
+					createMany: {
+						data: addProductImageUrls.map((url) => ({ url: url })),
+					},
+					deleteMany: {
+						id: {
+							in: removeProductImageIds,
+						},
+					},
+				},
+				mapAddress: {
+					update: {
+						urlMap: urlMap,
+					},
+				},
+			},
 		});
 	}
 
@@ -219,7 +256,7 @@ export class ProductRepository {
 			});
 			product.productSchedule.forEach((schedule) => {
 				schedule.infoBill.forEach((info) => {
-					if (info.bill.status === BillStatusEnum.paided) {
+					if (info.bill.status === BillStatusEnum.paid) {
 						return billsIdWaitingRefund.push(info.bill.id);
 					}
 					billsIdCancel.push(info.bill.id);

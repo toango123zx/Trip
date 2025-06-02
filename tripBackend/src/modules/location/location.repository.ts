@@ -26,13 +26,6 @@ export class LocationRepository {
 			: [];
 		const [locations, totalRecords] = await Promise.all([
 			this.prismaService.location.findMany({
-				include: {
-					mapAddress: {
-						include: {
-							providerMap: true,
-						},
-					},
-				},
 				where: {
 					displayName: {
 						contains: keyword,

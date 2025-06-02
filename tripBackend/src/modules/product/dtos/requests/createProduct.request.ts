@@ -1,6 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
-import { IsNotEmpty, IsString, IsUrl, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsOptional, IsString, IsUrl, Min } from 'class-validator';
 import { AutoTrim } from 'src/common/decorators';
 import { CreateProductDto } from 'src/models';
 
@@ -8,6 +9,8 @@ export class CreateProductRequestDto extends OmitType(CreateProductDto, [
 	'supplier',
 	'location',
 	'productCategory',
+	'productImage',
+	'mapAddress',
 ]) {
 	@AutoTrim()
 	name: string;
@@ -27,6 +30,7 @@ export class CreateProductRequestDto extends OmitType(CreateProductDto, [
 	})
 	@IsNotEmpty()
 	@IsString()
+	@AutoTrim()
 	locationId: string;
 	@ApiProperty({
 		type: String,
@@ -34,5 +38,26 @@ export class CreateProductRequestDto extends OmitType(CreateProductDto, [
 	})
 	@IsNotEmpty()
 	@IsString()
+	@AutoTrim()
 	productCategoryId: string;
+	@ApiProperty({
+		type: String,
+		isArray: true,
+		required: false,
+	})
+	@IsOptional()
+	@IsArray()
+	@Type(() => String)
+	@IsString({ each: true })
+	@AutoTrim()
+	productImageUrls?: string[];
+	@ApiProperty({
+		type: String,
+		required: true,
+	})
+	@IsNotEmpty()
+	@IsString()
+	@AutoTrim()
+	@IsUrl()
+	urlMap: string;
 }

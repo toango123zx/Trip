@@ -1,0 +1,45 @@
+/* Custom styles for order status steps - Success */
+.custom-steps .ant-steps-item-process .ant-steps-item-icon {
+  border-color: #FF7A22;
+  color: #FF7A22;
+}
+
+.custom-steps .ant-steps-item-finish .ant-steps-item-icon {
+  background-color: #FF7A22;
+  border-color: #FF7A22;
+}
+
+.custom-steps .ant-steps-item-finish .ant-steps-item-container .ant-steps-item-title,
+.custom-steps .ant-steps-item-process .ant-steps-item-container .ant-steps-item-title {
+  color: #FF7A22;
+  font-weight: 500;
+}
+
+.custom-steps .ant-steps-item-finish .ant-steps-item-tail::after {
+  background-color: #FF7A22;
+}
+
+/* Custom styles for order status steps - Error */
+.custom-steps-error .ant-steps-item-process .ant-steps-item-icon {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+}
+
+.custom-steps-error .ant-steps-item-finish .ant-steps-item-icon {
+  background-color: #FF7A22;
+  border-color: #FF7A22;
+}
+
+.custom-steps-error .ant-steps-item-finish .ant-steps-item-container .ant-steps-item-title {
+  color: #FF7A22;
+  font-weight: 500;
+}
+
+.custom-steps-error .ant-steps-item-process .ant-steps-item-container .ant-steps-item-title {
+  color: #ff4d4f;
+  font-weight: 500;
+}
+
+.custom-steps-error .ant-steps-item-finish .ant-steps-item-tail::after {
+  background-color: #FF7A22;
+}

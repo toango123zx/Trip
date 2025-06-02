@@ -16,6 +16,92 @@ import { DiscountOrderByDto } from './dtos';
 export class DiscountRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
+	async findDiscounts(
+		schedules?: string[],
+		keyword?: string,
+		status?: DiscountStatusEnum,
+		availabilityTime?: boolean,
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: DiscountOrderByDto,
+	): Promise<[DiscountEntity[], number]> {
+		const orderBy = Object.entries(filter || {})
+			.filter(([_, value]) => Boolean(value))
+			.map(([key, value]) => ({ [key]: value }));
+		const [discounts, totalRecords] = await Promise.all([
+			this.prismaService.discount.findMany({
+				include: {
+					user: true,
+					infoDiscount: {
+						include: {
+							productSchedule: {
+								include: {
+									product: true,
+								},
+							},
+						},
+					},
+					discountApplicationScope: true,
+					discountEligibility: true,
+					discountType: true,
+				},
+				where: {
+					name: {
+						contains: keyword,
+						mode: 'insensitive',
+					},
+					infoDiscount: {
+						some: {
+							productScheduleId: {
+								in: schedules,
+							},
+						},
+					},
+					startTime: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endTime: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					status: status,
+				},
+				orderBy: orderBy,
+				skip: pagination.skip,
+				take: pagination.take,
+			}),
+			this.prismaService.discount.count({
+				where: {
+					name: {
+						contains: keyword,
+						mode: 'insensitive',
+					},
+					infoDiscount: {
+						some: {
+							productScheduleId: {
+								in: schedules,
+							},
+						},
+					},
+					startTime: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endTime: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					status: status,
+				},
+			}),
+		]);
+		return [discounts, totalRecords];
+	}
+
 	async findDiscountsByProductId(
 		pagination: IPaginationQuery,
 		productId?: string,
@@ -82,6 +168,95 @@ export class DiscountRepository {
 		return [discounts, totalRecords];
 	}
 
+	async findDiscountsByProductScheduleIds(
+		scheduleIds: string[],
+		userIds?: string[],
+		status?: DiscountStatusEnum,
+		statusInfoDiscount?: InfoDiscountStatusEnum,
+		availabilityTime?: boolean,
+		keyword?: string,
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: DiscountOrderByDto,
+	): Promise<[DiscountEntity[], number]> {
+		const orderBy = Object.entries(filter || {})
+			.filter(([_, value]) => Boolean(value))
+			.map(([key, value]) => ({ [key]: value }));
+		const [discounts, totalRecords] = await Promise.all([
+			this.prismaService.discount.findMany({
+				include: {
+					user: true,
+					infoDiscount: {
+						include: {
+							productSchedule: {
+								include: {
+									product: {
+										include: {
+											supplier: {
+												include: {
+													user: true,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						where: {
+							status: statusInfoDiscount,
+						},
+					},
+					discountApplicationScope: true,
+					discountEligibility: true,
+					discountType: true,
+				},
+				where: {
+					name: {
+						contains: keyword,
+						mode: 'insensitive',
+					},
+					userId: { in: userIds },
+					startTime: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endTime: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					infoDiscount: {
+						some: {
+							productScheduleId: { in: scheduleIds },
+						},
+					},
+					status: status,
+				},
+				skip: pagination.skip,
+				take: pagination.take,
+				orderBy: orderBy,
+			}),
+			this.prismaService.discount.count({
+				where: {
+					userId: { in: userIds },
+					startTime: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endTime: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					status: status,
+				},
+			}),
+		]);
+
+		return [discounts, totalRecords];
+	}
+
 	async findDiscountsByUserId(
 		pagination: IPaginationQuery,
 		userId: string,
@@ -126,6 +301,85 @@ export class DiscountRepository {
 						contains: keyword,
 						mode: 'insensitive',
 					},
+				},
+			}),
+		]);
+
+		return [discounts, totalRecords];
+	}
+
+	async findDiscountsByDiscountIds(
+		discountIds: string[],
+		userIds?: string[],
+		scheduleIds?: string[],
+		status?: DiscountStatusEnum,
+		statusInfoDiscount?: InfoDiscountStatusEnum,
+		availabilityTime?: boolean,
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: DiscountOrderByDto,
+	): Promise<[DiscountEntity[], number]> {
+		const orderBy = Object.entries(filter || {})
+			.filter(([_, value]) => Boolean(value))
+			.map(([key, value]) => ({ [key]: value }));
+		const [discounts, totalRecords] = await Promise.all([
+			this.prismaService.discount.findMany({
+				include: {
+					user: true,
+					infoDiscount: {
+						include: {
+							productSchedule: {
+								include: {
+									product: true,
+								},
+							},
+						},
+						where: {
+							status: statusInfoDiscount,
+						},
+					},
+					discountApplicationScope: true,
+					discountEligibility: true,
+					discountType: true,
+				},
+				where: {
+					id: { in: discountIds },
+					userId: { in: userIds },
+					startTime: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endTime: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					infoDiscount: {
+						some: {
+							productScheduleId: { in: scheduleIds },
+						},
+					},
+					status: status,
+				},
+				skip: pagination.skip,
+				take: pagination.take,
+				orderBy: orderBy,
+			}),
+			this.prismaService.discount.count({
+				where: {
+					id: { in: discountIds },
+					userId: { in: userIds },
+					startTime: !availabilityTime
+						? undefined
+						: {
+								lte: new Date(),
+							},
+					endTime: !availabilityTime
+						? undefined
+						: {
+								gte: new Date(),
+							},
+					status: status,
 				},
 			}),
 		]);

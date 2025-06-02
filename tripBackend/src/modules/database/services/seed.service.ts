@@ -4,10 +4,12 @@ import {
 	DiscountApplicationScopeEnum,
 	DiscountEligibilityEnum,
 	DiscountTypeEnum,
+	PaymentMethodEnum,
 	PermissionForAdminEnum,
 	PermissionForSupplierEnum,
 	RoleEnum,
 } from 'src/common';
+import { ProviderMapEnum } from 'src/common/enums/providerMap.enum';
 
 import { PrismaService } from './prisma.service';
 
@@ -23,6 +25,8 @@ export class SeedService implements OnModuleInit {
 		await this.seedDiscountTypes();
 		await this.seedDiscountEligibilities();
 		await this.seedDiscountApplicationScopes();
+		await this.seedPaymentMethod();
+		await this.seedProviderMap();
 	}
 
 	private async seedRoles(): Promise<void> {
@@ -30,7 +34,8 @@ export class SeedService implements OnModuleInit {
 
 		const roles = await this.prisma.role.findMany();
 		const rolesName = roles.map((role) => role.name);
-		const flag = rolesName.every((item) => ROLE.includes(item));
+		const flag =
+			roles.length === 0 ? false : rolesName.every((item) => ROLE.includes(item));
 
 		if (!flag) {
 			await this.prisma.role.createMany({
@@ -240,6 +245,50 @@ export class SeedService implements OnModuleInit {
 		);
 		await this.prisma.discountApplicationScope.createMany({
 			data: discountApplicationScopesData,
+		});
+
+		return;
+	}
+	private async seedPaymentMethod(): Promise<void> {
+		const PAYMENT_METHODS: string[] = Object.values(PaymentMethodEnum);
+
+		const paymentMethodds = await this.prisma.paymentMethod.findMany();
+		const paymentMethodNamesDB = paymentMethodds.map(
+			(paymentMethod) => paymentMethod.name,
+		);
+		const paymentMethodNames = PAYMENT_METHODS.filter((paymentMethodName) => {
+			return !paymentMethodNamesDB.includes(paymentMethodName);
+		});
+		if (paymentMethodNames.length === 0) {
+			return;
+		}
+		const paymentMethodData = paymentMethodNames.map((paymentMethodName) => ({
+			name: paymentMethodName,
+			description: paymentMethodName.replaceAll('_', ' '),
+		}));
+		await this.prisma.paymentMethod.createMany({
+			data: paymentMethodData,
+		});
+
+		return;
+	}
+	private async seedProviderMap(): Promise<void> {
+		const PROVIDER_MAPS: string[] = Object.values(ProviderMapEnum);
+
+		const providerMaps = await this.prisma.providerMap.findMany();
+		const providerMapNamesDB = providerMaps.map((providerMap) => providerMap.name);
+		const providerMapNames = PROVIDER_MAPS.filter((providerMapName) => {
+			return !providerMapNamesDB.includes(providerMapName);
+		});
+		if (providerMapNames.length === 0) {
+			return;
+		}
+		const providerMapData = providerMapNames.map((providerMapName) => ({
+			name: providerMapName,
+			description: providerMapName.replaceAll('_', ' '),
+		}));
+		await this.prisma.providerMap.createMany({
+			data: providerMapData,
 		});
 
 		return;

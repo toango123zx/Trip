@@ -43,7 +43,7 @@ export class AssignProductSchedulesToDiscountHandler
 				'You are not the owner of this discount',
 			);
 		}
-		const productSchedules =
+		const [productSchedules] =
 			await this.productScheduleRepository.findProductSchedulesByProductSchedulesId(
 				productScheduleIds,
 				ProductScheduleStatusEnum.active,

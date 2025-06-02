@@ -1,3 +1,4 @@
 export enum DiscountTypeEnum {
-	Destination = 'Destination',
+	Percentage = 'Percentage (%)',
+	FixedAmount = 'Fixed Amount',
 }

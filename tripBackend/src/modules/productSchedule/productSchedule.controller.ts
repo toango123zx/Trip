@@ -5,6 +5,7 @@ import {
 	HttpException,
 	Param,
 	Post,
+	Put,
 	Query,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -18,20 +19,23 @@ import { GetCartResponseDto } from '../cart/dtos/responses/getCart.response';
 import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
 import { MyInformation } from '../user/decorators';
-import { UserInformationDto } from '../user/dtos';
+import { UserFilterRequestDto, UserInformationDto } from '../user/dtos';
 
 import {
 	AddToCartByProductScheduleIdCommand,
 	DeleteProductScheduleByProductScheduleIdCommand,
+	UpdateCompletedProductScheduleByProductScheduleCompleteCommand,
 } from './commands/implements';
 import {
 	DeleteProductScheduleByProductScheduleIdResponseDto,
 	GetProductScheduleByProductScheduleIdRequestDto,
+	GetUsersByProductScheduleIdResponseDto,
 	ProductScheduleFilterRequestDto,
 } from './dtos';
 import {
 	GetProductScheduleByProductScheduleIdQuery,
 	GetProductSchedulesBySupplierIdQuery,
+	GetUsersByProductScheduleIdQuery,
 } from './queries/implements';
 
 @Controller('schedule')
@@ -68,6 +72,24 @@ export class ProductScheduleController {
 		);
 	}
 
+	@Get(':productScheduleId/users')
+	@AuthPermission(PermissionEnum.FindUsersInProductScheduleByProductScheduleId)
+	async getUsersByProductScheduleId(
+		@Param('productScheduleId') productScheduleId: string,
+		@MyInformation() myInformation: UserInformationDto,
+		@Query() pagination: PaginationDto,
+		@Query() filter?: UserFilterRequestDto,
+	): Promise<HttpResponseBodyDto<GetUsersByProductScheduleIdResponseDto[]>> {
+		return this.queryBus.execute(
+			new GetUsersByProductScheduleIdQuery(
+				productScheduleId,
+				myInformation,
+				pagination,
+				filter,
+			),
+		);
+	}
+
 	@Post(':productScheduleId/add-to-cart')
 	@Auth()
 	async addProductScheduleToCart(
@@ -76,6 +98,20 @@ export class ProductScheduleController {
 	): Promise<HttpResponseBodyDto<GetCartResponseDto> | HttpException> {
 		return this.commandBus.execute(
 			new AddToCartByProductScheduleIdCommand(productScheduleId, myInformation),
+		);
+	}
+
+	@Put(':productScheduleId/completed')
+	@AuthPermission(PermissionEnum.UpdateCompletedProductSchedule)
+	async updateCompletedProductSchedule(
+		@Param('productScheduleId') productScheduleId: string,
+		@SupplierInformation() supplierInformation: SupplierInformationDto,
+	): Promise<HttpResponseBodyDto<ProductScheduleEntity | HttpException>> {
+		return this.commandBus.execute(
+			new UpdateCompletedProductScheduleByProductScheduleCompleteCommand(
+				productScheduleId,
+				supplierInformation,
+			),
 		);
 	}
 

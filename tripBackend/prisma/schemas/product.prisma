@@ -5,6 +5,13 @@ enum ProductCategoryStatusEnum {
     @@map("Product_Category_Status_Enum")
 }
 
+enum ProviderMapStatusEnum {
+    active
+    inactive
+
+    @@map("Provider_Map_Status_Enum")
+}
+
 enum MapAddressStatusEnum {
     active
     inactive
@@ -38,6 +45,7 @@ enum ProductRateStatusEnum {
 enum ProductScheduleStatusEnum {
     active
     full
+    completed
     canceled
 
     @@map("Product_Schedule_Status_Enum")
@@ -64,16 +72,19 @@ model productCategory {
 }
 
 model providerMap {
-    id          String    @id @default(cuid())
+    id          String                @id @default(cuid())
     name        String
     description String
-    createAt    DateTime  @default(now()) @map("create_at")
+    createAt    DateTime              @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    updateAt    DateTime  @updatedAt @map("update_at")
+    updateAt    DateTime              @updatedAt @map("update_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    deletedAt   DateTime? @map("deleted_at")
+    deletedAt   DateTime?             @map("deleted_at")
+    /// @DtoCreateHidden
+    /// @DtoUpdateHidden
+    status      ProviderMapStatusEnum @default(active)
 
     mapAddress mapAddress[]
 
@@ -86,6 +97,8 @@ model mapAddress {
     providerMapId String               @map("provider_map_id")
     /// @DtoRelationCanConnectOnCreate
     providerMap   providerMap          @relation(fields: [providerMapId], references: [id])
+    productId     String               @unique @map("product_id")
+    product       product              @relation(fields: [productId], references: [id])
     createAt      DateTime             @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
@@ -93,35 +106,27 @@ model mapAddress {
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
     deletedAt     DateTime?            @map("deleted_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
     status        MapAddressStatusEnum @default(active)
-    ///@DtoRelationCanCreateOnCreate
-    location      location?
 
     @@map("Map_Address")
 }
 
 model location {
-    id           String             @id @default(cuid())
+    id          String             @id @default(cuid())
     /// @DtoConnectHidden
-    systemName   String             @unique @map("system_name")
-    displayName  String             @map("display_name")
-    city         CityEnum
-    /// @DtoConnectHidden
-    mapAddressId String             @unique @map("map_address_id")
-    /// @DtoRelationCanConnectOnCreate
-    mapAddress   mapAddress         @relation(fields: [mapAddressId], references: [id])
-    createAt     DateTime           @default(now()) @map("create_at")
+    systemName  String             @unique @map("system_name")
+    displayName String             @map("display_name")
+    city        CityEnum
+    createAt    DateTime           @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    updateAt     DateTime           @updatedAt @map("update_at")
+    updateAt    DateTime           @updatedAt @map("update_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    deletedAt    DateTime?          @map("deleted_at")
+    deletedAt   DateTime?          @map("deleted_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
-    status       LocationStatusEnum @default(active)
+    status      LocationStatusEnum @default(active)
 
     product product[]
 
@@ -144,7 +149,7 @@ model product {
     quantityCompleted Int               @default(0) @map("quantity_completed")
     description       String
     quantityRate      Int               @default(0) @map("quantity_rate")
-    avgRate           Int               @default(0) @map("avg_rate")
+    avgRate           Float             @default(0) @map("avg_rate")
     locationId        String            @map("location_id")
     /// @DtoRelationCanConnectOnCreate
     location          location          @relation(fields: [locationId], references: [id])
@@ -164,6 +169,9 @@ model product {
     /// @DtoUpdateHidden
     status            ProductStatusEnum @default(active)
 
+    /// @DtoRelationCanCreateOnCreate
+    mapAddress      mapAddress?
+    /// @DtoRelationCanCreateOnCreate
     productImage    productImage[]
     productRate     productRate[]
     productSchedule productSchedule[]
@@ -188,6 +196,8 @@ model productRate {
     /// @DtoUpdateHidden
     productId String                @map("product_id")
     /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanConnectOnCreate
+    /// @DtoRelationCanUpdateOnUpdate
     product   product               @relation(fields: [productId], references: [id])
     /// @DtoUpdateHidden
     userId    String                @map("user_id")
@@ -195,7 +205,7 @@ model productRate {
     user      user                  @relation(fields: [userId], references: [id])
     /// @maximum 5
     /// @minimum 0
-    star      Int                   @default(0)
+    star      Int
     comment   String
     /// @DtoCreateHidden
     /// @DtoUpdateHidden

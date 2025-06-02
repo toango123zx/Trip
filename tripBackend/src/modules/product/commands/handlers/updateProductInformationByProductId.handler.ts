@@ -40,17 +40,28 @@ export class UpdateProductInformationByProductIdHandler
 			);
 		}
 
+		const { addProductImageUrls, removeProductImageIds, urlMap, ...productData } =
+			productInformationRequest;
+
 		const productInformation = new ObjectComparerDto<ProductEntity>(
 			product,
-		).getUpdatedFields<UpdateProductDto>(productInformationRequest);
+		).getUpdatedFields<UpdateProductDto>(productData);
 
-		if (!Object.keys(productInformation).length) {
+		if (
+			!Object.keys(productInformation).length &&
+			addProductImageUrls.length === 0 &&
+			removeProductImageIds.length === 0 &&
+			product.mapAddress?.urlMap === urlMap
+		) {
 			throw new ValidationException('No data has been changed.');
 		}
 
 		const updatedProduct = await this.productRepository.updateProductByProductId(
 			productId,
 			productInformation,
+			addProductImageUrls,
+			removeProductImageIds,
+			product.mapAddress?.urlMap !== urlMap ? urlMap : undefined,
 		);
 
 		return {

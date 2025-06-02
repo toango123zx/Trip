@@ -1,1 +1,0 @@
-export * from './infoBillDiscount.entity';

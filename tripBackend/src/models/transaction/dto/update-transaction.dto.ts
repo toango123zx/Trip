@@ -1,8 +1,16 @@
-import { TransactionTargetEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+
+import { TransactionTargetEnum } from '@prisma/client';
+import { IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class UpdateTransactionDto {
+	@ApiProperty({
+		type: 'string',
+		required: false,
+	})
+	@IsOptional()
+	@IsString()
+	transactionSessionCode?: string;
 	@ApiProperty({
 		type: 'string',
 		required: false,
@@ -17,4 +25,12 @@ export class UpdateTransactionDto {
 	})
 	@IsOptional()
 	transactionTarget?: TransactionTargetEnum;
+	@ApiProperty({
+		type: 'string',
+		format: 'date-time',
+		required: false,
+	})
+	@IsOptional()
+	@IsDateString()
+	createAt?: Date;
 }

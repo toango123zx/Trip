@@ -1,5 +1,6 @@
-import { TransactionStatusEnum, TransactionTargetEnum } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { TransactionStatusEnum, TransactionTargetEnum } from '@prisma/client';
 
 export class TransactionDto {
 	@ApiProperty({
@@ -9,11 +10,32 @@ export class TransactionDto {
 	@ApiProperty({
 		type: 'string',
 	})
-	code: string;
+	transactionSessionCode: string;
+	@ApiProperty({
+		type: 'integer',
+		format: 'int32',
+	})
+	amount: number;
+	@ApiProperty({
+		type: 'string',
+	})
+	bankCode: string;
+	@ApiProperty({
+		type: 'string',
+	})
+	cardType: string;
 	@ApiProperty({
 		type: 'string',
 	})
 	description: string;
+	@ApiProperty({
+		type: 'string',
+	})
+	BankTransactionCode: string;
+	@ApiProperty({
+		type: 'string',
+	})
+	transactionCode: string;
 	@ApiProperty({
 		enum: TransactionTargetEnum,
 		enumName: 'TransactionTargetEnum',
