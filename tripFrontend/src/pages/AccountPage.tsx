@@ -275,7 +275,7 @@ const AccountPage: React.FC = () => {
 									</span>
 								</div>
 								<button
-									className="edit-button bg-[#4CAF50] text-white border-none px-[15px] py-[10px] m-[5px] rounded cursor-pointer transition-colors duration-300 ease-in-out w-full flex items-center justify-center gap-[12px]"
+									className="edit-button bg-[#ff7a22] hover:bg-[#ff7a22]/80 text-white border-none px-[15px] py-[10px] m-[5px] rounded cursor-pointer transition-colors duration-300 ease-in-out w-full flex items-center justify-center gap-[12px]"
 									onClick={() => setEditMode(true)}
 								>
 									<FaEdit /> Chỉnh sửa

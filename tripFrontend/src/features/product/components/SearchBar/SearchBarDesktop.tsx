@@ -75,7 +75,7 @@ export const SearchBarDesktop = ({
 
 	return (
 		<section
-			className="bg-white py-6 shadow-xl rounded-2xl"
+			className="bg-white py-6 rounded-2xl border-2 border-[#FF7A22]"
 			aria-labelledby="search-bar-desktop"
 		>
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -87,19 +87,19 @@ export const SearchBarDesktop = ({
 				</h2>
 
 				<form onSubmit={handleSubmit(handlerSubmitOnClick)}>
-					<div className="flex flex-col md:flex-row items-stretch bg-white border-2 border-yellow-400 rounded-2xl shadow-lg overflow-hidden divide-y md:divide-y-0 md:divide-x">
+					<div className="flex flex-col md:flex-row items-stretch bg-[#FF7A22] rounded-2xl shadow-lg overflow-hidden divide-y md:divide-y-0 md:divide-x">
 
 						{/* Điểm đến */}
 						<div className="flex items-center px-4 py-3 flex-1">
 							<div className="w-full">
-								<label htmlFor="locationName" className="block text-xs font-medium text-gray-500 mb-1">
-									Điểm đến
+								<label htmlFor="locationName" className="block text-xs font-medium text-white mb-1">
+									Destination
 								</label>
 								<SelectBox
 									name="locationName"
 									selectOption={locations}
 									register={register}
-									className="w-full h-8 border border-[#d9d9d9] rounded-[6px] focus:ring-0 text-gray-800 bg-transparent"
+									className="w-full h-8 border border-[#d9d9d9] rounded-[6px] focus:ring-0 text-gray-800 bg-white"
 								/>
 							</div>
 						</div>
@@ -107,8 +107,8 @@ export const SearchBarDesktop = ({
 						{/* Thời gian */}
 						<div className="flex items-center px-4 py-3 flex-1">
 							<div className="w-full">
-								<label className="block text-xs font-medium text-gray-500 mb-1">
-									Thời gian
+								<label className="block text-xs font-medium text-white mb-1">
+									Time
 								</label>
 								<RangePicker
 									className="w-full h-8 focus:ring-0 bg-transparent text-gray-800"
@@ -126,8 +126,8 @@ export const SearchBarDesktop = ({
 						<div className="flex items-center px-4 py-3 flex-1">
 							<div className="w-full grid grid-cols-2 gap-2">
 								<div>
-									<label htmlFor="minPrice" className="block text-xs font-medium text-gray-500 mb-1">
-										Giá từ
+									<label htmlFor="minPrice" className="block text-xs font-medium text-white mb-1">
+										Price from
 									</label>
 									<input
 										{...register('minPrice')}
@@ -138,8 +138,8 @@ export const SearchBarDesktop = ({
 									/>
 								</div>
 								<div>
-									<label htmlFor="maxPrice" className="block text-xs font-medium text-gray-500 mb-1">
-										Giá đến
+									<label htmlFor="maxPrice" className="block text-xs font-medium text-white mb-1">
+										Price to
 									</label>
 									<input
 										{...register('maxPrice')}
@@ -156,9 +156,9 @@ export const SearchBarDesktop = ({
 						<div className="flex justify-center items-center">
 							<button
 								type="submit"
-								className="h-full px-6 bg-orange-600 hover:bg-orange-700 text-white font-semibold shadow-md transition-all"
+								className="h-full px-6 bg-[#FF7A22] hover:bg-orange-600 text-white font-semibold shadow-md transition-all"
 							>
-								Tìm
+								Search
 							</button>
 						</div>
 					</div>

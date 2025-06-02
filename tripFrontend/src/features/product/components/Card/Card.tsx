@@ -1,11 +1,11 @@
 import { Eye, Star } from 'lucide-react';
 import React, { JSX } from 'react';
-import { IoLocationOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
-
 import { cn } from '@/lib/utils';
 import { TProductSumary } from '@/types';
-
+import { IoLocationOutline } from 'react-icons/io5';
+import { BsClock, BsPeople } from 'react-icons/bs';
+import { FaCity } from 'react-icons/fa';
 interface ICardProps extends React.HTMLAttributes<HTMLDivElement> {
 	shadow?: 'none' | 'sm' | 'md' | 'lg';
 }
@@ -82,7 +82,7 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 			className={cn('w-full h-full md:flex-shrink-0 px-2', className)}
 		>
 			<button
-				className="w-full h-full text-left shadow-xl"
+				className="w-full h-full text-left hover:shadow-[0_4px_20px_rgba(255,123,0,0.4)] transition-all rounded-2xl"
 				onClick={handlerCardOnClick}
 			>
 				<Card className="h-full overflow-hidden border-none shadow-lg pt-0 px-0 rounded-2xl">
@@ -93,30 +93,44 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 							className="w-full h-full object-cover rounded-t-2xl p-1.5"
 						/>
 					</div>
-					<CardContent className="pt-4 pb-2 px-5">
-						<h3 className="font-semibold text-lg md:text-xl text-gray-900 mb-2 truncate">{product.name}</h3>
-						<div className="flex flex-row items-center mb-2">
-							<p className="text-gray-400 line-through text-base mr-2">VND {product.oldPrice || product.price}</p>
-							<p className="text-orange-500 font-bold text-base">VND {product.price}</p>
-						</div>
-						<div className="flex items-center mb-2">
-							{[...Array(5)].map((_, i) => (
-								<Star
-									key={i}
-									className={`h-4 w-4 ${i < Math.floor(product.avgRate) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-								/>
-							))}
-							<span className="ml-2 text-gray-500 text-sm">({product.avgRate})</span>
-						</div>
-						<div className="flex items-center text-gray-500 text-sm mb-2">
-							<Eye className="h-4 w-4 mr-1" />
-							<span>{product.quantityRate}</span>
-						</div>
-						<div className="flex items-center text-gray-500 text-sm">
-							<IoLocationOutline className="mr-1" />
-							<span>{product.city}</span>
-						</div>
-					</CardContent>
+					<CardContent className="pt-4 pb-2 px-5 space-y-2">
+  <h3 className="font-semibold text-lg md:text-xl text-gray-900 truncate">
+    {product.name}
+  </h3>
+
+  <div className="flex items-center text-sm text-gray-500 space-x-1">
+    {[...Array(5)].map((_, i) => (
+      <Star
+        key={i}
+        className={`h-4 w-4 ${i < Math.floor(product.avgRate) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+      />
+    ))}
+    <span className="ml-2">({product.avgRate})</span>
+  </div>
+
+  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
+    <div className="flex items-center">
+      <IoLocationOutline className="mr-1 text-gray-500" />
+      <span>{product.locationName}</span>
+    </div>
+
+    <div className="flex items-center">
+      <BsClock className="mr-1 text-gray-500" />
+      <span>{product.time}</span>
+    </div>
+
+    <div className="flex items-center">
+      <BsPeople className="mr-1 text-gray-500" />
+      <span>{product.quantityAvailable} chỗ</span>
+    </div>
+
+    <div className="flex items-center">
+      <FaCity className="mr-1 text-gray-500" />
+      <span>{product.city}</span>
+    </div>
+  </div>
+</CardContent>
+
 				</Card>
 			</button>
 		</div>

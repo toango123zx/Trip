@@ -290,4 +290,28 @@ input {
     border-style: solid;
     border-color: #d9d9d9;
     border-radius: 6px;
+    background: white;
+}
+
+.ant-btn-primary{
+    background-color: #ff6900;
+}
+.ant-btn-primary:hover{
+    background-color: #f54a00 !important;
+}
+.ant-btn-primary:active{
+    background-color: #f54a00 !important;
+}
+
+.ant-btn-default:hover{
+    border-color: #f54a00 !important;
+    color: #f54a00 !important;
+}
+
+.ant-input-outlined:hover, .ant-select:hover .ant-select-selector{
+    border-color: #f54a00 !important;
+}
+
+.ant-picker:hover{
+    border-color: transparent !important;
 }

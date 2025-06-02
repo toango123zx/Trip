@@ -10,7 +10,6 @@ import {
 	Modal,
 	Form,
 	Select,
-	notification,
 	DatePicker,
 } from 'antd';
 import { FilterDropdownProps } from 'antd/es/table/interface';
@@ -23,7 +22,7 @@ import { FaEdit, FaLock, FaUnlock, FaUserFriends, FaUserTie, FaUserShield } from
 import { BaseTable } from '@/components/BaseTable/BaseTable';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { EUserRole, EUserStatus, TUser } from '@/types/user.type';
+import { EUserRole, TUser } from '@/types/user.type';
 import { userThunk } from '../../userThunk';
 import { Popover } from 'antd';
 import { notificationUtils } from '@/utils/notificationUtils';
@@ -504,7 +503,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, onCancel, onSubmit })
 
 	return (
 		<Modal
-			title="Thêm Người Dùng Mới"
+			title="Add User"
 			open={open}
 			onOk={handleSubmit}
 			onCancel={() => {
@@ -515,20 +514,20 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, onCancel, onSubmit })
 			<Form form={form} layout="vertical">
 				<Form.Item
 					name="username"
-					label="Tên Đăng Nhập"
+					label="Username"
 					rules={[
-						{ required: true, message: 'Vui lòng nhập tên đăng nhập' },
-						{ min: 4, message: 'Tên đăng nhập phải có ít nhất 4 ký tự' }
+						{ required: true, message: 'Please enter username' },
+						{ min: 4, message: 'Username must be at least 4 characters' }
 					]}
 				>
 					<Input />
 				</Form.Item>
 				<Form.Item
 					name="password"
-					label="Mật Khẩu"
+					label="Password"
 					rules={[
-						{ required: true, message: 'Vui lòng nhập mật khẩu' },
-						{ min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự' }
+						{ required: true, message: 'Please enter password' },
+						{ min: 6, message: 'Password must be at least 6 characters' }
 					]}
 				>
 					<Input.Password />
@@ -537,26 +536,26 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, onCancel, onSubmit })
 					name="email"
 					label="Email"
 					rules={[
-						{ required: true, message: 'Vui lòng nhập email' },
-						{ type: 'email', message: 'Email không hợp lệ' }
+						{ required: true, message: 'Please enter email' },
+						{ type: 'email', message: 'Invalid email' }
 					]}
 				>
 					<Input />
 				</Form.Item>
 				<Form.Item
 					name="name"
-					label="Tên Người Dùng"
+					label="Name"
 					rules={[
-						{ required: true, message: 'Vui lòng nhập tên người dùng' },
-						{ min: 2, message: 'Tên phải có ít nhất 2 ký tự' }
+						{ required: true, message: 'Please enter name' },
+						{ min: 2, message: 'Name must be at least 2 characters' }
 					]}
 				>
 					<Input />
 				</Form.Item>
 				<Form.Item
 					name="roleName"
-					label="Vai Trò"
-					rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}
+					label="Role"
+					rules={[{ required: true, message: 'Please select role' }]}
 				>
 					<Select>
 						<Select.Option value={EUserRole.tourist}>Tourist</Select.Option>
@@ -597,7 +596,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
 	return (
 		<Modal
-			title="Chỉnh Sửa Người Dùng"
+			title="Edit User"
 			open={open}
 			onOk={handleSubmit}
 			onCancel={() => {
@@ -614,64 +613,64 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 					name="email"
 					label="Email"
 					rules={[
-						{ required: true, message: 'Vui lòng nhập email' },
-						{ type: 'email', message: 'Email không hợp lệ' }
+						{ required: true, message: 'Please enter email' },
+						{ type: 'email', message: 'Invalid email' }
 					]}
 				>
 					<Input />
 				</Form.Item>
 				<Form.Item
 					name="name"
-					label="Tên Đầy Đủ"
+					label="Full Name"
 					rules={[
-						{ required: true, message: 'Vui lòng nhập tên đầy đủ' },
-						{ min: 2, message: 'Tên phải có ít nhất 2 ký tự' }
+						{ required: true, message: 'Please enter full name' },
+						{ min: 2, message: 'Name must be at least 2 characters' }
 					]}
 				>
 					<Input />
 				</Form.Item>
 				<Form.Item
 					name="phoneNumber"
-					label="Số Điện Thoại"
+					label="Phone Number"
 					rules={[
 						{ 
 							pattern: /^(0[1-9][0-9]{8})$/, 
-							message: 'Số điện thoại không hợp lệ' 
+							message: 'Invalid phone number' 
 						}
 					]}
 				>
-					<Input placeholder="Nhập số điện thoại (không bắt buộc)" />
+					<Input placeholder="Enter phone number (optional)" />
 				</Form.Item>
 				<Form.Item
 					name="address"
-					label="Địa Chỉ"
+					label="Address"
 				>
-					<Input placeholder="Nhập địa chỉ (không bắt buộc)" />
+					<Input placeholder="Enter address (optional)" />
 				</Form.Item>
 				<Form.Item
 					name="dateOfBirth"
-					label="Ngày Sinh"
+					label="Date of Birth"
 				>
 					<DatePicker 
 						style={{ width: '100%' }} 
-						placeholder="Chọn ngày sinh (không bắt buộc)" 
+						placeholder="Select date of birth (optional)" 
 					/>
 				</Form.Item>
 				<Form.Item
 					name="gender"
-					label="Giới Tính"
+					label="Gender"
 				>
-					<Select placeholder="Chọn giới tính (không bắt buộc)">
-						<Select.Option value="male">Nam</Select.Option>
-						<Select.Option value="female">Nữ</Select.Option>
-						<Select.Option value="other">Khác</Select.Option>
+					<Select placeholder="Select gender (optional)">
+						<Select.Option value="male">Male</Select.Option>
+						<Select.Option value="female">Female</Select.Option>
+						<Select.Option value="other">Other</Select.Option>
 					</Select>
 				</Form.Item>
 				<Form.Item
 					name="roleName"
 					label="Vai Trò"
 				>
-					<Select placeholder="Chọn vai trò (không bắt buộc)">
+					<Select placeholder="Select role (optional)">
 						<Select.Option value={EUserRole.tourist}>Tourist</Select.Option>
 						<Select.Option value={EUserRole.supplier}>Supplier</Select.Option>
 						<Select.Option value={EUserRole.admin}>Admin</Select.Option>

@@ -369,12 +369,14 @@ export const Header = ({ className }: Props): JSX.Element => {
 										ref={triggerRef}
 										type="button"
 										onClick={toggleDropdown}
-										className="p-2 hover:text-orange-500 transition-all flex items-center gap-2"
+										className="group px-3 py-2 rounded-md hover:text-orange-500 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all flex items-center gap-2"
 										aria-haspopup="true"
 										aria-expanded={isOpen}
 									>
-										<FaRegUser className="h-7 w-7" />
-										<span className="hidden md:inline">{localStorage.getItem('username')}</span>
+										<FaRegUser className="h-6 w-6 text-gray-600 group-hover:text-orange-500 transition" />
+										<span className="hidden md:inline text-sm font-medium text-gray-700 group-hover:text-orange-500">
+											{localStorage.getItem('username')}
+										</span>
 									</button>
 
 									{/* Dropdown Menu */}
