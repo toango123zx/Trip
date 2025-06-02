@@ -9,7 +9,7 @@ import {
 	OptionalException,
 	PaymentMethodEnum,
 } from 'src/common';
-import { vnpay } from 'src/configs';
+import { vnpay, vnpayConfig } from 'src/configs';
 import { CreateTransactionSessionDto } from 'src/models';
 import { ProductCode, VnpLocale, dateFormat } from 'vnpay';
 
@@ -77,11 +77,11 @@ export class PaymentBillByBillIdHandler
 
 		const paymentUrl = vnpay.buildPaymentUrl({
 			vnp_Amount: bill.totalPrice - bill.reductionPrice,
-			vnp_IpAddr: '127.0.0.1',
+			vnp_IpAddr: vnpayConfig.vnp_IpAddr,
 			vnp_TxnRef: transactionSessionCreated.id,
 			vnp_OrderInfo: `Pay order ${bill.id} with the amount of ${bill.totalPrice - bill.reductionPrice}.`,
 			vnp_OrderType: ProductCode.Hotel_Tourism,
-			vnp_ReturnUrl: 'http://localhost:3000/transaction/vnpay-bill-payment',
+			vnp_ReturnUrl: `${vnpayConfig.vnp_ReturnUrl}/transaction/vnpay-bill-payment`,
 			vnp_Locale: VnpLocale.VN,
 			vnp_CreateDate: dateFormat(new Date()),
 			vnp_ExpireDate: dateFormat(expireDate),

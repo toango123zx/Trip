@@ -26,3 +26,8 @@ export const vnpay = new VNPay({
 		getBankListEndpoint: 'qrpayauth/api/merchant/get_bank_list',
 	},
 });
+
+export const vnpayConfig = {
+	vnp_IpAddr: String(process.env.VNPAY_IP_ADDRESS_BACK_END_RETUR) || '',
+	vnp_ReturnUrl: String(process.env.VNPAY_RETURN_URL_FRONT_END) || '',
+};

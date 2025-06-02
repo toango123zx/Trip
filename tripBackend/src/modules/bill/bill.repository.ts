@@ -15,7 +15,7 @@ import { BillOrderByDto } from './dtos/billOrderBy.dto';
 
 @Injectable()
 export class BillRepository {
-	constructor(private readonly prismaService: PrismaService) { }
+	constructor(private readonly prismaService: PrismaService) {}
 
 	async findBillsByUserId(
 		pagination: IPaginationQuery = {} as IPaginationQuery,
@@ -324,14 +324,14 @@ export class BillRepository {
 				discountIdsForProductSchedules.length == 0
 					? undefined
 					: {
-						create: discountIdsForProductSchedules.map((discountId) => ({
-							discount: {
-								connect: {
-									id: discountId,
+							create: discountIdsForProductSchedules.map((discountId) => ({
+								discount: {
+									connect: {
+										id: discountId,
+									},
 								},
-							},
-						})),
-					};
+							})),
+						};
 
 			// create bill
 			return prisma.bill.create({
@@ -397,14 +397,14 @@ export class BillRepository {
 					discountForBill: !discountIdForBill
 						? undefined
 						: {
-							create: {
-								discount: {
-									connect: {
-										id: discountIdForBill,
+								create: {
+									discount: {
+										connect: {
+											id: discountIdForBill,
+										},
 									},
 								},
 							},
-						},
 				},
 			});
 		});
