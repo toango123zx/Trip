@@ -2,21 +2,15 @@
 
 import React, { JSX, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { IoSearchOutline } from 'react-icons/io5';
 import { useDispatch } from 'react-redux';
 import { DatePicker } from 'antd';
 import dayjs from 'dayjs';
-
 import { SelectBox } from '@/components';
-import { cn } from '@/lib';
 import { TReduxStoreDispatch } from '@/store';
 import { locations } from '@/utils';
-import { Button } from '../Button';
 import { EArrange } from '@/types';
-
 import { TSearchAttraction } from '../../product.type';
 import { productThunk } from '../../productThunk';
-
 const { RangePicker } = DatePicker;
 
 type TSearchBarDesktopProps = {
@@ -38,17 +32,14 @@ export const SearchBarDesktop = ({
 		try {
 			const searchParams: TSearchAttraction = {};
 
-			// Xử lý name
 			if (data.name && data.name !== '') {
 				searchParams.name = data.name;
 			}
 
-			// Xử lý locationName
 			if (data.locationName) {
 				searchParams.locationName = EArrange.asc;
 			}
 
-			// Xử lý giá
 			if (data.minPrice) {
 				searchParams.minPrice = Number(data.minPrice);
 			}
@@ -57,12 +48,10 @@ export const SearchBarDesktop = ({
 				searchParams.maxPrice = Number(data.maxPrice);
 			}
 
-			// Xử lý thời gian
 			if (dateRange[0] && dateRange[1]) {
 				searchParams.time = EArrange.asc;
 			}
 
-			// Dispatch action search
 			await dispatch(productThunk.getProducts({
 				...searchParams,
 				page: 1,
@@ -87,7 +76,7 @@ export const SearchBarDesktop = ({
 				</h2>
 
 				<form onSubmit={handleSubmit(handlerSubmitOnClick)}>
-					<div className="flex flex-col md:flex-row items-stretch bg-[#FF7A22] rounded-2xl shadow-lg overflow-hidden divide-y md:divide-y-0 md:divide-x">
+					<div className="flex flex-col md:flex-row items-stretch bg-[#FF7A22] rounded-2xl shadow-lg overflow-hidden divide-y md:divide-y-0 md:divide-x divide-white/50">
 
 						{/* Điểm đến */}
 						<div className="flex items-center px-4 py-3 flex-1">
@@ -117,7 +106,7 @@ export const SearchBarDesktop = ({
 										setValue('time', dates ? EArrange.asc : undefined);
 									}}
 									format="DD/MM/YYYY"
-									placeholder={['Ngày nhận phòng', 'Ngày trả phòng']}
+									placeholder={['Departure date', 'Return date']}
 								/>
 							</div>
 						</div>
@@ -145,7 +134,7 @@ export const SearchBarDesktop = ({
 										{...register('maxPrice')}
 										id="maxPrice"
 										type="number"
-										placeholder="..."
+										placeholder="0"
 										className="w-full h-8 bg-transparent  focus:ring-0 text-gray-800"
 									/>
 								</div>
@@ -156,7 +145,7 @@ export const SearchBarDesktop = ({
 						<div className="flex justify-center items-center">
 							<button
 								type="submit"
-								className="h-full px-6 bg-[#FF7A22] hover:bg-orange-600 text-white font-semibold shadow-md transition-all"
+								className="h-full px-6 bg-[#FF7A22] hover:bg-orange-600 text-white font-semibold transition-all py-2 sm:py-0"
 							>
 								Search
 							</button>

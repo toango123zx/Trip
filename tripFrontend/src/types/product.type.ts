@@ -1,3 +1,4 @@
+import { Url } from 'url';
 import { EUserStatus } from './user.type';
 
 type Supplier = {
@@ -122,6 +123,7 @@ export type TProductDetail = {
 	productImage: TProductImage[];
 	productSchedule: TProductSchedule[];
 	productRate: TProductRate[];
+	mapAddress: string;
 };
 
 export type TStat = {

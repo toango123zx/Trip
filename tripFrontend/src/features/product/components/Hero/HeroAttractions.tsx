@@ -5,7 +5,7 @@ import { attractionsImages } from '@/assets';
 import { cn } from '@/lib';
 
 import { TSearchAttraction } from '../../product.type';
-import { SearchBarDesktop, SearchBarMobile } from '../SearchBar';
+import { SearchBarDesktop } from '../SearchBar';
 
 type THeroAttractionsProps = {
 	form: UseFormReturn<TSearchAttraction>;
@@ -47,10 +47,7 @@ export const HeroAttractions = ({
 				{/* Search bar */}
 				<div className="absolute left-0 bottom-[-9%] w-full flex justify-center px-4">
 					<div className="w-full max-w-[1280px]">
-						<div className="md:hidden">
-							<SearchBarMobile form={form} />
-						</div>
-						<div className="hidden md:block">
+						<div className="">
 							<SearchBarDesktop form={form} className="rounded-4xl m-5" />
 						</div>
 					</div>

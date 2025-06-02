@@ -394,6 +394,27 @@ export const AttractionsInformation: React.FC = () => {
 						</div>
 					)}
 				</div>
+
+				{/* Google Map Section */}
+				{data.mapAddress?.url && (
+					<div className="my-8">
+						<h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
+							Map Address
+						</h2>
+						<div className="w-full h-96 rounded-lg overflow-hidden">
+							<iframe
+								src={data.mapAddress.url}
+								width="100%"
+								height="100%"
+								style={{ border: 0 }}
+								allowFullScreen
+								loading="lazy"
+								referrerPolicy="no-referrer-when-downgrade"
+								title="Google Map"
+							></iframe>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Schedules */}
