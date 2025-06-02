@@ -27,7 +27,7 @@ export const HeroAttractionsDetail = ({
 	return (
 		<section
 			className={cn(
-				'relative bg-white py-6 md:py-12 md:pt-0 overflow-hidden',
+				'relative bg-white md:pt-0 overflow-hidden',
 				className
 			)}
 			aria-labelledby="hero-attractions-detail-heading"

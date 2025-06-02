@@ -274,3 +274,20 @@ input {
     color: #000000;
     background: #ff6900;
 }
+
+.ant-btn-primary {
+    background-color: #ff6900;
+    color: white !important;
+}
+
+.ant-btn-color-primary {
+    border-color: #ff6900 !important;
+    color: #ff6900;
+}
+
+input {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #d9d9d9;
+    border-radius: 6px;
+}

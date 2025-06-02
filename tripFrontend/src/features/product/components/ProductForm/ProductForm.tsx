@@ -25,6 +25,11 @@ import { EProductScheduleStatus } from '@/types/product.type';
 import { cloudinaryService } from '@/services/cloudinaryService';
 import { notificationUtils } from '@/utils/notificationUtils';
 
+interface ProductImage {
+	id: string;
+	url: string;
+}
+
 type TProductFormProps = {
 	form: UseFormReturn<TRequestBodyCreateProduct>;
 	schedules?: TProductSchedule[] | TRequestBodyCreateSchedule[];
@@ -43,6 +48,7 @@ type TProductFormProps = {
 	locationDescription?: string;
 	isGeneratingDescription?: boolean;
 	productImageUrls?: string[];
+	onScheduleDelete?: () => void;
 };
 
 export const ProductForm = ({
@@ -61,6 +67,7 @@ export const ProductForm = ({
 	locationDescription,
 	isGeneratingDescription = false,
 	productImageUrls = [],
+	onScheduleDelete,
 }: TProductFormProps): JSX.Element => {
 	const {
 		register,
@@ -167,18 +174,10 @@ export const ProductForm = ({
 		}
 		dispatch(scheduleThunk.deleteSchedule(String(newSchedule.id)));
 		setIsOpenPopupScheduleUpdate(false);
+		onScheduleDelete?.();
 	};
 
 	const handleSaveOnClick = (data: TRequestBodyCreateProduct): void => {
-		// Log toàn bộ dữ liệu trước khi submit
-		console.log('ProductForm - Submit Data:', {
-			...data,
-			productCategoryId: 'clv2my35m0000t8z5h4xetnxu',
-			posterImageUrl: data.posterImageUrl || '',
-			productImageUrls: data.productImageUrls || [],
-			urlMap: data.urlMap || '',
-		});
-
 		if (onSubmit) {
 			const submitData = {
 				...data,
@@ -198,10 +197,6 @@ export const ProductForm = ({
 		const selectedLocation = locations.find((l) => l.id === locationId);
 		if (selectedLocation && generateLocationDescription) {
 			generateLocationDescription(selectedLocation.displayName);
-		} else {
-			console.error(
-				'No location selected or generateLocationDescription not provided',
-			);
 		}
 	};
 
@@ -243,7 +238,6 @@ export const ProductForm = ({
 				description: 'Poster image uploaded successfully',
 			});
 		} catch (error) {
-			console.error('Image upload error:', error);
 			notificationUtils.error({
 				message: 'Upload Failed',
 				description: 'Unable to upload image. Please try again.',
@@ -311,7 +305,6 @@ export const ProductForm = ({
 				description: `${newImageUrls.length} image(s) uploaded successfully`,
 			});
 		} catch (error) {
-			console.error('Image upload error:', error);
 			notificationUtils.error({
 				message: 'Upload Failed',
 				description: 'Unable to upload images. Please try again.',
@@ -325,22 +318,18 @@ export const ProductForm = ({
 	};
 
 	useEffect(() => {
-		// Log chi tiết để kiểm tra dữ liệu productImage và isCreate
-		console.log('ProductForm - productImage (type):', typeof productImageUrls);
-		console.log(
-			'ProductForm - productImage (JSON):',
-			JSON.stringify(productImageUrls),
-		);
-		console.log('ProductForm - productImage (length):', productImageUrls?.length);
-		console.log('ProductForm - isCreate:', isCreate);
-
 		// Nếu không phải chế độ tạo mới và có productImage, set giá trị cho productImageUrls
 		if (!isCreate && productImageUrls && productImageUrls.length > 0) {
+			// Kiểm tra nếu productImageUrls là mảng các object có cấu trúc {id, url}
 			const imageUrls = productImageUrls.map((img) => {
-				console.log('ProductForm - individual image:', img);
+				// Nếu img là object có thuộc tính url, lấy url
+				if (typeof img === 'object' && img !== null && 'url' in img) {
+					const imageObj = img as ProductImage;
+					return imageObj.url;
+				}
+				// Nếu img là string, giữ nguyên
 				return img;
 			});
-			console.log('ProductForm - imageUrls:', imageUrls);
 			setValue('productImageUrls', imageUrls, {
 				shouldValidate: true,
 				shouldDirty: true,
@@ -418,14 +407,6 @@ export const ProductForm = ({
 						},
 					}}
 					disabled={disabled}
-					value={description || locationDescription || ''}
-					onChange={(value) => {
-						setValue('description', value, {
-							shouldValidate: true,
-							shouldDirty: true,
-							shouldTouch: true,
-						});
-					}}
 					extra={
 						generateLocationDescription ? (
 							<button
@@ -672,7 +653,6 @@ export const ProductForm = ({
 					</label>
 
 					{watch('productImageUrls')?.map((imageUrl, index) => {
-						console.log(`ProductForm - productImageUrls[${index}]:`, imageUrl);
 						return (
 							<div key={index} className="relative w-[90px] sm:w-[110px] group">
 								<img
@@ -762,6 +742,7 @@ export const ProductForm = ({
 						pageSize={5}
 						disabled={disabled}
 						onViewDetailSchedule={handleViewScheduleDetailOnClick}
+						onDeleteSuccess={onScheduleDelete}
 					/>
 				</div>
 			</div>
@@ -775,6 +756,7 @@ export const ProductForm = ({
 					onSave={handlerAddScheduleInPopup}
 					onRemove={handleRemoveSchedule}
 					onCancel={handleClosePopupScheduleUpdate}
+					onDeleteSuccess={onScheduleDelete}
 				/>
 			)}
 		</BaseForm>

@@ -43,6 +43,25 @@ export type TProductSchedule = {
 	updateAt: Date;
 	deletedAt: Date | null;
 	status: EProductScheduleStatus;
+	product?: {
+		id: string;
+		name: string;
+		posterImageUrl: string;
+		supplierId: string;
+		time: number;
+		quantityAvailable: number;
+		age: number;
+		quantityCompleted: number;
+		description: string;
+		quantityRate: number;
+		avgRate: number;
+		locationId: string;
+		productCategoryId: string;
+		createAt: Date;
+		updateAt: Date;
+		deletedAt: Date | null;
+		status: EProductStatus;
+	};
 };
 
 export type TProductRate = {

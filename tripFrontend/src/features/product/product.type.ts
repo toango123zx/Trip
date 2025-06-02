@@ -57,6 +57,7 @@ export type TRequestBodyUpdateProduct = {
 	quantityAvailable: number;
 	age: number;
 	description: string;
+	productImageUrls?: string[];
 };
 
 export type TSearchAttraction = {

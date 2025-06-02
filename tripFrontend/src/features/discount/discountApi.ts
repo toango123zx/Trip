@@ -62,13 +62,17 @@ export const discountApi = {
 	},
 
 	async createDiscount(discount: TRequestBodyCreateDiscount): Promise<TDiscount> {
-		const response = await api.post<TDiscount, TRequestBodyCreateDiscount>(
-			`/discount`,
-			discount,
-			{},
-			EServer.Backend,
-		);
-		return response;
+		try {
+			const response = await api.post<TDiscount, TRequestBodyCreateDiscount>(
+				`/discount`,
+				discount,
+				{},
+				EServer.Backend,
+			);
+			return response;
+		} catch (error) {
+			throw error;
+		}
 	},
 
 	async asignProductSchedulesToDiscount(

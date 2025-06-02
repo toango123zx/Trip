@@ -59,14 +59,14 @@ export const discountSlice = createSlice({
 					state.discountsNonDiscountable = action.payload[0];
 					state.pagination = action.payload[1] || ({} as TPagination);
 					state.error = null;
-				},
+				}
 			)
 			.addCase(
 				discountThunk.getNonDiscountableSchedules.rejected,
 				(state, action) => {
 					state.loading = false;
 					state.error = String(action.error.message);
-				},
+				}
 			)
 			.addCase(discountThunk.getDiscountByDiscountId.pending, (state) => {
 				state.loading = true;
@@ -103,14 +103,14 @@ export const discountSlice = createSlice({
 				(state) => {
 					state.loading = false;
 					state.error = null;
-				},
+				}
 			)
 			.addCase(
 				discountThunk.assignProductSchedulesToDiscount.rejected,
 				(state, action) => {
 					state.loading = false;
 					state.error = String(action.error.message);
-				},
+				}
 			)
 			.addCase(discountThunk.deleteProductSchedulesToDiscount.pending, (state) => {
 				state.loading = true;
@@ -122,14 +122,14 @@ export const discountSlice = createSlice({
 					state.loading = false;
 					state.discountDetail = action.payload;
 					state.error = null;
-				},
+				}
 			)
 			.addCase(
 				discountThunk.deleteProductSchedulesToDiscount.rejected,
 				(state, action) => {
 					state.loading = false;
 					state.error = String(action.error.message);
-				},
+				}
 			)
 			.addCase(discountThunk.deleteDiscount.pending, (state) => {
 				state.loading = true;

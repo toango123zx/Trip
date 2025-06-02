@@ -81,8 +81,13 @@ const createDiscount = createAsyncThunk(
 	}: {
 		discount: TRequestBodyCreateDiscount;
 	}): Promise<TDiscount> => {
-		const response = await discountApi.creatDiscount(discount);
-		return response;
+		try {
+			const response = await discountApi.createDiscount(discount);
+			return response;
+		} catch (error) {
+			console.error('discountThunk - createDiscount - Lỗi:', error);
+			throw error;
+		}
 	},
 );
 

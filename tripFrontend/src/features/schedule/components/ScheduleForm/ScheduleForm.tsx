@@ -26,6 +26,7 @@ type TScheduleFormProps = {
 	onSave?: (data: TRequestBodyCreateSchedule) => void;
 	onRemove?: () => void;
 	onCancel?: () => void;
+	onDeleteSuccess?: () => void;
 };
 
 type FieldKey = keyof Pick<
@@ -60,6 +61,7 @@ export const ScheduleForm = ({
 	onSave = (): void => {},
 	onRemove = (): void => {},
 	onCancel = (): void => {},
+	onDeleteSuccess = (): void => {},
 }: TScheduleFormProps): JSX.Element => {
 	const form = useForm<TRequestBodyCreateSchedule>({
 		defaultValues: data,
@@ -151,7 +153,7 @@ export const ScheduleForm = ({
 
 	return (
 		<BaseForm
-			title={isCreate ? 'New Schedule' : 'Schedule Details'}
+			title={isCreate ? 'New Schedule' : 'Schedule Detail'}
 			form={form}
 			isCreate={isCreate}
 			disabled={!isCreate || disabled}

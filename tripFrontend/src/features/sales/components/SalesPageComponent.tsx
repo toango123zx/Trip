@@ -9,12 +9,13 @@ import {
   message,
   Spin,
   Alert,
-  Tooltip,
 } from 'antd';
-import { FilterOutlined, TagOutlined, CopyOutlined } from '@ant-design/icons';
+import { FilterOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '@/store/reduxStore';
 import { fetchSales, Sale } from '../slice/salesSlice';
+import { cn } from '@/lib';
+import { attractionsImages } from '@/assets';
 
 // Constants for localization
 const TEXT = {
@@ -103,15 +104,14 @@ const FilterSection: React.FC<{
           {/* Preset discount buttons */}
           <div className="flex gap-2 mb-3 flex-wrap">
             {presetDiscounts.map((preset) => (
-              <Button 
-                key={preset.label} 
-                size="small" 
+              <Button
+                key={preset.label}
+                size="small"
                 onClick={() => handlePresetFilter(preset)}
-                className={`${
-                  filters.minValue === preset.min && filters.maxValue === preset.max 
-                    ? 'bg-primary text-white' 
+                className={`${filters.minValue === preset.min && filters.maxValue === preset.max
+                    ? 'bg-primary text-white'
                     : 'bg-gray-100'
-                }`}
+                  }`}
               >
                 {preset.label}
               </Button>
@@ -151,7 +151,7 @@ const SaleCard: React.FC<{ sale: Sale }> = ({ sale }) => {
     >
       <div className="space-y-3">
         <p className="text-gray-600">{sale.description}</p>
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <Tooltip title="Copy Code">
             <Button
               type="text"
@@ -161,13 +161,13 @@ const SaleCard: React.FC<{ sale: Sale }> = ({ sale }) => {
             />
           </Tooltip>
           <strong>{sale.code}</strong>
-        </div>
+        </div> */}
         <div className="flex items-center gap-2 text-gray-500">
           📅 {formatDateTime(sale.startTime)} - {formatDateTime(sale.endTime)}
         </div>
         <div className="flex justify-between flex-col items-start gap-2">
-          <div>🎯 Discount {sale.value}%</div>
-          <div>🧍 {sale.value} codes remaining</div>
+          <div>🎯 Discount {sale.value / 100}%</div>
+          <div>🧍 {sale.quantity - sale.applited} codes remaining</div>
         </div>
         <Button type="primary" block className="mt-3">
           {TEXT.USE_NOW}
@@ -201,8 +201,8 @@ const SalesPage: React.FC = () => {
   // Filter sales
   const filteredSales = sales.filter(
     (sale) =>
-      sale.value >= filters.minValue &&
-      sale.value <= filters.maxValue &&
+      sale.value / 100 >= filters.minValue &&
+      sale.value / 100 <= filters.maxValue &&
       (searchText === '' ||
         sale.name.toLowerCase().includes(searchText.toLowerCase()) ||
         sale.description.toLowerCase().includes(searchText.toLowerCase())),
@@ -225,42 +225,71 @@ const SalesPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={6}>
-          <FilterSection
-            filters={filters}
-            setFilters={setFilters}
-            searchText={searchText}
-            setSearchText={setSearchText}
+    <div>
+      <section
+        className={cn(
+          'relative bg-white md:py-12 md:pt-0 overflow-hidden'
+        )}
+        aria-labelledby="hero-attractions-heading"
+      >
+        <div className="relative w-full h-[500px] md:h-[1080px]">
+          {/* Background image as background instead of <img> */}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${attractionsImages.backgroundHero})` }}
           />
-        </Col>
-        <Col xs={24} md={18}>
-          {filteredSales.length === 0 ? (
-            <Alert message={TEXT.NO_DATA} type="info" showIcon className="mb-4" />
-          ) : (
-            <Row gutter={[16, 16]}>
-              {filteredSales.map((sale) => (
-                <Col key={sale.id} xs={24} sm={12} lg={8}>
-                  <SaleCard sale={sale} />
-                </Col>
-              ))}
-            </Row>
-          )}
-          {currentPage < pagination.totalPages && (
-            <div className="flex justify-center mt-6">
-              <Button
-                type="primary"
-                loading={loading}
-                onClick={handleLoadMore}
-                aria-label="Load more promotions"
-              >
-                {TEXT.LOAD_MORE}
-              </Button>
-            </div>
-          )}
-        </Col>
-      </Row>
+
+          {/* Overlay content */}
+          <div className="absolute inset-0 bg-black/30 z-0" />
+
+          {/* Text section */}
+          <div className="max-w-[1536px] w-full px-6 md:px-20 mx-auto relative grid justify-center">
+            <p className="w-full text-[60px] md:text-[225px] text-white/50 font-bold text-center">
+              SALES
+            </p>
+            <h1 className="text-3xl md:text-7xl text-center font-bold text-white w-full">
+            New deals daily – don't miss out!
+            </h1>
+          </div>
+        </div>
+      </section>
+      <div className="container mx-auto px-4 py-8">
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={6}>
+            <FilterSection
+              filters={filters}
+              setFilters={setFilters}
+              searchText={searchText}
+              setSearchText={setSearchText}
+            />
+          </Col>
+          <Col xs={24} md={18}>
+            {filteredSales.length === 0 ? (
+              <Alert message={TEXT.NO_DATA} type="info" showIcon className="mb-4" />
+            ) : (
+              <Row gutter={[16, 16]}>
+                {filteredSales.map((sale) => (
+                  <Col key={sale.id} xs={24} sm={12} lg={8}>
+                    <SaleCard sale={sale} />
+                  </Col>
+                ))}
+              </Row>
+            )}
+            {currentPage < pagination.totalPages && (
+              <div className="flex justify-center mt-6">
+                <Button
+                  type="primary"
+                  loading={loading}
+                  onClick={handleLoadMore}
+                  aria-label="Load more promotions"
+                >
+                  {TEXT.LOAD_MORE}
+                </Button>
+              </div>
+            )}
+          </Col>
+        </Row>
+      </div>
     </div>
   );
 };

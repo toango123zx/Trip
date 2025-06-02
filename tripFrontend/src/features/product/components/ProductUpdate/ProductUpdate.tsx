@@ -66,6 +66,7 @@ export const ProductUpdate = ({
 				cityName: productDetail.city,
 				productCategoryId: productDetail.productCategoryName,
 				locationOnMap: '',
+				productImageUrls: productDetail.productImage?.map(img => img.url) || []
 			};
 
 			form.reset(initialValues);
@@ -76,6 +77,7 @@ export const ProductUpdate = ({
 				quantityAvailable: productDetail.quantityAvailable,
 				age: productDetail.age,
 				description: productDetail.description,
+				productImageUrls: productDetail.productImage?.map(img => img.url) || []
 			};
 		}
 	}, [productDetail, form]);
@@ -115,7 +117,8 @@ export const ProductUpdate = ({
 			...data,
 			time: Number(data.time),
 			quantityAvailable: Number(data.quantityAvailable),
-			age: Number(data.age)
+			age: Number(data.age),
+			productImageUrls: data.productImageUrls || []
 		};
 		
 		dispatch(productThunk.updateProductByProductId({ productId, product: formattedData }));
@@ -141,6 +144,11 @@ export const ProductUpdate = ({
 		dispatch(productThunk.deleteProductByProductId(productId));
 		setHasSubmitted(true);
 	};
+
+	const handleScheduleDelete = () => {
+		dispatch(productThunk.getProductDetail(String(productId)));
+	};
+
 	return (
 		<ProductForm
 			form={form}
@@ -151,6 +159,7 @@ export const ProductUpdate = ({
 			// discounts={discounts}
 			onSubmit={onSubmit}
 			onCancel={onCancel}
+			onScheduleDelete={handleScheduleDelete}
 		/>
 	);
 };
