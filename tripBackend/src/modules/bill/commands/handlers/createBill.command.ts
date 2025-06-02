@@ -10,6 +10,8 @@ import {
 import {
 	ConflictException,
 	DiscountApplicationScopeEnum,
+	DiscountEligibilityEnum,
+	DiscountTypeEnum,
 	HttpResponseBodySuccessDto,
 	NotFoundException,
 	OptionalException,
@@ -144,7 +146,7 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 		const validIds = new Set(schedules.map((s) => s.id));
 
 		for (const { discountEligibility, infoDiscount } of discounts) {
-			if (discountEligibility.name === 'together') {
+			if (discountEligibility.name === DiscountEligibilityEnum.together) {
 				for (const { productScheduleId } of infoDiscount) {
 					if (!validIds.has(productScheduleId)) {
 						return false;
@@ -196,10 +198,13 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 			let nonStackableMax = 0;
 
 			for (const d of ds) {
-				const amt =
-					d.discountType.name === 'Percentage'
-						? baseAmount * (d.value / 100)
-						: d.value * qty;
+				let amt = 0;
+				if (d.discountType.name === DiscountTypeEnum.Percentage) {
+					amt += baseAmount * (d.value / 100);
+				}
+				if (d.discountType.name === DiscountTypeEnum.FixedAmount) {
+					amt += d.value * qty;
+				}
 
 				if (d.stackable) {
 					stackableSum += amt;

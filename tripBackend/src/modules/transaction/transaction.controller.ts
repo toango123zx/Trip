@@ -1,8 +1,9 @@
-import { Controller, Get, HttpException, Query } from '@nestjs/common';
+import { Controller, Get, Query, Res } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
-import { HttpResponseBodyDto } from 'src/common';
-import { TransactionEntity } from 'src/models';
+import { Response } from 'express';
+import { HttpResponseBodySuccessDto } from 'src/common';
+import { BillEntity } from 'src/models';
 import { VerifyIpnCall } from 'vnpay';
 
 import { CheckBillPaymentByVnpayQuery } from './queries/implements';
@@ -14,7 +15,19 @@ export class TransactionController {
 	@Get('/vnpay-bill-payment')
 	async verifyVnpayPayment(
 		@Query() verifyIpn: VerifyIpnCall,
-	): Promise<HttpResponseBodyDto<TransactionEntity> | HttpException> {
-		return this.queryBus.execute(new CheckBillPaymentByVnpayQuery(verifyIpn));
+		@Res() res: Response,
+	): Promise<void> {
+		try {
+			const response: HttpResponseBodySuccessDto<BillEntity> =
+				await this.queryBus.execute(new CheckBillPaymentByVnpayQuery(verifyIpn));
+			const bill: BillEntity = response.data;
+			return res.redirect(
+				`http://localhost:5173/bills/payment?status=success&billId=${bill.id}&amount=${bill.totalPrice - bill.reductionPrice}&createAt=${bill.createAt.toString()}`,
+			);
+		} catch (error) {
+			return res.redirect(
+				`http://localhost:5173/bills/payment?status=fail&billId=${error.data.bill.id}&amount=${error.data.bill.totalPrice - error.data.bill.reductionPrice}&createAt=${error.data.bill.createAt.toString()}`,
+			);
+		}
 	}
 }

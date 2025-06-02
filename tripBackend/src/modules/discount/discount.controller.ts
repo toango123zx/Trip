@@ -35,6 +35,7 @@ import {
 } from './dtos';
 import {
 	GetDiscountByDiscountIdQuery,
+	GetDiscountsAvailableByScheduleIdsQuery,
 	GetDiscountsByUserIdQuery,
 	GetDiscountsQuery,
 	GetNonDiscountableSchedulesQuery,
@@ -64,6 +65,18 @@ export class DiscountController {
 	): Promise<HttpResponseBodyDto<GetDiscountsResponseDto[]>> {
 		return this.queryBus.execute(
 			new GetDiscountsByUserIdQuery(pagination, myInformation, search),
+		);
+	}
+
+	@Get('/available-for-schedules')
+	async getDiscountsAvailableByScheduleIds(
+		@Query('scheduleIds') scheduleIds: string[],
+		@Query() filter?: DiscountFilterRequestDto,
+	): Promise<
+		HttpResponseBodyDto<GetDiscountByDiscountIdResponseDto[] | HttpException>
+	> {
+		return this.queryBus.execute(
+			new GetDiscountsAvailableByScheduleIdsQuery(scheduleIds, filter),
 		);
 	}
 

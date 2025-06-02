@@ -15,7 +15,7 @@ import { BillOrderByDto } from './dtos/billOrderBy.dto';
 
 @Injectable()
 export class BillRepository {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(private readonly prismaService: PrismaService) { }
 
 	async findBillsByUserId(
 		pagination: IPaginationQuery = {} as IPaginationQuery,
@@ -209,11 +209,16 @@ export class BillRepository {
 				});
 			}
 			if (discountIdsForProductSchedules.length > 0 || discountIdForBill) {
+				const discountIds = [];
 				// update applited discount and get data discount
-				const discountIds = [
-					...discountIdsForProductSchedules,
-					discountIdForBill,
-				];
+
+				if (discountIdsForProductSchedules.length > 0) {
+					discountIds.push(...discountIdsForProductSchedules);
+				}
+
+				if (discountIdForBill) {
+					discountIds.push(discountIdForBill);
+				}
 
 				const discountsFind = await prisma.discount.findMany({
 					include: {
@@ -319,14 +324,14 @@ export class BillRepository {
 				discountIdsForProductSchedules.length == 0
 					? undefined
 					: {
-							create: discountIdsForProductSchedules.map((discountId) => ({
-								discount: {
-									connect: {
-										id: discountId,
-									},
+						create: discountIdsForProductSchedules.map((discountId) => ({
+							discount: {
+								connect: {
+									id: discountId,
 								},
-							})),
-						};
+							},
+						})),
+					};
 
 			// create bill
 			return prisma.bill.create({
@@ -392,14 +397,14 @@ export class BillRepository {
 					discountForBill: !discountIdForBill
 						? undefined
 						: {
-								create: {
-									discount: {
-										connect: {
-											id: discountIdForBill,
-										},
+							create: {
+								discount: {
+									connect: {
+										id: discountIdForBill,
 									},
 								},
 							},
+						},
 				},
 			});
 		});

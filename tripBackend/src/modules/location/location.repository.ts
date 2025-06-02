@@ -10,7 +10,7 @@ import { LocationOrderByDto } from './dtos';
 
 @Injectable()
 export class LocationRepository {
-	constructor(private readonly prismaService: PrismaService) { }
+	constructor(private readonly prismaService: PrismaService) {}
 
 	async findLocations(
 		pagination: IPaginationQuery,
@@ -21,8 +21,8 @@ export class LocationRepository {
 	): Promise<[LocationEntity[], number]> {
 		const orderBy = filter
 			? Object.entries(filter)
-				.filter(([_, value]) => value)
-				.map(([key, value]) => ({ [key]: value }))
+					.filter(([_, value]) => value)
+					.map(([key, value]) => ({ [key]: value }))
 			: [];
 		const [locations, totalRecords] = await Promise.all([
 			this.prismaService.location.findMany({
