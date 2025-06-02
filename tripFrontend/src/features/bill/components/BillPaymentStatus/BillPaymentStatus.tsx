@@ -116,13 +116,12 @@ const CustomSteps: React.FC<{
                   className={`
                   relative w-6 h-6 rounded-full border-2 flex items-center justify-center bg-white
                   transition-all duration-300 ease-out
-                  ${
-                    isCompleted || isActive
+                  ${isCompleted || isActive
                       ? 'border-orange-400 shadow-md'
                       : isErrorStep
                         ? 'border-red-500 animate-pulse'
                         : 'border-gray-300'
-                  }
+                    }
                 `}
                 >
                   <motion.div
@@ -188,13 +187,12 @@ const CustomSteps: React.FC<{
                 <span
                   className={`
                   text-xs font-medium text-center whitespace-nowrap transition-colors duration-300 ease-out
-                  ${
-                    isCompleted || isActive
+                  ${isCompleted || isActive
                       ? 'text-orange-500'
                       : isErrorStep
                         ? 'text-red-500'
                         : 'text-gray-400'
-                  }
+                    }
                 `}
                 >
                   {item.title}
@@ -490,32 +488,8 @@ export const BillPaymentStatus: React.FC<PaymentResultProps> = ({
     }
 
     setIsRetrying(true);
-    try {
-      const result = await dispatch(billThunk.paymentBillByBillId(paymentResult.billId));
+    await dispatch(billThunk.paymentBillByBillId(paymentResult.billId));
 
-      if (billThunk.paymentBillByBillId.fulfilled.match(result)) {
-        const paymentUrl =
-          result.payload.paymentUrl || result.payload.url || result.payload;
-
-        if (typeof paymentUrl === 'string' && paymentUrl.startsWith('http')) {
-          const returnUrl = encodeURIComponent(`${window.location.origin}/bill/payment`);
-          const finalUrl = paymentUrl.includes('?')
-            ? `${paymentUrl}&vnp_ReturnUrl=${returnUrl}`
-            : `${paymentUrl}?vnp_ReturnUrl=${returnUrl}`;
-
-          window.location.href = finalUrl;
-        } else {
-          alert('Invalid payment URL');
-        }
-      } else {
-        alert('Unable to create payment link. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error retrying payment:', error);
-      alert('An error occurred while retrying payment');
-    } finally {
-      setIsRetrying(false);
-    }
   };
 
   const handleGoHome = () => navigate('/');
@@ -615,7 +589,7 @@ export const BillPaymentStatus: React.FC<PaymentResultProps> = ({
               isRetrying={isRetrying}
             />
           )}
-          #{/* Order Details */}
+          {/* Order Details */}
           <OrderDetails paymentResult={paymentResult} />
           {/* Action Buttons */}
           <ActionButtons

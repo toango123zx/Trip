@@ -504,9 +504,8 @@ const PaymentMethodDisplay = ({
   if (!paymentMethod || !paymentInfo) {
     return (
       <button
-        className={`text-blue-500 text-sm hover:text-blue-700 transition-colors ${
-          disabled ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
+        className={`text-blue-500 text-sm hover:text-blue-700 transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         onClick={disabled ? undefined : onClick}
         disabled={disabled}
       >
@@ -517,9 +516,8 @@ const PaymentMethodDisplay = ({
 
   return (
     <button
-      className={`flex items-center space-x-2 p-2 border border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors w-full ${
-        disabled ? 'opacity-50 cursor-not-allowed' : ''
-      }`}
+      className={`flex items-center space-x-2 p-2 border border-green-200 rounded-lg bg-green-50 hover:bg-green-100 transition-colors w-full ${disabled ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
     >
@@ -915,7 +913,6 @@ export const BookingCart = (): JSX.Element => {
 
       // Keep discount only if it has value > 0
       if (discountValue <= 0) {
-        console.log(`Removing discount "${discount.name}" - value is 0 VND`);
         return false;
       }
 
@@ -934,9 +931,6 @@ export const BookingCart = (): JSX.Element => {
         );
 
         if (!hasAllRequired) {
-          console.log(
-            `Removing discount "${discount.name}" - missing required tours for Together discount`,
-          );
           return false;
         }
       } else {
@@ -946,9 +940,6 @@ export const BookingCart = (): JSX.Element => {
         );
 
         if (!hasApplicable) {
-          console.log(
-            `Removing discount "${discount.name}" - no applicable tours selected`,
-          );
           return false;
         }
       }
@@ -1108,7 +1099,6 @@ export const BookingCart = (): JSX.Element => {
   // ✅ NEW: Payment method handlers
   const handlePaymentMethodApply = (paymentMethod: PaymentMethod) => {
     setSelectedPaymentMethod(paymentMethod);
-    console.log('Selected payment method:', paymentMethod);
   };
 
   // ✅ UPDATED: Event Handlers with expired items handling
@@ -1269,39 +1259,28 @@ export const BookingCart = (): JSX.Element => {
         discountIds: selectedDiscounts.map((discount) => discount.id),
       };
 
-      console.log('Creating bill with data:', createBillData);
 
       // ✅ Step 2: Create Bill
-      message.loading('Creating your booking...', 0);
-      console.log(
-        `🚀 ~ BookingCart.tsx:1253 ~ handlerCheckout ~ createBillData:`,
-        createBillData,
-      );
       const billResult = await billApi.createBill(createBillData);
 
       // if (billThunk.createBill.fulfilled.match(billResult)) {
       const billId = billResult.id;
-      console.log('Bill created successfully with ID:', billId);
 
       message.destroy(); // Clear loading message
-      message.loading('Preparing payment...', 0);
 
       // ✅ Step 3: Process Payment
       const paymentUrl = await billApi.paymentBillByBillId(billId);
 
       // if (billThunk.paymentBillByBillId.fulfilled.match(paymentResult)) {
       // const paymentUrl = paymentResult.payload;
-      console.log('Payment URL received:', paymentUrl);
 
       message.destroy(); // Clear loading message
-      message.success('Redirecting to payment gateway...');
 
       // ✅ Step 4: Redirect to payment URL
       setTimeout(() => {
         if (typeof paymentUrl === 'string' && paymentUrl.startsWith('http')) {
           window.location.href = paymentUrl;
         } else {
-          console.error('Invalid payment URL:', paymentUrl);
           message.error('Invalid payment URL received');
         }
       }, 1000); // Small delay to show success message

@@ -17,7 +17,7 @@ import { ProductScheduleRepository } from '../../productSchedule.repository';
 import { GetUsersByProductScheduleIdQuery } from '../implements';
 
 @QueryHandler(GetUsersByProductScheduleIdQuery)
-export class GetUsersByProductScheduleIdhandler
+export class GetUsersByProductScheduleIdHandler
 	implements IQueryHandler<GetUsersByProductScheduleIdQuery>
 {
 	constructor(
