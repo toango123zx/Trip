@@ -40,8 +40,19 @@ export class UpdateProductInformationByProductIdHandler
 			);
 		}
 
-		const { addProductImageUrls, removeProductImageIds, urlMap, ...productData } =
-			productInformationRequest;
+		const { productImages, urlMap, ...productData } = productInformationRequest;
+
+		const setProductImagesDatabase = new Set(
+			product.productImage.map((item) => item.url),
+		);
+		const setProductImagesRequest = new Set(productImages || []);
+
+		const addProductImageUrls: string[] = productImages.filter(
+			(url) => !setProductImagesDatabase.has(url),
+		);
+		const removeProductImageIds: string[] = product.productImage
+			.filter((item) => !setProductImagesRequest.has(item.url))
+			.map((item) => item.url);
 
 		const productInformation = new ObjectComparerDto<ProductEntity>(
 			product,
