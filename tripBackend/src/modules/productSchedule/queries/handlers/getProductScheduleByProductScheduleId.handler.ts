@@ -2,8 +2,8 @@ import { HttpException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { HttpResponseBodySuccessDto, NotFoundException } from 'src/common';
-import { ProductScheduleEntity } from 'src/models';
 
+import { GetProductScheduleDetailResponseDto } from '../../dtos';
 import { ProductScheduleRepository } from '../../productSchedule.repository';
 import { GetProductScheduleByProductScheduleIdQuery } from '../implements';
 
@@ -15,7 +15,9 @@ export class GetProductScheduleByProductScheduleIdHandler
 
 	async execute(
 		query: GetProductScheduleByProductScheduleIdQuery,
-	): Promise<HttpResponseBodySuccessDto<ProductScheduleEntity> | HttpException> {
+	): Promise<
+		HttpResponseBodySuccessDto<GetProductScheduleDetailResponseDto> | HttpException
+	> {
 		const productSchedule =
 			await this.productScheduleRepository.findProductScheduleByProductScheduleId(
 				query.productScheduleId,
@@ -26,11 +28,9 @@ export class GetProductScheduleByProductScheduleIdHandler
 			throw new NotFoundException('productScheduleId');
 		}
 
-		delete productSchedule.product.supplier;
-
 		return {
 			success: true,
-			data: productSchedule,
+			data: new GetProductScheduleDetailResponseDto(productSchedule),
 		};
 	}
 }

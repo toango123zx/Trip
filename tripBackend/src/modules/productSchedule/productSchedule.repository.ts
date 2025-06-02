@@ -205,6 +205,8 @@ export class ProductScheduleRepository {
 				product: {
 					include: {
 						supplier: true,
+						location: true,
+						productCategory: true,
 					},
 				},
 			},
