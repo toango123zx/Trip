@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import {
 	BillStatusEnum,
+	DiscountStatusEnum,
 	InfoDiscountStatusEnum,
 	ProductScheduleStatusEnum,
 	ProductStatusEnum,
@@ -23,6 +24,7 @@ export class ProductRepository {
 		userId: string,
 		status?: ProductStatusEnum,
 		filter?: ProductOrderByDto,
+		schedule: boolean = false,
 	): Promise<[ProductEntity[], number]> {
 		const orderBy = [];
 		if (filter.location?.displayName && filter.location?.city) {
@@ -61,6 +63,45 @@ export class ProductRepository {
 					},
 					location: true,
 					productCategory: true,
+					productSchedule: schedule
+						? {
+								include: {
+									infoDiscount: {
+										include: {
+											discount: true,
+										},
+										where: {
+											status: InfoDiscountStatusEnum.active,
+											discount: {
+												status: DiscountStatusEnum.active,
+												startTime: {
+													lt: new Date(),
+												},
+												endTime: {
+													gt: new Date(),
+												},
+											},
+										},
+										orderBy: {
+											discount: {
+												value: 'asc',
+											},
+										},
+										take: 1,
+									},
+								},
+								where: {
+									status: ProductScheduleStatusEnum.active,
+									startTime: {
+										gt: new Date(),
+									},
+								},
+								orderBy: {
+									price: 'asc',
+								},
+								take: 1,
+							}
+						: undefined,
 				},
 				where: {
 					name: {

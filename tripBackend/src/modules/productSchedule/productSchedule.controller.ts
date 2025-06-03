@@ -29,6 +29,7 @@ import {
 import {
 	DeleteProductScheduleByProductScheduleIdResponseDto,
 	GetProductScheduleByProductScheduleIdRequestDto,
+	GetProductScheduleDetailResponseDto,
 	GetUsersByProductScheduleIdResponseDto,
 	ProductScheduleFilterRequestDto,
 } from './dtos';
@@ -66,7 +67,7 @@ export class ProductScheduleController {
 	async getProductScheduleByProductScheduleId(
 		@Param('productScheduleId') productScheduleId: string,
 		@Query() filter?: GetProductScheduleByProductScheduleIdRequestDto,
-	): Promise<HttpResponseBodyDto<ProductScheduleEntity>> {
+	): Promise<HttpResponseBodyDto<GetProductScheduleDetailResponseDto>> {
 		return this.queryBus.execute(
 			new GetProductScheduleByProductScheduleIdQuery(productScheduleId, filter),
 		);

@@ -1,4 +1,36 @@
+import { InfoDiscountStatusEnum, ProductScheduleStatusEnum } from '@prisma/client';
 import { DiscountEntity } from 'src/models';
+
+class productSchedule {
+	id: string;
+	productId: string;
+	productName: string;
+	productPosterImageUrl: string;
+	productTime: number;
+	productRate: number;
+	productAge: number;
+	startTime: Date;
+	endTime: Date;
+	price: number;
+	booked: number;
+	startOrder: Date;
+	endOrder: Date;
+	createAt: Date;
+	updateAt: Date;
+	deletedAt: Date | null;
+	status: ProductScheduleStatusEnum;
+}
+
+class infoDiscount {
+	id: string;
+	discountId: string;
+	productScheduleId: string;
+	createAt: Date;
+	updateAt: Date;
+	deletedAt: Date | null;
+	status: InfoDiscountStatusEnum;
+	productSchedule: productSchedule;
+}
 
 export class GetDiscountsResponseDto {
 	id: string;
@@ -16,6 +48,7 @@ export class GetDiscountsResponseDto {
 	point: number;
 	applited: number;
 	stackable: boolean;
+	infoDiscount: infoDiscount[];
 	createAt: Date;
 	updateAt: Date;
 	deletedAt: Date;
@@ -37,6 +70,34 @@ export class GetDiscountsResponseDto {
 		this.point = discount.point;
 		this.applited = discount.applited;
 		this.stackable = discount.stackable;
+		this.infoDiscount = discount.infoDiscount?.map((info) => ({
+			id: info.id,
+			discountId: info.discountId,
+			productScheduleId: info.productScheduleId,
+			createAt: info.createAt,
+			updateAt: info.updateAt,
+			deletedAt: info.deletedAt,
+			status: info.status,
+			productSchedule: {
+				id: info.productSchedule.id,
+				productId: info.productSchedule.productId,
+				productName: info.productSchedule.product.name,
+				productPosterImageUrl: info.productSchedule.product.posterImageUrl,
+				productTime: info.productSchedule.product.time,
+				productRate: info.productSchedule.product.avgRate,
+				productAge: info.productSchedule.product.age,
+				startTime: info.productSchedule.startTime,
+				endTime: info.productSchedule.endTime,
+				price: info.productSchedule.price,
+				booked: info.productSchedule.booked,
+				startOrder: info.productSchedule.startOrder,
+				endOrder: info.productSchedule.endOrder,
+				createAt: info.productSchedule.createAt,
+				updateAt: info.productSchedule.updateAt,
+				deletedAt: info.productSchedule.deletedAt,
+				status: info.productSchedule.status,
+			},
+		}));
 		this.createAt = discount.createAt;
 		this.updateAt = discount.updateAt;
 		this.deletedAt = discount.deletedAt;

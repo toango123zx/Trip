@@ -50,10 +50,10 @@ export class GetProductByProductIdResponseDto extends GetProductsResponseDto {
 		}));
 
 		this.mapAddress = {
-			id: product.mapAddress.id,
-			url: product.mapAddress.urlMap,
-			providerMap: product.mapAddress.providerMap.name,
-			status: product.mapAddress.status,
+			id: product.mapAddress?.id,
+			url: product.mapAddress?.urlMap,
+			providerMap: product.mapAddress?.providerMap?.name,
+			status: product.mapAddress?.status,
 		};
 
 		this.productSchedule = product.productSchedule.map((schedule) => ({

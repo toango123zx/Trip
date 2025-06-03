@@ -16,18 +16,7 @@ export class UpdateProductInformationByProductIdRequestDto extends UpdateProduct
 	@Type(() => String)
 	@IsString({ each: true })
 	@AutoTrim()
-	addProductImageUrls?: string[];
-	@ApiProperty({
-		type: String,
-		isArray: true,
-		required: false,
-	})
-	@IsOptional()
-	@IsArray()
-	@Type(() => String)
-	@IsString({ each: true })
-	@AutoTrim()
-	removeProductImageIds?: string[];
+	productImages?: string[];
 	@ApiProperty({
 		type: String,
 		required: false,

@@ -50,8 +50,8 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			undefined,
 			statusSearch,
 			productOrderBy,
+			true,
 		);
-
 		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
 
 		const productInformation = products.map(

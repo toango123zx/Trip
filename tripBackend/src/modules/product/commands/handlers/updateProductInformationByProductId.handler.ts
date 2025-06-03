@@ -40,8 +40,19 @@ export class UpdateProductInformationByProductIdHandler
 			);
 		}
 
-		const { addProductImageUrls, removeProductImageIds, urlMap, ...productData } =
-			productInformationRequest;
+		const { productImages, urlMap, ...productData } = productInformationRequest;
+
+		const setProductImagesDatabase = new Set(
+			product.productImage.map((item) => item.url),
+		);
+		const setProductImagesRequest = new Set(productImages || []);
+
+		const addProductImageUrls: string[] = (productImages || []).filter(
+			(url) => !setProductImagesDatabase.has(url),
+		);
+		const removeProductImageUrls: string[] = product.productImage
+			.filter((item) => !setProductImagesRequest.has(item.url))
+			.map((item) => item.url);
 
 		const productInformation = new ObjectComparerDto<ProductEntity>(
 			product,
@@ -50,7 +61,7 @@ export class UpdateProductInformationByProductIdHandler
 		if (
 			!Object.keys(productInformation).length &&
 			addProductImageUrls.length === 0 &&
-			removeProductImageIds.length === 0 &&
+			removeProductImageUrls.length === 0 &&
 			product.mapAddress?.urlMap === urlMap
 		) {
 			throw new ValidationException('No data has been changed.');
@@ -60,7 +71,7 @@ export class UpdateProductInformationByProductIdHandler
 			productId,
 			productInformation,
 			addProductImageUrls,
-			removeProductImageIds,
+			removeProductImageUrls,
 			product.mapAddress?.urlMap !== urlMap ? urlMap : undefined,
 		);
 
