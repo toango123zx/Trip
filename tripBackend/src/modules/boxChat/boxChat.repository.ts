@@ -121,6 +121,38 @@ export class BoxChatRepository {
 		return [boxChats, totalRecords];
 	}
 
+	async findBoxChatByBoxChatId(
+		boxChatId: string,
+		userId?: string,
+	): Promise<BoxChatEntity> {
+		return this.prismaService.boxChat.findFirst({
+			include: {
+				boxChatMember: {
+					include: {
+						user: {
+							include: {
+								role: true,
+							},
+						},
+					},
+				},
+				message: {
+					orderBy: {
+						createAt: 'desc',
+					},
+				},
+			},
+			where: {
+				id: boxChatId,
+				boxChatMember: {
+					some: {
+						userId: userId,
+					},
+				},
+			},
+		});
+	}
+
 	async createBoxChat(
 		boxChat: CreateBoxChatDto,
 		boxChatMember: string[],

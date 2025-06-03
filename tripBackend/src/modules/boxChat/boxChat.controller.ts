@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param, Post, Query } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { HttpResponseBodyDto, PaginationDto } from 'src/common';
@@ -11,9 +11,10 @@ import { CreateBoxChatCommand } from './commands/implements';
 import {
 	BoxChatFilterRequestDto,
 	CreateBoxChatRequestDto,
+	GetBoxChatDetailResponseDto,
 	GetBoxChatResponseDto,
 } from './dtos';
-import { GetBoxChatsQuery } from './queries/implements';
+import { GetBoxChatByBoxChatIdQuery, GetBoxChatsQuery } from './queries/implements';
 
 @Controller('box-chat')
 export class BoxChatController {
@@ -31,6 +32,17 @@ export class BoxChatController {
 	): Promise<HttpResponseBodyDto<GetBoxChatResponseDto[]>> {
 		return this.queryBus.execute(
 			new GetBoxChatsQuery(myInformation, pagination, filter),
+		);
+	}
+
+	@Get('/:boxChatId')
+	@Auth()
+	async getBoxChatByBoxChatId(
+		@Param('boxChatId') boxChatId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<GetBoxChatDetailResponseDto | HttpException>> {
+		return this.queryBus.execute(
+			new GetBoxChatByBoxChatIdQuery(boxChatId, myInformation),
 		);
 	}
 
