@@ -60,6 +60,48 @@ export class UserRepository {
 		return [users, totalRecords];
 	}
 
+	async findUsersByUserIds(
+		userIds: string[],
+		userStatus?: UserStatusEnum[],
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: UserOrderByDto,
+	): Promise<[UserEntity[], number]> {
+		const orderBy = filter
+			? Object.entries(filter)
+					.filter(([_, value]) => value)
+					.map(([key, value]) => ({ [key]: value }))
+			: [];
+		const [users, totalRecords] = await Promise.all([
+			this.prismaService.user.findMany({
+				include: {
+					role: true,
+				},
+				where: {
+					id: {
+						in: userIds,
+					},
+					status: {
+						in: userStatus,
+					},
+				},
+				orderBy: orderBy,
+				skip: pagination.skip,
+				take: pagination.take,
+			}),
+			this.prismaService.user.count({
+				where: {
+					id: {
+						in: userIds,
+					},
+					status: {
+						in: userStatus,
+					},
+				},
+			}),
+		]);
+		return [users, totalRecords];
+	}
+
 	async findUsersInProductSchedulebyProductScheduleId(
 		productScheduleId: string,
 		productScheduleStatus?: ProductScheduleStatusEnum[],

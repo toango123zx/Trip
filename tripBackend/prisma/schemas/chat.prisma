@@ -28,9 +28,9 @@ model boxChatMember {
 model message {
     id        String    @id @default(cuid())
     content   String
-    /// @DtoUpdateHidden
     userId    String    @map("user_id")
-    User      user      @relation(fields: [userId], references: [id])
+    /// @DtoRelationCanConnectOnCreate
+    user      user      @relation(fields: [userId], references: [id])
     /// @DtoUpdateHidden
     boxChatId String    @map("box_chat_id")
     boxChat   boxChat   @relation(fields: [boxChatId], references: [id])

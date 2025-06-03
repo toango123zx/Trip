@@ -1,5 +1,6 @@
 import { AuthModule } from './auth/auth.module';
 import { BillModule } from './bill/bill.module';
+import { BoxChatModule } from './boxChat/boxChat.module';
 import { CartModule } from './cart/cart.module';
 import { DatabaseModule } from './database/database.module';
 import { DiscountModule } from './discount/discount.module';
@@ -38,4 +39,5 @@ export const Modules = [
 	PaymentMethodModule,
 	TransactionReferenceModule,
 	TransactionModule,
+	BoxChatModule,
 ];
