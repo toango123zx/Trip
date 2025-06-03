@@ -34,10 +34,11 @@ export class CreateBoxChatHandler implements ICommandHandler<CreateBoxChatComman
 			throw new NotFoundException('userId');
 		}
 
-		const [boxChats, totalBoxChats] = await this.boxChatRepository.findBoxChat(
-			undefined,
-			[...boxChatInformation.boxChatMember, myInformation.id],
-		);
+		const [boxChats, totalBoxChats] =
+			await this.boxChatRepository.findBoxChatsByBoxChatIdAndExactBoxChatMembers(
+				undefined,
+				[...boxChatInformation.boxChatMember, myInformation.id],
+			);
 
 		if (totalBoxChats > 0) {
 			const boxChatExisted = boxChats.find(

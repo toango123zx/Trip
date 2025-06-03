@@ -1,18 +1,27 @@
 import { Injectable } from '@nestjs/common';
 
+import { IPaginationQuery } from 'src/common';
 import { BoxChatEntity, CreateBoxChatDto } from 'src/models';
 
 import { PrismaService } from '../database/services';
+
+import { BoxChatOrderByDto } from './dtos';
 
 @Injectable()
 export class BoxChatRepository {
 	constructor(private readonly prismaService: PrismaService) {}
 
-	async findBoxChat(
+	async findBoxChatsByBoxChatIdAndBoxChatMembers(
 		boxChatId: string,
-		userId: string[],
+		userIds: string[],
+		nameSearch?: string,
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: BoxChatOrderByDto,
 	): Promise<[BoxChatEntity[], number]> {
-		const [boxChat, totalRecords] = await Promise.all([
+		const orderBy = Object.entries(filter || {})
+			.filter(([_, value]) => Boolean(value))
+			.map(([key, value]) => ({ [key]: value }));
+		const [boxChats, totalRecords] = await Promise.all([
 			this.prismaService.boxChat.findMany({
 				include: {
 					boxChatMember: {
@@ -28,14 +37,73 @@ export class BoxChatRepository {
 				},
 				where: {
 					id: boxChatId,
+					name: nameSearch,
 					boxChatMember: {
-						none: {
+						some: {
 							userId: {
-								notIn: userId,
+								in: userIds,
 							},
 						},
 					},
 				},
+				take: pagination.take,
+				skip: pagination.skip,
+				orderBy: orderBy,
+			}),
+			this.prismaService.boxChat.count({
+				where: {
+					id: boxChatId,
+					boxChatMember: {
+						some: {
+							userId: {
+								in: userIds,
+							},
+						},
+					},
+				},
+			}),
+		]);
+		return [boxChats, totalRecords];
+	}
+
+	async findBoxChatsByBoxChatIdAndExactBoxChatMembers(
+		boxChatId: string,
+		userIds: string[],
+		nameSearch?: string,
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: BoxChatOrderByDto,
+	): Promise<[BoxChatEntity[], number]> {
+		const orderBy = Object.entries(filter || {})
+			.filter(([_, value]) => Boolean(value))
+			.map(([key, value]) => ({ [key]: value }));
+		const [boxChats, totalRecords] = await Promise.all([
+			this.prismaService.boxChat.findMany({
+				include: {
+					boxChatMember: {
+						include: {
+							user: {
+								include: {
+									role: true,
+								},
+							},
+						},
+					},
+					message: true,
+				},
+				where: {
+					id: boxChatId,
+					name: nameSearch,
+					boxChatMember: {
+						none: {
+							userId: {
+								notIn: userIds,
+							},
+						},
+					},
+				},
+				take: pagination.take,
+				skip: pagination.skip,
+				orderBy: orderBy,
 			}),
 			this.prismaService.boxChat.count({
 				where: {
@@ -43,14 +111,14 @@ export class BoxChatRepository {
 					boxChatMember: {
 						none: {
 							userId: {
-								notIn: userId,
+								notIn: userIds,
 							},
 						},
 					},
 				},
 			}),
 		]);
-		return [boxChat, totalRecords];
+		return [boxChats, totalRecords];
 	}
 
 	async createBoxChat(

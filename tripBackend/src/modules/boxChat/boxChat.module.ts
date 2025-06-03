@@ -9,6 +9,7 @@ import { UserRepository } from '../user/user.repository';
 import { BoxChatController } from './boxChat.controller';
 import { BoxChatRepository } from './boxChat.repository';
 import { BoxChatCommandHandlers } from './commands/handlers';
+import { BoxChatQueryHandlers } from './queries/handlers';
 
 @Module({
 	imports: [CqrsModule, DatabaseModule, AuthModule],
@@ -17,6 +18,7 @@ import { BoxChatCommandHandlers } from './commands/handlers';
 		UserRepository,
 		SupplierRepository,
 		BoxChatRepository,
+		...BoxChatQueryHandlers,
 		...BoxChatCommandHandlers,
 	],
 	exports: [],
