@@ -71,6 +71,7 @@ export class GetUsersByProductScheduleIdHandler
 						});
 					});
 				}
+				return new GetUsersByProductScheduleIdResponseDto(user);
 			})
 			.flat();
 
