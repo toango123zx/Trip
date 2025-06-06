@@ -7,7 +7,7 @@ import { AutoTrim } from 'src/common/decorators';
 export class CreateBoxChatRequestDto {
 	@ApiProperty({
 		type: String,
-		required: false,
+		required: true,
 	})
 	@IsNotEmpty()
 	@Type(() => String)

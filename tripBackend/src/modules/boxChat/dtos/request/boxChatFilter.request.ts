@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { OrderByEnum } from 'src/common';
 
 export class BoxChatFilterRequestDto {
@@ -18,6 +18,6 @@ export class BoxChatFilterRequestDto {
 		required: false,
 	})
 	@IsOptional()
-	@IsString()
+	@IsEnum(OrderByEnum)
 	name?: OrderByEnum;
 }

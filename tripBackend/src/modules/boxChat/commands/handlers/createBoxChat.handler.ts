@@ -26,10 +26,10 @@ export class CreateBoxChatHandler implements ICommandHandler<CreateBoxChatComman
 	): Promise<HttpResponseBodySuccessDto<GetBoxChatResponseDto> | HttpException> {
 		const { boxChatInformation, myInformation } = command;
 
-		const totalRecords = await this.userRepository.findUsersByUserIds(
+		const [, totalRecords] = await this.userRepository.findUsersByUserIds(
 			[...boxChatInformation.boxChatMember],
 			[UserStatusEnum.active],
-		)[1];
+		);
 		if (totalRecords !== boxChatInformation.boxChatMember.length) {
 			throw new NotFoundException('userId');
 		}
