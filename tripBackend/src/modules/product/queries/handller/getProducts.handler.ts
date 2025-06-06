@@ -24,8 +24,10 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			keyword,
 			startTimeSearch,
 			endTimeSearch,
-			priceSearch,
+			priceFromSearch,
+			priceToSearch,
 			locationName,
+			citySearch,
 			city,
 			productCategoryName,
 			statusSearch,
@@ -58,7 +60,9 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			[ProductScheduleStatusEnum.active],
 			startTimeSearch,
 			endTimeSearch,
-			priceSearch,
+			priceFromSearch,
+			priceToSearch,
+			citySearch,
 		);
 		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
 

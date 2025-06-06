@@ -22,8 +22,10 @@ export class GetProductsManagementHandler
 			keyword,
 			startTimeSearch,
 			endTimeSearch,
-			priceSearch,
+			priceFromSearch,
+			priceToSearch,
 			locationName,
+			citySearch,
 			city,
 			productCategoryName,
 			statusSearch,
@@ -56,7 +58,9 @@ export class GetProductsManagementHandler
 			undefined,
 			startTimeSearch,
 			endTimeSearch,
-			priceSearch,
+			priceFromSearch,
+			priceToSearch,
+			citySearch,
 		);
 
 		const productInformation = products.map(
