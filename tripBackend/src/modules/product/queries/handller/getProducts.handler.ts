@@ -1,5 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
+import { ProductScheduleStatusEnum } from '@prisma/client';
 import { HttpResponseBodySuccessDto, IPaginationQuery } from 'src/common';
 
 import { GetProductsResponseDto, ProductOrderByDto } from '../../dtos';
@@ -21,6 +22,9 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 
 		const {
 			keyword,
+			startTimeSearch,
+			endTimeSearch,
+			priceSearch,
 			locationName,
 			city,
 			productCategoryName,
@@ -51,6 +55,10 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			statusSearch,
 			productOrderBy,
 			true,
+			[ProductScheduleStatusEnum.active],
+			startTimeSearch,
+			endTimeSearch,
+			priceSearch,
 		);
 		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
 

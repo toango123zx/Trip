@@ -25,6 +25,10 @@ export class ProductRepository {
 		status?: ProductStatusEnum,
 		filter?: ProductOrderByDto,
 		schedule: boolean = false,
+		productScheduleStatus: ProductScheduleStatusEnum[] = [],
+		startTimeSearch?: Date,
+		endTimeSearch?: Date,
+		priceSearch?: number,
 	): Promise<[ProductEntity[], number]> {
 		const orderBy = [];
 		if (filter.location?.displayName && filter.location?.city) {
@@ -52,6 +56,29 @@ export class ProductRepository {
 		orderBy.push({
 			name: 'asc',
 		});
+
+		const some = {};
+		if (startTimeSearch) {
+			some['startTime'] = {
+				gte: startTimeSearch,
+			};
+		}
+
+		if (endTimeSearch) {
+			some['endTime'] = {
+				lte: endTimeSearch,
+			};
+		}
+		if (priceSearch) {
+			some['price'] = {
+				lte: priceSearch,
+			};
+		}
+		if (productScheduleStatus.length > 0) {
+			some['status'] = {
+				in: productScheduleStatus,
+			};
+		}
 
 		const [products, totalRecords] = await Promise.all([
 			this.prismaService.product.findMany({
@@ -92,8 +119,8 @@ export class ProductRepository {
 								},
 								where: {
 									status: ProductScheduleStatusEnum.active,
-									startTime: {
-										gt: new Date(),
+									startOrder: {
+										lte: new Date(),
 									},
 								},
 								orderBy: {
@@ -111,6 +138,12 @@ export class ProductRepository {
 					supplier: {
 						userId: userId,
 					},
+					productSchedule:
+						Object.keys(some).length > 0
+							? {
+									some: some,
+								}
+							: undefined,
 					status: status,
 				},
 				skip: pagination.skip,
@@ -120,12 +153,19 @@ export class ProductRepository {
 			this.prismaService.product.count({
 				where: {
 					name: {
-						contains: filter.name,
+						contains: keyword,
 						mode: 'insensitive',
 					},
 					supplier: {
 						userId: userId,
 					},
+					productSchedule:
+						Object.keys(some).length > 0
+							? {
+									some: some,
+								}
+							: undefined,
+
 					status: status,
 				},
 			}),

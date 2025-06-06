@@ -1,10 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { ProductStatusEnum } from '@prisma/client';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsDate, IsEnum, IsInt, IsOptional, IsPositive, IsString } from 'class-validator';
 import { OrderByEnum, SearchDto } from 'src/common';
 
 export class ProductFilterRequestDto extends SearchDto {
+	@ApiProperty({
+		type: 'string',
+		required: false,
+	})
+	@IsOptional()
+	@Type(() => Date)
+	@IsDate()
+	startTimeSearch?: Date;
+	@ApiProperty({
+		type: 'string',
+		required: false,
+	})
+	@IsOptional()
+	@Type(() => Date)
+	@IsDate()
+	endTimeSearch?: Date;
+	@ApiProperty({ type: 'number', required: false })
+	@IsOptional()
+	@Type(() => Number)
+	@IsInt()
+	@IsPositive()
+	priceSearch?: number;
 	@ApiProperty({
 		type: 'string',
 		enum: OrderByEnum,

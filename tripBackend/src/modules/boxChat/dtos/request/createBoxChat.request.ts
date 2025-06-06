@@ -18,7 +18,7 @@ export class CreateBoxChatRequestDto {
 	@ApiProperty({
 		type: String,
 		isArray: true,
-		required: false,
+		required: true,
 	})
 	@IsNotEmpty()
 	@IsArray()
