@@ -1,11 +1,11 @@
 import { Eye, Star } from 'lucide-react';
 import React, { JSX } from 'react';
-import { IoLocationOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
-
 import { cn } from '@/lib/utils';
 import { TProductSumary } from '@/types';
-
+import { IoLocationOutline } from 'react-icons/io5';
+import { BsClock, BsPeople } from 'react-icons/bs';
+import { FaCity } from 'react-icons/fa';
 interface ICardProps extends React.HTMLAttributes<HTMLDivElement> {
 	shadow?: 'none' | 'sm' | 'md' | 'lg';
 }
@@ -82,57 +82,55 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 			className={cn('w-full h-full md:flex-shrink-0 px-2', className)}
 		>
 			<button
-				className="w-full h-full text-left shadow-xl"
+				className="w-full h-full text-left hover:shadow-[0_4px_20px_rgba(255,123,0,0.4)] transition-all rounded-2xl"
 				onClick={handlerCardOnClick}
 			>
-				<Card className="h-full overflow-hidden border-none shadow-md pt-4 px-3">
-					<div className="relative h-72 w-full">
+				<Card className="h-full overflow-hidden border-none shadow-lg pt-0 px-0 rounded-2xl">
+					<div className="relative h-56 w-full">
 						<img
 							src={product.posterImageUrl}
 							alt={`${product.name} image`}
-							className="w-full h-full object-cover rounded-xl "
+							className="w-full h-full object-cover rounded-t-2xl p-1.5"
 						/>
 					</div>
-					<CardContent className="pt-4">
-						<h3 className="font-medium text-2xl leading-11 tracking-wide py-3">
-							{product.name}
-						</h3>
-						<div className="flex flex-col-reverse md:flex-row justify-between">
-							<div className="flex items-center mt-2">
-								<p className="text-gray-500 line-through text-lg">
-									{currency} {product.price}
-								</p>
-								<p className="ml-2 text-orange-500 font-medium text-xl">
-									{currency} {product.price}
-								</p>
-							</div>
-							<div className="flex flex-row items-center gap-2.5">
-								<IoLocationOutline />
-								<p className="text-black text-lg">{product.city}</p>
-							</div>
-						</div>
-					</CardContent>
-					<CardFooter className="flex justify-between items-center pt-0">
-						<div className="flex items-center">
-							<p className="pr-2.5 text-xl">{product.avgRate}</p>
-							{[...Array(5)].map((_, i) => (
-								<Star
-									key={i}
-									className={`h-4 w-4 ${
-										i < Math.floor(product.avgRate)
-											? 'text-yellow-400 fill-yellow-400'
-											: 'text-gray-300'
-									}`}
-								/>
-							))}
-						</div>
-						<div className="flex items-center text-sm text-gray-500">
-							<Eye className="h-6 w-6 mr-1" />
-							<p className="text-black-500 text-xl">
-								{product.quantityRate}
-							</p>
-						</div>
-					</CardFooter>
+					<CardContent className="pt-4 pb-2 px-5 space-y-2">
+  <h3 className="font-semibold text-lg md:text-xl text-gray-900 truncate">
+    {product.name}
+  </h3>
+
+  <div className="flex items-center text-sm text-gray-500 space-x-1">
+    {[...Array(5)].map((_, i) => (
+      <Star
+        key={i}
+        className={`h-4 w-4 ${i < Math.floor(product.avgRate) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+      />
+    ))}
+    <span className="ml-2">({product.avgRate})</span>
+  </div>
+
+  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
+    <div className="flex items-center">
+      <IoLocationOutline className="mr-1 text-gray-500" />
+      <span>{product.locationName}</span>
+    </div>
+
+    <div className="flex items-center">
+      <BsClock className="mr-1 text-gray-500" />
+      <span className='mr-1'>{product.time}</span>Hours
+    </div>
+
+    <div className="flex items-center">
+      <BsPeople className="mr-1 text-gray-500" />
+      <span>{product.quantityAvailable} chỗ</span>
+    </div>
+
+    <div className="flex items-center">
+      <FaCity className="mr-1 text-gray-500" />
+      <span>{product.city}</span>
+    </div>
+  </div>
+</CardContent>
+
 				</Card>
 			</button>
 		</div>

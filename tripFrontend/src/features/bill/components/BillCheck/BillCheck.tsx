@@ -91,7 +91,7 @@ export const PaymentCheckout = ({ bookingItems = [] }: BookingItemProps): JSX.El
     >
       <Layout className="min-h-screen">
         <Content className="bg-white md:bg-gray-50 pt-4 md:py-6 px-4 md:px-8">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-[1536px] mx-auto">
             <Row gutter={24}>
               {/* Payment Form */}
               <Col xs={24} md={12} className="md:pr-6">

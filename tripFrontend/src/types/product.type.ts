@@ -1,3 +1,4 @@
+import { Url } from 'url';
 import { EUserStatus } from './user.type';
 
 type Supplier = {
@@ -43,6 +44,25 @@ export type TProductSchedule = {
 	updateAt: Date;
 	deletedAt: Date | null;
 	status: EProductScheduleStatus;
+	product?: {
+		id: string;
+		name: string;
+		posterImageUrl: string;
+		supplierId: string;
+		time: number;
+		quantityAvailable: number;
+		age: number;
+		quantityCompleted: number;
+		description: string;
+		quantityRate: number;
+		avgRate: number;
+		locationId: string;
+		productCategoryId: string;
+		createAt: Date;
+		updateAt: Date;
+		deletedAt: Date | null;
+		status: EProductStatus;
+	};
 };
 
 export type TProductRate = {
@@ -103,6 +123,7 @@ export type TProductDetail = {
 	productImage: TProductImage[];
 	productSchedule: TProductSchedule[];
 	productRate: TProductRate[];
+	mapAddress: string;
 };
 
 export type TStat = {

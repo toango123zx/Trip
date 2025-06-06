@@ -1,10 +1,10 @@
 import { Button } from 'antd';
 import { ReactNode } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { UseFormReturn, FieldValues } from 'react-hook-form';
 
 import { BaseModal } from '@/components/BaseModal/BaseModal';
 
-type BaseFormProps<T> = {
+type BaseFormProps<T extends FieldValues> = {
   title: string;
   form: UseFormReturn<T>;
   isCreate?: boolean;
@@ -14,6 +14,7 @@ type BaseFormProps<T> = {
   onSave?: (data: T) => void;
   onRemove?: () => void;
   onCancel?: () => void;
+  footer?: ReactNode | ReactNode[];
 };
 
 export const BaseForm = <T extends Record<string, any>>({
@@ -26,8 +27,25 @@ export const BaseForm = <T extends Record<string, any>>({
   onSave = () => {},
   onRemove = () => {},
   onCancel = () => {},
+  footer,
 }: BaseFormProps<T>) => {
   const { handleSubmit } = form;
+
+  const modalFooter = footer !== undefined ? footer : [
+    <Button key="cancel" onClick={onCancel}>
+      Hủy
+    </Button>,
+    !disabled && !isCreate && (
+      <Button key="remove" danger onClick={onRemove}>
+        Xóa
+      </Button>
+    ),
+    !disabled && (
+      <Button key="save" type="primary" onClick={handleSubmit(onSave)}>
+        Lưu
+      </Button>
+    ),
+  ];
 
   return (
     <BaseModal
@@ -35,21 +53,7 @@ export const BaseForm = <T extends Record<string, any>>({
       onCancel={onCancel}
       title={title}
       width={1000}
-      footer={[
-        <Button key="cancel" onClick={onCancel}>
-          Hủy
-        </Button>,
-        !disabled && !isCreate && (
-          <Button key="remove" danger onClick={onRemove}>
-            Xóa
-          </Button>
-        ),
-        !disabled && (
-          <Button key="save" type="primary" onClick={handleSubmit(onSave)}>
-            Lưu
-          </Button>
-        ),
-      ]}
+      footer={modalFooter}
     >
       <form onSubmit={handleSubmit(onSave)} className="grid gap-3 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
         {children}

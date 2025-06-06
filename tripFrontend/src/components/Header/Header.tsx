@@ -153,6 +153,9 @@ const UserProfileDropdown = ({
 	const handleLogout = (): void => {
 		localStorage.removeItem('logged');
 		localStorage.removeItem('role');
+		localStorage.removeItem('accessToken')
+		localStorage.removeItem('username');
+		localStorage.removeItem('token');
 		window.location.href = '/';
 	};
 
@@ -225,7 +228,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 			{ label: 'Sales', href: '/sales' },
 			// { label: 'Profile', href: '/user/me' },
 			{ label: 'Cart', href: '/carts' },
-			{ label: 'Contact', href: '/contact' },
+			// { label: 'Contact', href: '/contact' },
 		],
 		[],
 	);
@@ -324,7 +327,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 		<header className={cn(className)}>
 			<div className="h-[60px] md:h-[152px]" />
 
-			<div className="fixed top-0 w-full z-50 bg-gradient-to-b from-[#fffdea]/100 to-white/95 shadow-sm transition-all duration-300 py-4 px-6 md:py-12 md:px-24">
+			<div className="fixed top-0 w-full z-50 bg-gradient-to-b from-[#fffdea]/100 to-white/95 shadow-sm transition-all duration-300 py-4 px-6 md:py-12">
 				<div className="max-w-[1728px] mx-auto flex items-center justify-between">
 					{/* Logo */}
 					<Link to="/" className="flex items-center">
@@ -353,12 +356,12 @@ export const Header = ({ className }: Props): JSX.Element => {
 						{isLogged ? (
 							<div className="hidden md:flex items-center gap-4">
 								{/* Cart */}
-								<Link
+								{/* <Link
 									to="/carts"
 									className="p-2 hover:text-orange-500 transition-all"
 								>
 									<IoCartOutline className="h-7 w-7" />
-								</Link>
+								</Link> */}
 
 								{/* Dropdown */}
 								<div className="relative" ref={dropdownRef}>
@@ -366,11 +369,14 @@ export const Header = ({ className }: Props): JSX.Element => {
 										ref={triggerRef}
 										type="button"
 										onClick={toggleDropdown}
-										className="p-2 hover:text-orange-500 transition-all"
+										className="group px-3 py-2 rounded-md hover:text-orange-500 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all flex items-center gap-2"
 										aria-haspopup="true"
 										aria-expanded={isOpen}
 									>
-										<FaRegUser className="h-7 w-7" />
+										<FaRegUser className="h-6 w-6 text-gray-600 group-hover:text-orange-500 transition" />
+										<span className="hidden md:inline text-sm font-medium text-gray-700 group-hover:text-orange-500">
+											{localStorage.getItem('username')}
+										</span>
 									</button>
 
 									{/* Dropdown Menu */}

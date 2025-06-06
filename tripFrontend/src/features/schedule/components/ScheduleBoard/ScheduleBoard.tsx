@@ -12,6 +12,8 @@ import { cn } from '@/lib';
 import { TProductSchedule, EProductScheduleStatus } from '@/types';
 import { scheduleThunk } from '../..';
 import { TReduxStoreDispatch } from '@/store';
+import { ScheduleDetail } from '../ScheduleDetail/ScheduleDetail';
+import { scheduleApi } from '../../scheduleApi';
 
 import { TRequestBodyCreateSchedule } from '../../schedule.type';
 
@@ -48,10 +50,11 @@ export const SchedulesBoard = ({
 	const [localData, setLocalData] = useState<TProductSchedule[] | TRequestBodyCreateSchedule[]>(data || []);
 	const [searchText, setSearchText] = useState('');
 	const [searchedColumn, setSearchedColumn] = useState('');
+	const [selectedSchedule, setSelectedSchedule] = useState<TProductSchedule | null>(null);
+	const [isDetailOpen, setIsDetailOpen] = useState(false);
 	const searchInput = useRef<InputRef>(null);
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 
-	// Thêm useEffect để đồng bộ dữ liệu khi prop data thay đổi
 	useEffect(() => {
 		setLocalData(data || []);
 	}, [data]);
@@ -60,7 +63,6 @@ export const SchedulesBoard = ({
 		try {
 			await dispatch(scheduleThunk.deleteSchedule(scheduleId)).unwrap();
 			
-			// Cập nhật local state
 			const updatedData = localData.filter(schedule => schedule.id !== scheduleId);
 			setLocalData(updatedData);
 
@@ -79,6 +81,26 @@ export const SchedulesBoard = ({
 				description: 'Failed to delete schedule',
 				duration: 3,
 			});
+		}
+	};
+
+	const handleViewDetail = async (schedule: TProductSchedule) => {
+		try {
+			const response = await scheduleApi.getScheduleByScheduleId(schedule.id, EProductScheduleStatus.active);
+			setSelectedSchedule(response);
+			setIsDetailOpen(true);
+		} catch (error) {
+			notification.error({
+				message: 'Lỗi',
+				description: 'Không thể lấy thông tin chi tiết lịch trình',
+				duration: 3,
+			});
+		}
+	};
+
+	const handleScheduleDeleted = () => {
+		if (onDeleteSuccess) {
+			onDeleteSuccess();
 		}
 	};
 
@@ -136,37 +158,47 @@ export const SchedulesBoard = ({
 					<button
 						type="button"
 						onClick={() =>
-							!disabled ? onViewDetailSchedule(schedule) : (): void => {}
+							!disabled ? handleViewDetail(schedule as TProductSchedule) : (): void => {}
 						}
 						className={`text-blue-500 flex gap-2.5 items-center`}
 					>
-						<span>View detail </span>
+						<span>Xem chi tiết </span>
 						<span className="h-fit">
 							<IoIosArrowRoundForward />
 						</span>
 					</button>
-					{!disabled && (
+					{/* {!disabled && (
 						<button
 							type="button"
 							className="text-red-500 ml-2"
 							onClick={() => handleDelete(schedule.id)}
 						>
-							Delete
+							Xóa
 						</button>
-					)}
+					)} */}
 				</div>
 			),
 		},
 	];
 
 	return (
-		<BaseTable<TProductSchedule>
-			rowKey="id"
-			columns={columnTable}
-			dataSource={localData as TProductSchedule[]}
-			className={cn(className)}
-			pagination={(localData?.length ?? 0) > (pageSize ?? 10) ? { pageSize } : false}
-			size="middle"
-		/>
+		<>
+			<BaseTable<TProductSchedule>
+				rowKey="id"
+				columns={columnTable}
+				dataSource={localData as TProductSchedule[]}
+				className={cn(className)}
+				pagination={(localData?.length ?? 0) > (pageSize ?? 10) ? { pageSize } : false}
+				size="middle"
+			/>
+			{selectedSchedule && (
+				<ScheduleDetail
+					schedule={selectedSchedule}
+					open={isDetailOpen}
+					onCancel={() => setIsDetailOpen(false)}
+					onDeleteSuccess={handleScheduleDeleted}
+				/>
+			)}
+		</>
 	);
 };

@@ -17,4 +17,5 @@ export type TRequestQueryGetUsers = {
     limit?: number;
     search?: string;
     roleName?: 'tourist' | 'supplier' | 'admin';
+    username?: string;
 };

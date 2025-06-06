@@ -14,6 +14,7 @@ import { discountEligibilityThunk } from '@/features/discountEligibility';
 import { discountTypeThunk } from '@/features/discountType/discountTypeThunk';
 import { productThunk } from '@/features/product/productThunk';
 import { ScheduleDetail } from '@/features/schedule/components/ScheduleDetail/ScheduleDetail';
+import { scheduleApi } from '@/features/schedule/scheduleApi';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import {
 	EInfoDiscountStatus,
@@ -22,6 +23,8 @@ import {
 	TDiscountsNonDiscountable,
 	TProductDetail,
 	TDiscount,
+	EProductScheduleStatus,
+	TProductSchedule,
 } from '@/types';
 
 import { TAddScheduleInDiscount, TRequestBodyCreateDiscount } from '../../discount.type';
@@ -127,6 +130,7 @@ export const DiscountForm = ({
 	const [productId, setProductId] = useState<string>('');
 	const [isOpenPopupProductDetail, setIsOpenPopupProductDetail] = useState(false);
 	const [isOpenPopupScheduleDetail, setIsOpenPopupScheduleDetail] = useState(false);
+	const [selectedSchedule, setSelectedSchedule] = useState<TProductSchedule | null>(null);
 
 	const LIMIT_PRODUCT = 1000;
 
@@ -242,11 +246,19 @@ export const DiscountForm = ({
 		setIsOpenPopupProductDetail(false);
 	};
 
-	const handleOpenScheduleDetail = (e: React.MouseEvent<HTMLButtonElement>): void => {
+	const handleOpenScheduleDetail = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
 		e.preventDefault();
 		e.stopPropagation();
 		if (!productId || !watch('scheduleIds')) return;
-		setIsOpenPopupScheduleDetail(true);
+		
+		try {
+			const scheduleId = String(watch('scheduleIds'));
+			const response = await scheduleApi.getScheduleByScheduleId(scheduleId, EProductScheduleStatus.active);
+			setSelectedSchedule(response);
+			setIsOpenPopupScheduleDetail(true);
+		} catch (error) {
+			console.error('Error fetching schedule details:', error);
+		}
 	};
 
 	const handleCloseScheduleDetail = (): void => {
@@ -341,6 +353,17 @@ export const DiscountForm = ({
 				flag = true;
 			}
 
+			// Convert numeric fields to integers
+			if (value.value) {
+				value.value = Math.floor(Number(value.value));
+			}
+			if (value.quantity) {
+				value.quantity = Math.floor(Number(value.quantity));
+			}
+			if (value.point) {
+				value.point = Math.floor(Number(value.point));
+			}
+
 			if (value.point <= 0) {
 				setValue('quantity', 0);
 			}
@@ -354,7 +377,8 @@ export const DiscountForm = ({
 			value.scheduleIds = addScheduleIds.length > 0 ? addScheduleIds : undefined;
 
 			try {
-				onSave(value as TRequestBodyCreateDiscount);
+				console.log('DiscountForm - handleSaveOnClick - Gọi onSave với dữ liệu:', value);
+				onSave(value);
 			} catch (error) {
 				console.error('Error saving discount:', error);
 			}
@@ -690,14 +714,10 @@ export const DiscountForm = ({
 				/>
 			)}
 
-			{isOpenPopupScheduleDetail && productId && watch('scheduleIds') && (
+			{isOpenPopupScheduleDetail && selectedSchedule && (
 				<ScheduleDetail
-					productName={
-						productOption.find((p) => p.id === productId)?.label || 'None'
-					}
-					scheduleId={String(watch('scheduleIds'))}
-					disabled={true}
-					isCreate={false}
+					schedule={selectedSchedule}
+					open={isOpenPopupScheduleDetail}
 					onCancel={handleCloseScheduleDetail}
 				/>
 			)}

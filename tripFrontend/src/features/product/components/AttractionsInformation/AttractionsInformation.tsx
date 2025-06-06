@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Pagination, Navigation, Autoplay, Mousewheel } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import ImageGallery from 'react-image-gallery';
+import "react-image-gallery/styles/css/image-gallery.css";
 
 import { scheduleThunk } from '@/features/schedule';
 import { cn } from '@/lib';
@@ -15,6 +17,7 @@ import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { EProductScheduleStatus, TProductSchedule } from '@/types';
 
 import { productThunk } from '../../productThunk';
+import { ImageFallback } from '@/components/ImageFallback';
 
 type TStarIconProps = { filled: boolean };
 const StarIcon = ({ filled }: TStarIconProps): JSX.Element =>
@@ -188,7 +191,6 @@ const ScheduleCard = ({
 				{/* Price and actions */}
 				<div className="flex items-center justify-between border-t border-gray-100 pt-5">
 					<div>
-						<p className="text-xs text-gray-500 mb-1">From</p>
 						<p className="text-2xl font-bold text-orange-600">
 							{new Intl.NumberFormat('vi-VN').format(schedule.price)} ₫
 						</p>
@@ -209,21 +211,11 @@ const ScheduleCard = ({
 							onClick={addScheduleInCart}
 							disabled={isAddedToCart}
 							className={cn(
-								'px-6 py-2 rounded-lg text-sm font-semibold transition-colors',
+								'px-6 py-2 rounded-lg text-sm font-semibold transition-colors bg-orange-500 text-white hover:bg-orange-600',
 								'flex items-center gap-2',
-								isAddedToCart
-									? 'bg-green-100 text-green-700 border border-green-200'
-									: 'bg-orange-500 text-white hover:bg-orange-600',
 							)}
 						>
-							{isAddedToCart ? (
-								<>
-									<FaCheck className="w-4 h-4" />
-									Added
-								</>
-							) : (
-								'Book Now'
-							)}
+							Book Now
 						</button>
 					</div>
 				</div>
@@ -242,6 +234,8 @@ export const AttractionsInformation: React.FC = () => {
 	const [showAllImages, setShowAllImages] = useState(false);
 	const [showFullDesc, setShowFullDesc] = useState(false);
 	const swiperRef = useRef<unknown>(null);
+	const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
 	useEffect(() => {
 		if (attractionId) dispatch(productThunk.getProductDetail(attractionId));
@@ -270,6 +264,19 @@ export const AttractionsInformation: React.FC = () => {
 		{ label: 'Available', value: data.quantityAvailable },
 		{ label: 'Completed', value: data.quantityCompleted },
 	];
+
+	// Chuyển đổi dữ liệu ảnh sang định dạng của ImageGallery
+	const images = data.productImage?.map(img => ({
+		original: img.url,
+		thumbnail: img.url,
+		originalAlt: 'Gallery image',
+		thumbnailAlt: 'Gallery thumbnail'
+	}));
+
+	const handleImageClick = (index: number) => {
+		setCurrentImageIndex(index);
+		setIsGalleryOpen(true);
+	};
 
 	return (
 		<section className="relative">
@@ -360,22 +367,22 @@ export const AttractionsInformation: React.FC = () => {
 					<h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">
 						Gallery
 					</h2>
-					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-						{visibleImages?.map((img, i) => (
+					<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+						{data.productImage?.map((img, i) => (
 							<div
 								key={img.id || i}
-								className="group relative overflow-hidden rounded-lg"
+								className="group relative overflow-hidden rounded-lg cursor-pointer"
+								onClick={() => handleImageClick(i)}
 							>
 								<ImageFallback
 									src={img.url}
 									alt={`Gallery image ${i + 1}`}
 									className="w-full h-48 md:h-64 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
 								/>
-								<div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
 							</div>
 						))}
 					</div>
-					{data.productImage?.length > 3 && (
+					{data.productImage?.length > 6 && (
 						<div className="mt-6 text-center">
 							<button
 								onClick={() => setShowAllImages((v) => !v)}
@@ -386,6 +393,27 @@ export const AttractionsInformation: React.FC = () => {
 						</div>
 					)}
 				</div>
+
+				{/* Google Map Section */}
+				{data.mapAddress?.url && (
+					<div className="my-8">
+						<h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
+							Map Address
+						</h2>
+						<div className="w-full h-96 rounded-lg overflow-hidden">
+							<iframe
+								src={data.mapAddress.url}
+								width="100%"
+								height="100%"
+								style={{ border: 0 }}
+								allowFullScreen
+								loading="lazy"
+								referrerPolicy="no-referrer-when-downgrade"
+								title="Google Map"
+							></iframe>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Schedules */}
@@ -401,6 +429,80 @@ export const AttractionsInformation: React.FC = () => {
 					</div>
 				</div>
 			</div>
+
+			{/* Image Gallery Modal */}
+			{isGalleryOpen && (
+				<div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
+					<div className="w-full max-w-[1536px] mx-auto p-4">
+						<button
+							onClick={() => setIsGalleryOpen(false)}
+							className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+						>
+							<svg
+								className="w-6 h-6"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						</button>
+						<ImageGallery
+							items={images}
+							startIndex={currentImageIndex}
+							showPlayButton={false}
+							showFullscreenButton={true}
+							showNav={true}
+							showThumbnails={true}
+							thumbnailPosition="bottom"
+							slideInterval={3000}
+							onClose={() => setIsGalleryOpen(false)}
+							additionalClass="custom-gallery"
+						/>
+					</div>
+				</div>
+			)}
+
+			{/* Thêm CSS tùy chỉnh */}
+			<style jsx global>{`
+				.custom-gallery .image-gallery-slide {
+					background: transparent;
+				}
+				.custom-gallery .image-gallery-thumbnail {
+					width: 100px;
+					height: 70px;
+					overflow: hidden;
+					border-radius: 4px;
+					margin: 0 4px;
+				}
+				.custom-gallery .image-gallery-thumbnail.active {
+					border: 2px solid #3b82f6;
+				}
+				.custom-gallery .image-gallery-thumbnail:hover {
+					border: 2px solid #60a5fa;
+				}
+				.custom-gallery .image-gallery-thumbnails-container {
+					background: transparent;
+				}
+				.custom-gallery .image-gallery-thumbnails {
+					padding: 10px 0;
+				}
+				.custom-gallery .image-gallery-thumbnail-image {
+					object-fit: cover;
+					height: 100%;
+				}
+				.custom-gallery .image-gallery-icon {
+					filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1));
+				}
+				.custom-gallery .image-gallery-icon:hover {
+					color: #60a5fa;
+				}
+			`}</style>
 		</section>
 	);
 };

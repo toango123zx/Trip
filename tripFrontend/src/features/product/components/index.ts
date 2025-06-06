@@ -13,3 +13,4 @@ export * from './SearchBar';
 export * from './Services';
 export * from './Stats';
 export * from './TopDestinations';
+export * from './TourBookingFeatures';

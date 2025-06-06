@@ -3,7 +3,7 @@
 import { JSX, useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 import { ProductForm, scheduleThunk, TRequestBodyCreateSchedule } from '@/features';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
@@ -26,8 +26,7 @@ export const AddProduct = ({
 	const [hasSubmitted, setHasSubmitted] = useState(false);
 	const [locationDescription, setLocationDescription] = useState<string>('');
 	const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
-	const form = useForm<TRequestBodyCreateProduct>({
-	});
+	const form = useForm<TRequestBodyCreateProduct>({});
 
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 
@@ -43,9 +42,9 @@ export const AddProduct = ({
 			...data,
 			time: Number(data.time),
 			quantityAvailable: Number(data.quantityAvailable),
-			age: Number(data.age)
+			age: Number(data.age),
 		};
-		
+
 		setHasSubmitted(true);
 		dispatch(productThunk.createProduct(formattedData));
 	};
@@ -64,13 +63,13 @@ Nội dung cần hấp dẫn, truyền cảm hứng, và nêu bật điểm đ�
 `;
 
 		try {
-			const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+			const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 			const result = await model.generateContent(prompt);
 			const description = result.response.text();
 			form.setValue('description', description, {
 				shouldValidate: true,
 				shouldDirty: true,
-				shouldTouch: true
+				shouldTouch: true,
 			});
 
 			setLocationDescription(description);

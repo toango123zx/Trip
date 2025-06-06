@@ -136,11 +136,11 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 			className={cn('relative w-full', className)}
 			aria-label="Product Management"
 		>
-			<div className="container mx-auto bg-white rounded-lg shadow-lg p-3 sm:p-6 md:px-8 md:py-10 lg:px-10 lg:py-12 font-sans flex flex-col transition-all duration-300">
+			<div className="container mx-auto bg-white rounded-lg p-3 sm:p-6 md:px-8 md:py-10 lg:px-10 lg:py-12 font-sans flex flex-col transition-all duration-300">
 				{/* Main Content */}
 				<main className="flex flex-col md:flex-row flex-1 gap-4 md:gap-6 lg:gap-8">
-					{/* Sidebar - Always Visible */}
-					<div className="flex flex-row md:flex-col flex-wrap justify-center md:justify-start gap-2 md:gap-4 md:w-1/4 lg:w-1/5 font-Montserrat">
+					{/* Sidebar - Fixed */}
+					<div className="flex flex-row md:flex-col flex-wrap justify-center md:justify-start gap-2 md:gap-4 md:w-1/4 lg:w-1/5 font-Montserrat md:sticky md:top-0 md:h-screen">
 						<button
 							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
 								activeTab === 'product'
@@ -177,7 +177,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 					</div>
 
 					{/* Content Area */}
-					<div className="flex-1 rounded-xl bg-white p-3 sm:p-4 md:p-6 shadow-md border border-gray-100 transition-all duration-300">
+					<div className="flex-1 rounded-xl bg-white p-3 sm:p-4 md:p-6 shadow-md border border-gray-100 transition-all duration-300 overflow-hidden flex flex-col">
 						<div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 							<h2 className="text-lg sm:text-xl font-semibold text-gray-800 flex items-center gap-2">
 								{activeTab === 'product' && (
@@ -227,7 +227,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 							</div>
 						</div>
 
-						<div className="bg-gray-50 rounded-lg p-2 sm:p-4 transition-all duration-300 overflow-x-auto">
+						<div className="bg-gray-50 rounded-lg p-2 sm:p-4 transition-all duration-300 overflow-x-auto flex-1">
 							{activeTab === EactiveTab.product && (
 								<ProductsBoard
 									page={pageProduct}

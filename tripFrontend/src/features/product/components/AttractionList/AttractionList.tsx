@@ -91,7 +91,7 @@ export const AttractionList = ({
 			aria-labelledby="search-bar-desktop"
 		>
 			<div className="max-w-[1536px] mx-auto">
-				<div className="mb-8 flex flex-row justify-between items-center px-2">
+				<div className="mb-8 flex flex-col items-start md:flex-row md:justify-between md:items-center px-2">
 					<div className="relative font-semibold text-4xl font-[Montserrat] text-left">List Attractions</div>
 					<div className="flex items-center gap-5">
 						{locations && (

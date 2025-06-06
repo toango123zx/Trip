@@ -1,6 +1,6 @@
-import { Star } from 'lucide-react';
-import { JSX, useMemo, useState } from 'react';
-import { IoMdCheckmarkCircle } from 'react-icons/io';
+import React, { JSX, useMemo, useState } from 'react';
+import { Star, Send, CheckCircle } from 'lucide-react';
+import { IoLocationOutline } from 'react-icons/io5';
 
 import { SelectBox } from '@/components';
 import { cn } from '@/lib';
@@ -13,37 +13,30 @@ type TRatingCardProps = {
 };
 
 const RatingCard = ({ rate, className }: TRatingCardProps): JSX.Element => (
-	<section
-		className={cn('relative md:pt-0', className)}
-		aria-labelledby="attractions-rating"
-	>
-		<div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm h-full flex flex-col text-sm md:text-2xl">
-			<div className="flex justify-between items-start mb-1 md:mb-3">
-				<div>
-					<div className="flex items-center mb-1.5 md:mb-3.5 gap-0.5">
-						{Array.from({ length: 5 }).map((_, index) => (
-							<Star
-								key={index}
-								className={`w-3 md:w-5 ${index < rate.star ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-							/>
-						))}
-					</div>
-					<div className="flex items-center">
-						<span className="font-medium text-gray-800 mr-1">
-							{rate.userName}
-						</span>
-						<IoMdCheckmarkCircle className="w-3.5 md:w-5 text-green-500" />
-					</div>
+	<div className="bg-white rounded-2xl overflow-hidden transition-all duration-300 ease-in-out shadow-sm hover:shadow-md border border-gray-100">
+		<div className="bg-gradient-to-r from-blue-50 to-orange-50 p-5 border-b border-gray-100">
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-2">
+					<span className="font-medium text-gray-800">{rate.userName}</span>
+					<CheckCircle className="w-4 h-4 text-green-500" />
+				</div>
+				<div className="flex items-center gap-1">
+					{Array.from({ length: 5 }).map((_, index) => (
+						<Star
+							key={index}
+							className={`w-4 h-4 ${index < rate.star ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+						/>
+					))}
 				</div>
 			</div>
-			<p className="text-gray-600 mb-2.5 md:mb-6 italic flex-grow">
-				"{rate.comment}"
-			</p>
-			<p className="text-xs md:text-xl text-gray-400 mt-auto">
-				Posted on {rate.createAt}
-			</p>
 		</div>
-	</section>
+		<div className="p-5">
+			<p className="text-gray-600 italic mb-4">"{rate.comment}"</p>
+			<div className="text-xs text-gray-400 flex justify-between items-center">
+				<span>Posted on {rate.createAt}</span>
+			</div>
+		</div>
+	</div>
 );
 
 type TAttractionRateProps = {
@@ -55,6 +48,8 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 	const REVIEWS_PER_PAGE = 8;
 
 	const [visibleCount, setVisibleCount] = useState(REVIEWS_PER_PAGE);
+	const [selectedStars, setSelectedStars] = useState(0);
+	const [comment, setComment] = useState('');
 
 	const stars = useMemo(
 		() =>
@@ -79,61 +74,126 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 			Math.min(prev + REVIEWS_PER_PAGE, attraction.productRate.length),
 		);
 
+	const handleStarClick = (starCount: number): void => {
+		setSelectedStars(starCount);
+	};
+
+	const handleSubmitReview = (): void => {
+		if (selectedStars > 0 && comment.trim()) {
+			// TODO: Implement actual review submission logic
+			console.log('Submitting review:', { stars: selectedStars, comment });
+			// Reset form after submission
+			setSelectedStars(0);
+			setComment('');
+		}
+	};
+
 	return (
-		<section
-			className={cn('relative md:pt-0', className)}
-			aria-labelledby="attractions-rate"
-		>
-			<div className="container mx-auto bg-white rounded-lg shadow-lg p-6 md:px-20 md:py-16 font-sans">
-				<div className="flex justify-between items-center mb-5 md:mb-8">
-					<div className="space-y-2 md:space-y-5 w-full">
-						<h2 className="text-xl md:text-4xl font-semibold text-gray-800">
-							Ratings
-						</h2>
-						<div className="flex justify-between items-end w-full">
-							<div className="flex items-center gap-2 text-sm md:text-2xl text-gray-500">
-								<div className="flex flex-col-reverse gap-0 md:gap-1.5 text-base md:text-3xl">
-									<div className="flex gap-1.5 items-center">
-										{stars}
-									</div>
-									<div className="space-x-1 md:space-x-2.5">
-										<span className="text-orange-400">
-											{attraction.avgRate}
-										</span>
-										<span className="md:text-xl">
-											({attraction.quantityRate})
-										</span>
-									</div>
-								</div>
+		<section className={cn('relative', className)}>
+			<div className="container mx-auto bg-white rounded-lg shadow-sm p-6 md:p-8">
+				{/* Header */}
+				<div className="mb-6 pb-6">
+					<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+						<div>
+							<h1 className="text-2xl md:text-4xl font-bold text-gray-900">
+								Ratings & Reviews
+							</h1>
+							<div className="flex items-center gap-2 text-gray-500 mt-2">
+								<IoLocationOutline className="text-orange-500" />
+								<span className="text-sm md:text-base">{attraction.city}</span>
 							</div>
-							<SelectBox
-								selectOption={[
-									{ id: '1', label: 'latest', value: 'latest' },
-									{ id: '2', label: 'oldest', value: 'oldest' },
-								]}
-								className="w-28 md:w-52 h-8 md:h-10 flex items-center justify-between px-4 md:px-6 text-sm md:text-2xl border border-black rounded-4xl bg-white focus-within:ring-2 focus-within:ring-orange-200 focus-within:border-transparent transition-all duration-150"
-							/>
+						</div>
+						<div className="flex items-center gap-2 text-gray-500">
+							<div className="flex gap-1 items-center">
+								{stars}
+								<span className="ml-1 text-sm md:text-base">
+									{attraction.avgRate}
+								</span>
+							</div>
+							<span className="text-sm md:text-base">
+								({attraction.quantityRate} reviews)
+							</span>
 						</div>
 					</div>
 				</div>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 mb-6 md:mb-12">
-					{attraction.productRate.slice(0, visibleCount).map((rate) => (
-						<RatingCard key={rate.id} rate={rate} />
-					))}
+				{/* Review Submission Section */}
+				<div className="bg-gray-50 rounded-lg p-6 mb-8 shadow-inner">
+					<div className="grid md:grid-cols-2 gap-6">
+						<div>
+							<h3 className="text-xl font-semibold text-gray-800 mb-4">
+								Write a Review
+							</h3>
+							<div className="flex items-center space-x-2 mb-4">
+								{Array.from({ length: 5 }).map((_, index) => (
+									<Star
+										key={index}
+										onClick={() => handleStarClick(index + 1)}
+										className={`w-6 md:w-8 cursor-pointer transition-colors duration-200 ${
+											index < selectedStars 
+											? 'text-yellow-400 fill-yellow-400' 
+											: 'text-gray-300 hover:text-yellow-300'
+										}`}
+									/>
+								))}
+							</div>
+							<p className="text-sm text-gray-500 mb-2">
+								{selectedStars > 0 
+									? `You selected ${selectedStars} star${selectedStars > 1 ? 's' : ''}` 
+									: 'Select your rating'}
+							</p>
+						</div>
+						<div className="space-y-4">
+							<textarea
+								value={comment}
+								onChange={(e) => setComment(e.target.value)}
+								placeholder="Share your experience..."
+								className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-200 transition-all duration-150 min-h-[150px]"
+							/>
+							<button 
+								onClick={handleSubmitReview}
+								disabled={selectedStars === 0 || !comment.trim()}
+								className="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+							>
+								<Send className="w-5 h-5 mr-2" />
+								Submit Review
+							</button>
+						</div>
+					</div>
 				</div>
 
-				<div className="text-center">
-					{visibleCount < attraction.productRate.length ? (
-						<button
-							onClick={handleLoadMore}
-							className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2 px-5 rounded-full shadow-md transition duration-150 ease-in-out"
-						>
-							Load More Reviews (
-							{attraction.productRate.length - visibleCount} remaining)
-						</button>
-					) : (
-						<p className="text-sm text-gray-500">All reviews loaded.</p>
+				{/* Reviews Grid */}
+				<div className="bg-gray-50 rounded-lg p-6">
+					<div className="flex justify-between items-center mb-6">
+						<h2 className="text-xl font-semibold text-gray-900">
+							Customer Reviews
+						</h2>
+						<SelectBox
+							selectOption={[
+								{ id: '1', label: 'Latest', value: 'latest' },
+								{ id: '2', label: 'Highest Rated', value: 'highest' },
+								{ id: '3', label: 'Oldest', value: 'oldest' },
+							]}
+							className="w-48 h-10 flex items-center justify-between px-4 text-sm border border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-orange-200 transition-all duration-150"
+						/>
+					</div>
+
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+						{attraction.productRate.slice(0, visibleCount).map((rate) => (
+							<RatingCard key={rate.id} rate={rate} />
+						))}
+					</div>
+
+					{visibleCount < attraction.productRate.length && (
+						<div className="text-center">
+							<button
+								onClick={handleLoadMore}
+								className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2 px-6 rounded-full shadow-md transition duration-150 ease-in-out"
+							>
+								Load More Reviews (
+								{attraction.productRate.length - visibleCount} remaining)
+							</button>
+						</div>
 					)}
 				</div>
 			</div>

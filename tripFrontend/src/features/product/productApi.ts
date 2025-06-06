@@ -14,7 +14,7 @@ export const productApi = {
 		try {
 			const safeQuery = query || {};
 			const response = await api.get<TProductSumary[]>(
-				'/product',
+				'/product?time=asc&statusSearch=active',
 				{
 					...safeQuery,
 					page: safeQuery.page || 1,

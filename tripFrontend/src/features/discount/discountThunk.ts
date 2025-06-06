@@ -89,11 +89,20 @@ const getDiscountByDiscountId = createAsyncThunk(
 );
 
 const createDiscount = createAsyncThunk(
-  'discount/createDiscount',
-  async ({ discount }: { discount: TRequestBodyCreateDiscount }): Promise<TDiscount> => {
-    const response = await discountApi.createDiscount(discount);
-    return response;
-  },
+	'discount/createDiscount',
+	async ({
+		discount,
+	}: {
+		discount: TRequestBodyCreateDiscount;
+	}): Promise<TDiscount> => {
+		try {
+			const response = await discountApi.createDiscount(discount);
+			return response;
+		} catch (error) {
+			console.error('discountThunk - createDiscount - Lỗi:', error);
+			throw error;
+		}
+	},
 );
 
 const assignProductSchedulesToDiscount = createAsyncThunk(

@@ -39,18 +39,30 @@ export const ProductsBoard = ({
 		(state: TReduxStoreState) => state.product.pagination,
 	);
 
+	const [searchText, setSearchText] = useState('');
+	const [searchedColumn, setSearchedColumn] = useState('');
+	const searchInput = useRef<InputRef>(null);
+
+	// Thêm debounce để tránh gọi API quá nhiều
+	const [debouncedSearchText, setDebouncedSearchText] = useState('');
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedSearchText(searchText);
+		}, 500); // Đợi 500ms sau khi người dùng ngừng gõ
+
+		return () => clearTimeout(timer);
+	}, [searchText]);
+
 	useEffect(() => {
 		dispatch(
 			productThunk.getProducts({
 				page: page,
 				limit: pageSize,
+				keyword: debouncedSearchText || undefined, // Thêm keyword vào params
 			}),
 		);
-	}, [dispatch, page, pageSize]);
-
-	const [searchText, setSearchText] = useState('');
-	const [searchedColumn, setSearchedColumn] = useState('');
-	const searchInput = useRef<InputRef>(null);
+	}, [dispatch, page, pageSize, debouncedSearchText]);
 
 	const columnTable: TableColumnsType<TProductSumary> = [
 		{
@@ -78,24 +90,16 @@ export const ProductsBoard = ({
 			title: 'Thành phố',
 			dataIndex: 'city',
 			key: 'city',
-			...getColumnSearchProps(
-				'city',
-				searchInput,
-				searchText,
-				setSearchText,
-				searchedColumn,
-				setSearchedColumn,
-			),
 			sorter: (a, b) => a.city.length - b.city.length,
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
 			title: 'Time',
-			dataIndex: 'time',
-			key: 'time',
-			sorter: (a, b) => a.time - b.time,
+			dataIndex: 'createAt',
+			key: 'createAt',
+			sorter: (a, b) => new Date(a.createAt).getTime() - new Date(b.createAt).getTime(),
 			sortDirections: ['descend', 'ascend'],
-			render: (value: Date) => formatDateTime(value),
+			render: (value: string) => formatDateTime(value),
 		},
 		{
 			title: 'Số lượng',
