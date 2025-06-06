@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import {
 	BillStatusEnum,
+	CityEnum,
 	DiscountStatusEnum,
 	InfoDiscountStatusEnum,
 	ProductScheduleStatusEnum,
@@ -28,7 +29,9 @@ export class ProductRepository {
 		productScheduleStatus: ProductScheduleStatusEnum[] = [],
 		startTimeSearch?: Date,
 		endTimeSearch?: Date,
-		priceSearch?: number,
+		priceFromSearch?: number,
+		priceToSearch?: number,
+		citySearch?: CityEnum,
 	): Promise<[ProductEntity[], number]> {
 		const orderBy = [];
 		if (filter.location?.displayName && filter.location?.city) {
@@ -69,9 +72,10 @@ export class ProductRepository {
 				lte: endTimeSearch,
 			};
 		}
-		if (priceSearch) {
+		if (priceFromSearch || priceToSearch) {
 			some['price'] = {
-				lte: priceSearch,
+				gte: priceFromSearch,
+				lte: priceToSearch,
 			};
 		}
 		if (productScheduleStatus.length > 0) {
@@ -137,6 +141,9 @@ export class ProductRepository {
 					},
 					supplier: {
 						userId: userId,
+					},
+					location: {
+						city: citySearch,
 					},
 					productSchedule:
 						Object.keys(some).length > 0
