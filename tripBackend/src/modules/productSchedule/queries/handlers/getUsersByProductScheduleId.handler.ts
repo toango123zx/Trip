@@ -55,15 +55,24 @@ export class GetUsersByProductScheduleIdHandler
 			await this.userRepository.findUsersInProductSchedulebyProductScheduleId(
 				productScheduleId,
 				undefined,
-				[BillStatusEnum.pending, BillStatusEnum.done],
+				[BillStatusEnum.pending, BillStatusEnum.paid, BillStatusEnum.done],
 				[UserStatusEnum.active],
 				page,
 				filter,
 			);
 
-		const usersInformation = users.map(
-			(user) => new GetUsersByProductScheduleIdResponseDto(user),
-		);
+		const usersInformation = users
+			.map((user) => {
+				if (user.bill.length > 1) {
+					return user.bill.map((bill) => {
+						return new GetUsersByProductScheduleIdResponseDto({
+							...user,
+							bill: [bill],
+						});
+					});
+				}
+			})
+			.flat();
 
 		return {
 			success: true,
