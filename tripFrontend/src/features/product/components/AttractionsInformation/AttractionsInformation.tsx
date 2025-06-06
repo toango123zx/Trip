@@ -12,6 +12,7 @@ import ImageGallery from 'react-image-gallery';
 import "react-image-gallery/styles/css/image-gallery.css";
 
 import { scheduleThunk } from '@/features/schedule';
+import { cartThunk } from '@/features/cart';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { EProductScheduleStatus, TProductSchedule } from '@/types';
@@ -230,6 +231,7 @@ export const AttractionsInformation: React.FC = () => {
 	const { productDetail: data } = useSelector(
 		(state: TReduxStoreState) => state.product,
 	);
+	const { carts } = useSelector((state: TReduxStoreState) => state.cart);
 
 	const [showAllImages, setShowAllImages] = useState(false);
 	const [showFullDesc, setShowFullDesc] = useState(false);
@@ -238,8 +240,27 @@ export const AttractionsInformation: React.FC = () => {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
 	useEffect(() => {
-		if (attractionId) dispatch(productThunk.getProductDetail(attractionId));
+		if (attractionId) {
+			dispatch(productThunk.getProductDetail(attractionId));
+			dispatch(cartThunk.getCarts());
+		}
 	}, [attractionId, dispatch]);
+
+	// Filter schedules based on booking time and cart status
+	const filteredSchedules = useMemo(() => {
+		if (!data.productSchedule) return [];
+		
+		const now = new Date();
+		const bookedScheduleIds = new Set(carts.map(cart => cart.scheduleId));
+
+		return data.productSchedule.filter(schedule => {
+			const startOrder = new Date(schedule.startOrder);
+			const isBookingOpen = now >= startOrder;
+			const isNotBooked = !bookedScheduleIds.has(schedule.id);
+			
+			return isBookingOpen && isNotBooked;
+		});
+	}, [data.productSchedule, carts]);
 
 	const truncatedDesc = useMemo(() => {
 		if (!data.description) return '';
@@ -423,9 +444,14 @@ export const AttractionsInformation: React.FC = () => {
 						Available Schedules
 					</h2>
 					<div className="space-y-4">
-						{data.productSchedule?.map((sched) => (
+						{filteredSchedules.map((sched) => (
 							<ScheduleCard key={sched.id} schedule={sched} />
 						))}
+						{filteredSchedules.length === 0 && (
+							<div className="text-center py-8 text-gray-500">
+								No available schedules at the moment
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

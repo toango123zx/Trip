@@ -245,7 +245,7 @@ const AccountPage: React.FC = () => {
 							<div className="profile-info">
 								<div className="info-item">
 									<FaUser className="info-icon" />
-									<span>Tên: {userProfile.name}</span>
+									<span>Name: {userProfile.name}</span>
 								</div>
 								<div className="info-item">
 									<FaEnvelope className="info-icon" />
@@ -253,25 +253,24 @@ const AccountPage: React.FC = () => {
 								</div>
 								<div className="info-item">
 									<FaUserTag className="info-icon" />
-									<span>Vai trò: {userProfile.roleName}</span>
+									<span>Role: {userProfile.roleName}</span>
 								</div>
 								<div className="info-item">
 									<FaTransgender className="info-icon" />
 									<span>
-										Giới tính: {userProfile.gender || 'Chưa cập nhật'}
+										Gender: {userProfile.gender || 'Chưa cập nhật'}
 									</span>
 								</div>
 								<div className="info-item">
 									<FaPhone className="info-icon" />
 									<span>
-										Số điện thoại:{' '}
-										{userProfile.phoneNumber || 'Chưa cập nhật'}
+										Phone Number: {userProfile.phoneNumber || 'Chưa cập nhật'}
 									</span>
 								</div>
 								<div className="info-item">
 									<FaMapMarkerAlt className="info-icon" />
 									<span>
-										Địa chỉ: {userProfile.address || 'Chưa cập nhật'}
+										Address: {userProfile.address || 'Chưa cập nhật'}
 									</span>
 								</div>
 								<button
@@ -284,7 +283,7 @@ const AccountPage: React.FC = () => {
 						) : (
 							<div className="profile-edit">
 								<div className="input-group">
-									<label htmlFor="name">Tên</label>
+									<label htmlFor="name">Name</label>
 									<input
 										type="text"
 										id="name"
@@ -294,7 +293,7 @@ const AccountPage: React.FC = () => {
 									/>
 								</div>
 								<div className="input-group">
-									<label htmlFor="gender">Giới tính</label>
+									<label htmlFor="gender">Gender</label>
 									<input
 										type="text"
 										id="gender"
@@ -304,7 +303,7 @@ const AccountPage: React.FC = () => {
 									/>
 								</div>
 								<div className="input-group">
-									<label htmlFor="phoneNumber">Số điện thoại</label>
+									<label htmlFor="phoneNumber">Phone Number</label>
 									<input
 										type="text"
 										id="phoneNumber"
@@ -314,7 +313,7 @@ const AccountPage: React.FC = () => {
 									/>
 								</div>
 								<div className="input-group">
-									<label htmlFor="address">Địa chỉ</label>
+									<label htmlFor="address">Address</label>
 									<input
 										type="text"
 										id="address"
@@ -328,13 +327,13 @@ const AccountPage: React.FC = () => {
 										className="save-button"
 										onClick={handleUpdateProfile}
 									>
-										Lưu
+										Save
 									</button>
 									<button
 										className="cancel-button"
 										onClick={() => setEditMode(false)}
 									>
-										Hủy
+										Cancel
 									</button>
 								</div>
 							</div>
@@ -346,7 +345,7 @@ const AccountPage: React.FC = () => {
 					<div className="password-section">
 						<div className="password-change">
 							<div className="input-group">
-								<label htmlFor="currentPassword">Mật khẩu hiện tại</label>
+								<label htmlFor="currentPassword">Current Password</label>
 								<input
 									type="password"
 									id="currentPassword"
@@ -356,7 +355,7 @@ const AccountPage: React.FC = () => {
 								/>
 							</div>
 							<div className="input-group">
-								<label htmlFor="newPassword">Mật khẩu mới</label>
+								<label htmlFor="newPassword">New Password</label>
 								<input
 									type="password"
 									id="newPassword"
@@ -366,9 +365,7 @@ const AccountPage: React.FC = () => {
 								/>
 							</div>
 							<div className="input-group">
-								<label htmlFor="confirmPassword">
-									Xác nhận mật khẩu mới
-								</label>
+								<label htmlFor="confirmPassword">Confirm New Password</label>
 								<input
 									type="password"
 									id="confirmPassword"
@@ -382,7 +379,7 @@ const AccountPage: React.FC = () => {
 									className="change-password-button"
 									onClick={handleChangePassword}
 								>
-									Đổi mật khẩu
+									Change Password
 								</button>
 							</div>
 						</div>
