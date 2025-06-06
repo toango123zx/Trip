@@ -242,6 +242,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 									pageSize={PAGE_SIZE}
 									page={pageSchedule}
 									setPage={setPageSchedule}
+									pagination={schedulePagination}
 								/>
 							)}
 							{activeTab === EactiveTab.discount && (

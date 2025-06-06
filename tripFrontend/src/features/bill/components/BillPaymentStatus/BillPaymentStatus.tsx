@@ -98,7 +98,7 @@ const CustomSteps: React.FC<{
           return (
             <React.Fragment key={index}>
               <motion.div
-                className="relative z-10 flex-shrink-0"
+                className="relative z-1 flex-shrink-0"
                 initial={{ scale: 0.8, opacity: 0.5 }}
                 animate={{
                   scale: shouldAnimate ? (isActive ? 1.1 : 1) : 0.8,
@@ -220,8 +220,8 @@ const SuccessResult: React.FC<{ message: string }> = ({ message }) => (
       whileHover={{ scale: 1.05 }}
       transition={{ type: 'spring', stiffness: 300 }}
     >
-      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto shadow-lg">
-        <SuccessIcon className="w-12 h-12" />
+      <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto shadow-lg">
+        <SuccessIcon className="w-12 h-12 text-orange-500" />
       </div>
     </motion.div>
     <motion.h2

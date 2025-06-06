@@ -6,7 +6,7 @@ import { TRequestBodyCreateSchedule, TReSponseBodyScheduleDetail } from './sched
 export const scheduleApi = {
 	async getSchedules(query?: { page?: number; limit?: number }): Promise<{ data: TProductSchedule[]; pagination: { totalItems: number; itemsPerPage: number; currentPage: number; totalPages: number } }> {
 		const response = await api.get<{ data: TProductSchedule[]; pagination: { totalItems: number; itemsPerPage: number; currentPage: number; totalPages: number } }>(
-			'/schedule',
+			'/schedule?createAt=desc',
 			query,
 			EServer.Backend,
 		);

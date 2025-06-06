@@ -1,7 +1,6 @@
-import { InputRef, TableColumnsType, notification } from 'antd';
-import { JSX, useState, useRef, useEffect } from 'react';
+import { TableColumnsType, notification } from 'antd';
+import { JSX, useState, useEffect } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
-import { useDispatch } from 'react-redux';
 
 import {
 	BaseTable,
@@ -10,8 +9,6 @@ import {
 } from '@/components/BaseTable/BaseTable';
 import { cn } from '@/lib';
 import { TProductSchedule, EProductScheduleStatus } from '@/types';
-import { scheduleThunk } from '../..';
-import { TReduxStoreDispatch } from '@/store';
 import { ScheduleDetail } from '../ScheduleDetail/ScheduleDetail';
 import { scheduleApi } from '../../scheduleApi';
 
@@ -29,6 +26,9 @@ type TSchedulesBoard = {
 	className?: string;
 	setPage?: (page: number) => void;
 	onDeleteSuccess?: () => void;
+	pagination?: {
+		totalItems: number;
+	};
 };
 
 const STATUS_MAP = {
@@ -42,49 +42,20 @@ export const SchedulesBoard = ({
 	pageSize,
 	page,
 	disabled = false,
-	onViewDetailSchedule = (): void => {},
 	className,
 	setPage,
 	onDeleteSuccess,
+	pagination,
 }: TSchedulesBoard): JSX.Element => {
 	const [localData, setLocalData] = useState<TProductSchedule[] | TRequestBodyCreateSchedule[]>(data || []);
-	const [searchText, setSearchText] = useState('');
-	const [searchedColumn, setSearchedColumn] = useState('');
 	const [selectedSchedule, setSelectedSchedule] = useState<TProductSchedule | null>(null);
 	const [isDetailOpen, setIsDetailOpen] = useState(false);
-	const searchInput = useRef<InputRef>(null);
-	const dispatch = useDispatch<TReduxStoreDispatch>();
 
 	useEffect(() => {
 		setLocalData(data || []);
 	}, [data]);
 
-	const handleDelete = async (scheduleId: string): Promise<void> => {
-		try {
-			await dispatch(scheduleThunk.deleteSchedule(scheduleId)).unwrap();
-			
-			const updatedData = localData.filter(schedule => schedule.id !== scheduleId);
-			setLocalData(updatedData);
-
-			notification.success({
-				message: 'Success',
-				description: 'Schedule deleted successfully',
-				duration: 3,
-			});
-			
-			if (onDeleteSuccess) {
-				onDeleteSuccess();
-			}
-		} catch (error) {
-			notification.error({
-				message: 'Error',
-				description: 'Failed to delete schedule',
-				duration: 3,
-			});
-		}
-	};
-
-	const handleViewDetail = async (schedule: TProductSchedule) => {
+		const handleViewDetail = async (schedule: TProductSchedule) => {
 		try {
 			const response = await scheduleApi.getScheduleByScheduleId(schedule.id, EProductScheduleStatus.active);
 			setSelectedSchedule(response);
@@ -188,7 +159,13 @@ export const SchedulesBoard = ({
 				columns={columnTable}
 				dataSource={localData as TProductSchedule[]}
 				className={cn(className)}
-				pagination={(localData?.length ?? 0) > (pageSize ?? 10) ? { pageSize } : false}
+				pagination={{
+					current: page,
+					pageSize: pageSize,
+					total: pagination?.totalItems,
+					onChange: (newPage) => setPage?.(newPage),
+					showSizeChanger: false
+				}}
 				size="middle"
 			/>
 			{selectedSchedule && (
