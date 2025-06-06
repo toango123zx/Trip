@@ -282,7 +282,7 @@ input {
 
 .ant-btn-color-primary {
     border-color: #ff6900 !important;
-    color: #ff6900;
+    color: #ff6900 !important;
 }
 
 input {
@@ -294,7 +294,8 @@ input {
 }
 
 .ant-btn-primary{
-    background-color: #ff6900;
+    background-color: #ff6900 !important;
+    color: #ffffff !important;
 }
 .ant-btn-primary:hover{
     background-color: #f54a00 !important;
@@ -314,4 +315,8 @@ input {
 
 .ant-picker:hover{
     border-color: transparent !important;
+}
+
+.ant-list-item:last-child{
+    border-block-end: revert-layer !important;
 }

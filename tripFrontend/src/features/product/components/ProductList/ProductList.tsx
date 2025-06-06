@@ -133,14 +133,14 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 
 	return (
 		<section
-			className={cn('relative w-full h-screen', className)}
+			className={cn('relative w-full', className)}
 			aria-label="Product Management"
 		>
-			<div className="container mx-auto bg-white rounded-lg p-3 sm:p-6 md:px-8 md:py-10 lg:px-10 lg:py-12 font-sans flex flex-col transition-all duration-300 h-full">
+			<div className="container mx-auto bg-white rounded-lg p-3 sm:p-6 md:px-8 md:py-10 lg:px-10 lg:py-12 font-sans flex flex-col transition-all duration-300">
 				{/* Main Content */}
-				<main className="flex flex-col md:flex-row flex-1 gap-4 md:gap-6 lg:gap-8 h-full">
+				<main className="flex flex-col md:flex-row flex-1 gap-4 md:gap-6 lg:gap-8">
 					{/* Sidebar - Fixed */}
-					<div className="flex flex-row md:flex-col flex-wrap justify-center md:justify-start gap-2 md:gap-4 md:w-1/4 lg:w-1/5 font-Montserrat md:sticky md:top-0 md:h-screen md:overflow-y-auto">
+					<div className="flex flex-row md:flex-col flex-wrap justify-center md:justify-start gap-2 md:gap-4 md:w-1/4 lg:w-1/5 font-Montserrat md:sticky md:top-0 md:h-screen">
 						<button
 							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
 								activeTab === 'product'

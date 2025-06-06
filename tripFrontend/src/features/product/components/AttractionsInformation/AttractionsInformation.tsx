@@ -191,7 +191,6 @@ const ScheduleCard = ({
 				{/* Price and actions */}
 				<div className="flex items-center justify-between border-t border-gray-100 pt-5">
 					<div>
-						<p className="text-xs text-gray-500 mb-1">From</p>
 						<p className="text-2xl font-bold text-orange-600">
 							{new Intl.NumberFormat('vi-VN').format(schedule.price)} ₫
 						</p>
@@ -383,7 +382,7 @@ export const AttractionsInformation: React.FC = () => {
 							</div>
 						))}
 					</div>
-					{data.productImage?.length > 3 && (
+					{data.productImage?.length > 6 && (
 						<div className="mt-6 text-center">
 							<button
 								onClick={() => setShowAllImages((v) => !v)}
@@ -434,7 +433,7 @@ export const AttractionsInformation: React.FC = () => {
 			{/* Image Gallery Modal */}
 			{isGalleryOpen && (
 				<div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
-					<div className="w-full max-w-6xl mx-auto p-4">
+					<div className="w-full max-w-[1536px] mx-auto p-4">
 						<button
 							onClick={() => setIsGalleryOpen(false)}
 							className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"

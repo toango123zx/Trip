@@ -15,6 +15,7 @@ import {
   message,
   Tooltip,
   Tag,
+  Skeleton,
 } from 'antd';
 import {
   ChevronLeft,
@@ -27,6 +28,7 @@ import {
 } from 'lucide-react';
 import { JSX, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { billApi } from '@/features/bill/billApi';
 import { cartThunk } from '@/features/cart/cartThunk';
@@ -64,32 +66,16 @@ const isScheduleExpired = (startTime: string): boolean => {
   return scheduleStart < now;
 };
 
-// ✅ Component: Mobile Header
-const MobileHeader = (): JSX.Element => (
-  <div className="md:hidden bg-white pt-5 px-4 flex justify-between items-center">
-    <a
-      href="/"
-      className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 text-orange-500 no-underline"
-    >
-      <ChevronLeft size={18} />
-    </a>
-    <Title level={4} style={{ margin: 0, color: '#f97316' }}>
-      My Booking Cart
-    </Title>
-    <div className="w-8" />
-  </div>
-);
-
-// ✅ Component: Desktop Header
+// ✅ Enhanced: Desktop Header with animation
 const DesktopHeader = (): JSX.Element => (
-  <div className="hidden md:flex items-center mb-10">
-    <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-      <ShoppingCart size={32} />
-    </div>
-    <Title level={2} style={{ margin: '0 0 0 24px', color: '#f97316' }}>
-      My Booking Cart
-    </Title>
-  </div>
+  <motion.div
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+    className="relative font-semibold text-4xl font-[Montserrat] text-left mb-8"
+  >
+    My Booking Cart
+  </motion.div>
 );
 
 // ✅ Component: Table Header (Updated with expired indicator)
@@ -98,6 +84,7 @@ interface TableHeaderProps {
   toggleSelectAll: () => void;
 }
 
+// ✅ Enhanced: Table Header with better styling
 const TableHeader = ({
   bookingItems,
   toggleSelectAll,
@@ -107,50 +94,48 @@ const TableHeader = ({
     validItems.length > 0 && validItems.every((item) => item.selected);
 
   return (
-    <div className="hidden md:flex bg-white p-4 rounded-t-lg border-b">
+    <div className="hidden md:flex items-center bg-gray-50 p-4 rounded-lg mb-4">
       <div style={{ width: '5%' }}>
         <Checkbox
           onChange={toggleSelectAll}
           checked={allValidSelected}
           disabled={validItems.length === 0}
+          className="transform scale-110"
         />
       </div>
-      <div style={{ width: '30%' }}>
-        <Text strong>Product</Text>
+      <div style={{ width: '50%' }}>
+        <Text strong className="text-gray-600">Product</Text>
       </div>
-      <div style={{ width: '12%' }}>
-        <Text strong>Start</Text>
-      </div>
-      <div style={{ width: '12%' }}>
-        <Text strong>End</Text>
-      </div>
-      <div style={{ width: '12%' }}>
-        <Text strong>Price</Text>
+      <div style={{ width: '14%' }}>
+        <Text strong className="text-gray-600">Price</Text>
       </div>
       <div style={{ width: '15%', textAlign: 'center' }}>
-        <Text strong>Quantity</Text>
+        <Text strong className="text-gray-600">Quantity</Text>
       </div>
-      <div style={{ width: '9%', textAlign: 'center' }}>
-        <Text strong>Total</Text>
+      <div style={{ width: '10%', textAlign: 'center' }}>
+        <Text strong className="text-gray-600">Total</Text>
       </div>
-      <div style={{ width: '5%', textAlign: 'center' }}>
-        <Text strong>Action</Text>
+      <div style={{ width: '10%', textAlign: 'center' }}>
+        <Text strong className="text-gray-600">Action</Text>
       </div>
     </div>
   );
 };
 
-// ✅ Component: Empty Cart
+// ✅ Enhanced: Empty Cart with animation
 const EmptyCart = (): JSX.Element => (
-  <div className="text-center py-10">
-    <ShoppingCart size={50} className="mx-auto mb-4 text-gray-300" />
-    <Text className="text-lg text-gray-500">Your cart is empty</Text>
-    <div className="mt-4">
-      <Button type="primary" href="/attractions">
-        Browse Attractions
-      </Button>
-    </div>
-  </div>
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.5 }}
+    className="text-center py-16"
+  >
+    <ShoppingCart size={64} className="mx-auto mb-6 text-gray-300" />
+    <Text className="text-xl text-gray-500 mb-4">Your cart is empty</Text>
+    {/* <Button type="primary" size="large" href="/attractions" className="hover:scale-105 transition-transform">
+      Browse Attractions
+    </Button> */}
+  </motion.div>
 );
 
 // ✅ Component: Quantity Controls (Updated with disabled state)
@@ -162,32 +147,46 @@ interface QuantityControlsProps {
   disabled?: boolean; // ✅ NEW: Disabled state
 }
 
+// ✅ Enhanced: Quantity Controls with better styling
 const QuantityControls = ({
   quantity,
   onIncrease,
   onDecrease,
   size = 'default',
-  disabled = false, // ✅ NEW: Disabled state
+  disabled = false,
 }: QuantityControlsProps): JSX.Element => {
-  const buttonSize = size === 'small' ? { minWidth: 28, height: 28 } : { minWidth: 28 };
+  const buttonSize = size === 'small' ? { minWidth: 28, height: 28 } : { minWidth: 32, height: 32 };
   const iconSize = size === 'small' ? 12 : 14;
 
   return (
     <div className="flex items-center">
-      <Button onClick={onDecrease} size="small" style={buttonSize} disabled={disabled}>
+      <Button
+        onClick={onDecrease}
+        size="small"
+        style={buttonSize}
+        disabled={disabled}
+        className="hover:bg-gray-100 transition-colors"
+      >
         <Minus size={iconSize} />
       </Button>
       <Text
         style={{
-          margin: '0 8px',
+          // margin: '0 8px',
           minWidth: 30,
           textAlign: 'center',
           color: disabled ? '#ccc' : 'inherit',
         }}
+        className="font-medium"
       >
         {quantity}
       </Text>
-      <Button onClick={onIncrease} size="small" style={buttonSize} disabled={disabled}>
+      <Button
+        onClick={onIncrease}
+        size="small"
+        style={buttonSize}
+        disabled={disabled}
+        className="hover:bg-gray-100 transition-colors"
+      >
         <Plus size={iconSize} />
       </Button>
     </div>
@@ -197,9 +196,15 @@ const QuantityControls = ({
 // ✅ Component: Expired Badge
 const ExpiredBadge = (): JSX.Element => (
   <Tooltip title="This schedule has expired and cannot be booked">
-    <Tag color="red" icon={<Clock size={12} />} className="ml-2">
-      Expired
-    </Tag>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Tag color="red" icon={<Clock size={12} />} className="ml-2">
+        Expired
+      </Tag>
+    </motion.div>
   </Tooltip>
 );
 
@@ -212,6 +217,7 @@ interface MobileCartItemProps {
   onDecreaseQuantity: () => void;
 }
 
+// ✅ Enhanced: Mobile Cart Item with better styling
 const MobileCartItem = ({
   item,
   onToggleSelection,
@@ -219,76 +225,87 @@ const MobileCartItem = ({
   onIncreaseQuantity,
   onDecreaseQuantity,
 }: MobileCartItemProps): JSX.Element => (
-  <div className="md:hidden w-full">
-    <div className="flex">
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    className="relative md:hidden w-full p-4 bg-white rounded-xl shadow-md mb-4"
+  >
+    {/* Top left: Checkbox */}
+    <div className="absolute top-4 left-4">
       <Checkbox
         checked={item.selected}
         onChange={onToggleSelection}
-        className="mr-3 mt-1"
-        disabled={item.isExpired} // ✅ NEW: Disable if expired
+        disabled={item.isExpired}
+        className="transform scale-110"
       />
+    </div>
+
+    {/* Top right: Remove button */}
+    <div className="absolute top-4 right-4">
+      <Button
+        type="text"
+        onClick={onRemove}
+        className="hover:bg-gray-100 rounded-full !p-0"
+      >
+        <Trash2 size={18} />
+      </Button>
+    </div>
+
+    {/* Center content */}
+    <div className="flex flex-col items-center text-center gap-2 mt-8">
       <Avatar
         shape="square"
-        size={60}
+        size={120}
         src={item.image}
         style={{
-          borderRadius: 6,
-          marginRight: 12,
-          opacity: item.isExpired ? 0.5 : 1, // ✅ NEW: Fade if expired
+          borderRadius: 12,
+          opacity: item.isExpired ? 0.5 : 1,
         }}
       />
-      <div className="flex-grow">
-        <div className="flex justify-between items-start">
-          <div>
-            <Text strong style={{ color: item.isExpired ? '#ccc' : 'inherit' }}>
-              {item.name}
-            </Text>
-            {item.isExpired && <ExpiredBadge />}
-          </div>
-          <Button
-            type="text"
-            onClick={onRemove}
-            style={{
-              padding: 0,
-              lineHeight: 1,
-            }}
-          >
-            ✕
-          </Button>
-        </div>
-        <div className="flex items-center text-gray-500 text-xs mt-1">
-          <MapPin size={12} className="mr-1" />
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {item.location}
-          </Text>
-        </div>
-        <div className="flex items-center justify-between mt-2">
-          <QuantityControls
-            quantity={item.quantity}
-            onIncrease={onIncreaseQuantity}
-            onDecrease={onDecreaseQuantity}
-            size="small"
-            disabled={item.isExpired} // ✅ NEW: Disable if expired
-          />
-          <div className="text-right">
-            <div className="text-xs text-gray-500">
-              {item.price.toLocaleString()} VND each
-            </div>
-            <Text
-              type="danger"
-              strong
-              style={{
-                fontSize: 14,
-                color: item.isExpired ? '#ccc' : 'inherit',
-              }}
-            >
-              {(item.price * item.quantity).toLocaleString()} VND
-            </Text>
-          </div>
-        </div>
+      <Text strong className="text-base mt-2 line-clamp-2">
+        {item.name}
+      </Text>
+      <div className="flex items-center text-gray-500 text-sm">
+        <MapPin size={14} className="mr-1.5" />
+        <Text type="secondary" className="truncate">
+          {item.location}
+        </Text>
       </div>
     </div>
-  </div>
+
+    {/* Price and Total */}
+    <div className="flex justify-between items-center mt-4">
+      <div>
+        <Text type="secondary" className="text-xs">Price per item</Text>
+        <Text strong className="text-sm block">
+          {item.price.toLocaleString()} VND
+        </Text>
+      </div>
+      <div className="text-right">
+        <Text type="secondary" className="text-xs">Total</Text>
+        <Text
+          strong
+          className="text-sm block"
+          style={{ color: item.isExpired ? '#ccc' : 'inherit' }}
+        >
+          {(item.price * item.quantity).toLocaleString()} VND
+        </Text>
+      </div>
+    </div>
+
+    {/* Quantity controls */}
+    <div className="flex items-center justify-between pt-3 mt-3 border-t border-gray-200">
+      <Text type="secondary" className="text-sm">Quantity:</Text>
+      <QuantityControls
+        quantity={item.quantity}
+        onIncrease={onIncreaseQuantity}
+        onDecrease={onDecreaseQuantity}
+        size="small"
+        disabled={item.isExpired}
+      />
+    </div>
+  </motion.div>
 );
 
 // ✅ Component: Desktop Cart Item (Updated with expired handling)
@@ -300,6 +317,7 @@ interface DesktopCartItemProps {
   onDecreaseQuantity: () => void;
 }
 
+// ✅ Enhanced: Desktop Cart Item with better styling
 const DesktopCartItem = ({
   item,
   onToggleSelection,
@@ -307,88 +325,73 @@ const DesktopCartItem = ({
   onIncreaseQuantity,
   onDecreaseQuantity,
 }: DesktopCartItemProps): JSX.Element => (
-  <div
-    className={`hidden md:flex w-full items-center ${item.isExpired ? 'opacity-60' : ''}`}
+  <motion.div
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: 20 }}
+    className={`hidden md:flex w-full items-center p-4 hover:bg-gray-50 transition-colors rounded-lg ${item.isExpired ? 'opacity-60' : ''}`}
   >
     <div style={{ width: '5%' }}>
       <Checkbox
         checked={item.selected}
         onChange={onToggleSelection}
-        disabled={item.isExpired} // ✅ NEW: Disable if expired
+        disabled={item.isExpired}
+        className="transform scale-110"
       />
     </div>
-    <div style={{ width: '30%' }} className="flex items-center">
+    <div style={{ width: '50%' }} className="flex items-center space-x-4 gap-1">
       <Avatar
         shape="square"
-        size={70}
+        size={64}
         src={item.image}
         style={{
-          borderRadius: 6,
-          marginRight: 12,
-          opacity: item.isExpired ? 0.5 : 1, // ✅ NEW: Fade if expired
+          borderRadius: 8,
+          opacity: item.isExpired ? 0.5 : 1,
         }}
+        className="flex-shrink-0"
       />
-      <div>
-        <div className="flex items-center">
-          <Text strong style={{ color: item.isExpired ? '#ccc' : 'inherit' }}>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center space-x-2">
+          <Text strong style={{ color: item.isExpired ? '#ccc' : 'inherit' }} className="text-base truncate">
             {item.name}
           </Text>
-          {item.isExpired && <ExpiredBadge />}
+          {/* {item.isExpired && <ExpiredBadge />} */}
         </div>
-        <div className="flex items-center text-gray-500 text-sm">
-          <MapPin size={14} className="mr-1" />
-          <Text type="secondary" style={{ fontSize: 14 }}>
-            {item.location}
-          </Text>
+        <div className="flex items-center text-gray-500 text-sm mt-1">
+          <MapPin size={14} className="mr-2 flex-shrink-0" />
+          <Text type="secondary" className="truncate">{item.location}</Text>
         </div>
       </div>
     </div>
-    <div style={{ width: '12%' }}>
-      <Text
-        style={{
-          fontSize: 12,
-          color: item.isExpired ? '#ccc' : 'inherit',
-        }}
-      >
-        {item.startTime}
-      </Text>
-    </div>
-    <div style={{ width: '12%' }}>
-      <Text
-        style={{
-          fontSize: 12,
-          color: item.isExpired ? '#ccc' : 'inherit',
-        }}
-      >
-        {item.endTime}
-      </Text>
-    </div>
-    <div style={{ width: '12%' }}>
-      <Text type="danger" strong style={{ color: item.isExpired ? '#ccc' : '#ff4d4f' }}>
+    <div style={{ width: '14%' }}>
+      <Text type="danger" strong style={{ color: item.isExpired ? '#ccc' : '#ff4d4f' }} className="text-base">
         {item.price.toLocaleString()} VND
       </Text>
     </div>
-    <div style={{ width: '15%', textAlign: 'center' }}>
-      <Space>
-        <QuantityControls
-          quantity={item.quantity}
-          onIncrease={onIncreaseQuantity}
-          onDecrease={onDecreaseQuantity}
-          disabled={item.isExpired} // ✅ NEW: Disable if expired
-        />
-      </Space>
+    <div style={{ width: '15%' }} className="flex justify-center">
+      <QuantityControls
+        quantity={item.quantity}
+        onIncrease={onIncreaseQuantity}
+        onDecrease={onDecreaseQuantity}
+        disabled={item.isExpired}
+      />
     </div>
-    <div style={{ width: '9%', textAlign: 'center' }}>
-      <Text type="danger" strong style={{ color: item.isExpired ? '#ccc' : '#ff4d4f' }}>
+    <div style={{ width: '10%' }} className="text-center">
+      <Text type="danger" strong style={{ color: item.isExpired ? '#ccc' : '#ff4d4f' }} className="text-base">
         {(item.price * item.quantity).toLocaleString()}
       </Text>
     </div>
-    <div style={{ width: '5%', textAlign: 'center' }}>
-      <Button type="text" onClick={onRemove} danger>
+    <div style={{ width: '5%' }} className="flex justify-center">
+      <Button
+        type="text"
+        onClick={onRemove}
+        danger
+        className="hover:bg-red-50 rounded-full p-2 transition-colors"
+      >
         <Trash2 size={16} />
       </Button>
     </div>
-  </div>
+  </motion.div>
 );
 
 // ✅ Component: Cart Item
@@ -505,8 +508,7 @@ const PaymentMethodDisplay = ({
   if (!paymentMethod || !paymentInfo) {
     return (
       <button
-        className={`text-blue-500 text-sm hover:text-blue-700 transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+        className={`text-orange-500 text-sm hover:text-orange-700 transition-colors`}
         onClick={disabled ? undefined : onClick}
         disabled={disabled}
       >
@@ -592,13 +594,14 @@ interface OrderSummaryProps {
   isProcessing?: boolean;
 }
 
+// ✅ Enhanced: Order Summary with better styling
 const OrderSummary = ({
   subtotal,
   discount,
   total,
   selectedDiscounts,
   selectedItemsCount,
-  validItemsCount, // ✅ NEW: Count of valid items
+  validItemsCount,
   selectedPaymentMethod,
   onShowDiscountSelector,
   onShowPaymentMethodSelector,
@@ -611,35 +614,40 @@ const OrderSummary = ({
     selectedItemsCount > 0 && selectedPaymentMethod && hasValidItems && !isProcessing;
 
   return (
-    <div className="hidden md:block">
-      <Card>
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
-          <div className="flex justify-between">
-            <Text>Subtotal:</Text>
-            <Text strong>{subtotal.toLocaleString()} VND</Text>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="hidden md:block sticky top-4"
+    >
+      <Card className="shadow-lg rounded-xl border-0">
+        <Space direction="vertical" style={{ width: '100%' }} size="large">
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <Text className="text-gray-500">Subtotal:</Text>
+              <Text strong className="text-lg">{subtotal.toLocaleString()} VND</Text>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <Text className="text-gray-500">Discount:</Text>
+              <Text type="danger" className="text-lg">- {discount.toLocaleString()} VND</Text>
+            </div>
+
+            <div className="flex justify-end items-center">
+              <button
+                className="text-orange-500 text-sm hover:text-orange-700 transition-colors"
+                onClick={onShowDiscountSelector}
+                disabled={!hasValidItems || isProcessing}
+              >
+                {selectedDiscounts.length > 0
+                  ? `Selected ${selectedDiscounts.length} discount(s)`
+                  : 'Select/enter code'}
+              </button>
+            </div>
           </div>
 
-          <div className="flex justify-between">
-            <Text>Discount:</Text>
-            <Text type="danger">- {discount.toLocaleString()} VND</Text>
-          </div>
-
-          {/* Discount Selector */}
-          <div className="flex justify-end items-center">
-            <button
-              className="text-blue-500 text-sm hover:text-blue-700 transition-colors"
-              onClick={onShowDiscountSelector}
-              disabled={!hasValidItems || isProcessing}
-            >
-              {selectedDiscounts.length > 0
-                ? `Selected ${selectedDiscounts.length} discount(s)`
-                : 'Select/enter code'}
-            </button>
-          </div>
-
-          {/* ✅ ENHANCED: Payment Method Selector with Logo and Name */}
-          <div className="space-y-2">
-            <Text className="text-sm text-gray-600">Payment Method:</Text>
+          <div className="flex justify-between items-center">
+            <Text className="text-sm text-gray-500">Payment Method:</Text>
             <PaymentMethodDisplay
               paymentMethod={selectedPaymentMethod}
               onClick={onShowPaymentMethodSelector}
@@ -647,52 +655,56 @@ const OrderSummary = ({
             />
           </div>
 
-          <AppliedDiscounts
-            selectedDiscounts={selectedDiscounts}
-            calculateDiscountAmount={calculateDiscountAmount}
-          />
+          {selectedDiscounts.length > 0 && (
+            <AppliedDiscounts
+              selectedDiscounts={selectedDiscounts}
+              calculateDiscountAmount={calculateDiscountAmount}
+            />
+          )}
 
-          <Divider style={{ margin: '12px 0' }} />
+          <Divider className="my-4" />
 
-          <div className="flex justify-between">
-            <Text strong>Total amount:</Text>
-            <Text type="danger" strong style={{ fontSize: 18 }}>
-              {total.toLocaleString()} VND
-            </Text>
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <Text strong className="text-lg">Total amount:</Text>
+              <Text type="danger" strong className="text-2xl">
+                {total.toLocaleString()} VND
+              </Text>
+            </div>
+
+            <Button
+              type="primary"
+              onClick={onCheckout}
+              block
+              size="large"
+              loading={isProcessing}
+              disabled={!canCheckout}
+              className="h-12 text-lg font-medium transition-transform"
+            >
+              {isProcessing ? 'Processing...' : 'Check out'}
+            </Button>
+
+            {!hasValidItems && (
+              <Text type="secondary" className="text-sm text-center block">
+                No valid items available for checkout
+              </Text>
+            )}
+
+            {hasValidItems && selectedItemsCount === 0 && (
+              <Text type="secondary" className="text-sm text-center block">
+                Please select items to checkout
+              </Text>
+            )}
+
+            {hasValidItems && selectedItemsCount > 0 && !selectedPaymentMethod && (
+              <Text type="warning" className="text-sm text-center block">
+                Please select a payment method to continue
+              </Text>
+            )}
           </div>
-
-          <Button
-            type="primary"
-            onClick={onCheckout}
-            block
-            size="large"
-            loading={isProcessing}
-            disabled={!canCheckout}
-          >
-            {isProcessing ? 'Processing...' : 'Check out'}
-          </Button>
-
-          {/* ✅ UPDATED: Validation messages */}
-          {!hasValidItems && (
-            <Text type="secondary" className="text-xs text-center block">
-              No valid items available for checkout
-            </Text>
-          )}
-
-          {hasValidItems && selectedItemsCount === 0 && (
-            <Text type="secondary" className="text-xs text-center block">
-              Please select items to checkout
-            </Text>
-          )}
-
-          {hasValidItems && selectedItemsCount > 0 && !selectedPaymentMethod && (
-            <Text type="warning" className="text-xs text-center block">
-              Please select a payment method to continue
-            </Text>
-          )}
         </Space>
       </Card>
-    </div>
+    </motion.div>
   );
 };
 
@@ -707,9 +719,10 @@ interface MobileCheckoutProps {
   isProcessing?: boolean;
 }
 
+// ✅ Enhanced: Mobile Checkout with better styling
 const MobileCheckout = ({
   selectedItemsCount,
-  validItemsCount, // ✅ NEW: Count of valid items
+  validItemsCount,
   total,
   selectedPaymentMethod,
   onCheckout,
@@ -722,79 +735,83 @@ const MobileCheckout = ({
     selectedItemsCount > 0 && selectedPaymentMethod && hasValidItems && !isProcessing;
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg">
-      {/* Payment Method Display for Mobile */}
-      {selectedPaymentMethod && paymentInfo && (
-        <div className="mb-3">
-          <div className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded-lg">
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-4 flex items-center justify-center bg-white border border-gray-200 rounded">
-                {paymentInfo.logo ? (
-                  <img
-                    src={paymentInfo.logo}
-                    alt={paymentInfo.name}
-                    className="max-w-full max-h-full object-contain"
-                  />
-                ) : (
-                  <div className="text-xs">{paymentInfo.icon}</div>
-                )}
+    <motion.div
+      initial={{ opacity: 0, y: 100 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg"
+    >
+      <div className="max-w-[1536px] mx-auto px-4 py-4">
+        {selectedPaymentMethod && paymentInfo && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-6 flex items-center justify-center bg-white border border-gray-200 rounded">
+                  {paymentInfo.logo ? (
+                    <img
+                      src={paymentInfo.logo}
+                      alt={paymentInfo.name}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  ) : (
+                    <div className="text-xs">{paymentInfo.icon}</div>
+                  )}
+                </div>
+                <Text className="text-green-700 font-medium">
+                  {paymentInfo.name}
+                </Text>
               </div>
-              <Text className="text-green-700 font-medium text-sm">
-                {paymentInfo.name}
-              </Text>
+              <Button
+                type="text"
+                size="small"
+                onClick={onShowPaymentMethodSelector}
+                className="text-green-600 hover:text-green-700"
+                disabled={!hasValidItems || isProcessing}
+              >
+                Change
+              </Button>
             </div>
-            <Button
-              type="text"
-              size="small"
-              onClick={onShowPaymentMethodSelector}
-              className="text-green-600"
-              disabled={!hasValidItems || isProcessing}
-            >
-              Change
-            </Button>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="flex justify-between items-center mb-2">
-        <Text strong>Total ({selectedItemsCount} tours):</Text>
-        <Text type="danger" strong style={{ fontSize: 16 }}>
-          {total.toLocaleString()} VND
-        </Text>
-      </div>
-
-      <Button
-        type="primary"
-        block
-        onClick={onCheckout}
-        loading={isProcessing}
-        disabled={!canCheckout}
-      >
-        {isProcessing ? 'Processing...' : `Check out (${selectedItemsCount})`}
-      </Button>
-
-      {/* ✅ UPDATED: Conditional buttons for different states */}
-      {hasValidItems && selectedItemsCount > 0 && !selectedPaymentMethod && (
-        <div className="mt-2">
-          <Button
-            block
-            onClick={onShowPaymentMethodSelector}
-            className="border-orange-500 text-orange-500"
-            disabled={isProcessing}
-          >
-            Select Payment Method
-          </Button>
-        </div>
-      )}
-
-      {!hasValidItems && (
-        <div className="mt-2">
-          <Text className="text-xs text-center block text-gray-500">
-            No valid items available for checkout
+        <div className="flex justify-between items-center">
+          <Text strong className="text-lg">Total ({selectedItemsCount} tours):</Text>
+          <Text type="danger" strong className="text-xl">
+            {total.toLocaleString()} VND
           </Text>
         </div>
-      )}
-    </div>
+
+        <div className="space-y-3">
+          <Button
+            type="primary"
+            block
+            onClick={onCheckout}
+            loading={isProcessing}
+            disabled={!canCheckout}
+            className="h-12 text-lg font-medium hover:scale-[1.02] transition-transform"
+          >
+            {isProcessing ? 'Processing...' : `Check out (${selectedItemsCount})`}
+          </Button>
+
+          {hasValidItems && selectedItemsCount > 0 && !selectedPaymentMethod && (
+            <Button
+              block
+              onClick={onShowPaymentMethodSelector}
+              className="h-12 text-lg border-orange-500 text-orange-500 hover:bg-orange-50"
+              disabled={isProcessing}
+            >
+              Select Payment Method
+            </Button>
+          )}
+
+          {!hasValidItems && (
+            <Text className="text-sm text-center block text-gray-500">
+              No valid items available for checkout
+            </Text>
+          )}
+        </div>
+      </div>
+    </motion.div>
   );
 };
 
@@ -823,9 +840,10 @@ const CartList = ({
   const expiredCount = bookingItems.filter((item) => item.isExpired).length;
 
   return (
-    <div>
+    <div className="space-y-4">
       <ExpiredItemsNotice expiredCount={expiredCount} />
       <List
+        className="divide-y divide-gray-100"
         dataSource={bookingItems}
         renderItem={(item) => (
           <CartItem
@@ -854,8 +872,15 @@ export const BookingCart = (): JSX.Element => {
     (state) => state.bill?.loading || false,
   );
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    dispatch(cartThunk.getCarts());
+    const loadData = async () => {
+      setIsLoading(true);
+      await dispatch(cartThunk.getCarts());
+      setIsLoading(false);
+    };
+    loadData();
   }, [dispatch]);
 
   const [bookingItems, setBookingItems] = useState<TBookingItem[]>([]);
@@ -1311,6 +1336,19 @@ export const BookingCart = (): JSX.Element => {
   const isMobile = (): boolean =>
     typeof window !== 'undefined' && window.innerWidth < 768;
 
+  if (isLoading) {
+    return (
+      <Layout className="min-h-screen">
+        <Content className="bg-white md:bg-gray-50 pt-4 md:py-12 py-6 px-4 md:px-8">
+          <div className="max-w-[1536px] mx-auto">
+            <Skeleton active paragraph={{ rows: 4 }} />
+            <Skeleton active paragraph={{ rows: 4 }} />
+          </div>
+        </Content>
+      </Layout>
+    );
+  }
+
   return (
     <ConfigProvider
       theme={{
@@ -1320,67 +1358,63 @@ export const BookingCart = (): JSX.Element => {
         },
       }}
     >
-      <Layout className="min-h-screen">
-        <MobileHeader />
-
-        <Content className="bg-white md:bg-gray-50 pt-4 md:py-6 px-4 md:px-8">
-          <div className="max-w-6xl mx-auto">
+      <Layout className="min-h-screen bg-gray-50">
+        <Content className="py-6 px-4 md:py-12 md:px-8">
+          <div className="max-w-[1536px] mx-auto">
             <DesktopHeader />
 
-            <Row gutter={24}>
-              <Col xs={24} md={16}>
-                <TableHeader
-                  bookingItems={bookingItems}
-                  toggleSelectAll={toggleSelectAll}
-                />
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <Row gutter={[24, 24]} className="p-6">
+                <Col xs={24} md={16} className="border-r border-gray-100">
+                  <TableHeader
+                    bookingItems={bookingItems}
+                    toggleSelectAll={toggleSelectAll}
+                  />
 
-                <CartList
-                  bookingItems={bookingItems}
-                  toggleSelection={toggleSelection}
-                  removeItem={removeItem}
-                  increaseQuantity={increaseQuantity}
-                  decreaseQuantity={decreaseQuantity}
-                  isMobile={isMobile()}
-                />
+                  <AnimatePresence>
+                    <CartList
+                      bookingItems={bookingItems}
+                      toggleSelection={toggleSelection}
+                      removeItem={removeItem}
+                      increaseQuantity={increaseQuantity}
+                      decreaseQuantity={decreaseQuantity}
+                      isMobile={isMobile()}
+                    />
+                  </AnimatePresence>
+                </Col>
 
-                <DeleteAllButton
-                  bookingItems={bookingItems}
-                  onDeleteAll={handleDeleteAll}
-                />
-              </Col>
+                <Col xs={24} md={8}>
+                  <OrderSummary
+                    subtotal={subtotal}
+                    discount={discount}
+                    total={total}
+                    selectedDiscounts={selectedDiscounts}
+                    selectedItemsCount={selectedItems.length}
+                    validItemsCount={validItems.length}
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    onShowDiscountSelector={() => setShowDiscountSelector(true)}
+                    onShowPaymentMethodSelector={() => setShowPaymentMethodSelector(true)}
+                    onCheckout={handlerCheckout}
+                    calculateDiscountAmount={calculateDiscountAmount}
+                    isProcessing={isProcessingCheckout || billLoading}
+                  />
 
-              <Col xs={24} md={8}>
-                <OrderSummary
-                  subtotal={subtotal}
-                  discount={discount}
-                  total={total}
-                  selectedDiscounts={selectedDiscounts}
-                  selectedItemsCount={selectedItems.length}
-                  validItemsCount={validItems.length} // ✅ NEW: Pass valid items count
-                  selectedPaymentMethod={selectedPaymentMethod}
-                  onShowDiscountSelector={() => setShowDiscountSelector(true)}
-                  onShowPaymentMethodSelector={() => setShowPaymentMethodSelector(true)}
-                  onCheckout={handlerCheckout}
-                  calculateDiscountAmount={calculateDiscountAmount}
-                  isProcessing={isProcessingCheckout || billLoading}
-                />
-
-                <MobileCheckout
-                  selectedItemsCount={selectedItems.length}
-                  validItemsCount={validItems.length} // ✅ NEW: Pass valid items count
-                  total={total}
-                  selectedPaymentMethod={selectedPaymentMethod}
-                  onCheckout={handlerCheckout}
-                  onShowPaymentMethodSelector={() => setShowPaymentMethodSelector(true)}
-                  isProcessing={isProcessingCheckout || billLoading}
-                />
-              </Col>
-            </Row>
+                  <MobileCheckout
+                    selectedItemsCount={selectedItems.length}
+                    validItemsCount={validItems.length}
+                    total={total}
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    onCheckout={handlerCheckout}
+                    onShowPaymentMethodSelector={() => setShowPaymentMethodSelector(true)}
+                    isProcessing={isProcessingCheckout || billLoading}
+                  />
+                </Col>
+              </Row>
+            </div>
           </div>
         </Content>
       </Layout>
 
-      {/* Discount Selector Modal */}
       <DiscountSelector
         open={showDiscountSelector}
         onCancel={() => setShowDiscountSelector(false)}
@@ -1399,7 +1433,6 @@ export const BookingCart = (): JSX.Element => {
         previouslySelectedDiscounts={selectedDiscounts}
       />
 
-      {/* Payment Method Selector Modal */}
       <PaymentMethodSelector
         open={showPaymentMethodSelector}
         onCancel={() => setShowPaymentMethodSelector(false)}

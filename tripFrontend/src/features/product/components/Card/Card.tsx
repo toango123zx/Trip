@@ -116,7 +116,7 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 
     <div className="flex items-center">
       <BsClock className="mr-1 text-gray-500" />
-      <span>{product.time}</span>
+      <span className='mr-1'>{product.time}</span>Hours
     </div>
 
     <div className="flex items-center">

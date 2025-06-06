@@ -302,7 +302,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 			title: 'Status',
 			dataIndex: 'status',
 			render: (text: string) => (
-				<span 
+				<span
 					className={`
 						font-semibold 
 						${text === 'active' ? 'text-green-500' : 'text-red-500'}
@@ -366,39 +366,36 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 			className={cn('relative w-full h-screen', className)}
 			aria-label="User Management"
 		>
-			<div className="container mx-auto bg-white rounded-lg shadow-lg p-3 sm:p-6 md:px-8 md:py-10 lg:px-10 lg:py-12 font-sans flex flex-col transition-all duration-300 h-full">
+			<div className="container mx-auto bg-white rounded-lg shadow-lg p-3 sm:p-6 md:px-8 md:py-10 lg:px-10 lg:py-12 font-sans flex flex-col transition-all duration-300 ">
 				{/* Main Content */}
-				<main className="flex flex-col md:flex-row flex-1 gap-4 md:gap-6 lg:gap-8 h-full">
+				<main className="flex flex-col md:flex-row flex-1 gap-4 md:gap-6 lg:gap-8 ">
 					{/* Sidebar - Fixed */}
-					<div className="flex flex-row md:flex-col flex-wrap justify-center md:justify-start gap-2 md:gap-4 md:w-1/4 lg:w-1/5 font-Montserrat md:sticky md:top-0 md:h-screen md:overflow-y-auto">
+					<div className="flex flex-row md:flex-col flex-wrap justify-center md:justify-start gap-2 md:gap-4 md:w-1/4 lg:w-1/5 font-Montserrat md:sticky md:top-0 md:h-screen">
 						<button
-							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
-								activeTab === EUserRole.tourist
+							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${activeTab === EUserRole.tourist
 									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
 									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
-							}`}
+								}`}
 							onClick={() => handleChangeTab(EUserRole.tourist)}
 						>
 							<FaUserFriends className="text-lg md:text-xl" />
 							<span className="text-xs sm:text-sm md:text-base">Tourists</span>
 						</button>
 						<button
-							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
-								activeTab === EUserRole.supplier
+							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${activeTab === EUserRole.supplier
 									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
 									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
-							}`}
+								}`}
 							onClick={() => handleChangeTab(EUserRole.supplier)}
 						>
 							<FaUserTie className="text-lg md:text-xl" />
 							<span className="text-xs sm:text-sm md:text-base">Suppliers</span>
 						</button>
 						<button
-							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${
-								activeTab === EUserRole.admin
+							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${activeTab === EUserRole.admin
 									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
 									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
-							}`}
+								}`}
 							onClick={() => handleChangeTab(EUserRole.admin)}
 						>
 							<FaUserShield className="text-lg md:text-xl" />
@@ -568,11 +565,11 @@ const AddUserModal: React.FC<AddUserModalProps> = ({ open, onCancel, onSubmit })
 	);
 };
 
-const EditUserModal: React.FC<EditUserModalProps> = ({ 
-	open, 
-	onCancel, 
-	onSubmit, 
-	initialValues 
+const EditUserModal: React.FC<EditUserModalProps> = ({
+	open,
+	onCancel,
+	onSubmit,
+	initialValues
 }) => {
 	const [form] = Form.useForm();
 
@@ -633,9 +630,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 					name="phoneNumber"
 					label="Phone Number"
 					rules={[
-						{ 
-							pattern: /^(0[1-9][0-9]{8})$/, 
-							message: 'Invalid phone number' 
+						{
+							pattern: /^(0[1-9][0-9]{8})$/,
+							message: 'Invalid phone number'
 						}
 					]}
 				>
@@ -651,9 +648,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 					name="dateOfBirth"
 					label="Date of Birth"
 				>
-					<DatePicker 
-						style={{ width: '100%' }} 
-						placeholder="Select date of birth (optional)" 
+					<DatePicker
+						style={{ width: '100%' }}
+						placeholder="Select date of birth (optional)"
 					/>
 				</Form.Item>
 				<Form.Item

@@ -95,11 +95,11 @@ export const ProductsBoard = ({
 		},
 		{
 			title: 'Time',
-			dataIndex: 'time',
-			key: 'time',
-			sorter: (a, b) => a.time - b.time,
+			dataIndex: 'createAt',
+			key: 'createAt',
+			sorter: (a, b) => new Date(a.createAt).getTime() - new Date(b.createAt).getTime(),
 			sortDirections: ['descend', 'ascend'],
-			render: (value: Date) => formatDateTime(value),
+			render: (value: string) => formatDateTime(value),
 		},
 		{
 			title: 'Số lượng',

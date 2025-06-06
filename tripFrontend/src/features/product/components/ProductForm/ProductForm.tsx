@@ -413,7 +413,7 @@ export const ProductForm = ({
 								type="button"
 								onClick={handleGenerateDescription}
 								disabled={isGeneratingDescription}
-								className="ml-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+								className="ml-2 px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
 							>
 								{isGeneratingDescription ? 'Đang tạo...' : 'Tạo mô tả AI'}
 							</button>
@@ -442,13 +442,6 @@ export const ProductForm = ({
 						Destination & Attributes
 					</span>
 				</div>
-
-				<FormInput
-					control={control}
-					name="cityName"
-					label="Destination"
-					disabled={true}
-				/>
 
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
 					<FormInput

@@ -43,7 +43,7 @@ const TopDestinations = ({ className }: TTopDestinationsProps): JSX.Element => {
 								Discover your love
 							</h2>
 						</div>
-						<div className="hidden md:flex items-center gap-2 flex gap-1.5 flex-row-reverse md:top-0 md:right-0 z-10">
+						<div className="hidden md:flex items-center gap-2 flex gap-1.5 flex-row-reverse md:top-0 md:right-0 z-1">
 							<a
 								href="/attractions"
 								className="text-orange-500 inline-flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-orange-600 transition-colors group"
