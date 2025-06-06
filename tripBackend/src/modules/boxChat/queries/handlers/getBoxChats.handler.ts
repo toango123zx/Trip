@@ -20,7 +20,7 @@ export class GetBoxChatsHandler implements IQueryHandler<GetBoxChatsQuery> {
 			await this.boxChatRepository.findBoxChatsByBoxChatIdAndBoxChatMembers(
 				undefined,
 				[myInformation.id],
-				undefined,
+				nameSearch,
 				page,
 				boxChatFilter,
 			);

@@ -37,7 +37,10 @@ export class BoxChatRepository {
 				},
 				where: {
 					id: boxChatId,
-					name: nameSearch,
+					name: {
+						contains: nameSearch,
+						mode: 'insensitive',
+					},
 					boxChatMember: {
 						some: {
 							userId: {
@@ -92,7 +95,10 @@ export class BoxChatRepository {
 				},
 				where: {
 					id: boxChatId,
-					name: nameSearch,
+					name: {
+						contains: nameSearch,
+						mode: 'insensitive',
+					},
 					boxChatMember: {
 						none: {
 							userId: {

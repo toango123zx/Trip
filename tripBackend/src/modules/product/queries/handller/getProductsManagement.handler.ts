@@ -20,6 +20,9 @@ export class GetProductsManagementHandler
 
 		const {
 			keyword,
+			startTimeSearch,
+			endTimeSearch,
+			priceSearch,
 			locationName,
 			city,
 			productCategoryName,
@@ -49,6 +52,11 @@ export class GetProductsManagementHandler
 			myInformation.roleName.includes('admin') ? undefined : myInformation.id,
 			statusSearch,
 			productOrderBy,
+			false,
+			undefined,
+			startTimeSearch,
+			endTimeSearch,
+			priceSearch,
 		);
 
 		const productInformation = products.map(
