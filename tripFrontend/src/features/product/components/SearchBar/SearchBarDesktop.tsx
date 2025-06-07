@@ -8,8 +8,8 @@ import dayjs from 'dayjs';
 import { SelectBox } from '@/components';
 import { TReduxStoreDispatch } from '@/store';
 import { locations } from '@/utils';
-import { EArrange } from '@/types';
-import { TSearchAttraction } from '../../product.type';
+import { EArrange, EProductStatus } from '@/types';
+import { TSearchAttraction, TRequestQueryGetProducts } from '../../product.type';
 import { productThunk } from '../../productThunk';
 const { RangePicker } = DatePicker;
 
@@ -30,33 +30,34 @@ export const SearchBarDesktop = ({
 
 	const handlerSubmitOnClick = async (data: TSearchAttraction): Promise<void> => {
 		try {
-			const searchParams: TSearchAttraction = {};
-
-			if (data.name && data.name !== '') {
-				searchParams.name = data.name;
-			}
+			const searchParams: TRequestQueryGetProducts = {
+				page: 1,
+				limit: 6
+			};
 
 			if (data.locationName) {
-				searchParams.locationName = EArrange.asc;
+				const cityName = String(data.locationName).replace(/,\s*$/, '');
+				searchParams.citySearch = cityName;
 			}
 
 			if (data.minPrice) {
-				searchParams.minPrice = Number(data.minPrice);
+				searchParams.priceFromSearch = Number(data.minPrice);
 			}
 
 			if (data.maxPrice) {
-				searchParams.maxPrice = Number(data.maxPrice);
+				searchParams.priceToSearch = Number(data.maxPrice);
 			}
 
 			if (dateRange[0] && dateRange[1]) {
-				searchParams.time = EArrange.asc;
+				searchParams.startTimeSearch = dateRange[0].format('YYYY-MM-DD');
+				searchParams.endTimeSearch = dateRange[1].format('YYYY-MM-DD');
 			}
 
-			await dispatch(productThunk.getProducts({
-				...searchParams,
-				page: 1,
-				limit: 6
-			}));
+			const cleanParams = Object.fromEntries(
+				Object.entries(searchParams).filter(([_, value]) => value !== undefined)
+			);
+
+			await dispatch(productThunk.getProducts(cleanParams));
 		} catch (error) {
 			console.error('Lỗi khi tìm kiếm:', error);
 		}

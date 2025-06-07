@@ -98,6 +98,7 @@ export type TProductSumary = {
 	updateAt: string;
 	deletedAt: string | null;
 	status: keyof typeof EProductStatus;
+	schedule?: { price?: number };
 };
 
 export type TProductDetail = {

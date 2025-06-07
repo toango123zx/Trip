@@ -33,6 +33,11 @@ export type TRequestQueryGetProducts = {
 	deletedAt?: EArrange;
 	statusSearch?: EProductStatus;
 	status?: EArrange;
+	priceFromSearch?: number;
+	priceToSearch?: number;
+	startTimeSearch?: string;
+	endTimeSearch?: string;
+	citySearch?: string;
 };
 
 export type TRequestBodyCreateProduct = {

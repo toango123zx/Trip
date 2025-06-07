@@ -55,10 +55,10 @@ const FilterSection: React.FC<{
 
   // Preset discount ranges
   const presetDiscounts = [
-    { label: 'Dưới 10%', min: 0, max: 10 },
-    { label: 'Từ 10–30%', min: 10, max: 30 },
-    { label: 'Từ 30–50%', min: 30, max: 50 },
-    { label: 'Trên 50%', min: 50, max: 100 },
+    { label: 'Dưới 50%', min: 0, max: 50 },
+    { label: 'Từ 50–100%', min: 50, max: 100 },
+    { label: 'Từ 100–200%', min: 100, max: 200 },
+    { label: 'Trên 200%', min: 200, max: 1000 },
   ];
 
   // Memoize handleSearch to prevent unnecessary re-renders
@@ -120,7 +120,7 @@ const FilterSection: React.FC<{
           <Slider
             range
             min={0}
-            max={100}
+            max={1000}
             value={[filters.minValue, filters.maxValue]}
             onChange={(value: number[]) =>
               setFilters({ minValue: value[0], maxValue: value[1] })
@@ -166,7 +166,7 @@ const SaleCard: React.FC<{ sale: Sale }> = ({ sale }) => {
           📅 {formatDateTime(sale.startTime)} - {formatDateTime(sale.endTime)}
         </div>
         <div className="flex justify-between flex-col items-start gap-2">
-          <div>🎯 Discount {sale.value / 100}%</div>
+          <div>🎯 Discount {sale.value / 1000}%</div>
           <div>🧍 {sale.quantity - sale.applited} codes remaining</div>
         </div>
         <Button type="primary" block className="mt-3">
@@ -185,7 +185,7 @@ const SalesPage: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [filters, setFilters] = useState({
     minValue: 0,
-    maxValue: 100,
+    maxValue: 1000,
   });
 
   // Fetch sales data
@@ -200,12 +200,16 @@ const SalesPage: React.FC = () => {
 
   // Filter sales
   const filteredSales = sales.filter(
-    (sale) =>
-      sale.value / 100 >= filters.minValue &&
-      sale.value / 100 <= filters.maxValue &&
-      (searchText === '' ||
-        sale.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        sale.description.toLowerCase().includes(searchText.toLowerCase())),
+    (sale) => {
+      const discountValue = sale.value / 1000; // Convert to percentage
+      return (
+        discountValue >= filters.minValue &&
+        discountValue <= filters.maxValue &&
+        (searchText === '' ||
+          sale.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          sale.description.toLowerCase().includes(searchText.toLowerCase()))
+      );
+    }
   );
 
   if (loading && currentPage === 1) {
