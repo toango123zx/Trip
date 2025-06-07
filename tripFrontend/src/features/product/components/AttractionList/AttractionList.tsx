@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SelectBox } from '@/components';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { TProductSumary } from '@/types';
+import { TProductSumary, TPagination } from '@/types';
 import { locations, optionSortAttraction } from '@/utils';
 import { EArrange } from '@/types';
 
@@ -28,11 +28,11 @@ export const AttractionList = ({
 	const { setValue } = form;
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const attractions = useSelector((state: TReduxStoreState) => state.product.products);
+	const pagination = useSelector((state: TReduxStoreState) => state.product.pagination) as TPagination;
 	const [selectOption, setSelectOption] = useState<keyof TSearchAttraction>('name');
 	const [selectSort, setSelectSort] = useState<EArrange>(EArrange.desc);
 	const [at, setat] = useState<TProductSumary[]>([]);
 	const [page, setPage] = useState<number>(1);
-	const [hasMore, setHasMore] = useState<boolean>(true);
 
 	useEffect(() => {
 		dispatch(
@@ -77,13 +77,11 @@ export const AttractionList = ({
 			if (newProducts.length > 0) {
 				setPage(nextPage);
 				setat(prevAt => [...prevAt, ...newProducts]);
-			} else {
-				setHasMore(false);
 			}
-		} else {
-			setHasMore(false);
 		}
 	};
+
+	const showMoreButton = pagination?.totalItems > 6 && at.length < pagination.totalItems;
 
 	return (
 		<section
@@ -93,7 +91,7 @@ export const AttractionList = ({
 			<div className="max-w-[1536px] mx-auto">
 				<div className="mb-8 flex flex-col items-start md:flex-row md:justify-between md:items-center px-2">
 					<div className="relative font-semibold text-4xl font-[Montserrat] text-left">List Attractions</div>
-					<div className="flex items-center gap-5">
+					{/* <div className="flex items-center gap-5">
 						{locations && (
 							<label
 								htmlFor="sort-select"
@@ -129,22 +127,28 @@ export const AttractionList = ({
 								defaultValue={EArrange.desc}
 							/>
 						</div>
-					</div>
+					</div> */}
 				</div>
 				<div>
 					<div className="w-full relative overflow-hidden pt-9 pb-14">
-						<div className="w-full grid grid-cols-2 md:grid-cols-3 gap-y-9 gap-x-5 transition-transform duration-300 ease-in-out">
-							{at.map((attraction) => (
-								<CardProduct
-									key={attraction.id}
-									product={attraction}
-									className="w-full"
-								/>
-							))}
-						</div>
+						{at.length === 0 ? (
+							<div className="text-center text-gray-500 py-12 text-lg font-medium">
+								We couldn't find anything matching your search.
+							</div>
+						) : (
+							<div className="w-full grid grid-cols-2 md:grid-cols-3 gap-y-9 gap-x-5 transition-transform duration-300 ease-in-out">
+								{at.map((attraction) => (
+									<CardProduct
+										key={attraction.id}
+										product={attraction}
+										className="w-full"
+									/>
+								))}
+							</div>
+						)}
 					</div>
 				</div>
-				{hasMore && (
+				{showMoreButton && (
 					<div className="flex justify-center">
 						<button 
 							onClick={handleLoadMore}

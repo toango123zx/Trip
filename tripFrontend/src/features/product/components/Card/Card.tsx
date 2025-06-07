@@ -71,7 +71,6 @@ type TCardProductInput = {
 
 export const CardProduct = ({ product, className }: TCardProductInput): JSX.Element => {
 	const nav = useNavigate();
-	const currency = 'VND';
 
 	const handlerCardOnClick = (): void => {
 		nav(`/attractions/${product.id}`);
@@ -94,43 +93,46 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 						/>
 					</div>
 					<CardContent className="pt-4 pb-2 px-5 space-y-2">
-  <h3 className="font-semibold text-lg md:text-xl text-gray-900 truncate">
-    {product.name}
-  </h3>
+						<h3 className="font-semibold text-lg md:text-xl text-gray-900 truncate">
+							{product.name}
+						</h3>
 
-  <div className="flex items-center text-sm text-gray-500 space-x-1">
-    {[...Array(5)].map((_, i) => (
-      <Star
-        key={i}
-        className={`h-4 w-4 ${i < Math.floor(product.avgRate) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-      />
-    ))}
-    <span className="ml-2">({product.avgRate})</span>
-  </div>
+						<div className="text-lg font-bold text-orange-500">
+							{product.schedule?.price}đ
+						</div>
 
-  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
-    <div className="flex items-center">
-      <IoLocationOutline className="mr-1 text-gray-500" />
-      <span>{product.locationName}</span>
-    </div>
+						<div className="flex items-center text-sm text-gray-500 space-x-1">
+							{[...Array(5)].map((_, i) => (
+								<Star
+									key={i}
+									className={`h-4 w-4 ${i < Math.floor(product.avgRate) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+								/>
+							))}
+							<span className="ml-2">({product.avgRate})</span>
+						</div>
 
-    <div className="flex items-center">
-      <BsClock className="mr-1 text-gray-500" />
-      <span className='mr-1'>{product.time}</span>Hours
-    </div>
+						<div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-gray-600">
+							<div className="flex items-center">
+								<IoLocationOutline className="mr-1 text-gray-500" />
+								<span>{product.locationName}</span>
+							</div>
 
-    <div className="flex items-center">
-      <BsPeople className="mr-1 text-gray-500" />
-      <span>{product.quantityAvailable} chỗ</span>
-    </div>
+							<div className="flex items-center">
+								<BsClock className="mr-1 text-gray-500" />
+								<span className='mr-1'>{product.time}</span>Hours
+							</div>
 
-    <div className="flex items-center">
-      <FaCity className="mr-1 text-gray-500" />
-      <span>{product.city}</span>
-    </div>
-  </div>
-</CardContent>
+							<div className="flex items-center">
+								<BsPeople className="mr-1 text-gray-500" />
+								<span>{product.quantityAvailable} chỗ</span>
+							</div>
 
+							<div className="flex items-center">
+								<FaCity className="mr-1 text-gray-500" />
+								<span>{product.city}</span>
+							</div>
+						</div>
+					</CardContent>
 				</Card>
 			</button>
 		</div>
