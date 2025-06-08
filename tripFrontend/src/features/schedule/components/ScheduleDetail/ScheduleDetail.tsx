@@ -1,4 +1,4 @@
-import React, { JSX } from 'react';
+import React, { JSX, useEffect, useState } from 'react';
 import { useForm, FieldValues, Control, Controller, RegisterOptions, Path, PathValue } from 'react-hook-form';
 import { FormInput } from '@/components/Form/FormInput';
 import { BaseForm } from '@/components/Form/BaseForm/BaseForm';
@@ -6,7 +6,8 @@ import { TProductSchedule } from '@/types';
 import { FormTextarea } from '@/components/Form/FormTextarea';
 import { formatDateTime } from '@/components/BaseTable/BaseTable';
 import { scheduleApi } from '../../scheduleApi';
-import { notification, Button } from 'antd';
+import { notification, Button, Table, Avatar } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 
 type ScheduleDetailProps = {
 	schedule: TProductSchedule;
@@ -30,7 +31,24 @@ type ScheduleFormValues = {
 	location?: string;
 };
 
+type User = {
+	id: string;
+	name: string;
+	email: string;
+	gender: string | null;
+	phoneNumber: string | null;
+	address: string | null;
+	image: string;
+	dateOfBirth: string | null;
+	status: string;
+	quantity: number;
+	billStatus: string;
+};
+
 export const ScheduleDetail = ({ schedule, open, onCancel, onDeleteSuccess }: ScheduleDetailProps) => {
+	const [users, setUsers] = useState<User[]>([]);
+	const [loading, setLoading] = useState(false);
+
 	const form = useForm<ScheduleFormValues>({
 		defaultValues: {
 			id: schedule.id,
@@ -48,6 +66,28 @@ export const ScheduleDetail = ({ schedule, open, onCancel, onDeleteSuccess }: Sc
 		}
 	});
 	const { control } = form;
+
+	useEffect(() => {
+		const fetchUsers = async () => {
+			try {
+				setLoading(true);
+				const response = await scheduleApi.getScheduleUsers(schedule.id);
+				setUsers(response.data);
+			} catch (error) {
+				notification.error({
+					message: 'Error',
+					description: 'Failed to fetch users',
+					duration: 3,
+				});
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		if (open) {
+			fetchUsers();
+		}
+	}, [schedule.id, open]);
 
 	const handleDelete = async () => {
 		try {
@@ -68,6 +108,63 @@ export const ScheduleDetail = ({ schedule, open, onCancel, onDeleteSuccess }: Sc
 		}
 	};
 
+	const handleComplete = async () => {
+		try {
+			await scheduleApi.completeSchedule(schedule.id);
+			notification.success({
+				message: 'Success',
+				description: 'Schedule completed successfully',
+				duration: 3,
+			});
+			onCancel();
+			onDeleteSuccess?.();
+		} catch (error) {
+			notification.error({
+				message: 'Error',
+				description: 'Failed to complete schedule',
+				duration: 3,
+			});
+		}
+	};
+
+	const columns: ColumnsType<User> = [
+		{
+			title: 'User',
+			dataIndex: 'name',
+			key: 'name',
+			render: (text: string, record: User) => (
+				<div className="flex items-center gap-2">
+					<Avatar src={record.image} alt={text} />
+					<div>
+						<div className="font-medium">{text}</div>
+						<div className="text-sm text-gray-500">{record.email}</div>
+					</div>
+				</div>
+			),
+		},
+		{
+			title: 'Quantity',
+			dataIndex: 'quantity',
+			key: 'quantity',
+			render: (text: number) => `${text} người`,
+		},
+		{
+			title: 'Status',
+			dataIndex: 'billStatus',
+			key: 'billStatus',
+			render: (text: string) => (
+				<span className={`px-2 py-1 rounded-full text-xs font-medium ${text === 'paid' ? 'bg-green-100 text-green-800' :
+						text === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+							'bg-gray-100 text-gray-800'
+					}`}>
+					{text === 'paid' ? 'Đã thanh toán' :
+						text === 'pending' ? 'Chờ thanh toán' :
+							text}
+				</span>
+			),
+		},
+	];
+
 	return (
 		<BaseForm
 			title="Schedule Details"
@@ -83,6 +180,9 @@ export const ScheduleDetail = ({ schedule, open, onCancel, onDeleteSuccess }: Sc
 				<Button key="remove" danger onClick={handleDelete}>
 					Xóa
 				</Button>,
+				<Button key="complete" type="primary" onClick={handleComplete}>
+					Hoàn thành
+				</Button>
 			]}
 		>
 			<div className="grid gap-4 sm:gap-6">
@@ -137,12 +237,6 @@ export const ScheduleDetail = ({ schedule, open, onCancel, onDeleteSuccess }: Sc
 						label="Booked"
 						disabled
 					/>
-					<FormInput
-						control={control as any}
-						name="status"
-						label="Status"
-						disabled
-					/>
 				</div>
 
 				{/* --- Product Info --- */}
@@ -187,21 +281,39 @@ export const ScheduleDetail = ({ schedule, open, onCancel, onDeleteSuccess }: Sc
 					/>
 					<FormInput
 						control={control as any}
-						name="avgRate"
-						label="Average Rate"
-						disabled
-					/>
-					<FormInput
-						control={control as any}
 						name="productTime"
 						label="Product Time"
 						disabled
 					/>
-					<FormInput
-						control={control as any}
-						name="location"
-						label="Location"
-						disabled
+				</div>
+
+				{/* --- Booked Users --- */}
+				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+					<div className="flex items-center gap-2 sm:gap-3 mb-4">
+						<svg
+							className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+							/>
+						</svg>
+						<span className="text-sm sm:text-base font-medium text-gray-800">
+							Booked Users
+						</span>
+					</div>
+
+					<Table
+						columns={columns}
+						dataSource={users}
+						rowKey="id"
+						loading={loading}
+						pagination={false}
 					/>
 				</div>
 			</div>

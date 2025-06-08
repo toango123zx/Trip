@@ -93,14 +93,14 @@ export const ProductsBoard = ({
 			sorter: (a, b) => a.city.length - b.city.length,
 			sortDirections: ['descend', 'ascend'],
 		},
-		{
-			title: 'Time',
-			dataIndex: 'createAt',
-			key: 'createAt',
-			sorter: (a, b) => new Date(a.createAt).getTime() - new Date(b.createAt).getTime(),
-			sortDirections: ['descend', 'ascend'],
-			render: (value: string) => formatDateTime(value),
-		},
+		// {
+		// 	title: 'Time',
+		// 	dataIndex: 'createAt',
+		// 	key: 'createAt',
+		// 	sorter: (a, b) => new Date(a.createAt).getTime() - new Date(b.createAt).getTime(),
+		// 	sortDirections: ['descend', 'ascend'],
+		// 	render: (value: string) => formatDateTime(value),
+		// },
 		{
 			title: 'Số lượng',
 			dataIndex: 'quantityAvailable',
