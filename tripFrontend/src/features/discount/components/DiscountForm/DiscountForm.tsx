@@ -400,7 +400,7 @@ export const DiscountForm = ({
 	return (
 		<>
 			<BaseForm
-				title={isCreate ? 'Thêm khuyến mãi' : 'Chi tiết khuyến mãi'}
+				title={isCreate ? 'Add Discount' : 'Discount Details'}
 				form={form}
 				isCreate={isCreate}
 				disabled={isCreate ? disabled : false}
@@ -408,6 +408,14 @@ export const DiscountForm = ({
 				onSave={isCreate ? handleSaveOnClick : undefined}
 				onRemove={onRemove}
 				onCancel={onCancel}
+				footer={[
+					<Button key="cancel" onClick={onCancel}>
+						Hủy
+					</Button>,
+					<Button key="remove" danger onClick={onRemove}>
+						Xóa
+					</Button>,
+				]}
 			>
 				{/* --- Basic Information --- */}
 				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
@@ -426,24 +434,24 @@ export const DiscountForm = ({
 							/>
 						</svg>
 						<span className="text-sm sm:text-base font-medium text-gray-800">
-							Thông tin cơ bản
+							Basic Information
 						</span>
 					</div>
 
 					<FormInput
 						control={control}
 						name="name"
-						label="Tên khuyến mãi"
+						label="Discount Name"
 						disabled={!isCreate && disabled}
-						rules={{ required: 'Tên khuyến mãi là bắt buộc' }}
+						rules={{ required: 'Discount name is required' }}
 					/>
 
 					<FormInput
 						control={control}
 						name="description"
-						label="Mô tả"
+						label="Description"
 						disabled={!isCreate && disabled}
-						rules={{ required: 'Mô tả là bắt buộc' }}
+						rules={{ required: 'Description is required' }}
 					/>
 				</div>
 
@@ -464,7 +472,7 @@ export const DiscountForm = ({
 							/>
 						</svg>
 						<span className="text-sm sm:text-base font-medium text-gray-800">
-							Thông tin giá trị
+							Value Information
 						</span>
 					</div>
 
@@ -472,11 +480,11 @@ export const DiscountForm = ({
 						<FormInput
 							control={control}
 							name="value"
-							label="Giá trị"
+							label="Value"
 							type="number"
 							disabled={!isCreate && disabled}
 							rules={{
-								required: 'Giá trị là bắt buộc',
+								required: 'Value is required',
 								validate: validateGreaterThanZero,
 							}}
 						/>
@@ -484,11 +492,11 @@ export const DiscountForm = ({
 						<FormInput
 							control={control}
 							name="quantity"
-							label="Số lượng"
+							label="Quantity"
 							type="number"
 							disabled={!isCreate && disabled}
 							rules={{
-								required: 'Số lượng là bắt buộc',
+								required: 'Quantity is required',
 								validate: validateGreaterThanZero,
 							}}
 						/>
@@ -496,7 +504,7 @@ export const DiscountForm = ({
 						<FormInput
 							control={control}
 							name="point"
-							label="Điểm"
+							label="Points"
 							type="number"
 							disabled={!isCreate && disabled}
 						/>
@@ -520,7 +528,7 @@ export const DiscountForm = ({
 							/>
 						</svg>
 						<span className="text-sm sm:text-base font-medium text-gray-800">
-							Điều kiện áp dụng
+							Application Conditions
 						</span>
 					</div>
 
@@ -528,21 +536,21 @@ export const DiscountForm = ({
 						<FormSelect
 							control={control}
 							name="discountTypeId"
-							label="Loại khuyến mãi"
+							label="Discount Type"
 							options={discountTypesOption || []}
 							disabled={!isCreate && disabled}
 						/>
 						<FormSelect
 							control={control}
 							name="discountEligibilityId"
-							label="Điều kiện áp dụng"
+							label="Eligibility"
 							options={discountEligibilitiesOption || []}
 							disabled={!isCreate && disabled}
 						/>
 						<FormSelect
 							control={control}
 							name="discountApplicationScopeId"
-							label="Phạm vi áp dụng"
+							label="Application Scope"
 							options={discountApplicationScopesOption || []}
 							disabled={!isCreate && disabled}
 						/>
@@ -551,7 +559,7 @@ export const DiscountForm = ({
 					<div className="mt-2">
 						<CheckboxForm
 							name="stackable"
-							label="Có thể áp dụng cùng lúc"
+							label="Can be stacked"
 							disabled={!isCreate && disabled}
 							defaultValue={watch('stackable')}
 							register={form.register}
@@ -578,7 +586,7 @@ export const DiscountForm = ({
 							/>
 						</svg>
 						<span className="text-sm sm:text-base font-medium text-gray-800">
-							Thời gian áp dụng
+							Application Time
 						</span>
 					</div>
 
@@ -616,7 +624,7 @@ export const DiscountForm = ({
 								/>
 							</svg>
 							<span className="text-sm sm:text-base font-medium text-gray-800">
-								Sản phẩm áp dụng
+								Applicable Products
 							</span>
 						</div>
 					</div>
@@ -626,7 +634,7 @@ export const DiscountForm = ({
 							<FormSelect
 								control={control}
 								name="productId"
-								label="Chọn sản phẩm"
+								label="Select Product"
 								options={productOption}
 								onChange={changeProductId}
 								disabled={!isCreate && disabled}
@@ -637,8 +645,9 @@ export const DiscountForm = ({
 							variant="outlined"
 							className="w-full sm:w-auto"
 							onClick={handleOpenPopupProductDetail}
+							disabled={!isCreate}
 						>
-							Chi tiết
+							Details
 						</Button>
 					</div>
 				</div>
@@ -661,7 +670,7 @@ export const DiscountForm = ({
 								/>
 							</svg>
 							<span className="text-sm sm:text-base font-medium text-gray-800">
-								Lịch trình áp dụng
+								Applicable Schedule
 							</span>
 						</div>
 					</div>
@@ -671,7 +680,7 @@ export const DiscountForm = ({
 							<FormSelect
 								control={control}
 								name="scheduleIds"
-								label="Chọn lịch trình"
+								label="Select Schedule"
 								options={scheduleOption}
 								onChange={() => setChangeScheduleOption(!changeScheduleOption)}
 								disabled={!isCreate && disabled}
@@ -682,16 +691,18 @@ export const DiscountForm = ({
 								type="primary" 
 								onClick={handAddScheduleInDiscount}
 								className="flex-1 sm:flex-none"
+								disabled={!isCreate}
 							>
-								Thêm
+								Add
 							</Button>
 							<Button
 								color="primary"
 								variant="outlined"
 								onClick={handleOpenScheduleDetail}
 								className="flex-1 sm:flex-none"
+								disabled={!isCreate}
 							>
-								Chi tiết
+								Details
 							</Button>
 						</div>
 					</div>

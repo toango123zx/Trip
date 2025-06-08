@@ -249,18 +249,21 @@ export const AttractionsInformation: React.FC = () => {
 	// Filter schedules based on booking time and cart status
 	const filteredSchedules = useMemo(() => {
 		if (!data.productSchedule) return [];
-		
+	
 		const now = new Date();
 		const bookedScheduleIds = new Set(carts.map(cart => cart.scheduleId));
-
+	
 		return data.productSchedule.filter(schedule => {
 			const startOrder = new Date(schedule.startOrder);
+			const endOrder = new Date(schedule.endOrder);
+	
 			const isBookingOpen = now >= startOrder;
+			const isBookingNotEnded = now < endOrder;
 			const isNotBooked = !bookedScheduleIds.has(schedule.id);
-			
-			return isBookingOpen && isNotBooked;
+	
+			return isBookingOpen && isBookingNotEnded && isNotBooked;
 		});
-	}, [data.productSchedule, carts]);
+	}, [data.productSchedule, carts]);	
 
 	const truncatedDesc = useMemo(() => {
 		if (!data.description) return '';

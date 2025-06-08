@@ -59,4 +59,59 @@ export const scheduleApi = {
 		);
 		return data;
 	},
+
+	async getScheduleUsers(scheduleId: string): Promise<{
+		data: Array<{
+			id: string;
+			name: string;
+			email: string;
+			gender: string | null;
+			phoneNumber: string | null;
+			address: string | null;
+			image: string;
+			dateOfBirth: string | null;
+			status: string;
+			quantity: number;
+			billStatus: string;
+		}>;
+		pagination: {
+			totalItems: number;
+			itemsPerPage: number;
+			currentPage: number;
+			totalPages: number;
+		};
+	}> {
+		const response = await api.get<{
+			data: Array<{
+				id: string;
+				name: string;
+				email: string;
+				gender: string | null;
+				phoneNumber: string | null;
+				address: string | null;
+				image: string;
+				dateOfBirth: string | null;
+				status: string;
+				quantity: number;
+				billStatus: string;
+			}>;
+			pagination: {
+				totalItems: number;
+				itemsPerPage: number;
+				currentPage: number;
+				totalPages: number;
+			};
+		}>(`/schedule/${scheduleId}/users`, {}, EServer.Backend);
+		return response.data;
+	},
+
+	async completeSchedule(scheduleId: string): Promise<TProductSchedule> {
+		const data = await api.put<TProductSchedule, Record<string, never>>(
+			`/schedule/${scheduleId}/completed`,
+			{},
+			{},
+			EServer.Backend,
+		);
+		return data;
+	},
 };

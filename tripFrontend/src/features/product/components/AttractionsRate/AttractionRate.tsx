@@ -1,11 +1,17 @@
-import React, { JSX, useMemo, useState } from 'react';
+import React, { JSX, useMemo, useState, useEffect } from 'react';
 import { Star, Send, CheckCircle } from 'lucide-react';
 import { IoLocationOutline } from 'react-icons/io5';
-
-import { SelectBox } from '@/components';
+import { notification, Select } from 'antd';
+import { useSelector } from 'react-redux';
 import { cn } from '@/lib';
 import { TProductDetail, TProductRate } from '@/types';
-import { BaNa } from '@/utils';
+import { TReduxStoreState } from '@/store';
+import { rateApi } from '@/features/product/rateApi';
+
+const formatDate = (dateString: string): string => {
+	const date = new Date(dateString);
+	return date.toISOString().split('T')[0];
+};
 
 type TRatingCardProps = {
 	rate: TProductRate;
@@ -18,7 +24,6 @@ const RatingCard = ({ rate, className }: TRatingCardProps): JSX.Element => (
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-2">
 					<span className="font-medium text-gray-800">{rate.userName}</span>
-					<CheckCircle className="w-4 h-4 text-green-500" />
 				</div>
 				<div className="flex items-center gap-1">
 					{Array.from({ length: 5 }).map((_, index) => (
@@ -33,23 +38,68 @@ const RatingCard = ({ rate, className }: TRatingCardProps): JSX.Element => (
 		<div className="p-5">
 			<p className="text-gray-600 italic mb-4">"{rate.comment}"</p>
 			<div className="text-xs text-gray-400 flex justify-between items-center">
-				<span>Posted on {rate.createAt}</span>
+				<span>Posted on {formatDate(rate.createAt)}</span>
 			</div>
 		</div>
 	</div>
 );
+
+type SortType = 'latest' | 'highest' | 'oldest';
 
 type TAttractionRateProps = {
 	className?: string;
 };
 
 export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element => {
-	const attraction: TProductDetail = BaNa;
+	const attraction = useSelector<TReduxStoreState, TProductDetail>(
+		(state) => state.product.productDetail
+	);
 	const REVIEWS_PER_PAGE = 8;
 
 	const [visibleCount, setVisibleCount] = useState(REVIEWS_PER_PAGE);
 	const [selectedStars, setSelectedStars] = useState(0);
 	const [comment, setComment] = useState('');
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [rates, setRates] = useState<TProductRate[]>([]);
+	const [sortBy, setSortBy] = useState<SortType>('latest');
+	const [isLoading, setIsLoading] = useState(false);
+
+	useEffect(() => {
+		if (attraction?.id) {
+			fetchRates();
+		}
+	}, [attraction?.id, sortBy]);
+
+	const fetchRates = async () => {
+		if (!attraction?.id) return;
+		
+		try {
+			setIsLoading(true);
+			const [ratesData, pagination] = await rateApi.getRates(attraction.id);
+			setRates(ratesData);
+		} catch (error) {
+			console.error('Error fetching rates:', error);
+			notification.error({
+				message: 'Error',
+				description: 'Unable to load reviews. Please try again later.',
+				placement: 'topRight',
+			});
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleLoadMore = async () => {
+		const newCount = visibleCount + REVIEWS_PER_PAGE;
+		setVisibleCount(newCount);
+		await fetchRates();
+	};
+
+	const handleSortChange = (value: string) => {
+		setSortBy(value as SortType);
+		// Refresh rates when sort changes
+		fetchRates();
+	};
 
 	const stars = useMemo(
 		() =>
@@ -69,22 +119,46 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 		[attraction.avgRate],
 	);
 
-	const handleLoadMore = (): void =>
-		setVisibleCount((prev) =>
-			Math.min(prev + REVIEWS_PER_PAGE, attraction.productRate.length),
-		);
-
 	const handleStarClick = (starCount: number): void => {
 		setSelectedStars(starCount);
 	};
 
-	const handleSubmitReview = (): void => {
+	const handleSubmitReview = async (): Promise<void> => {
 		if (selectedStars > 0 && comment.trim()) {
-			// TODO: Implement actual review submission logic
-			console.log('Submitting review:', { stars: selectedStars, comment });
-			// Reset form after submission
-			setSelectedStars(0);
-			setComment('');
+			try {
+				setIsSubmitting(true);
+				const response = await rateApi.submitRate(attraction.id, {
+					star: selectedStars,
+					comment: comment.trim()
+				});
+
+				if (response.success) {
+					notification.success({
+						message: 'Success',
+						description: 'Your review has been submitted successfully!',
+						placement: 'topRight',
+					});
+					// Reset form after submission
+					setSelectedStars(0);
+					setComment('');
+					// TODO: Refresh the reviews list
+				} else {
+					notification.error({
+						message: 'Error',
+						description: 'An error occurred while submitting your review. Please try again later.',
+						placement: 'topRight',
+					});
+				}
+			} catch (error) {
+				console.error('Error submitting review:', error);
+				notification.error({
+					message: 'Error',
+					description: 'An error occurred while submitting your review. Please try again later.',
+					placement: 'topRight',
+				});
+			} finally {
+				setIsSubmitting(false);
+			}
 		}
 	};
 
@@ -152,11 +226,11 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 							/>
 							<button 
 								onClick={handleSubmitReview}
-								disabled={selectedStars === 0 || !comment.trim()}
+								disabled={selectedStars === 0 || !comment.trim() || isSubmitting}
 								className="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
 							>
 								<Send className="w-5 h-5 mr-2" />
-								Submit Review
+								{isSubmitting ? 'Submitting...' : 'Submit Review'}
 							</button>
 						</div>
 					</div>
@@ -168,30 +242,40 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 						<h2 className="text-xl font-semibold text-gray-900">
 							Customer Reviews
 						</h2>
-						<SelectBox
-							selectOption={[
-								{ id: '1', label: 'Latest', value: 'latest' },
-								{ id: '2', label: 'Highest Rated', value: 'highest' },
-								{ id: '3', label: 'Oldest', value: 'oldest' },
+						<Select
+							value={sortBy}
+							onChange={handleSortChange}
+							options={[
+								{ value: 'latest', label: 'Latest' },
+								{ value: 'highest', label: 'Highest Rated' },
+								{ value: 'oldest', label: 'Oldest' },
 							]}
-							className="w-48 h-10 flex items-center justify-between px-4 text-sm border border-gray-300 rounded-lg bg-white focus-within:ring-2 focus-within:ring-orange-200 transition-all duration-150"
+							className="w-48"
 						/>
 					</div>
 
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-						{attraction.productRate.slice(0, visibleCount).map((rate) => (
-							<RatingCard key={rate.id} rate={rate} />
-						))}
+						{isLoading ? (
+							<div className="col-span-2 text-center py-8">Loading...</div>
+						) : rates.length > 0 ? (
+							rates.map((rate) => (
+								<RatingCard key={rate.id} rate={rate} />
+							))
+						) : (
+							<div className="col-span-2 text-center py-8 text-gray-500">
+								No reviews yet
+							</div>
+						)}
 					</div>
 
-					{visibleCount < attraction.productRate.length && (
+					{rates.length >= visibleCount && (
 						<div className="text-center">
 							<button
 								onClick={handleLoadMore}
-								className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2 px-6 rounded-full shadow-md transition duration-150 ease-in-out"
+								disabled={isLoading}
+								className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-2 px-6 rounded-full shadow-md transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
 							>
-								Load More Reviews (
-								{attraction.productRate.length - visibleCount} remaining)
+								{isLoading ? 'Loading...' : 'Load More Reviews'}
 							</button>
 						</div>
 					)}

@@ -51,11 +51,24 @@ export const SchedulesBoard = ({
 	const [selectedSchedule, setSelectedSchedule] = useState<TProductSchedule | null>(null);
 	const [isDetailOpen, setIsDetailOpen] = useState(false);
 
+	const fetchData = async () => {
+		try {
+			const response = await scheduleApi.getSchedules();
+			setLocalData(response.data);
+		} catch (error) {
+			notification.error({
+				message: 'Lỗi',
+				description: 'Không thể làm mới danh sách lịch trình',
+				duration: 3,
+			});
+		}
+	};
+
 	useEffect(() => {
 		setLocalData(data || []);
 	}, [data]);
 
-		const handleViewDetail = async (schedule: TProductSchedule) => {
+	const handleViewDetail = async (schedule: TProductSchedule) => {
 		try {
 			const response = await scheduleApi.getScheduleByScheduleId(schedule.id, EProductScheduleStatus.active);
 			setSelectedSchedule(response);
@@ -173,7 +186,10 @@ export const SchedulesBoard = ({
 					schedule={selectedSchedule}
 					open={isDetailOpen}
 					onCancel={() => setIsDetailOpen(false)}
-					onDeleteSuccess={handleScheduleDeleted}
+					onDeleteSuccess={() => {
+						handleScheduleDeleted();
+						fetchData();
+					}}
 				/>
 			)}
 		</>
