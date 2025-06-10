@@ -105,6 +105,7 @@ export class BillRepository {
 										},
 										productCategory: true,
 										location: true,
+										productRate: true,
 									},
 								},
 							},

@@ -32,6 +32,7 @@ class InfoBillItem {
 	reduction: number;
 	paymentPrice: number;
 	productScheduleStatus: ProductScheduleStatusEnum;
+	isRated: boolean;
 	product:
 		| {
 				id: string;
@@ -148,9 +149,12 @@ const calculateBillInfo = (
 		if (d.discountApplicationScope.name === DiscountApplicationScopeEnum.Bill) {
 			billDiscounts.push(d);
 		} else {
-			for (const { id } of d.infoDiscount) {
-				if (!schedDiscMap[id]) schedDiscMap[id] = [];
-				schedDiscMap[id]!.push(d);
+			// ✅ FIX: Check if infoDiscount exists and is an array
+			if (d.infoDiscount && Array.isArray(d.infoDiscount)) {
+				for (const { id } of d.infoDiscount) {
+					if (!schedDiscMap[id]) schedDiscMap[id] = [];
+					schedDiscMap[id]!.push(d);
+				}
 			}
 		}
 	}
@@ -266,6 +270,12 @@ export class BillDetailResponseDto {
 					(item) => item.scheduleId === infoBillDetail.productScheduleId,
 				)?.paymentPrice,
 				productScheduleStatus: infoBillDetail.productSchedule?.status,
+				isRated: infoBillDetail.productSchedule?.product?.productRate?.find(
+					(rate) =>
+						rate.userId === bill.userId && rate.createAt > bill.createAt,
+				)
+					? true
+					: false,
 				product: infoBillDetail.productSchedule.product && {
 					id: infoBillDetail.productSchedule.product.id,
 					name: infoBillDetail.productSchedule.product.name,
