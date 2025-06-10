@@ -41,9 +41,9 @@ const pickerConfigs: {
 	key: FieldKey;
 	label: string;
 }[] = [
-	{ key: 'startTime', label: 'Start' },
-	{ key: 'endTime', label: 'End' },
-];
+		{ key: 'startTime', label: 'Start' },
+		{ key: 'endTime', label: 'End' },
+	];
 
 type TError = {
 	startTime: boolean;
@@ -72,9 +72,9 @@ export const DiscountForm = ({
 	isCreate = false,
 	disabled = false,
 	open = false,
-	onSave = () => {},
-	onRemove = () => {},
-	onCancel = () => {},
+	onSave = () => { },
+	onRemove = () => { },
+	onCancel = () => { },
 }: TDiscountFormProps): JSX.Element => {
 	const { control, watch, setValue } = form;
 
@@ -250,7 +250,7 @@ export const DiscountForm = ({
 		e.preventDefault();
 		e.stopPropagation();
 		if (!productId || !watch('scheduleIds')) return;
-		
+
 		try {
 			const scheduleId = String(watch('scheduleIds'));
 			const response = await scheduleApi.getScheduleByScheduleId(scheduleId, EProductScheduleStatus.active);
@@ -403,7 +403,7 @@ export const DiscountForm = ({
 				title={isCreate ? 'Add Discount' : 'Discount Details'}
 				form={form}
 				isCreate={isCreate}
-				disabled={isCreate ? disabled : false}
+				disabled={isCreate ? true : false}
 				open={open}
 				onSave={isCreate ? handleSaveOnClick : undefined}
 				onRemove={onRemove}
@@ -488,7 +488,7 @@ export const DiscountForm = ({
 								validate: validateGreaterThanZero,
 							}}
 						/>
-						
+
 						<FormInput
 							control={control}
 							name="quantity"
@@ -500,7 +500,7 @@ export const DiscountForm = ({
 								validate: validateGreaterThanZero,
 							}}
 						/>
-						
+
 						<FormInput
 							control={control}
 							name="point"
@@ -687,8 +687,8 @@ export const DiscountForm = ({
 							/>
 						</div>
 						<div className="flex gap-2 w-full sm:w-auto">
-							<Button 
-								type="primary" 
+							<Button
+								type="primary"
 								onClick={handAddScheduleInDiscount}
 								className="flex-1 sm:flex-none"
 								disabled={!isCreate}

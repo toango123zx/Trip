@@ -6,7 +6,7 @@ const BillPage = lazy(() => import('@/pages/Bills'));
 const BillHistoryPage = lazy(() => import('@/pages/BillHistory'));
 const BillPaymentPage = lazy(() => import('@/pages/BillPayment'));
 
-export const billRoutes = [
+export const billsRoutes = [
 	{
 		path: '/bills/payment',
 		element: (

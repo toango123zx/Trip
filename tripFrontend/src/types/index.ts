@@ -1,5 +1,6 @@
 export * from './account.type';
 export * from './bill.type';
+export * from './boxChat.type';
 export * from './cart.type';
 export * from './common.type';
 export * from './discount.type';

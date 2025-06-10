@@ -1,6 +1,7 @@
 export * from './auth';
 export * from './bill';
 export * from './cart';
+export * from './boxChat';
 export * from './discount';
 export * from './discountApplicationScope';
 export * from './discountEligibility';

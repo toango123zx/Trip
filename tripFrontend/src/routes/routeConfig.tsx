@@ -6,6 +6,7 @@ import { billRoutes } from './billRoutes';
 import { cartsRoutes } from './cartsRoutes';
 import { productsRoutes } from './productsRoutes';
 import { usersRoutes } from './useRoutes';
+import { chatRoutes } from './chatRoutes';
 
 const HomePage = lazy(() => import('@/pages/Home'));
 const SalesPage = lazy(() => import('@/pages/SalesPage'));
@@ -25,6 +26,7 @@ const AppRoutes = [
   ...productsRoutes,
   ...cartsRoutes,
   ...billRoutes,
+  ...chatRoutes,
 ];
 
 export default AppRoutes;

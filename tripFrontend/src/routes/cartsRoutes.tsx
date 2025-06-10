@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import { AuthMiddleware } from '@/middleware/authMiddleware.tsx';
 
 const CartPage = lazy(() => import('@/pages/Cart'));

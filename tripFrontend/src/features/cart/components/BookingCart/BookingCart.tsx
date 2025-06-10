@@ -1362,7 +1362,6 @@ export const BookingCart = (): JSX.Element => {
         <Content className="py-6 px-4 md:py-12 md:px-8">
           <div className="max-w-[1536px] mx-auto">
             <DesktopHeader />
-
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <Row gutter={[24, 24]} className="p-6">
                 <Col xs={24} md={16} className="border-r border-gray-100">

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://trip-fzu1.onrender.com';
+const BASE_URL = 'http://localhost:3000';
 
 // Cấu hình axios để gửi cookie
 axios.defaults.withCredentials = true;

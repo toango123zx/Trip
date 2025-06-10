@@ -39,6 +39,9 @@ export const SearchBarDesktop = ({
 				const cityName = String(data.locationName).replace(/,\s*$/, '');
 				searchParams.citySearch = cityName;
 			}
+			if (data.name) {
+				searchParams.keyword = String(data.name).trim();
+			} 
 
 			if (data.minPrice) {
 				searchParams.priceFromSearch = Number(data.minPrice);
@@ -85,10 +88,17 @@ export const SearchBarDesktop = ({
 								<label htmlFor="locationName" className="block text-xs font-medium text-white mb-1">
 									Destination
 								</label>
-								<SelectBox
+								{/* <SelectBox
 									name="locationName"
 									selectOption={locations}
 									register={register}
+									className="w-full h-8 border border-[#d9d9d9] rounded-[6px] focus:ring-0 text-gray-800 bg-white"
+								/> */}
+								<input
+									{...register('name')}
+									id="name"
+									type="text"
+									placeholder="Enter name"
 									className="w-full h-8 border border-[#d9d9d9] rounded-[6px] focus:ring-0 text-gray-800 bg-white"
 								/>
 							</div>
