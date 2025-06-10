@@ -377,7 +377,6 @@ export const DiscountForm = ({
 			value.scheduleIds = addScheduleIds.length > 0 ? addScheduleIds : undefined;
 
 			try {
-				console.log('DiscountForm - handleSaveOnClick - Gọi onSave với dữ liệu:', value);
 				onSave(value);
 			} catch (error) {
 				console.error('Error saving discount:', error);
@@ -405,17 +404,32 @@ export const DiscountForm = ({
 				isCreate={isCreate}
 				disabled={isCreate ? disabled : false}
 				open={open}
-				onSave={isCreate ? handleSaveOnClick : undefined}
+				onSave={isCreate ? form.handleSubmit(handleSaveOnClick) : undefined}
 				onRemove={onRemove}
 				onCancel={onCancel}
-				footer={[
-					<Button key="cancel" onClick={onCancel}>
-						Hủy
-					</Button>,
-					<Button key="remove" danger onClick={onRemove}>
-						Xóa
-					</Button>,
-				]}
+				footer={
+					isCreate
+						? [
+							<Button key="cancel" onClick={onCancel}>
+								Hủy
+							</Button>,
+							<Button
+								key="save"
+								type="primary"
+								onClick={form.handleSubmit(handleSaveOnClick)}
+							>
+								Lưu
+							</Button>,
+						]
+						: [
+							<Button key="cancel" onClick={onCancel}>
+								Hủy
+							</Button>,
+							<Button key="remove" danger onClick={onRemove}>
+								Xóa
+							</Button>,
+						]
+				}
 			>
 				{/* --- Basic Information --- */}
 				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
