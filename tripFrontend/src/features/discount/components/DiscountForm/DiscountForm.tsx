@@ -381,7 +381,6 @@ export const DiscountForm = ({
 			value.scheduleIds = addScheduleIds.length > 0 ? addScheduleIds : undefined;
 
 			try {
-				console.log('DiscountForm - handleSaveOnClick - Gọi onSave với dữ liệu:', value);
 				onSave(value);
 			} catch (error) {
 				console.error('Error saving discount:', error);
