@@ -3,7 +3,7 @@ import { OrderByEnum } from 'src/common';
 export class LocationOrderByDto {
 	systemName?: OrderByEnum;
 	displayName?: OrderByEnum;
-	city?: OrderByEnum;
+	country?: OrderByEnum;
 	mapAddressId?: OrderByEnum;
 	createAt?: OrderByEnum;
 	updateAt?: OrderByEnum;

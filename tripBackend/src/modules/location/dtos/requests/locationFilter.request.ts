@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { CityEnum, LocationStatusEnum } from '@prisma/client';
+import { CountryEnum, LocationStatusEnum } from '@prisma/client';
 import { IsEnum, IsOptional } from 'class-validator';
 import { OrderByEnum, SearchDto } from 'src/common';
 
@@ -23,12 +23,12 @@ export class LocationFilterRequestDto extends SearchDto {
 	displayName?: OrderByEnum;
 	@ApiProperty({
 		type: 'string',
-		enum: CityEnum,
+		enum: CountryEnum,
 		required: false,
 	})
 	@IsOptional()
-	@IsEnum(CityEnum)
-	city?: CityEnum;
+	@IsEnum(CountryEnum)
+	city?: CountryEnum;
 	@ApiProperty({
 		type: 'string',
 		enum: LocationStatusEnum,

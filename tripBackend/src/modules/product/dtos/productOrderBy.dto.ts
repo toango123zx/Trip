@@ -1,5 +1,7 @@
 import { OrderByEnum } from 'src/common';
 
+import { ProductFilterRequestDto } from './requests';
+
 export class ProductOrderByDto {
 	name?: OrderByEnum;
 	time?: OrderByEnum;
@@ -10,7 +12,7 @@ export class ProductOrderByDto {
 	avgRate?: OrderByEnum;
 	location?: {
 		displayName?: OrderByEnum;
-		city?: OrderByEnum;
+		country?: OrderByEnum;
 	};
 	productCategory?: {
 		name?: OrderByEnum;
@@ -19,4 +21,11 @@ export class ProductOrderByDto {
 	updateAt?: OrderByEnum;
 	deletedAt?: OrderByEnum;
 	status?: OrderByEnum;
+
+	constructor(productFilter: Partial<ProductFilterRequestDto>) {
+		Object.assign(this, productFilter);
+		if (productFilter.city) {
+			this.location.country = productFilter.city;
+		}
+	}
 }

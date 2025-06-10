@@ -14,6 +14,7 @@ import { PaymentMethodModule } from './paymentMethod/paymentMethod.module';
 import { ProductModule } from './product/product.module';
 import { ProductRateModule } from './productRate/productRate.module';
 import { ProductScheduleModule } from './productSchedule/productSchedule.module';
+import { ProductViewLogModule } from './productViewLog/productViewLog.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { TransactionReferenceModule } from './transactionSession/transactionSession.module';
@@ -40,4 +41,5 @@ export const Modules = [
 	TransactionReferenceModule,
 	TransactionModule,
 	BoxChatModule,
+	ProductViewLogModule,
 ];

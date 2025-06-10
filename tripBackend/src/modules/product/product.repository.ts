@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import {
 	BillStatusEnum,
-	CityEnum,
+	CountryEnum,
 	DiscountStatusEnum,
 	InfoDiscountStatusEnum,
 	ProductScheduleStatusEnum,
@@ -21,7 +21,7 @@ export class ProductRepository {
 
 	async findProducts(
 		keyword: string,
-		pagination: IPaginationQuery,
+		pagination: IPaginationQuery = {} as IPaginationQuery,
 		userId: string,
 		status?: ProductStatusEnum,
 		filter?: ProductOrderByDto,
@@ -31,10 +31,11 @@ export class ProductRepository {
 		endTimeSearch?: Date,
 		priceFromSearch?: number,
 		priceToSearch?: number,
-		citySearch?: CityEnum,
+		countrySearch?: CountryEnum,
+		productIds?: string[],
 	): Promise<[ProductEntity[], number]> {
 		const orderBy = [];
-		if (filter.location?.displayName && filter.location?.city) {
+		if (filter.location?.displayName && filter.location?.country) {
 			orderBy.push(
 				{
 					location: {
@@ -43,7 +44,7 @@ export class ProductRepository {
 				},
 				{
 					location: {
-						city: filter.location.city,
+						country: filter.location.country,
 					},
 				},
 			);
@@ -60,7 +61,14 @@ export class ProductRepository {
 			name: 'asc',
 		});
 
-		const some = {};
+		const some = {
+			startOrder: {
+				lte: new Date(),
+			},
+			endOrder: {
+				gte: new Date(),
+			},
+		};
 		if (startTimeSearch) {
 			some['startTime'] = {
 				gte: startTimeSearch,
@@ -135,6 +143,9 @@ export class ProductRepository {
 						: undefined,
 				},
 				where: {
+					id: {
+						in: productIds,
+					},
 					name: {
 						contains: keyword,
 						mode: 'insensitive',
@@ -143,7 +154,7 @@ export class ProductRepository {
 						userId: userId,
 					},
 					location: {
-						city: citySearch,
+						country: countrySearch,
 					},
 					productSchedule:
 						Object.keys(some).length > 0
@@ -159,6 +170,9 @@ export class ProductRepository {
 			}),
 			this.prismaService.product.count({
 				where: {
+					id: {
+						in: productIds,
+					},
 					name: {
 						contains: keyword,
 						mode: 'insensitive',
