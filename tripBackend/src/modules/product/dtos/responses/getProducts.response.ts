@@ -69,7 +69,7 @@ export class GetProductsResponseDto {
 		this.avgRate = product.avgRate;
 		this.productCategoryName = product.productCategory.name;
 		this.locationName = product.location.displayName;
-		this.city = product.location.city;
+		this.city = product.location.country;
 		this.supplier = {
 			id: product.supplier.id,
 			userId: product.supplier.user.id,

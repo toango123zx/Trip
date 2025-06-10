@@ -116,7 +116,7 @@ model location {
     /// @DtoConnectHidden
     systemName  String             @unique @map("system_name")
     displayName String             @map("display_name")
-    city        CityEnum
+    country     CountryEnum       @map("country")
     createAt    DateTime           @default(now()) @map("create_at")
     /// @DtoCreateHidden
     /// @DtoUpdateHidden
@@ -175,6 +175,7 @@ model product {
     productImage    productImage[]
     productRate     productRate[]
     productSchedule productSchedule[]
+    productViewLog  productViewLog[]
 
     @@map("Product")
 }
@@ -254,4 +255,20 @@ model productSchedule {
     infoDiscount infoDiscount[]
 
     @@map("Product_Schedule")
+}
+
+model productViewLog {
+    id        String   @id @default(cuid())
+    /// @DtoUpdateHidden
+    productId String   @map("product_id")
+    /// @DtoRelationCanConnectOnCreate
+    product   product  @relation(fields: [productId], references: [id])
+    productName String   @map("product_name")
+    /// @DtoUpdateHidden
+    userId    String   @map("user_id")
+    /// @DtoRelationCanConnectOnCreate
+    user      user     @relation(fields: [userId], references: [id])
+    createdAt DateTime @default(now()) @map("create_at")
+
+    @@map("Product_View_Log")
 }

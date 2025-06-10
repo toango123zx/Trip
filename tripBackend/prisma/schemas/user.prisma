@@ -156,6 +156,7 @@ model user {
     discount        discount[]
     boxChatMember   boxChatMember[]
     message         message[]
+    productViewLog  productViewLog[]
 
     @@map("User")
 }

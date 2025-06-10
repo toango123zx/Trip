@@ -14,12 +14,13 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { HttpResponseBodyDto, PaginationDto, PermissionEnum, RoleEnum } from 'src/common';
 import { ProductEntity, ProductScheduleEntity } from 'src/models';
 
-import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
+import { Auth, AuthPermission, AuthRole, OptionalAuth } from '../auth/decorators';
 import { DiscountFilterRequestDto, GetDiscountsResponseDto } from '../discount/dtos';
 import {
 	GetProductRatesResponseDto,
 	ProductRateFilterRequestDto,
 } from '../productRate/dto';
+import { ProductViewLog } from '../productViewLog/decorators';
 import { SupplierInformation } from '../supplier/decorators';
 import { SupplierInformationDto } from '../supplier/dtos';
 import { MyInformation } from '../user/decorators';
@@ -32,6 +33,7 @@ import {
 	DeleteProductByProductIdCommand,
 	UpdateProductInformationByProductIdCommand,
 } from './commands/implements';
+import { UpdateProductVector } from './decorators';
 import {
 	CreateProductScheduleByProductIdRequestDto,
 	CreateProductRequestDto,
@@ -57,11 +59,15 @@ export class ProductController {
 	) {}
 
 	@Get()
+	@OptionalAuth()
 	async getProducts(
 		@Query() pagination: PaginationDto,
+		@MyInformation() myInformation?: UserInformationDto,
 		@Query() filter?: ProductFilterRequestDto,
 	): Promise<HttpResponseBodyDto<GetProductsResponseDto[]>> {
-		return this.queryBus.execute(new GetProductsQuery(pagination, filter));
+		return this.queryBus.execute(
+			new GetProductsQuery(pagination, myInformation, filter),
+		);
 	}
 
 	@Get('/management')
@@ -77,6 +83,7 @@ export class ProductController {
 	}
 
 	@Get('/:productId')
+	@ProductViewLog()
 	async getProductByProductId(
 		@Param('productId') productId: string,
 	): Promise<HttpResponseBodyDto<GetProductByProductIdResponseDto | HttpException>> {
@@ -107,6 +114,7 @@ export class ProductController {
 
 	@Post()
 	@AuthPermission(PermissionEnum.CreateProduct)
+	@UpdateProductVector()
 	async createProduct(
 		@Body() createProductRequestDto: CreateProductRequestDto,
 		@SupplierInformation() supplierInformation: SupplierInformationDto,
@@ -134,6 +142,7 @@ export class ProductController {
 
 	@Post('/:productId/rate')
 	@Auth()
+	@UpdateProductVector()
 	async createProductRateByProductId(
 		@Param('productId') productId: string,
 		@Body() productRateInformation: CreateProductRateByProductIdRequestDto,
@@ -150,6 +159,7 @@ export class ProductController {
 
 	@Put('/:productId')
 	@AuthPermission(PermissionEnum.UpdateProductInformation)
+	@UpdateProductVector()
 	async updateProductInformationByProductId(
 		@Param('productId') productId: string,
 		@Body() productInformationRequest: UpdateProductInformationByProductIdRequestDto,

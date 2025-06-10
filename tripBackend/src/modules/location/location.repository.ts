@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { LocationStatusEnum, CityEnum } from '@prisma/client';
+import { LocationStatusEnum, CountryEnum } from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
 import { LocationEntity } from 'src/models';
 
@@ -15,7 +15,7 @@ export class LocationRepository {
 	async findLocations(
 		pagination: IPaginationQuery,
 		keyword?: string,
-		city?: CityEnum,
+		country?: CountryEnum,
 		status?: LocationStatusEnum,
 		filter?: LocationOrderByDto,
 	): Promise<[LocationEntity[], number]> {
@@ -31,7 +31,7 @@ export class LocationRepository {
 						contains: keyword,
 						mode: 'insensitive',
 					},
-					city: city,
+					country: country,
 					status: status,
 				},
 				skip: pagination.skip,
@@ -44,7 +44,7 @@ export class LocationRepository {
 						contains: keyword,
 						mode: 'insensitive',
 					},
-					city: city,
+					country: country,
 					status: status,
 				},
 			}),
