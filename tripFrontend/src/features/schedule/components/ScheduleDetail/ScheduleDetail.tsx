@@ -2,7 +2,7 @@ import React, { JSX, useEffect, useState } from 'react';
 import { useForm, FieldValues, Control, Controller, RegisterOptions, Path, PathValue } from 'react-hook-form';
 import { FormInput } from '@/components/Form/FormInput';
 import { BaseForm } from '@/components/Form/BaseForm/BaseForm';
-import { TProductSchedule } from '@/types';
+import { EProductScheduleStatus, TProductSchedule } from '@/types';
 import { FormTextarea } from '@/components/Form/FormTextarea';
 import { formatDateTime } from '@/components/BaseTable/BaseTable';
 import { scheduleApi } from '../../scheduleApi';
@@ -12,6 +12,8 @@ import type { ColumnsType } from 'antd/es/table';
 type ScheduleDetailProps = {
 	schedule: TProductSchedule;
 	open: boolean;
+	isComplete?: boolean;
+	isRemove?: boolean;
 	onCancel: () => void;
 	onDeleteSuccess?: () => void;
 };
@@ -45,7 +47,7 @@ type User = {
 	billStatus: string;
 };
 
-export const ScheduleDetail = ({ schedule, open, onCancel, onDeleteSuccess }: ScheduleDetailProps) => {
+export const ScheduleDetail = ({ schedule, open, isComplete = true, isRemove = false, onCancel, onDeleteSuccess }: ScheduleDetailProps) => {
 	const [users, setUsers] = useState<User[]>([]);
 	const [loading, setLoading] = useState(false);
 
@@ -154,8 +156,8 @@ export const ScheduleDetail = ({ schedule, open, onCancel, onDeleteSuccess }: Sc
 			key: 'billStatus',
 			render: (text: string) => (
 				<span className={`px-2 py-1 rounded-full text-xs font-medium ${text === 'paid' ? 'bg-green-100 text-green-800' :
-						text === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-							'bg-gray-100 text-gray-800'
+					text === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+						'bg-gray-100 text-gray-800'
 					}`}>
 					{text === 'paid' ? 'Đã thanh toán' :
 						text === 'pending' ? 'Chờ thanh toán' :
@@ -170,20 +172,32 @@ export const ScheduleDetail = ({ schedule, open, onCancel, onDeleteSuccess }: Sc
 			title="Schedule Details"
 			form={form}
 			open={open}
+			isRemove={isRemove}
 			onCancel={onCancel}
 			onRemove={handleDelete}
 			isCreate={false}
-			footer={[
-				<Button key="cancel" onClick={onCancel}>
-					Hủy
-				</Button>,
-				<Button key="remove" danger onClick={handleDelete}>
-					Xóa
-				</Button>,
-				<Button key="complete" type="primary" onClick={handleComplete}>
-					Hoàn thành
-				</Button>
-			]}
+			footer={
+				[
+					(schedule.status === EProductScheduleStatus.active || schedule.status === EProductScheduleStatus.full) && isComplete && (
+						<Button key="cancel" onClick={onCancel}>
+							Hủy
+						</Button>
+					),
+					isComplete && (
+						<Button key="complete" type="primary" onClick={handleComplete}>
+							Hoàn thành
+						</Button>
+					),
+					isRemove && (
+						<Button key="remove" danger onClick={handleDelete}>
+							Xóa
+						</Button>
+					),
+					<Button key="cancel" onClick={onCancel}>
+						Hủy
+					</Button>
+				]
+				}
 		>
 			<div className="grid gap-4 sm:gap-6">
 				{/* --- Schedule Basic Info --- */}

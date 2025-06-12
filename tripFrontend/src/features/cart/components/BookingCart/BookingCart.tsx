@@ -59,13 +59,6 @@ type TBookingItem = {
   isExpired: boolean; // ✅ NEW: Track if schedule is expired
 };
 
-// ✅ NEW: Utility function to check if schedule is expired
-const isScheduleExpired = (startTime: string): boolean => {
-  const now = new Date();
-  const scheduleStart = new Date(startTime);
-  return scheduleStart < now;
-};
-
 // ✅ Enhanced: Desktop Header with animation
 const DesktopHeader = (): JSX.Element => (
   <motion.div
@@ -103,10 +96,13 @@ const TableHeader = ({
           className="transform scale-110"
         />
       </div>
-      <div style={{ width: '50%' }}>
+      <div style={{ width: '44%' }}>
         <Text strong className="text-gray-600">Product</Text>
       </div>
-      <div style={{ width: '14%' }}>
+      <div style={{ width: '10%' }}>
+        <Text strong className="text-gray-600">Start Time</Text>
+      </div>
+      <div style={{ width: '10%' }}>
         <Text strong className="text-gray-600">Price</Text>
       </div>
       <div style={{ width: '15%', textAlign: 'center' }}>
@@ -339,7 +335,7 @@ const DesktopCartItem = ({
         className="transform scale-110"
       />
     </div>
-    <div style={{ width: '50%' }} className="flex items-center space-x-4 gap-1">
+    <div style={{ width: '44%' }} className="flex items-center space-x-4 gap-1 pr-2">
       <Avatar
         shape="square"
         size={64}
@@ -350,7 +346,7 @@ const DesktopCartItem = ({
         }}
         className="flex-shrink-0"
       />
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1" >
         <div className="flex items-center space-x-2">
           <Text strong style={{ color: item.isExpired ? '#ccc' : 'inherit' }} className="text-base truncate">
             {item.name}
@@ -363,7 +359,12 @@ const DesktopCartItem = ({
         </div>
       </div>
     </div>
-    <div style={{ width: '14%' }}>
+    <div style={{ width: '10%' }}>
+      <Text type="danger" strong style={{ color: item.isExpired ? '#ccc' : '#ff4d4f' }} className="text-base">
+        {item.startTime.toLocaleString()}
+      </Text>
+    </div>
+    <div style={{ width: '10%' }} className="text-center">
       <Text type="danger" strong style={{ color: item.isExpired ? '#ccc' : '#ff4d4f' }} className="text-base">
         {item.price.toLocaleString()} VND
       </Text>
@@ -402,6 +403,7 @@ interface CartItemProps {
   onIncreaseQuantity: () => void;
   onDecreaseQuantity: () => void;
   isMobile: boolean;
+  disabled?: boolean;
 }
 
 const CartItem = ({
@@ -411,13 +413,14 @@ const CartItem = ({
   onIncreaseQuantity,
   onDecreaseQuantity,
   isMobile,
+  disabled = false
 }: CartItemProps): JSX.Element => (
   <List.Item
-    key={item.id}
-    className="p-0 border-b"
-    style={{
-      padding: isMobile ? '12px 0' : '16px 0',
-    }}
+  key={item.id}
+  className="p-0 border-b"
+  style={{
+    padding: isMobile ? '12px 0' : '16px 0',
+  }}
   >
     <MobileCartItem
       item={item}
@@ -433,6 +436,12 @@ const CartItem = ({
       onIncreaseQuantity={onIncreaseQuantity}
       onDecreaseQuantity={onDecreaseQuantity}
     />
+    {
+      disabled && (
+        <div className="absolute inset-0 bg-gray-100 opacity-50 z-20 cursor-not-allowed rounded-lg" />
+      )
+    }
+
   </List.Item>
 );
 
@@ -853,6 +862,7 @@ const CartList = ({
             onIncreaseQuantity={() => increaseQuantity(item.id)}
             onDecreaseQuantity={() => decreaseQuantity(item.id)}
             isMobile={isMobile}
+            disabled={item.isExpired}
           />
         )}
       />
@@ -897,7 +907,7 @@ export const BookingCart = (): JSX.Element => {
         price: cart.price,
         selected: false,
         quantity: 1,
-        isExpired: isScheduleExpired(cart.endOrder.toString()), // ✅ NEW: Check if expired
+        isExpired: cart.endOrder < new Date(),
       })),
     );
   }, [carts]);

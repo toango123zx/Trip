@@ -14,6 +14,14 @@ const getBillByUserId = createAsyncThunk(
   },
 );
 
+const getBillByBillId = createAsyncThunk(
+  'bill/getBillByBillId',
+  async (billId: string): Promise<TBill> => {
+    const data = await billApi.getBillByBillId(billId);
+    return data;
+  },
+);
+
 const createBill = createAsyncThunk(
   'bill/createBill',
   async (bill: CreateBillRequestDto): Promise<TBill> => {
@@ -32,6 +40,7 @@ const paymentBillByBillId = createAsyncThunk(
 
 export const billThunk = {
   getBillByUserId,
+  getBillByBillId,
   createBill,
   paymentBillByBillId,
 };

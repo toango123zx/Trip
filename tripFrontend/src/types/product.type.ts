@@ -144,3 +144,17 @@ export type TSchedule = {
 	price: number;
 	status: string;
 };
+
+export type TUserBookedSchedule = {
+	id: string;
+	name: string;
+	email: string;
+	gender: string | null;
+	phoneNumber: string | null;
+	address: string | null;
+	image: string;
+	dateOfBirth: string | null;
+	status: string;
+	quantity: number;
+	billStatus: string;
+}

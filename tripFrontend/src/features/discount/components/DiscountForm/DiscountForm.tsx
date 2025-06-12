@@ -59,6 +59,8 @@ type TDiscountFormProps = {
 	form: UseFormReturn<TRequestBodyCreateDiscount>;
 	discountId?: string;
 	isCreate?: boolean;
+	isUpdate?: boolean;
+	isRemove?: boolean;
 	disabled?: boolean;
 	open?: boolean;
 	onSave?: (data: TRequestBodyCreateDiscount) => void;
@@ -70,6 +72,8 @@ export const DiscountForm = ({
 	form,
 	discountId,
 	isCreate = false,
+	isUpdate = false,
+	isRemove = false,
 	disabled = false,
 	open = false,
 	onSave = () => { },
@@ -403,19 +407,24 @@ export const DiscountForm = ({
 				title={isCreate ? 'Add Discount' : 'Discount Details'}
 				form={form}
 				isCreate={isCreate}
-				disabled={isCreate ? true : false}
+				isUpdate={isUpdate}
+				isRemove={isRemove}
+				disabled={isCreate ? false : true}
 				open={open}
 				onSave={isCreate ? handleSaveOnClick : undefined}
 				onRemove={onRemove}
 				onCancel={onCancel}
-				footer={[
-					<Button key="cancel" onClick={onCancel}>
-						Hủy
-					</Button>,
-					<Button key="remove" danger onClick={onRemove}>
-						Xóa
-					</Button>,
-				]}
+				// footer={[
+				// 	<Button key="cancel" onClick={onCancel}>
+				// 		Hủy
+				// 	</Button>,
+				// 	<Button key="remove" danger onClick={onRemove}>
+				// 		Xóa
+				// 	</Button>,
+				// 	<Button key="save" type="primary" onClick={() => handleSaveOnClick(form.getValues())}>
+				// 		Lưu
+				// 	</Button>
+				// ]}
 			>
 				{/* --- Basic Information --- */}
 				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
@@ -539,6 +548,8 @@ export const DiscountForm = ({
 							label="Discount Type"
 							options={discountTypesOption || []}
 							disabled={!isCreate && disabled}
+							rules={{ required: 'Discount type is required' }}
+							search={true}
 						/>
 						<FormSelect
 							control={control}
@@ -546,6 +557,8 @@ export const DiscountForm = ({
 							label="Eligibility"
 							options={discountEligibilitiesOption || []}
 							disabled={!isCreate && disabled}
+							rules={{ required: 'Discount eligibility is required' }}
+							search={true}
 						/>
 						<FormSelect
 							control={control}
@@ -553,6 +566,8 @@ export const DiscountForm = ({
 							label="Application Scope"
 							options={discountApplicationScopesOption || []}
 							disabled={!isCreate && disabled}
+							rules={{ required: 'Discount application scope is required' }}
+							search={true}
 						/>
 					</div>
 
@@ -637,7 +652,7 @@ export const DiscountForm = ({
 								label="Select Product"
 								options={productOption}
 								onChange={changeProductId}
-								disabled={!isCreate && disabled}
+								// disabled={!isCreate && disabled}
 							/>
 						</div>
 						<Button
@@ -645,7 +660,7 @@ export const DiscountForm = ({
 							variant="outlined"
 							className="w-full sm:w-auto"
 							onClick={handleOpenPopupProductDetail}
-							disabled={!isCreate}
+							// disabled={!isCreate}
 						>
 							Details
 						</Button>
@@ -683,7 +698,7 @@ export const DiscountForm = ({
 								label="Select Schedule"
 								options={scheduleOption}
 								onChange={() => setChangeScheduleOption(!changeScheduleOption)}
-								disabled={!isCreate && disabled}
+								// disabled={!isCreate && disabled}
 							/>
 						</div>
 						<div className="flex gap-2 w-full sm:w-auto">
@@ -691,7 +706,7 @@ export const DiscountForm = ({
 								type="primary"
 								onClick={handAddScheduleInDiscount}
 								className="flex-1 sm:flex-none"
-								disabled={!isCreate}
+								// disabled={!isCreate}
 							>
 								Add
 							</Button>
@@ -700,7 +715,7 @@ export const DiscountForm = ({
 								variant="outlined"
 								onClick={handleOpenScheduleDetail}
 								className="flex-1 sm:flex-none"
-								disabled={!isCreate}
+								// disabled={!isCreate}
 							>
 								Details
 							</Button>
@@ -729,6 +744,8 @@ export const DiscountForm = ({
 				<ScheduleDetail
 					schedule={selectedSchedule}
 					open={isOpenPopupScheduleDetail}
+					isComplete={false}
+					isRemove={false}
 					onCancel={handleCloseScheduleDetail}
 				/>
 			)}

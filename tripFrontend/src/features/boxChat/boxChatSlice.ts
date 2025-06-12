@@ -39,10 +39,23 @@ export const boxChatSlice = createSlice({
 			})
 			.addCase(boxChatThunk.getBoxChatByBoxChatId.fulfilled, (state, action) => {
 				state.loading = false;
-				state.boxChatDetails = action.payload;
+				state.boxChatDetail = action.payload;
 				state.error = null;
 			})
 			.addCase(boxChatThunk.getBoxChatByBoxChatId.rejected, (state, action) => {
+				state.loading = false;
+				state.error = String(action.error.message);
+			})
+			.addCase(boxChatThunk.createBoxChat.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(boxChatThunk.createBoxChat.fulfilled, (state, action) => {
+				state.loading = false;
+				state.boxChatDetail = action.payload;
+				state.error = null;
+			})
+			.addCase(boxChatThunk.createBoxChat.rejected, (state, action) => {
 				state.loading = false;
 				state.error = String(action.error.message);
 			});

@@ -38,7 +38,7 @@ type TProductFormProps = {
 	>;
 	// discounts?: TDiscountDetail[];
 	isCreate?: boolean;
-	remove?: boolean;
+	isRemove?: boolean;
 	onRemove?: () => void;
 	onSubmit?: SubmitHandler<TRequestBodyCreateProduct>;
 	onCancel?: () => void;
@@ -57,7 +57,7 @@ export const ProductForm = ({
 	setSchedules = (): void => {},
 	// discounts = [],
 	isCreate = false,
-	remove = true,
+	isRemove = true,
 	disabled = false,
 	open = true,
 	onSubmit,
@@ -351,10 +351,11 @@ export const ProductForm = ({
 			title={isCreate ? 'Add Product' : 'Product Details'}
 			form={form}
 			isCreate={isCreate}
+			isRemove={isRemove}
 			disabled={disabled}
 			open={open}
 			onSave={handleSaveOnClick}
-			onRemove={remove ? onRemove : undefined}
+			onRemove={isRemove ? onRemove : undefined}
 			onCancel={onCancel}
 		>
 			{/* --- Product Info --- */}
@@ -389,10 +390,11 @@ export const ProductForm = ({
 				<FormSelect
 					control={control}
 					name="locationId"
-					label="Location On System"
+					label="Location"
 					options={options}
 					rules={{ required: 'Location is required' }}
 					disabled={disabled}
+					search={true}
 				/>
 
 				<FormTextarea
@@ -746,6 +748,7 @@ export const ProductForm = ({
 					data={newSchedule}
 					setData={setNewSchedule}
 					isCreate={isCreateSchedule}
+					isRemove={isCreateSchedule}
 					onSave={handlerAddScheduleInPopup}
 					onRemove={handleRemoveSchedule}
 					onCancel={handleClosePopupScheduleUpdate}

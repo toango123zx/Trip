@@ -53,7 +53,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 	useEffect(() => {
 		if (activeTab === EactiveTab.discount) {
 			dispatch(
-				discountThunk.getDiscountByUserId({
+				discountThunk.getDiscountManagement({
 					query: {
 						page: pageDiscount,
 						statusSearch: EDiscountStatus.active,
@@ -111,14 +111,14 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 		switch (activeTab) {
 			case EactiveTab.product:
 				dispatch(
-					productThunk.getProducts({ page: pageProduct, limit: PAGE_SIZE }),
+					productThunk.getProductsManagement({ page: pageProduct, limit: PAGE_SIZE }),
 				);
 				setIsOpenPopupAddProduct(false);
 				setIsOpenPopupProductUpdate(false);
 				break;
 			case EactiveTab.discount:
 				dispatch(
-					discountThunk.getDiscountByUserId({
+					discountThunk.getDiscountManagement({
 						query: {
 							page: pageDiscount,
 							statusSearch: EDiscountStatus.active,

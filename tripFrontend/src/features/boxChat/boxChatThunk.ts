@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { TBoxChat, TBoxChatSummary, TPagination } from '@/types';
 import { boxChatApi } from './boxChatApi';
-import { TRequestQueryGetBoxChats } from './boxChat.type';
+import { TRequestQueryCreateBoxChat, TRequestQueryGetBoxChats } from './boxChat.type';
 
 
 const getBoxChats = createAsyncThunk(
@@ -24,7 +24,16 @@ const getBoxChatByBoxChatId = createAsyncThunk(
 	},
 );
 
+const createBoxChat = createAsyncThunk(
+	'boxChat/createBoxChat',
+	async (boxChat: TRequestQueryCreateBoxChat): Promise<TBoxChat> => {
+		const data = await boxChatApi.createBoxChat(boxChat);
+		return data;
+	},
+);
+
 export const boxChatThunk = {
 	getBoxChats,
 	getBoxChatByBoxChatId,
+	createBoxChat,
 };

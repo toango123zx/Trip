@@ -56,7 +56,7 @@ export const ProductsBoard = ({
 
 	useEffect(() => {
 		dispatch(
-			productThunk.getProducts({
+			productThunk.getProductsManagement({
 				page: page,
 				limit: pageSize,
 				keyword: debouncedSearchText || undefined, // Thêm keyword vào params

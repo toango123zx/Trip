@@ -54,6 +54,7 @@ export const AddDiscount = ({
 		<DiscountForm
 			form={form}
 			isCreate={true}
+			isRemove={false}
 			onSave={onSubmit}
 			onCancel={onCancel}
 			open={open}

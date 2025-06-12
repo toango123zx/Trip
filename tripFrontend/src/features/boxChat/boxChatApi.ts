@@ -1,6 +1,6 @@
 import { api, EServer } from '@/lib';
 import { TPagination, TBoxChatSummary, TBoxChat } from '@/types';
-import { TRequestQueryGetBoxChats } from './boxChat.type';
+import { TRequestQueryCreateBoxChat, TRequestQueryGetBoxChats } from './boxChat.type';
 
 
 export const boxChatApi = {
@@ -22,4 +22,14 @@ export const boxChatApi = {
 			);
 			return response.data;
 		},
+
+	async createBoxChat(boxChat: TRequestQueryCreateBoxChat): Promise<TBoxChat> {
+		const response = await api.post<TBoxChat>(
+			'/box-chat',
+			boxChat,
+			undefined,
+			EServer.Backend,
+		);
+		return response;
+	}
 };

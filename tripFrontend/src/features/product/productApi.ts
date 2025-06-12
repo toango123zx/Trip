@@ -18,7 +18,7 @@ export const productApi = {
 				{
 					...safeQuery,
 					page: safeQuery.page || 1,
-					limit: safeQuery.limit || 6
+					limit: safeQuery.limit || 10,
 				},
 				EServer.Backend,
 			);

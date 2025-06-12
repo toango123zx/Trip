@@ -14,3 +14,8 @@ export type TRequestQueryGetBoxChats = {
 	nameSearch?: string;
 	name?: EArrange;
 };
+
+export type TRequestQueryCreateBoxChat = {
+	name: string;
+	boxChatMember: string[];
+};

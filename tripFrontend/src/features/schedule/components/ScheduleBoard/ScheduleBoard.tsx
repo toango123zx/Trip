@@ -70,7 +70,7 @@ export const SchedulesBoard = ({
 
 	const handleViewDetail = async (schedule: TProductSchedule) => {
 		try {
-			const response = await scheduleApi.getScheduleByScheduleId(schedule.id, EProductScheduleStatus.active);
+			const response = await scheduleApi.getScheduleByScheduleId(schedule.id);
 			setSelectedSchedule(response);
 			setIsDetailOpen(true);
 		} catch (error) {
@@ -185,6 +185,8 @@ export const SchedulesBoard = ({
 				<ScheduleDetail
 					schedule={selectedSchedule}
 					open={isDetailOpen}
+					isComplete={false}
+					isRemove={true}
 					onCancel={() => setIsDetailOpen(false)}
 					onDeleteSuccess={() => {
 						handleScheduleDeleted();

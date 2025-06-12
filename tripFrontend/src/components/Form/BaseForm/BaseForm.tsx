@@ -8,6 +8,8 @@ type BaseFormProps<T extends FieldValues> = {
   title: string;
   form: UseFormReturn<T>;
   isCreate?: boolean;
+  isUpdate?: boolean;
+  isRemove?: boolean;
   disabled?: boolean;
   open?: boolean;
   children: ReactNode;
@@ -17,11 +19,12 @@ type BaseFormProps<T extends FieldValues> = {
   footer?: ReactNode | ReactNode[];
 };
 
-export const BaseForm = <T extends Record<string, any>>({
+export const  BaseForm = <T extends Record<string, any>>({
   title,
   form,
   isCreate = false,
-  disabled = false,
+  isUpdate = false,
+  isRemove = false,
   open = false,
   children,
   onSave = () => {},
@@ -29,18 +32,19 @@ export const BaseForm = <T extends Record<string, any>>({
   onCancel = () => {},
   footer,
 }: BaseFormProps<T>) => {
+  console.log(`🚀 ~ BaseForm.tsx:35 ~ isRemove:`, isRemove)
   const { handleSubmit } = form;
 
   const modalFooter = footer !== undefined ? footer : [
     <Button key="cancel" onClick={onCancel}>
       Hủy
     </Button>,
-    !disabled && !isCreate && (
+    isRemove === true && (
       <Button key="remove" danger onClick={onRemove}>
         Xóa
       </Button>
     ),
-    !disabled && (
+    (isUpdate || isCreate)  && (
       <Button key="save" type="primary" onClick={handleSubmit(onSave)}>
         Lưu
       </Button>

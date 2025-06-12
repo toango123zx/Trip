@@ -34,6 +34,19 @@ export const billSlice = createSlice({
         state.loading = false;
         state.error = String(action.error.message);
       })
+      .addCase(billThunk.getBillByBillId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(billThunk.getBillByBillId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.billDetail = action.payload;
+      })
+      .addCase(billThunk.getBillByBillId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = String(action.error.message);
+      })
       .addCase(billThunk.createBill.pending, (state) => {
         state.loading = true;
         state.error = null;

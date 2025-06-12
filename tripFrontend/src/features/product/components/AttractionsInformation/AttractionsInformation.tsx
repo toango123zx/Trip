@@ -5,7 +5,7 @@ import { IoLocationOutline } from 'react-icons/io5';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { RiCalendarScheduleLine } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Pagination, Navigation, Autoplay, Mousewheel } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import ImageGallery from 'react-image-gallery';
@@ -19,6 +19,7 @@ import { EProductScheduleStatus, TProductSchedule } from '@/types';
 
 import { productThunk } from '../../productThunk';
 import { ImageFallback } from '@/components/ImageFallback';
+import { boxChatThunk } from '@/features/boxChat';
 
 type TStarIconProps = { filled: boolean };
 const StarIcon = ({ filled }: TStarIconProps): JSX.Element =>
@@ -46,6 +47,8 @@ type TScheduleCardProps = {
 	schedule: TProductSchedule;
 	className?: string;
 	isInCart?: boolean;
+	disabled?: boolean;
+	inCart?: boolean;
 	onDetailsClick?: () => void;
 };
 
@@ -53,6 +56,8 @@ const ScheduleCard = ({
 	schedule,
 	className,
 	isInCart = false,
+	disabled = false,
+	inCart = false,
 	onDetailsClick,
 }: TScheduleCardProps): JSX.Element => {
 	const statusColor =
@@ -99,7 +104,7 @@ const ScheduleCard = ({
 	return (
 		<section
 			className={cn(
-				'bg-white rounded-2xl overflow-hidden transition-all duration-300 ease-in-out',
+				'relative bg-white rounded-2xl overflow-hidden transition-all duration-300 ease-in-out',
 				'shadow-sm hover:shadow-md border border-gray-100',
 				className,
 			)}
@@ -115,6 +120,11 @@ const ScheduleCard = ({
 							{startDateTime.date} - {endDateTime.date}
 						</h3>
 					</div>
+					{inCart && (
+						<div className='bg-[#ff7921] py-4 px-8 rounded-2xl '>
+							<p className='text-xs font-medium text-white uppercase tracking-wider'>In Cart</p>
+						</div>
+					)}
 				</div>
 			</div>
 
@@ -210,7 +220,7 @@ const ScheduleCard = ({
 
 						<button
 							onClick={addScheduleInCart}
-							disabled={isAddedToCart}
+							disabled={isAddedToCart || disabled}
 							className={cn(
 								'px-6 py-2 rounded-lg text-sm font-semibold transition-colors bg-orange-500 text-white hover:bg-orange-600',
 								'flex items-center gap-2',
@@ -221,6 +231,9 @@ const ScheduleCard = ({
 					</div>
 				</div>
 			</div>
+			{disabled || inCart &&
+				<div className="absolute inset-0 bg-gray-100 opacity-50 z-20 cursor-not-allowed rounded-lg" />
+			}
 		</section>
 	);
 };
@@ -238,6 +251,9 @@ export const AttractionsInformation: React.FC = () => {
 	const swiperRef = useRef<unknown>(null);
 	const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
+	const [scheduledIdsDisabled, setScheduledIdsDisabled] = useState<Set<string>>(new Set());
+
+	const nav = useNavigate();
 
 	useEffect(() => {
 		if (attractionId) {
@@ -249,21 +265,22 @@ export const AttractionsInformation: React.FC = () => {
 	// Filter schedules based on booking time and cart status
 	const filteredSchedules = useMemo(() => {
 		if (!data.productSchedule) return [];
-	
+
 		const now = new Date();
-		const bookedScheduleIds = new Set(carts.map(cart => cart.scheduleId));
-	
+		setScheduledIdsDisabled(new Set(carts.map(cart => cart.scheduleId)));
+
 		return data.productSchedule.filter(schedule => {
 			const startOrder = new Date(schedule.startOrder);
 			const endOrder = new Date(schedule.endOrder);
-	
+
 			const isBookingOpen = now >= startOrder;
 			const isBookingNotEnded = now < endOrder;
-			const isNotBooked = !bookedScheduleIds.has(schedule.id);
-	
-			return isBookingOpen && isBookingNotEnded && isNotBooked;
+			// const isNotBooked = !bookedScheduleIds.has(schedule.id);
+
+			// return isBookingOpen && isBookingNotEnded && isNotBooked;
+			return isBookingOpen && isBookingNotEnded;
 		});
-	}, [data.productSchedule, carts]);	
+	}, [data.productSchedule, carts]);
 
 	const truncatedDesc = useMemo(() => {
 		if (!data.description) return '';
@@ -301,6 +318,16 @@ export const AttractionsInformation: React.FC = () => {
 		setCurrentImageIndex(index);
 		setIsGalleryOpen(true);
 	};
+
+	const handleContactClick = () => {
+		dispatch(boxChatThunk.createBoxChat({
+			name: `${data.supplier.name} - ${localStorage.getItem('username')}`,
+			boxChatMember: [
+				data.supplier.userId,
+			]
+		}))
+		nav('/chats')
+	}
 
 	return (
 		<section className="relative">
@@ -358,6 +385,7 @@ export const AttractionsInformation: React.FC = () => {
 						))}
 					</Swiper>
 				</div>
+				<button onClick={handleContactClick}>Contact</button>
 
 				{/* Description */}
 				<div className="mb-8 text-gray-700 leading-relaxed text-sm md:text-base">
@@ -448,7 +476,7 @@ export const AttractionsInformation: React.FC = () => {
 					</h2>
 					<div className="space-y-4">
 						{filteredSchedules.map((sched) => (
-							<ScheduleCard key={sched.id} schedule={sched} />
+							<ScheduleCard key={sched.id} schedule={sched} disabled={scheduledIdsDisabled.has(sched.id)} inCart={scheduledIdsDisabled.has(sched.id)} />
 						))}
 						{filteredSchedules.length === 0 && (
 							<div className="text-center py-8 text-gray-500">

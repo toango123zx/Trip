@@ -21,6 +21,7 @@ import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TBillSumary } from '@/types/bill.type';
 
 import { billThunk } from '../../billThunk';
+import { BillDetail } from '../BillDetail/BillDetail';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -43,6 +44,8 @@ type TBillInTable = {
 export const BillList = (): JSX.Element => {
 	const [filter, setFilter] = useState('all');
 	// const [currentPage, setCurrentPage] = useState(1);
+	const [billDetailVisible, setBillDetailVisible] = useState(false);
+	const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const bills: TBillSumary[] = useSelector<TReduxStoreState, TBillSumary[]>(
 		(state) => state.bill.bills,
@@ -69,6 +72,17 @@ export const BillList = (): JSX.Element => {
 			})),
 		);
 	}, [bills]);
+
+	const handleViewDetail = (billId: string): void => {
+		console.log(`🚀 ~ BillList.tsx:76 ~ handleViewDetail ~ billId:`, billId)
+		setSelectedBillId(billId);
+		setBillDetailVisible(true);
+	};
+
+	const handleCloseBillDetail = (): void => {
+		setBillDetailVisible(false);
+		setSelectedBillId(null);
+	};
 
 	// Sample data for orders
 	// const orders: Order[] = [
@@ -144,11 +158,12 @@ export const BillList = (): JSX.Element => {
 		{
 			title: 'ACTION',
 			key: 'action',
-			render: (): JSX.Element => (
+			render: (_: any, record: TBillInTable): JSX.Element => (
 				<Button
 					type="link"
 					className="text-blue-500 flex items-center"
 					style={{ padding: 0 }}
+					onClick={() => handleViewDetail(record.id)}
 				>
 					<span>View Details</span>
 					<ChevronRight size={16} className="ml-1" />
@@ -168,8 +183,8 @@ export const BillList = (): JSX.Element => {
 		filter === 'all'
 			? orders
 			: orders.filter(
-					(order) => order.status.toLowerCase() === filter.toLowerCase(),
-				);
+				(order) => order.status.toLowerCase() === filter.toLowerCase(),
+			);
 
 	return (
 		<ConfigProvider
@@ -267,10 +282,10 @@ export const BillList = (): JSX.Element => {
 																order.status === 'DONE'
 																	? '#52c41a'
 																	: order.status ===
-																		  'CANCELED'
+																		'CANCELED'
 																		? '#f5222d'
 																		: order.status ===
-																			  'WAITING'
+																			'WAITING'
 																			? '#1890ff'
 																			: '#fa8c16',
 														}}
@@ -289,6 +304,7 @@ export const BillList = (): JSX.Element => {
 														type="link"
 														className="text-blue-500 flex items-center p-0"
 														style={{ padding: 0 }}
+														onClick={() => handleViewDetail(order.id)}
 													>
 														<span>View Details</span>
 														<ChevronRight
@@ -377,6 +393,11 @@ export const BillList = (): JSX.Element => {
 					</Content>
 				</Layout>
 			</Layout>
+			<BillDetail
+				visible={billDetailVisible}
+				onClose={handleCloseBillDetail}
+				billId={selectedBillId}
+			/>
 		</ConfigProvider>
 	);
 };

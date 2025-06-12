@@ -33,12 +33,12 @@ export const AttractionList = ({
 	const [selectSort, setSelectSort] = useState<EArrange>(EArrange.desc);
 	const [at, setat] = useState<TProductSumary[]>([]);
 	const [page, setPage] = useState<number>(1);
-
+	const LIMIT_PRODUCTS = 20;
 	useEffect(() => {
 		dispatch(
 			productThunk.getProducts({
 				page: 1,
-				limit: 6,
+				limit: LIMIT_PRODUCTS,
 			}),
 		);
 	}, [dispatch]);
@@ -68,7 +68,7 @@ export const AttractionList = ({
 		const result = await dispatch(
 			productThunk.getProducts({ 
 				page: nextPage, 
-				limit: 6,
+				limit: LIMIT_PRODUCTS,
 			})
 		);
 

@@ -1,5 +1,5 @@
 import { api, EServer } from '@/lib';
-import { EProductScheduleStatus, TCartSummary, TProductSchedule } from '@/types';
+import { EProductScheduleStatus, TCartSummary, TProductSchedule, TUserBookedSchedule } from '@/types';
 
 import { TRequestBodyCreateSchedule, TReSponseBodyScheduleDetail } from './schedule.type';
 
@@ -15,7 +15,7 @@ export const scheduleApi = {
 
 	async getScheduleByScheduleId(
 		scheduleId: string,
-		status: EProductScheduleStatus,
+		status?: EProductScheduleStatus,
 	): Promise<TReSponseBodyScheduleDetail> {
 		const data = await api.get<TReSponseBodyScheduleDetail>(
 			`/schedule/${scheduleId}`,
@@ -61,48 +61,19 @@ export const scheduleApi = {
 	},
 
 	async getScheduleUsers(scheduleId: string): Promise<{
-		data: Array<{
-			id: string;
-			name: string;
-			email: string;
-			gender: string | null;
-			phoneNumber: string | null;
-			address: string | null;
-			image: string;
-			dateOfBirth: string | null;
-			status: string;
-			quantity: number;
-			billStatus: string;
-		}>;
-		pagination: {
+		data: TUserBookedSchedule[];
+		pagination?: {
 			totalItems: number;
 			itemsPerPage: number;
 			currentPage: number;
 			totalPages: number;
 		};
 	}> {
-		const response = await api.get<{
-			data: Array<{
-				id: string;
-				name: string;
-				email: string;
-				gender: string | null;
-				phoneNumber: string | null;
-				address: string | null;
-				image: string;
-				dateOfBirth: string | null;
-				status: string;
-				quantity: number;
-				billStatus: string;
-			}>;
-			pagination: {
-				totalItems: number;
-				itemsPerPage: number;
-				currentPage: number;
-				totalPages: number;
-			};
-		}>(`/schedule/${scheduleId}/users`, {}, EServer.Backend);
-		return response.data;
+		const response = await api.get<TUserBookedSchedule[]>(`/schedule/${scheduleId}/users`, {}, EServer.Backend);
+		return {
+			data: response.data,
+			pagination: response.pagination,
+		};
 	},
 
 	async completeSchedule(scheduleId: string): Promise<TProductSchedule> {

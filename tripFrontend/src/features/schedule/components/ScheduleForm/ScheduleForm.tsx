@@ -22,6 +22,7 @@ type TScheduleFormProps = {
 	data: TRequestBodyCreateSchedule;
 	setData: React.Dispatch<React.SetStateAction<TRequestBodyCreateSchedule>>;
 	isCreate?: boolean;
+	isRemove?: boolean;
 	disabled?: boolean;
 	onSave?: (data: TRequestBodyCreateSchedule) => void;
 	onRemove?: () => void;
@@ -38,11 +39,11 @@ const pickerConfigs: {
 	key: FieldKey;
 	label: string;
 }[] = [
-	{ key: 'startTime', label: 'Start' },
-	{ key: 'endTime', label: 'End' },
-	{ key: 'startOrder', label: 'Start Order' },
-	{ key: 'endOrder', label: 'End Order' },
-];
+		{ key: 'startTime', label: 'Start' },
+		{ key: 'endTime', label: 'End' },
+		{ key: 'startOrder', label: 'Start Order' },
+		{ key: 'endOrder', label: 'End Order' },
+	];
 
 type TError = {
 	price: boolean;
@@ -57,20 +58,21 @@ export const ScheduleForm = ({
 	data,
 	setData,
 	isCreate = false,
+	isRemove = false,
 	disabled = false,
-	onSave = (): void => {},
-	onRemove = (): void => {},
-	onCancel = (): void => {},
-	onDeleteSuccess = (): void => {},
+	onSave = (): void => { },
+	onRemove = (): void => { },
+	onCancel = (): void => { },
+	onDeleteSuccess = (): void => { },
 }: TScheduleFormProps): JSX.Element => {
 	const form = useForm<TRequestBodyCreateSchedule>({
 		defaultValues: data,
 	});
-	
+
 	const { control, setValue, watch, getValues } = form;
 	const isInitialMount = useRef(true);
 	const prevDataRef = useRef(data);
-	
+
 	// Synchronize form data with component state only on initial mount or when data prop changes
 	useEffect(() => {
 		if (data && JSON.stringify(data) !== JSON.stringify(prevDataRef.current)) {
@@ -88,13 +90,13 @@ export const ScheduleForm = ({
 			isInitialMount.current = false;
 			return;
 		}
-		
+
 		const numPrice = Number(price);
 		if (!isNaN(numPrice) && numPrice > 0 && numPrice !== data.price) {
 			setData((prev) => ({ ...prev, price: numPrice }));
 		}
 	}, [price, setData, data.price]);
-	
+
 	const updateField = (dateOrTime: Dayjs, field: FieldKey, isDate: boolean): void => {
 		setData((prev) => {
 			const d = new Date(prev[field]);
@@ -112,9 +114,9 @@ export const ScheduleForm = ({
 	const handleSaveOnClick = (): void => {
 		setError({} as TError);
 		let flag = false;
-		
+
 		const formValues = getValues();
-		
+
 		if (formValues.price <= 0) {
 			setError((prev) => ({ ...prev, price: true }));
 			flag = true;
@@ -123,7 +125,7 @@ export const ScheduleForm = ({
 			setError((prev) => ({ ...prev, startTime: true }));
 			flag = true;
 		}
-		if (data.startOrder < data.startTime) {
+		if (data.startOrder >= data.startTime) {
 			setError((prev) => ({ ...prev, startOrder: true }));
 			flag = true;
 		}
@@ -134,7 +136,7 @@ export const ScheduleForm = ({
 		if (
 			data.endOrder <= new Date() ||
 			data.endOrder <= data.startOrder ||
-			data.endOrder <= data.startTime
+			data.endOrder > data.startTime
 		) {
 			setError((prev) => ({ ...prev, endOrder: true }));
 			flag = true;
@@ -142,10 +144,10 @@ export const ScheduleForm = ({
 		if (flag) {
 			return;
 		}
-		
+
 		onSave?.(data);
 	};
-	
+
 	const validateGreaterThanZero = (value: string | number | boolean): string | boolean => {
 		const numValue = Number(value);
 		return isNaN(numValue) || numValue <= 0 ? 'Price must be greater than 0' : true;
@@ -156,6 +158,7 @@ export const ScheduleForm = ({
 			title={isCreate ? 'New Schedule' : 'Schedule Detail'}
 			form={form}
 			isCreate={isCreate}
+			isRemove={isRemove}
 			disabled={!isCreate || disabled}
 			open={true}
 			onSave={isCreate ? handleSaveOnClick : undefined}
@@ -209,7 +212,7 @@ export const ScheduleForm = ({
 					</svg>
 					<h3 className="text-sm sm:text-base font-medium text-gray-800">Schedule Times</h3>
 				</div>
-				
+
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 					{pickerConfigs.map((cfg) => (
 						<div key={cfg.key} className="p-2 sm:p-3 bg-white border border-gray-200 rounded-md shadow-sm">

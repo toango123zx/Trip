@@ -16,6 +16,15 @@ export const billApi = {
     return [response.data, response.pagination];
   },
 
+  async getBillByBillId(billId: string): Promise<TBill> {
+    const response = await api.get<TBill>(
+      `/bill/${billId}`,
+      {},
+      EServer.Backend
+    );
+    return response.data;
+  },
+
   async createBill(bill: CreateBillRequestDto): Promise<TBill> {
     const data = await api.post<TBill, CreateBillRequestDto>(
       `/bill`,

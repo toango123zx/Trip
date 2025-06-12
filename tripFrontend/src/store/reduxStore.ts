@@ -15,6 +15,7 @@ import {
 import { locationSlice } from '@/features/location';
 import salesReducer from '@/features/sales/slice/salesSlice';
 import { boxChatSlice } from '@/features/boxChat';
+import { statisticSlice } from '@/features/statistic';
 
 export const _reduxStore = configureStore({
 	reducer: {
@@ -31,6 +32,7 @@ export const _reduxStore = configureStore({
 		cart: cartSlice.reducer,
 		bill: billSlice.reducer,
 		boxChat: boxChatSlice.reducer,
+		statistic: statisticSlice.reducer,
 	},
 });
 

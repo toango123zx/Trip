@@ -67,8 +67,9 @@ export const UpdateDiscount = ({
 		<DiscountForm
 			discountId={discountId}
 			form={form}
+			isUpdate={true}
+			isRemove={true}
 			disabled={true}
-			isCreate={false}
 			onCancel={onCancel}
 			onRemove={onRemove}
 			open={open}

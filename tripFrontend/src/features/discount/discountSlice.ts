@@ -39,14 +39,11 @@ export const discountSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        discountThunk.getDiscountsAvailableByScheduleIds.fulfilled,
-        (state, action) => {
-          state.loading = false;
-          state.discountsDetail = action.payload;
-          state.error = null;
-        },
-      )
+      .addCase(discountThunk.getDiscountsAvailableByScheduleIds.fulfilled, (state, action) => {
+        state.loading = false;
+        state.discountsDetail = action.payload;
+        state.error = null;
+      })
       .addCase(
         discountThunk.getDiscountsAvailableByScheduleIds.rejected,
         (state, action) => {
@@ -65,6 +62,20 @@ export const discountSlice = createSlice({
         state.error = null;
       })
       .addCase(discountThunk.getDiscountByUserId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = String(action.error.message);
+      })
+      .addCase(discountThunk.getDiscountManagement.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(discountThunk.getDiscountManagement.fulfilled, (state, action) => {
+        state.loading = false;
+        state.discounts = action.payload[0];
+        state.pagination = action.payload[1] || ({} as TPagination);
+        state.error = null;
+      })
+      .addCase(discountThunk.getDiscountManagement.rejected, (state, action) => {
         state.loading = false;
         state.error = String(action.error.message);
       })

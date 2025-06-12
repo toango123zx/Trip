@@ -152,6 +152,7 @@ export const ProductUpdate = ({
 	return (
 		<ProductForm
 			form={form}
+			isRemove={true}
 			onRemove={onRemove}
 			schedules={schedules}
 			setSchedules={setSchedules}

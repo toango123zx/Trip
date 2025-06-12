@@ -118,7 +118,7 @@ Nội dung cần hấp dẫn, truyền cảm hứng, và nêu bật điểm đ�
 		<div>
 			<ProductForm
 				form={form}
-				remove={false}
+				isRemove={false}
 				schedules={schedules}
 				setSchedules={setSchedules}
 				isCreate={true}

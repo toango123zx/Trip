@@ -11,6 +11,7 @@ export * from './location.type';
 export * from './pagination.type';
 export * from './product.type';
 export * from './responseBackend.type';
+export * from './staticts.type';
 export * from './user.type';
 
 export type TRequestQueryGetUsers = {

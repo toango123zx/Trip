@@ -60,7 +60,7 @@ export const formatDateTime = (value: Date | string | null | undefined, format: 
   return dayjs(value).format(format);
 };
 
-export const BaseTable = <T extends object>({
+export const  BaseTable = <T extends object>({
   className,
   pagination: paginationProps,
   dataSource,

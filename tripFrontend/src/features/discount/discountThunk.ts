@@ -60,6 +60,18 @@ const getDiscountByUserId = createAsyncThunk(
   },
 );
 
+const getDiscountManagement = createAsyncThunk(
+  'discount/getDiscountManagement',
+  async ({
+    query,
+  }: {
+    query?: TRequestQueryGetDiscountsByProductId;
+  }): Promise<[TDiscountDetail[], TPagination?]> => {
+    const [data, pagination] = await discountApi.getDiscountManagement(query);
+    return [data, pagination];
+  },
+);
+
 const getNonDiscountableSchedules = createAsyncThunk(
   'discount/nonDiscountableSchedules',
   async ({
@@ -152,6 +164,7 @@ export const discountThunk = {
   getDiscountsAvailableByScheduleIds,
   getNonDiscountableSchedules,
   getDiscountByUserId,
+  getDiscountManagement,
   getDiscountByDiscountId,
   createDiscount,
   assignProductSchedulesToDiscount,

@@ -39,6 +39,17 @@ export const discountApi = {
     return [response.data, response.pagination];
   },
 
+    async getDiscountManagement(
+    query?: TRequestQueryGetDiscountsByProductId,
+  ): Promise<[TDiscountDetail[], TPagination?]> {
+    const response = await api.get<TDiscountDetail[]>(
+      `/discount/management`,
+      query,
+      EServer.Backend,
+    );
+    return [response.data, response.pagination];
+  },
+
   async getDiscountsAvailableByScheduleIds(
     scheduleIds: string[],
     query?: TRequestQueryGetDiscountsByProductId,

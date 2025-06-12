@@ -176,7 +176,7 @@ const ChatPage: React.FC = () => {
       )}
 
       {/* Chatbot Modal */}
-      <ChatbotModal
+  <ChatbotModal
         isOpen={isChatbotOpen}
         onClose={handleCloseChatbot}
         myInformationId={myInformationId}
