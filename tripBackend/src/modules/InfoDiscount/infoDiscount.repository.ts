@@ -7,7 +7,7 @@ import { PrismaService } from '../database/services';
 
 @Injectable()
 export class InfoDiscountRepository {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(private readonly prismaService: PrismaService) { }
 
 	async createInfoDiscountForProductSchedules(
 		discoutId: string,
@@ -25,8 +25,8 @@ export class InfoDiscountRepository {
 	async deleteInfoDiscountForProductSchedules(
 		discountId: string,
 		productScheduleIds: string[],
-	): Promise<InfoDiscountEntity[]> {
-		return this.prismaService.infoDiscount.updateManyAndReturn({
+	): Promise<InfoDiscountEntity[] | any> {
+		const a = await this.prismaService.infoDiscount.updateManyAndReturn({
 			include: {
 				productSchedule: {
 					include: {

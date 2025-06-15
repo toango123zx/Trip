@@ -270,12 +270,13 @@ export class BillDetailResponseDto {
 					(item) => item.scheduleId === infoBillDetail.productScheduleId,
 				)?.paymentPrice,
 				productScheduleStatus: infoBillDetail.productSchedule?.status,
-				isRated: infoBillDetail.productSchedule?.product?.productRate?.find(
-					(rate) =>
-						rate.userId === bill.userId && rate.createAt > bill.createAt,
-				)
-					? true
-					: false,
+				// isRated: infoBillDetail.productSchedule?.product?.productRate?.find(
+				// 	(rate) =>
+				// 		rate.userId === bill.userId && rate.createAt > bill.createAt,
+				// )
+				// 	? true
+				// 	: false,
+				isRated: infoBillDetail.productRate ? true : false,
 				product: infoBillDetail.productSchedule.product && {
 					id: infoBillDetail.productSchedule.product.id,
 					name: infoBillDetail.productSchedule.product.name,

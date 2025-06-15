@@ -506,7 +506,7 @@ export class DiscountRepository {
 			where: {
 				id: discountId,
 				status: {
-					not: DiscountStatusEnum.canceled,
+					in: [DiscountStatusEnum.active, DiscountStatusEnum.full],
 				},
 			},
 			data: {
@@ -515,11 +515,60 @@ export class DiscountRepository {
 					updateMany: {
 						where: {
 							status: {
-								not: InfoDiscountStatusEnum.inactive,
+								in: [InfoDiscountStatusEnum.active],
 							},
 						},
 						data: {
 							status: InfoDiscountStatusEnum.inactive,
+						},
+					},
+				},
+			},
+		});
+	}
+
+	async expiredDiscountByDiscountId(discountId: string): Promise<DiscountEntity> {
+		return this.prismaService.discount.update({
+			include: {
+				user: true,
+				infoDiscount: {
+					include: {
+						productSchedule: {
+							include: {
+								product: {
+									include: {
+										supplier: {
+											include: {
+												user: true,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				discountApplicationScope: true,
+				discountEligibility: true,
+				discountType: true,
+			},
+			where: {
+				id: discountId,
+				status: {
+					in: [DiscountStatusEnum.active, DiscountStatusEnum.full],
+				},
+			},
+			data: {
+				status: DiscountStatusEnum.expired,
+				infoDiscount: {
+					updateMany: {
+						where: {
+							status: {
+								in: [InfoDiscountStatusEnum.active],
+							},
+						},
+						data: {
+							status: InfoDiscountStatusEnum.expired,
 						},
 					},
 				},

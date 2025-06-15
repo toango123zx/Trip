@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { firstValueFrom, timeout, catchError } from 'rxjs';
 import { of } from 'rxjs';
+import { IPaginationQuery } from 'src/common';
 import { recommendProductConfig } from 'src/configs';
 
 import { ProductRecommendationsResponseDto } from '../dtos';
@@ -39,8 +40,9 @@ export class ProductRecommendationsService {
 	 */
 	async getRecommendations(
 		userId: string, // Bắt buộc phải có userId
+		pagination: IPaginationQuery = {} as IPaginationQuery,
 	): Promise<ProductRecommendationsResponseDto[]> {
-		const url = `${this.recommendationApiUrl}/recommendations/${userId}`;
+		const url = `${this.recommendationApiUrl}/recommendations/${userId}?take=${pagination.take}&skip=${pagination.skip}`;
 		this.logger.log(`Calling recommendation API: GET ${url}`);
 		try {
 			const response = await firstValueFrom(

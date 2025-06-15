@@ -31,8 +31,8 @@ model message {
     userId    String    @map("user_id")
     /// @DtoRelationCanConnectOnCreate
     user      user      @relation(fields: [userId], references: [id])
-    /// @DtoUpdateHidden
     boxChatId String    @map("box_chat_id")
+    /// @DtoRelationCanConnectOnCreate
     boxChat   boxChat   @relation(fields: [boxChatId], references: [id])
     isRead    Boolean   @default(false) @map("is_read")
     createAt  DateTime  @default(now()) @map("create_at")

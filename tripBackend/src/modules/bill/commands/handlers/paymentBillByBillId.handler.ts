@@ -33,7 +33,6 @@ export class PaymentBillByBillIdHandler
 		command: PaymentBillByBillIdCommand,
 	): Promise<HttpResponseBodySuccessDto<string> | HttpException> {
 		const { billId, myInformation } = command;
-
 		const bill = await this.billRepository.findBillByBillId(billId);
 		if (!bill || bill.status !== BillStatusEnum.pending) {
 			throw new NotFoundException('billId for payment');

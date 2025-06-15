@@ -18,15 +18,15 @@ export class SeedService implements OnModuleInit {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async onModuleInit(): Promise<void> {
-		await this.seedRoles();
-		await this.seedPermissions();
-		await this.seedPermissionsForAdmin();
-		await this.seedPermissionsForSupplier();
-		await this.seedDiscountTypes();
-		await this.seedDiscountEligibilities();
-		await this.seedDiscountApplicationScopes();
-		await this.seedPaymentMethod();
-		await this.seedProviderMap();
+		// await this.seedRoles();
+		// await this.seedPermissions();
+		// await this.seedPermissionsForAdmin();
+		// await this.seedPermissionsForSupplier();
+		// await this.seedDiscountTypes();
+		// await this.seedDiscountEligibilities();
+		// await this.seedDiscountApplicationScopes();
+		// await this.seedPaymentMethod();
+		// await this.seedProviderMap();
 	}
 
 	private async seedRoles(): Promise<void> {

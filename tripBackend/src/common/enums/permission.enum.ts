@@ -20,4 +20,5 @@ export enum PermissionEnum {
 	AssignProductSchedulesToDiscount = 'assign_product_schedules_to_discount',
 	UpdatePaidBill = 'update_paid_bill',
 	DeleteProductRateByProductRateId = 'delete_product_rate_by_product_rate_id',
+	Statistic = 'statistic',
 }

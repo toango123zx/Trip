@@ -1,8 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { ProductScheduleStatusEnum } from '@prisma/client';
-import { HttpResponseBodySuccessDto, IPaginationQuery } from 'src/common';
-import { ProductEntity } from 'src/models';
+import { HttpResponseBodySuccessDto, PaginationUtils } from 'src/common';
 
 import {
 	GetProductsResponseDto,
@@ -18,17 +17,13 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 	constructor(
 		private readonly recommendationService: ProductRecommendationsService,
 		private readonly productRepository: ProductRepository,
-	) {}
+	) { }
 
 	async execute(
 		query: GetProductsQuery,
 	): Promise<HttpResponseBodySuccessDto<GetProductsResponseDto[]>> {
-		const { myInformation } = query;
-		const skip = (query.pagination.page - 1) * query.pagination.limit;
-		const pagination: IPaginationQuery = {
-			skip,
-			take: query.pagination.limit,
-		};
+		const { myInformation, pagination } = query;
+		const page = new PaginationUtils().extractSkipTakeFromPagination(pagination);
 
 		const {
 			keyword,
@@ -47,9 +42,9 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 		if (myInformation) {
 			recommendations = await this.recommendationService.getRecommendations(
 				myInformation.id,
+				page,
 			);
 		}
-
 		const productIdRecommendations =
 			recommendations.length > 0
 				? recommendations.map((recommendation) => recommendation.id)
@@ -58,11 +53,11 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			...productFilter,
 			...(locationName || city
 				? {
-						location: {
-							...(locationName && { displayName: locationName }),
-							...(city && { city: city }),
-						},
-					}
+					location: {
+						...(locationName && { displayName: locationName }),
+						...(city && { city: city }),
+					},
+				}
 				: {}),
 			...(productCategoryName && {
 				productCategory: {
@@ -72,9 +67,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 		};
 		const [products, totalRecords] = await this.productRepository.findProducts(
 			keyword,
-			productIdRecommendations && productIdRecommendations.length > 0
-				? undefined
-				: pagination,
+			page,
 			undefined,
 			statusSearch,
 			productOrderBy,
@@ -86,36 +79,24 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			priceToSearch,
 			citySearch,
 			productIdRecommendations && productIdRecommendations.length > 0
-				? undefined
-				: productIdRecommendations,
+				? productIdRecommendations
+				: undefined,
 		);
-		const totalPage = Math.ceil(totalRecords / query.pagination.limit);
-		let productsDb: ProductEntity[] = products;
-		if (productIdRecommendations && productIdRecommendations.length > 0) {
-			const productMap = new Map(products.map((p) => [p.id, p]));
-
-			productsDb = productIdRecommendations
-				.map((id) => productMap.get(id))
-				.filter(Boolean)
-				.slice(
-					Number(pagination.skip),
-					Number(Number(pagination.skip) + Number(pagination.take)),
-				);
+		let sortedProducts = [...products];
+		if (recommendations.length > 0 && products.length >= 0) {
+			const orderMap = new Map(recommendations.map((item, index) => [item.id, index]));
+			sortedProducts = [...products].sort((x, y) => {
+				return (orderMap.get(x.id) ?? 0) - (orderMap.get(y.id) ?? 0);
+			});
 		}
-
-		const productInformation = productsDb.map(
+		const productInformation = sortedProducts.map(
 			(product) => new GetProductsResponseDto(product),
 		);
 
 		return {
 			success: true,
 			data: productInformation,
-			pagination: {
-				totalItems: totalRecords,
-				itemsPerPage: products.length,
-				currentPage: query.pagination.page,
-				totalPages: totalPage,
-			},
+			pagination: page.convertPaginationResponseDtoFromTotalRecords(totalRecords),
 		};
 	}
 }
