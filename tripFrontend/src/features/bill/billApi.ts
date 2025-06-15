@@ -43,4 +43,13 @@ export const billApi = {
     );
     return data;
   },
+
+  async cancelBillByBillId(billId: string): Promise<TBill> {
+    const data = await api.delete<TBill>(`/bill/${billId}`,
+      {},
+      {},
+      EServer.Backend,
+    );
+    return data;
+  },
 };

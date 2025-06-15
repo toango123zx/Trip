@@ -74,15 +74,15 @@ const SummarySection = ({
         <div className="flex justify-between items-center text-orange-600 mt-3 pt-3 border-t border-orange-200">
           <Text className="font-medium">Total discount:</Text>
           <Text strong className="text-xl">
-            -{getTotalDiscount().toLocaleString()} VND
+            -{(getTotalDiscount() <= subtotal ? getTotalDiscount() : subtotal).toLocaleString()} VND
           </Text>
         </div>
         <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-300">
           <Text strong className="text-lg">
             Amount to pay:
           </Text>
-          <Text strong className="text-2xl text-green-600">
-            {Math.max(0, subtotal - getTotalDiscount()).toLocaleString()} VND
+          <Text strong className="text-2xl text-green-600 justify-end">
+            {(Math.max(0, subtotal - getTotalDiscount()) > 10000 ? Math.max(0, subtotal - getTotalDiscount()) : 10000).toLocaleString()} VND
           </Text>
         </div>
       </>
@@ -312,9 +312,8 @@ const ActiveDiscountItem = ({
 }: ActiveDiscountItemProps): JSX.Element => (
   <List.Item
     key={discount.id}
-    className={`border rounded-lg mb-3 p-4 transition-all duration-200 cursor-pointer ${
-      isDisabled ? 'opacity-50 bg-gray-50' : 'hover:shadow-md hover:border-orange-300'
-    } ${isSelected ? 'border-orange-500 bg-orange-50 shadow-sm' : 'border-gray-200'}`}
+    className={`border rounded-lg mb-3 p-4 transition-all duration-200 cursor-pointer ${isDisabled ? 'opacity-50 bg-gray-50' : 'hover:shadow-md hover:border-orange-300'
+      } ${isSelected ? 'border-orange-500 bg-orange-50 shadow-sm' : 'border-gray-200'}`}
     onClick={() => !isDisabled && onDiscountChange(discount, !isSelected)}
   >
     <div className="w-full px-3">

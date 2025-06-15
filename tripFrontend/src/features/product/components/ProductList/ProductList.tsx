@@ -260,7 +260,7 @@ export const ProductList = ({ className }: ProductListProps): JSX.Element => {
 				{/* Modals */}
 				{isOpenPopupAddProduct && <AddProduct onCancel={handleClosePopup} />}
 				{isOpenPopupProductUpdate && (
-					<ProductUpdate productId={productId} onCancel={handleClosePopup} />
+					<ProductUpdate productId={productId} isCreate={true} isRemove={true} onCancel={handleClosePopup} />
 				)}
 				{isOpenPopupAddDiscount && (
 					<AddDiscount 

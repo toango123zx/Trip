@@ -16,12 +16,16 @@ import { productThunk } from '../../productThunk';
 type TProductUpdateProps = {
 	productId: string;
 	disabled?: boolean;
+	isCreate?: boolean;
+	isRemove?: boolean;
 	onCancel?: () => void;
 };
 
 export const ProductUpdate = ({
 	productId,
 	disabled = false,
+	isCreate = false,
+	isRemove = false,
 	onCancel = (): void => {},
 }: TProductUpdateProps): JSX.Element => {
 	const dispatch = useDispatch<TReduxStoreDispatch>();
@@ -152,7 +156,8 @@ export const ProductUpdate = ({
 	return (
 		<ProductForm
 			form={form}
-			isRemove={true}
+			isCreate={isCreate}
+			isRemove={isRemove}
 			onRemove={onRemove}
 			schedules={schedules}
 			setSchedules={setSchedules}

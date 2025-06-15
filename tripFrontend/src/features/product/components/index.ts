@@ -1,3 +1,4 @@
+export * from './AddAttractionRatePopup';
 export * from './AddProduct';
 export * from './AttractionList';
 export * from './AttractionsInformation';

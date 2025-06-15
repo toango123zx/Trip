@@ -2,6 +2,7 @@ import { TBoxChat, TMessage } from '@/types';
 import { notificationUtils } from '@/utils/notificationUtils';
 import { JSX, useEffect, useRef, useState } from 'react';
 import io, { Socket } from 'socket.io-client';
+const baseURL = import.meta.env.VITE_DOMAIN_BACKEND || 'http://localhost:3000/api';
 
 export type TChatProps = {
   myInformationId: string;
@@ -15,7 +16,7 @@ export const BoxChat = ({
   myInformationId,
   userId,
   boxChat,
-  wsUrl = 'http://localhost:3000',
+  wsUrl = baseURL,
   isChatBot = false
 }: TChatProps): JSX.Element => {
   const socketRef = useRef<Socket | null>(null);

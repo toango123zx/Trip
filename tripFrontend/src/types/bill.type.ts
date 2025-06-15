@@ -4,11 +4,11 @@ import { EUserStatus } from './user.type';
 
 export enum EBillStatus {
 	done = 'done',
-	paided = 'paided',
+	paid = 'paid',
 	pending = 'pending',
 	cancel = 'cancel',
 	refunded = 'refunded',
-	waitingRefund = 'waiting_refund',
+	waitingRefund = 'waitingRefund',
 }
 
 export enum ETransactionTarget {
@@ -82,6 +82,7 @@ type TInfoBillItem = {
 	reduction: number;
 	paymentPrice: number;
 	productScheduleStatus: string;
+	isRated: boolean;
 	product: TProduct;
 };
 

@@ -32,6 +32,8 @@ export const  BaseForm = <T extends Record<string, any>>({
   onCancel = () => {},
   footer,
 }: BaseFormProps<T>) => {
+  console.log(`🚀 ~ BaseForm.tsx:52 ~ isUpdate:`, isUpdate)
+  console.log(`🚀 ~ BaseForm.tsx:52 ~ isCreate:`, isCreate)
   console.log(`🚀 ~ BaseForm.tsx:35 ~ isRemove:`, isRemove)
   const { handleSubmit } = form;
 

@@ -2,6 +2,7 @@ import { Table, TableProps, Badge, Tooltip } from 'antd';
 import { LucideIcon } from 'lucide-react';
 import dayjs from 'dayjs';
 import { cn } from '@/lib';
+import { JSX } from 'react';
 
 export type StatusConfig = {
   color: string;

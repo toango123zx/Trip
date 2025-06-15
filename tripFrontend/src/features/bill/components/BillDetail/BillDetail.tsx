@@ -14,13 +14,15 @@ import {
     Spin,
 } from 'antd';
 import { CalendarDays, MapPin, Users, CreditCard } from 'lucide-react';
-import { JSX, useEffect } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { TBill } from '@/types/bill.type';
+import { EBillStatus, TBill } from '@/types/bill.type';
 
 import { billThunk } from '../../billThunk';
+import { billApi } from '../../billApi';
+import { AddAttractionRatePopup } from '@/features/product';
 
 const { Title, Text } = Typography;
 
@@ -31,11 +33,18 @@ type TBillDetailProps = {
 };
 
 export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.Element => {
+    const [productRateVisible, setProductRateVisible] = useState<boolean>(false);
     const dispatch = useDispatch<TReduxStoreDispatch>();
-    const billDetail = useSelector<TReduxStoreState, TBill | null>(
+
+    const billDetail = useSelector<TReduxStoreState, TBill>(
         (state) => state.bill.billDetail,
     );
-    const loading = useSelector<TReduxStoreState, boolean>(
+
+    const paymentBillUrl = useSelector<TReduxStoreState, string>(
+        (state) => state.bill.paymentBillUrl,
+    );
+
+    const loadingBill = useSelector<TReduxStoreState, boolean>(
         (state) => state.bill.loading,
     );
 
@@ -46,22 +55,28 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
     }, [visible, billId, dispatch]);
 
     useEffect(() => {
-        console.log(`🚀 ~ BillDetail.tsx:48 ~ billDetail:`, billDetail)
-    }, [billDetail]);
+        if (paymentBillUrl && !loadingBill) {
+            window.open(paymentBillUrl, '_self');
+        }
+    }, [paymentBillUrl, loadingBill]);
 
     const getStatusColor = (status: string): string => {
         switch (status) {
-            case 'DONE':
+            case EBillStatus.paid:
                 return 'green';
-            case 'CANCELED':
+            case EBillStatus.cancel:
                 return 'red';
-            case 'WAITING':
+            case EBillStatus.refunded:
                 return 'blue';
-            case 'PENDING':
-                return 'orange';
+            case EBillStatus.pending:
+                return 'yellow';
             default:
                 return 'default';
         }
+    };
+
+    const getRatedColor = (isRated: boolean): string => {
+        return isRated ? 'green' : 'red';
     };
 
     const formatCurrency = (amount: number): string => {
@@ -81,9 +96,94 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
         });
     };
 
+    const handleRetryPayment = async () => {
+        if (billDetail?.id) {
+            dispatch(billThunk.paymentBillByBillId(billDetail.id));
+        }
+    };
+
+    const handleCancelPayment = async () => {
+        if (billDetail?.id) {
+            dispatch(billThunk.cancelBillByBillId(billDetail.id));
+            onClose();
+        }
+    };
+
+    const redirectAttraction = async (attractionId: string) => {
+        window.open(`/attractions/${attractionId}`, '_self');
+    }
+
+    const handleCloseRatePopup = () => {
+        setProductRateVisible(false);
+    }
+
+    const handleOpenRatePopup = () => {
+        console.log(`🚀 ~ BillDetail.tsx:123 ~ handleOpenRatePopup ~ true:`, true)
+        setProductRateVisible(true);
+    };
+
+    // ✅ Function để submit rating
+    // const handleSubmitRating = async (rating: number, comment: string) => {
+    //     try {
+    //         if (billDetail?.id) {
+    //             // Call API to submit rating
+    //             // await rateApi.submitRate(billDetail.id, { star: rating, comment });
+    //             console.log('Submitting rating:', { billId: billDetail.id, rating, comment });
+                
+    //             // Close popup after successful submission
+    //             setProductRateVisible(false);
+                
+    //             // Refresh bill detail to update rating status
+    //             dispatch(billThunk.getBillByBillId(billDetail.id));
+    //         }
+    //     } catch (error) {
+    //         console.error('Error submitting rating:', error);
+    //         throw error; // Let the popup handle the error
+    //     }
+    // };
+
+    // ✅ Function để tạo footer buttons với unique keys
+    const getFooterButtons = () => {
+        const buttons = [
+            <Button key="close" onClick={onClose}>
+                Close
+            </Button>
+        ];
+
+        // Add Cancel button for specific statuses
+        if (billDetail?.status === EBillStatus.pending || 
+            billDetail?.status === EBillStatus.paid || 
+            billDetail?.status === EBillStatus.waitingRefund) {
+            buttons.push(
+                <Button 
+                    key="cancel-payment" // ✅ Unique key
+                    onClick={handleCancelPayment} 
+                    className='!bg-red-500 !text-white hover:bg-red-600'
+                >
+                    Cancel
+                </Button>
+            );
+        }
+
+        // Add Checkout button for pending status
+        if (billDetail?.status === EBillStatus.pending) {
+            buttons.push(
+                <Button 
+                    key="retry-checkout" // ✅ Unique key
+                    onClick={handleRetryPayment} 
+                    className='!bg-orange-500 !text-white hover:bg-orange-600'
+                >
+                    Checkout
+                </Button>
+            );
+        }
+
+        return buttons;
+    };
+
     // Safe access to infoBill data
-    const infoBillData = billDetail?.infoBill?.[0];
-    const productData = infoBillData?.product;
+    const infoBillData = billDetail?.infoBill || [];
+    const productData = infoBillData?.[0]?.product;
 
     return (
         <Modal
@@ -95,117 +195,21 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
             }
             open={visible}
             onCancel={onClose}
-            footer={[
-                <Button key="close" onClick={onClose}>
-                    Đóng
-                </Button>,
-            ]}
-            width={800}
-            bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
+            footer={getFooterButtons()} // ✅ Sử dụng function với unique keys
+            width={1000}
+            styles={{ // ✅ Sử dụng styles thay vì style deprecated
+                body: { 
+                    maxHeight: '70vh', 
+                    overflowY: 'auto' 
+                }
+            }}
         >
-            {loading ? (
+            {loadingBill ? (
                 <div className="flex justify-center items-center py-8">
                     <Spin size="large" />
                 </div>
             ) : billDetail ? (
-                <div className="space-y-6">
-                    {/* Header Information */}
-                    <Card className="bg-gradient-to-r from-orange-50 to-orange-100">
-                        <Row gutter={[16, 16]}>
-                            <Col xs={24} sm={12}>
-                                <div className="space-y-2">
-                                    <Text strong>Mã hóa đơn:</Text>
-                                    <Title level={4} className="!mb-0">
-                                        #{billDetail.id}
-                                    </Title>
-                                </div>
-                            </Col>
-                            <Col xs={24} sm={12}>
-                                <div className="space-y-2">
-                                    <Text strong>Trạng thái:</Text>
-                                    <div>
-                                        <Tag color={getStatusColor(billDetail.status)} className="text-sm px-3 py-1">
-                                            {billDetail.status}
-                                        </Tag>
-                                    </div>
-                                </div>
-                            </Col>
-                        </Row>
-                    </Card>
-
-                    {/* Trip Information */}
-                    {infoBillData && productData && (
-                        <Card title="Thông tin chuyến đi" className="shadow-sm">
-                            <div className="space-y-4">
-                                <div className="flex items-center space-x-2">
-                                    <MapPin size={16} className="text-orange-500" />
-                                    <Text strong>{productData.name}</Text>
-                                </div>
-                                {infoBillData.startTime && infoBillData.endTime && (
-                                    <div className="flex items-center space-x-2">
-                                        <CalendarDays size={16} className="text-orange-500" />
-                                        <Text>
-                                            {formatDate(infoBillData.startTime)} - {formatDate(infoBillData.endTime)}
-                                        </Text>
-                                    </div>
-                                )}
-                                <div className="flex items-center space-x-2">
-                                    <Users size={16} className="text-orange-500" />
-                                    <Text>Số người tham gia: {infoBillData.quantity || 0}</Text>
-                                </div>
-                                {productData.description && (
-                                    <div>
-                                        <Text strong>Mô tả: </Text>
-                                        <Text>{productData.description}</Text>
-                                    </div>
-                                )}
-                            </div>
-                        </Card>
-                    )}
-
-                    {/* Bill Details */}
-                    <Card title="Chi tiết thanh toán" className="shadow-sm">
-                        <div className="space-y-4">
-                            <Row gutter={[16, 16]}>
-                                <Col xs={24} sm={12}>
-                                    <div>
-                                        <Text strong>Ngày tạo:</Text>
-                                        <div>{formatDate(billDetail.createAt)}</div>
-                                    </div>
-                                </Col>
-                                <Col xs={24} sm={12}>
-                                    <div>
-                                        <Text strong>Ngày cập nhật:</Text>
-                                        <div>{formatDate(billDetail.updateAt)}</div>
-                                    </div>
-                                </Col>
-                            </Row>
-
-                            <Divider />
-
-                            {/* Price Breakdown */}
-                            {infoBillData && (
-                                <div className="space-y-2">
-                                    <div className="flex justify-between">
-                                        <Text>Giá mỗi người:</Text>
-                                        <Text>{formatCurrency(infoBillData.price || 0)}</Text>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <Text>Số lượng:</Text>
-                                        <Text>{infoBillData.quantity || 0} người</Text>
-                                    </div>
-                                    <Divider />
-                                    <div className="flex justify-between">
-                                        <Text strong>Tổng cộng:</Text>
-                                        <Title level={4} className="!mb-0 text-orange-500">
-                                            {formatCurrency((infoBillData.price || 0) * (infoBillData.quantity || 0))}
-                                        </Title>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
+                <div className="flex flex-col gap-y-3.5">
                     {/* User Information */}
                     {billDetail.user && (
                         <Card title="Thông tin khách hàng" className="shadow-sm">
@@ -228,12 +232,124 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                         </Card>
                     )}
 
-                    {/* Additional Information */}
-                    {/* {billDetail.note && (
-                        <Card title="Ghi chú" className="shadow-sm">
-                            <Text>{billDetail.note}</Text>
-                        </Card>
-                    )} */}
+                    {/* Bill Details */}
+                    <Card title="Chi tiết thanh toán" className="shadow-sm">
+                        <div className="space-y-4">
+                            <Row gutter={[16, 16]}>
+                                <Col xs={24} sm={12}>
+                                    <div className="space-y-2">
+                                        <Text strong>Mã hóa đơn:</Text>
+                                        <div>
+                                            <Text strong className='!mt-2'>#{billDetail.id}</Text>
+                                        </div>
+                                    </div>
+                                </Col>
+                                <Col xs={24} sm={12}>
+                                    <div className="space-y-2">
+                                        <Text strong>Trạng thái:</Text>
+                                        <div>
+                                            <Tag color={getStatusColor(billDetail.status)} className="text-sm !px-2.5 !py-2 !mt-2">
+                                                {billDetail.status}
+                                            </Tag>
+                                        </div>
+                                    </div>
+                                </Col>
+                            </Row>
+                            <Row gutter={[16, 16]}>
+                                <Col xs={24} sm={12}>
+                                    <div>
+                                        <Text strong>Ngày tạo:</Text>
+                                        <div>{formatDate(billDetail.createAt)}</div>
+                                    </div>
+                                </Col>
+                                <Col xs={24} sm={12}>
+                                    <div>
+                                        <Text strong>Ngày cập nhật:</Text>
+                                        <div>{formatDate(billDetail.updateAt)}</div>
+                                    </div>
+                                </Col>
+                            </Row>
+
+                            <Divider />
+
+                            {/* Price Breakdown */}
+                            <div className="space-y-4">
+                                <div className="flex justify-between">
+                                    <Text strong>Giảm giá:</Text>
+                                    <Title level={5} className="!m-0 !text-orange-500">
+                                        - {(billDetail.reductionPrice)} VND
+                                    </Title>
+                                </div>
+                                <div className="flex justify-between">
+                                    <Text strong>Tổng cộng:</Text>
+                                    <Title level={5} className="!m-0 text-orange-500">
+                                        {(billDetail.totalPrice - billDetail.reductionPrice).toLocaleString('vi-VN')} VND
+                                    </Title>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Trip Information */}
+                    <div className="flex flex-col gap-y-3.5 shadow-sm border rounded-lg border-gray-100 p-4">
+                        {(productData && infoBillData.length > 0) &&
+                            infoBillData.map((infoItem) => (
+                                <Card
+                                    key={infoItem.id || `info-item-${infoItem.productId}`} // ✅ Unique key
+                                    title={
+                                        <div className="flex justify-between items-center">
+                                            <div className="flex items-center space-x-2">
+                                                <MapPin size={16} className="text-orange-500" />
+                                                <Text 
+                                                    strong
+                                                    onClick={() => redirectAttraction(infoItem.productId)}
+                                                    className='cursor-pointer hover:underline hover:!text-orange-600'
+                                                >
+                                                    {productData.name}
+                                                </Text>
+                                            </div>
+                                            {billDetail.status === EBillStatus.done && ( // ✅ Chỉ hiển thị rating khi đã thanh toán
+                                                <div onClick={handleOpenRatePopup} className="cursor-pointer">
+                                                    <Tag color={getRatedColor(infoItem.isRated)} className="text-sm !px-2.5 !py-2 !mt-2">
+                                                        {infoItem.isRated ? 'Rated' : 'Rate Now >'}
+                                                    </Tag>
+                                                </div>
+                                            )}
+                                        </div>
+                                    }
+                                    className="shadow-sm"
+                                >
+                                    <div className="space-y-4">
+                                        {infoItem.startTime && infoItem.endTime && (
+                                            <div className="flex items-center space-x-2">
+                                                <CalendarDays size={16} className="text-orange-500" />
+                                                <Text>
+                                                    {formatDate(infoItem.startTime)} - {formatDate(infoItem.endTime)}
+                                                </Text>
+                                            </div>
+                                        )}
+                                        <div className="flex items-center space-x-2">
+                                            <Users size={16} className="text-orange-500" />
+                                            <Text>Số người tham gia: {infoItem.quantity || 0}</Text>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <CreditCard size={16} className="text-orange-500" />
+                                            <Text>Giá: {(infoItem.price || 0).toLocaleString('vi-VN')} VND</Text>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                    </div>
+
+                    {/* Rating Popup */}
+                    {(productData && infoBillData.length > 0 && billDetail.status === EBillStatus.done) && (
+                        <AddAttractionRatePopup
+                            attractionId={infoBillData[0]?.productId} // ✅ Sử dụng productId thay vì billId
+                            isVisible={productRateVisible}
+                            attractionName={productData.name}
+                            onClose={handleCloseRatePopup}
+                        />
+                    )}
                 </div>
             ) : (
                 <div className="flex justify-center items-center py-8">

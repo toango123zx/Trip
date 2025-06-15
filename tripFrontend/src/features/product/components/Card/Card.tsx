@@ -98,7 +98,7 @@ export const CardProduct = ({ product, className }: TCardProductInput): JSX.Elem
 						</h3>
 
 						<div className="text-lg font-bold text-orange-500">
-							{product.schedule?.price}đ
+							{product.schedule?.price?.toLocaleString('vi-VN')} VND
 						</div>
 
 						<div className="flex items-center text-sm text-gray-500 space-x-1">

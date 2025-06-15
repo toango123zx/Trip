@@ -128,7 +128,7 @@ const ChatPage: React.FC = () => {
             myInformationId={myInformationId}
             userId={targetUserId}
             boxChat={boxChatDetail}
-            wsUrl="http://localhost:3000"
+            wsUrl={process.env.VITE_DOMAIN_BACKEND || "http://192.168.2.208:3000"}
             isChatBot={false}
           />
         ) : selectedChatId && !boxChatDetail?.id ? (

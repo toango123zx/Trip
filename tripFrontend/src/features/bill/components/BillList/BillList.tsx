@@ -18,7 +18,7 @@ import { JSX, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
-import { TBillSumary } from '@/types/bill.type';
+import { EBillStatus, TBillSumary } from '@/types/bill.type';
 
 import { billThunk } from '../../billThunk';
 import { BillDetail } from '../BillDetail/BillDetail';
@@ -36,9 +36,14 @@ type TOrder = {
 
 type TBillInTable = {
 	id: string;
-	status: string;
-	date: Date;
-	quantity: number;
+	userId: string;
+	transactionTargetId: string;
+	reductionPrice: number;
+	totalPrice: number;
+	createAt: Date;
+	updateAt: Date;
+	deletedAt?: Date | null;
+	status: EBillStatus;
 };
 
 export const BillList = (): JSX.Element => {
@@ -66,9 +71,14 @@ export const BillList = (): JSX.Element => {
 		setTableDate(
 			bills.map((bill) => ({
 				id: bill.id,
-				status: bill.status,
-				quantity: 2,
-				date: bill.createAt,
+				userId: bill.userId,
+				transactionTargetId: bill.transactionTargetId,
+				reductionPrice: bill.reductionPrice,
+				totalPrice: bill.totalPrice,
+				createAt: new Date(bill.createAt),
+				updateAt: new Date(bill.updateAt),
+				deletedAt: bill.deletedAt ? new Date(bill.deletedAt) : null,
+				status: bill.status as EBillStatus, // Ensure status is of type EBillStatus
 			})),
 		);
 	}, [bills]);
@@ -80,6 +90,12 @@ export const BillList = (): JSX.Element => {
 	};
 
 	const handleCloseBillDetail = (): void => {
+		// dispatch(
+		// 	billThunk.getBillByUserId({
+		// 		page: 1,
+		// 		limit: LIMIT_BILL_HISTORY_CALL_API,
+		// 	}),
+		// );
 		setBillDetailVisible(false);
 		setSelectedBillId(null);
 	};
@@ -142,18 +158,32 @@ export const BillList = (): JSX.Element => {
 			title: 'STATUS',
 			dataIndex: 'status',
 			key: 'status',
-			render: (status: string): JSX.Element => getStatusTag(status),
+			render: (status: string): JSX.Element => {
+				return (
+					<span className={`px-2 py-1 rounded-full text-xs font-medium border-1 shadow-2xl ${status === EBillStatus.paid ? 'bg-green-100 text-green-800' :
+						status === EBillStatus.pending ? 'bg-yellow-100 text-yellow-800' :
+							status === EBillStatus.refunded ? 'bg-blue-100 text-blue-800' :
+								status === EBillStatus.cancel ? 'bg-red-100 text-red-800' :
+									'bg-gray-100 text-gray-800'
+						}`}>
+						{status}
+					</span>
+				)
+			},
 		},
 		{
-			title: 'DATE',
-			dataIndex: 'date',
-			key: 'date',
+			title: 'Order Date',
+			dataIndex: 'createAt',
+			key: 'createAt',
 			render: (value: Date): string => String(value.toLocaleString()),
 		},
 		{
-			title: 'QUANTITY',
-			dataIndex: 'quantity',
-			key: 'quantity',
+			title: 'Amount',
+			dataIndex: 'amount',
+			key: 'amount',
+			render: (_: any, record: TBillInTable): JSX.Element => (
+				<span>{(record.totalPrice - record.reductionPrice).toLocaleString('vi-VN')} VND</span>
+			),
 		},
 		{
 			title: 'ACTION',
@@ -197,51 +227,6 @@ export const BillList = (): JSX.Element => {
 		>
 			<Layout className="min-h-screen">
 				<Layout>
-					{/* Desktop Sidebar - Only visible on desktop */}
-					{/* <Sider
-            className="hidden md:block bg-white"
-            width={200}
-            style={{ background: "#fff", boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)" }}
-          >
-            <div className="p-4">
-              <div
-                className={`py-3 px-4 mb-1 rounded cursor-pointer ${filter === "all" ? "bg-orange-500 text-white" : "hover:bg-gray-100"
-                  }`}
-                onClick={() => setFilter("all")}
-              >
-                <Text strong={filter === "all"}>All</Text>
-              </div>
-              <div
-                className={`py-3 px-4 mb-1 rounded cursor-pointer ${filter === "done" ? "bg-orange-500 text-white" : "hover:bg-gray-100"
-                  }`}
-                onClick={() => setFilter("done")}
-              >
-                <Text strong={filter === "done"}>Done</Text>
-              </div>
-              <div
-                className={`py-3 px-4 mb-1 rounded cursor-pointer ${filter === "waiting" ? "bg-orange-500 text-white" : "hover:bg-gray-100"
-                  }`}
-                onClick={() => setFilter("waiting")}
-              >
-                <Text strong={filter === "waiting"}>Waiting</Text>
-              </div>
-              <div
-                className={`py-3 px-4 mb-1 rounded cursor-pointer ${filter === "pending" ? "bg-orange-500 text-white" : "hover:bg-gray-100"
-                  }`}
-                onClick={() => setFilter("pending")}
-              >
-                <Text strong={filter === "pending"}>Pending</Text>
-              </div>
-              <div
-                className={`py-3 px-4 mb-1 rounded cursor-pointer ${filter === "canceled" ? "bg-orange-500 text-white" : "hover:bg-gray-100"
-                  }`}
-                onClick={() => setFilter("canceled")}
-              >
-                <Text strong={filter === "canceled"}>Canceled</Text>
-              </div>
-            </div>
-          </Sider> */}
-
 					<Content className="bg-gray-50 p-4 md:p-6">
 						<div className="max-w-6xl mx-auto">
 							{/* Mobile Filter Dropdown - Only visible on mobile */}
@@ -372,6 +357,7 @@ export const BillList = (): JSX.Element => {
 										columns={columns}
 										dataSource={tableData}
 										pagination={false}
+										rowKey={(record) => record.id}
 										rowClassName={(record, index) =>
 											index % 2 === 0 ? 'bg-orange-50' : ''
 										}

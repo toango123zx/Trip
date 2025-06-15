@@ -416,11 +416,11 @@ const CartItem = ({
   disabled = false
 }: CartItemProps): JSX.Element => (
   <List.Item
-  key={item.id}
-  className="p-0 border-b"
-  style={{
-    padding: isMobile ? '12px 0' : '16px 0',
-  }}
+    key={item.id}
+    className="p-0 border-b"
+    style={{
+      padding: isMobile ? '12px 0' : '16px 0',
+    }}
   >
     <MobileCartItem
       item={item}
@@ -674,11 +674,20 @@ const OrderSummary = ({
           <Divider className="my-4" />
 
           <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <Text strong className="text-lg">Total amount:</Text>
-              <Text type="danger" strong className="text-2xl">
-                {total.toLocaleString()} VND
-              </Text>
+            <div>
+              <div className="flex justify-between items-center">
+                <Text strong className="text-lg">Total amount:</Text>
+                <Text type="danger" strong className="text-2xl">
+                  {((total < 10000 && subtotal !== 0) ? 10000 : total).toLocaleString()} VND
+                </Text>
+              </div>
+              <div className="flex justify-end items-center">
+                {(discount !== 0 && total < 10000) && (
+                  <Text type="danger" strong className="text-2xl">
+                    Bank fees payable
+                  </Text>
+                )}
+              </div>
             </div>
 
             <Button
@@ -933,7 +942,7 @@ export const BookingCart = (): JSX.Element => {
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
-  const discount = appliedDiscount;
+  const discount = appliedDiscount > subtotal ? subtotal : appliedDiscount;
   const total = selectedItems.length > 0 ? Math.max(0, subtotal - discount) : 0;
 
   // ✅ NEW: Function to validate and clean up discounts

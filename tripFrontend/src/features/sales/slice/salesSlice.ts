@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+const baseURL = import.meta.env.VITE_DOMAIN_BACKEND || 'http://localhost:3000/api';
+console.log(`🚀 ~ salesSlice.ts:4 ~ baseURL:`, baseURL)
 
 export interface Sale {
   id: string;
@@ -47,7 +49,7 @@ export const fetchSales = createAsyncThunk(
   'sales/fetchSales',
   async (page: number = 1, { rejectWithValue }) => {
     try {
-      const response = await axios.get('http://localhost:3000/discount', {
+      const response = await axios.get(`${baseURL}/discount`, {
         withCredentials: true,
         params: { 
           page,

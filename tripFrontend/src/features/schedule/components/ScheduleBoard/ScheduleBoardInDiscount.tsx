@@ -123,7 +123,9 @@ export const SchedulesBoardInDiscount = ({
         renderActionIcon({
           icon: Trash2,
           tooltip: 'Remove schedule',
-          onClick: () => onRemove(schedule.schedulesId),
+          onClick: () => {
+            return onRemove(schedule.schedulesId)
+          },
           className: 'text-gray-600 hover:text-red-600',
         }),
     },

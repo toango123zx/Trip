@@ -38,9 +38,18 @@ const paymentBillByBillId = createAsyncThunk(
   },
 );
 
+const cancelBillByBillId = createAsyncThunk(
+  'bill/cancel',
+  async (billId: string): Promise<TBill> => {
+    const data = await billApi.cancelBillByBillId(billId);
+    return data;
+  },
+);
+
 export const billThunk = {
   getBillByUserId,
   getBillByBillId,
   createBill,
   paymentBillByBillId,
+  cancelBillByBillId,
 };

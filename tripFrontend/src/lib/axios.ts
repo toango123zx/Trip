@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const baseURL = import.meta.env.VITE_DOMAIN_BACKEND || 'http://localhost:3000/api';
+
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: baseURL,
     withCredentials: true, // Quan trọng để gửi cookies cross-origin
 });
 

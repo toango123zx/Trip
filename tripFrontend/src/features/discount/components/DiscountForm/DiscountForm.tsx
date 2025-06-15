@@ -411,20 +411,20 @@ export const DiscountForm = ({
 				isRemove={isRemove}
 				disabled={isCreate ? false : true}
 				open={open}
-				onSave={isCreate ? handleSaveOnClick : undefined}
+				onSave={isCreate ? handleSaveOnClick : isUpdate ? handleChangeInfoDiscount : undefined}
 				onRemove={onRemove}
 				onCancel={onCancel}
-				// footer={[
-				// 	<Button key="cancel" onClick={onCancel}>
-				// 		Hủy
-				// 	</Button>,
-				// 	<Button key="remove" danger onClick={onRemove}>
-				// 		Xóa
-				// 	</Button>,
-				// 	<Button key="save" type="primary" onClick={() => handleSaveOnClick(form.getValues())}>
-				// 		Lưu
-				// 	</Button>
-				// ]}
+			// footer={[
+			// 	<Button key="cancel" onClick={onCancel}>
+			// 		Hủy
+			// 	</Button>,
+			// 	<Button key="remove" danger onClick={onRemove}>
+			// 		Xóa
+			// 	</Button>,
+			// 	<Button key="save" type="primary" onClick={() => handleSaveOnClick(form.getValues())}>
+			// 		Lưu
+			// 	</Button>
+			// ]}
 			>
 				{/* --- Basic Information --- */}
 				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
@@ -652,7 +652,8 @@ export const DiscountForm = ({
 								label="Select Product"
 								options={productOption}
 								onChange={changeProductId}
-								// disabled={!isCreate && disabled}
+								search={true}
+							// disabled={!isCreate && disabled}
 							/>
 						</div>
 						<Button
@@ -660,7 +661,7 @@ export const DiscountForm = ({
 							variant="outlined"
 							className="w-full sm:w-auto"
 							onClick={handleOpenPopupProductDetail}
-							// disabled={!isCreate}
+						// disabled={!isCreate}
 						>
 							Details
 						</Button>
@@ -698,7 +699,8 @@ export const DiscountForm = ({
 								label="Select Schedule"
 								options={scheduleOption}
 								onChange={() => setChangeScheduleOption(!changeScheduleOption)}
-								// disabled={!isCreate && disabled}
+								search={true}
+							// disabled={!isCreate && disabled}
 							/>
 						</div>
 						<div className="flex gap-2 w-full sm:w-auto">
@@ -706,7 +708,7 @@ export const DiscountForm = ({
 								type="primary"
 								onClick={handAddScheduleInDiscount}
 								className="flex-1 sm:flex-none"
-								// disabled={!isCreate}
+							// disabled={!isCreate}
 							>
 								Add
 							</Button>
@@ -715,7 +717,7 @@ export const DiscountForm = ({
 								variant="outlined"
 								onClick={handleOpenScheduleDetail}
 								className="flex-1 sm:flex-none"
-								// disabled={!isCreate}
+							// disabled={!isCreate}
 							>
 								Details
 							</Button>
@@ -735,6 +737,8 @@ export const DiscountForm = ({
 			{isOpenPopupProductDetail && productId && (
 				<ProductUpdate
 					productId={String(productId)}
+					isCreate={false}
+					isRemove={false}
 					disabled={true}
 					onCancel={handleClosePopupProductDetail}
 				/>

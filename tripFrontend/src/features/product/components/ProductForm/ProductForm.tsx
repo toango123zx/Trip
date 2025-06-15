@@ -139,7 +139,7 @@ export const ProductForm = ({
 			startOrder: new Date(),
 			endTime: new Date(),
 			endOrder: new Date(),
-			status: EProductScheduleStatus.active,
+			status: EProductScheduleStatus.waitingAdd,
 		});
 		setIsCreateSchedule(true);
 		setIsOpenPopupScheduleUpdate(true);
@@ -737,6 +737,7 @@ export const ProductForm = ({
 						pageSize={5}
 						disabled={disabled}
 						onViewDetailSchedule={handleViewScheduleDetailOnClick}
+						handleClosePopup={handleClosePopupScheduleUpdate}
 						onDeleteSuccess={onScheduleDelete}
 					/>
 				</div>

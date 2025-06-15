@@ -178,26 +178,21 @@ export const ScheduleDetail = ({ schedule, open, isComplete = true, isRemove = f
 			isCreate={false}
 			footer={
 				[
-					(schedule.status === EProductScheduleStatus.active || schedule.status === EProductScheduleStatus.full) && isComplete && (
-						<Button key="cancel" onClick={onCancel}>
-							Hủy
-						</Button>
-					),
-					isComplete && (
-						<Button key="complete" type="primary" onClick={handleComplete}>
-							Hoàn thành
-						</Button>
-					),
+					<Button key="cancel" onClick={onCancel}>
+						Hủy
+					</Button>,
 					isRemove && (
 						<Button key="remove" danger onClick={handleDelete}>
 							Xóa
 						</Button>
 					),
-					<Button key="cancel" onClick={onCancel}>
-						Hủy
-					</Button>
+					(schedule.status === EProductScheduleStatus.active || schedule.status === EProductScheduleStatus.full) && isComplete && (
+						<Button key="complete" type="primary" onClick={handleComplete}>
+							Hoàn thành
+						</Button>
+					),
 				]
-				}
+			}
 		>
 			<div className="grid gap-4 sm:gap-6">
 				{/* --- Schedule Basic Info --- */}
