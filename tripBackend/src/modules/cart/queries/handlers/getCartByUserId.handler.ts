@@ -5,6 +5,7 @@ import { HttpResponseBodySuccessDto, PaginationUtils } from 'src/common';
 import { CartRepository } from '../../cart.repository';
 import { GetCartResponseDto } from '../../dtos/responses/getCart.response';
 import { GetCartByUserIdQuery } from '../implements';
+import { ProductScheduleStatusEnum } from '@prisma/client';
 
 @QueryHandler(GetCartByUserIdQuery)
 export class GetCartsByUserIdHandler implements IQueryHandler<GetCartByUserIdQuery> {
@@ -23,6 +24,7 @@ export class GetCartsByUserIdHandler implements IQueryHandler<GetCartByUserIdQue
 			page,
 			myInformation.id,
 			cartFilter,
+			[ProductScheduleStatusEnum.active, ProductScheduleStatusEnum.full],
 		);
 		const cartsResponse = carts.map((cart) => new GetCartResponseDto(cart));
 		return {

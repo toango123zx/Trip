@@ -110,6 +110,7 @@ export class BillRepository {
 								},
 							},
 						},
+						productRate: true,
 					},
 				},
 				infoBillDiscount: {
@@ -301,7 +302,7 @@ export class BillRepository {
 				// check if discount is full
 				const discountIdsFull: string[] = [];
 				discountsDb.forEach((discount) => {
-					if (discount.quantity >= discount.applited) {
+					if (discount.quantity <= discount.applited) {
 						discountIdsFull.push(discount.id);
 					}
 				});

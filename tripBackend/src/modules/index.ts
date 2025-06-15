@@ -1,7 +1,11 @@
+import { ScheduleModule } from '@nestjs/schedule';
+
 import { AuthModule } from './auth/auth.module';
+import { AutomationModule } from './automation/automation.module';
 import { BillModule } from './bill/bill.module';
 import { BoxChatModule } from './boxChat/boxChat.module';
 import { CartModule } from './cart/cart.module';
+import { ChatModule } from './chat/chat.module';
 import { DatabaseModule } from './database/database.module';
 import { DiscountModule } from './discount/discount.module';
 import { DiscountApplicationScopeModule } from './discountApplicationScope/discountApplicationScope.module';
@@ -10,11 +14,13 @@ import { DiscountTypeModule } from './discountType/discountType.module';
 import { HealthCheckModule } from './healthCheck/healthCheck.module';
 import { InfoDiscountModule } from './InfoDiscount/infoDiscount.module';
 import { LocationModule } from './location/location.module';
+import { MessageModule } from './message/message.module';
 import { PaymentMethodModule } from './paymentMethod/paymentMethod.module';
 import { ProductModule } from './product/product.module';
 import { ProductRateModule } from './productRate/productRate.module';
 import { ProductScheduleModule } from './productSchedule/productSchedule.module';
 import { ProductViewLogModule } from './productViewLog/productViewLog.module';
+import { StatisticModule } from './statistic/statistic.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { TransactionReferenceModule } from './transactionSession/transactionSession.module';
@@ -42,4 +48,9 @@ export const Modules = [
 	TransactionModule,
 	BoxChatModule,
 	ProductViewLogModule,
+	MessageModule,
+	ChatModule,
+	AutomationModule,
+	StatisticModule,
+	// ScheduleModule.forRoot(),
 ];

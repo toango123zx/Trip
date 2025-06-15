@@ -76,7 +76,7 @@ export class CheckBillPaymentByVnpayHandler
 			}
 
 			const transaction: CreateTransactionDto = {
-				amount: Number(verifyIpn.vnp_Amount),
+				amount: BigInt(Number(verifyIpn.vnp_Amount)),
 				bankCode: verifyIpn.vnp_BankCode,
 				BankTransactionCode: verifyIpn.vnp_BankTranNo,
 				cardType: verifyIpn.vnp_CardType,
@@ -97,7 +97,6 @@ export class CheckBillPaymentByVnpayHandler
 				createAt: parseDate(verifyIpn.vnp_PayDate),
 				status: TransactionStatusEnum.completed,
 			};
-
 			const transactionCreated =
 				await this.transactionRepository.createTransactionSuccess(transaction);
 
@@ -106,9 +105,9 @@ export class CheckBillPaymentByVnpayHandler
 				data: transactionCreated.bill,
 			};
 		} catch (error) {
-			await this.transactionSessionRepository.deleteTranasactionSession(
-				transactionSession.id,
-			);
+			// await this.transactionSessionRepository.deleteTranasactionSession(
+			// 	transactionSession.id,
+			// );
 			throw {
 				message: error,
 				data: transactionSession.bill,

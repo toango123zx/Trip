@@ -14,7 +14,7 @@ export class GetBoxChatResponseDto {
 	constructor(boxChat: BoxChatEntity) {
 		this.id = boxChat.id;
 		this.name = boxChat.name;
-		this.boxChatMember = boxChat.boxChatMember.map((member) => ({
+		this.boxChatMember = boxChat.boxChatMember?.map((member) => ({
 			userId: member.userId,
 			userName: member.user?.name,
 			image: member.user?.image,

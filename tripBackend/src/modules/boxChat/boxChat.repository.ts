@@ -144,7 +144,7 @@ export class BoxChatRepository {
 				},
 				message: {
 					orderBy: {
-						createAt: 'desc',
+						createAt: 'asc',
 					},
 				},
 			},

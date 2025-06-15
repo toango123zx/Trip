@@ -21,4 +21,12 @@ export class CreateProductRateByProductIdRequestDto {
 	@IsString()
 	@AutoTrim()
 	comment: string;
+	@ApiProperty({
+		type: 'string',
+		required: true,
+	})
+	@IsNotEmpty()
+	@IsString()
+	@AutoTrim()
+	billId: string;
 }

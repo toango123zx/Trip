@@ -1,0 +1,5 @@
+enum SystemCheckServiceEnum {
+    bill
+
+    @@map("System_Check_Service_Enum")
+}

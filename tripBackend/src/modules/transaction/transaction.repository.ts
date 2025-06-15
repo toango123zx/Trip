@@ -20,7 +20,7 @@ export class TransactionRepository {
 				},
 				data: {
 					status: BillStatusEnum.paid,
-					transaction: {
+					transactionSession: {
 						deleteMany: {
 							billId: transaction.bill.connect.id,
 						},
@@ -32,7 +32,26 @@ export class TransactionRepository {
 					bill: true,
 				},
 				data: {
-					...transaction,
+					bill: {
+						connect: {
+							id: transaction.bill.connect.id,
+						},
+					},
+					paymentMethod: {
+						connect: {
+							id: transaction.paymentMethod.connect.id,
+						},
+					},
+					bankCode: transaction.bankCode,
+					cardType: transaction.cardType,
+					description: transaction.description,
+					BankTransactionCode: transaction.BankTransactionCode,
+					amount: transaction.amount,
+					transactionCode: transaction.transactionCode,
+					transactionTarget: transaction.transactionTarget,
+					createAt: transaction.createAt,
+					status: transaction.status,
+					transactionSessionCode: transaction.transactionSessionCode,
 				},
 			});
 

@@ -5,6 +5,7 @@ import { CartEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
 import { ProductOrderByDto } from '../product/dtos';
+import { ProductScheduleStatusEnum } from '@prisma/client';
 
 @Injectable()
 export class CartRepository {
@@ -15,6 +16,7 @@ export class CartRepository {
 		pagination: IPaginationQuery,
 		userId: string,
 		filter?: ProductOrderByDto,
+		productScheduleStatus?: ProductScheduleStatusEnum[]
 	): Promise<[CartEntity[], number]> {
 		const orderBy = Object.entries(filter || {})
 			.filter(([_, value]) => Boolean(value))
@@ -50,6 +52,9 @@ export class CartRepository {
 								mode: 'insensitive',
 							},
 						},
+						status: {
+							in: productScheduleStatus
+						}
 					},
 				},
 			}),
@@ -63,6 +68,9 @@ export class CartRepository {
 								mode: 'insensitive',
 							},
 						},
+						status: {
+							in: productScheduleStatus
+						}
 					},
 				},
 			}),

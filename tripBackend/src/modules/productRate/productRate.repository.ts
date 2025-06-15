@@ -28,6 +28,11 @@ export class ProductRateRepository {
 			this.prismaService.productRate.findMany({
 				include: {
 					user: true,
+					infoBill: {
+						include: {
+							bill: true,
+						}
+					},
 				},
 				where: {
 					productId: productId,

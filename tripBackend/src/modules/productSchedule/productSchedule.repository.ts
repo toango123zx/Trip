@@ -11,7 +11,7 @@ import {
 	OrderByEnum,
 	OrderBySearchDto,
 } from 'src/common';
-import { BillEntity, CreateProductScheduleDto, ProductScheduleEntity } from 'src/models';
+import { BillEntity, CreateProductScheduleDto, InfoBillEntity, ProductScheduleEntity } from 'src/models';
 
 import { PrismaService } from '../database/services';
 
@@ -19,7 +19,7 @@ import { ProductScheduleOrderByDto } from './dtos';
 
 @Injectable()
 export class ProductScheduleRepository {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(private readonly prismaService: PrismaService) { }
 
 	async findProductSchedulesBySupplierId(
 		supplierId: string,
@@ -31,8 +31,8 @@ export class ProductScheduleRepository {
 	): Promise<[ProductScheduleEntity[], number]> {
 		const orderBy = filter
 			? new OrderBySearchDto().convertOrderByToORM<ProductScheduleOrderByDto>(
-					filter,
-				)
+				filter,
+			)
 			: [];
 		orderBy.push({
 			startTime: OrderByEnum.ASC,
@@ -78,8 +78,8 @@ export class ProductScheduleRepository {
 	): Promise<[ProductScheduleEntity[], number]> {
 		const orderBy = filter
 			? new OrderBySearchDto().convertOrderByToORM<ProductScheduleOrderByDto>(
-					filter,
-				)
+				filter,
+			)
 			: [];
 		const [productSchedules, totalRecords] = await Promise.all([
 			this.prismaService.productSchedule.findMany({
@@ -93,13 +93,13 @@ export class ProductScheduleRepository {
 					startOrder: !availabilityTime
 						? undefined
 						: {
-								lte: new Date(),
-							},
+							lte: new Date(),
+						},
 					endOrder: !availabilityTime
 						? undefined
 						: {
-								gte: new Date(),
-							},
+							gte: new Date(),
+						},
 					status: status,
 				},
 				orderBy: orderBy,
@@ -114,13 +114,13 @@ export class ProductScheduleRepository {
 					startOrder: !availabilityTime
 						? undefined
 						: {
-								lte: new Date(),
-							},
+							lte: new Date(),
+						},
 					endOrder: !availabilityTime
 						? undefined
 						: {
-								gte: new Date(),
-							},
+							gte: new Date(),
+						},
 					status: status,
 				},
 			}),
@@ -139,8 +139,8 @@ export class ProductScheduleRepository {
 	): Promise<[ProductScheduleEntity[], number]> {
 		const orderBy = filter
 			? new OrderBySearchDto().convertOrderByToORM<ProductScheduleOrderByDto>(
-					filter,
-				)
+				filter,
+			)
 			: [];
 		orderBy.push({
 			startTime: OrderByEnum.ASC,
@@ -166,7 +166,7 @@ export class ProductScheduleRepository {
 					startTime: startTime,
 					endTime: endTime,
 					status: {
-						not: ProductScheduleStatusEnum.canceled,
+						in: [ProductScheduleStatusEnum.active, ProductScheduleStatusEnum.full],
 					},
 				},
 				orderBy: orderBy,
@@ -188,7 +188,7 @@ export class ProductScheduleRepository {
 					startTime: startTime,
 					endTime: endTime,
 					status: {
-						not: ProductScheduleStatusEnum.canceled,
+						in: [ProductScheduleStatusEnum.active, ProductScheduleStatusEnum.full],
 					},
 				},
 			}),
@@ -451,16 +451,18 @@ export class ProductScheduleRepository {
 					});
 					totalPrice += price - discountPrice;
 				});
-				await prisma.user.update({
-					where: {
-						id: productSchedule.product.supplier.userId,
-					},
-					data: {
-						balance: {
-							increment: totalPrice,
+				if (totalPrice > 0) {
+					await prisma.user.update({
+						where: {
+							id: productSchedule.product.supplier.userId,
 						},
-					},
-				});
+						data: {
+							balance: {
+								increment: totalPrice,
+							},
+						},
+					});
+				}
 			}
 
 			return productSchedule;
@@ -471,7 +473,7 @@ export class ProductScheduleRepository {
 		productScheduleId: string,
 	): Promise<[ProductScheduleEntity, BillEntity[], BillEntity[]]> {
 		return await this.prismaService.$transaction(async (prisma) => {
-			const billsIdWaitingRefund: string[] = [];
+			const billsIdWaitingRefund: InfoBillEntity[] = [];
 			const billsIdCancel: string[] = [];
 			let billsWaitingRefund: BillEntity[] = [];
 			let billsCancel: BillEntity[] = [];
@@ -485,7 +487,7 @@ export class ProductScheduleRepository {
 						where: {
 							bill: {
 								status: {
-									notIn: [BillStatusEnum.cancel, BillStatusEnum.done],
+									in: [BillStatusEnum.pending, BillStatusEnum.paid],
 								},
 							},
 						},
@@ -501,7 +503,7 @@ export class ProductScheduleRepository {
 						updateMany: {
 							where: {
 								status: {
-									not: InfoDiscountStatusEnum.inactive,
+									in: [InfoDiscountStatusEnum.active],
 								},
 							},
 							data: {
@@ -514,25 +516,31 @@ export class ProductScheduleRepository {
 			});
 			productSchedule.infoBill.forEach((info) => {
 				if (info.bill.status === BillStatusEnum.paid) {
-					return billsIdWaitingRefund.push(info.bill.id);
+					billsIdWaitingRefund.push(info);
+					return;
 				}
 				billsIdCancel.push(info.bill.id);
 			});
-
-			if (billsIdWaitingRefund.length > 0) {
-				billsWaitingRefund = await prisma.bill.updateManyAndReturn({
-					where: {
-						id: {
-							in: billsIdWaitingRefund,
+			billsWaitingRefund = await Promise.all(
+				billsIdWaitingRefund.map(async (info) => {
+					return await prisma.bill.update({
+						where: {
+							id: info.bill.id,
 						},
-					},
-					data: {
-						deletedAt: new Date(),
-						status: BillStatusEnum.waitingRefund,
-					},
-				});
-			}
-
+						data: {
+							deletedAt: new Date(),
+							status: BillStatusEnum.refunded,
+							user: {
+								update: {
+									balance: {
+										increment: productSchedule.price * info.quantity,
+									}
+								}
+							}
+						},
+					});
+				}),
+			)
 			if (billsIdCancel.length > 0) {
 				billsCancel = await prisma.bill.updateManyAndReturn({
 					where: {

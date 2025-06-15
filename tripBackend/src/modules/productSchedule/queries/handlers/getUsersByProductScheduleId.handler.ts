@@ -18,12 +18,11 @@ import { GetUsersByProductScheduleIdQuery } from '../implements';
 
 @QueryHandler(GetUsersByProductScheduleIdQuery)
 export class GetUsersByProductScheduleIdHandler
-	implements IQueryHandler<GetUsersByProductScheduleIdQuery>
-{
+	implements IQueryHandler<GetUsersByProductScheduleIdQuery> {
 	constructor(
 		private readonly productScheduleRepository: ProductScheduleRepository,
 		private readonly userRepository: UserRepository,
-	) {}
+	) { }
 
 	async execute(
 		query: GetUsersByProductScheduleIdQuery,
@@ -55,25 +54,28 @@ export class GetUsersByProductScheduleIdHandler
 			await this.userRepository.findUsersInProductSchedulebyProductScheduleId(
 				productScheduleId,
 				undefined,
-				[BillStatusEnum.pending, BillStatusEnum.paid, BillStatusEnum.done],
+				[BillStatusEnum.refunded, BillStatusEnum.pending, BillStatusEnum.paid, BillStatusEnum.done],
 				[UserStatusEnum.active],
 				page,
 				filter,
 			);
-
 		const usersInformation = users
 			.map((user) => {
-				if (user.bill.length > 1) {
+				if (user.bill.length > 0) {
 					return user.bill.map((bill) => {
-						return new GetUsersByProductScheduleIdResponseDto({
-							...user,
-							bill: [bill],
-						});
+						if (bill.infoBill.length > 0 && (bill.status === BillStatusEnum.paid || bill.status === BillStatusEnum.done || bill.status === BillStatusEnum.refunded || bill.status === BillStatusEnum.pending)) {
+							return new GetUsersByProductScheduleIdResponseDto({
+								...user,
+								bill: [bill],
+							});
+						}
 					});
 				}
 				return new GetUsersByProductScheduleIdResponseDto(user);
 			})
-			.flat();
+			.flat().filter(
+				(userInfo) => userInfo !== undefined
+			);
 
 		return {
 			success: true,

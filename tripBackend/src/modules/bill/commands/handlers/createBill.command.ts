@@ -213,6 +213,10 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 				}
 			}
 
+			if (baseAmount <= stackableSum + nonStackableMax) {
+				return baseAmount;
+			}
+
 			return stackableSum + nonStackableMax;
 		}
 
@@ -324,7 +328,7 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 				},
 			},
 			totalPrice: totalPrice,
-			reductionPrice: reductionPrice,
+			reductionPrice: reductionPrice >= totalPrice ? (totalPrice - 10000) : reductionPrice,
 			transactionTargetId: TransactionTargetEnum.pay,
 			infoBill: {
 				create: infoBill.map((info) => ({

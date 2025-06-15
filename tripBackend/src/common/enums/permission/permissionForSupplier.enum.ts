@@ -13,4 +13,5 @@ export enum PermissionForSupplierEnum {
 	DeleteDiscountByDiscountId = PermissionEnum.DeleteDiscountByDiscountId,
 	FindDiscountsByUserId = PermissionEnum.FindDiscountsByUserId,
 	AssignProductSchedulesToDiscount = PermissionEnum.AssignProductSchedulesToDiscount,
+	Statistic = PermissionEnum.Statistic,
 }

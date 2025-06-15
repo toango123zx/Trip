@@ -33,6 +33,7 @@ export class ProductRepository {
 		priceToSearch?: number,
 		countrySearch?: CountryEnum,
 		productIds?: string[],
+		timeAvailable: boolean = true,
 	): Promise<[ProductEntity[], number]> {
 		const orderBy = [];
 		if (filter.location?.displayName && filter.location?.country) {
@@ -61,14 +62,17 @@ export class ProductRepository {
 			name: 'asc',
 		});
 
-		const some = {
-			startOrder: {
-				lte: new Date(),
-			},
-			endOrder: {
-				gte: new Date(),
-			},
-		};
+		let some = {};
+		if (timeAvailable) {
+			some = {
+				startOrder: {
+					lte: new Date(),
+				},
+				endOrder: {
+					gte: new Date(),
+				},
+			};
+		}
 		if (startTimeSearch) {
 			some['startTime'] = {
 				gte: startTimeSearch,
@@ -91,7 +95,6 @@ export class ProductRepository {
 				in: productScheduleStatus,
 			};
 		}
-
 		const [products, totalRecords] = await Promise.all([
 			this.prismaService.product.findMany({
 				include: {
@@ -209,13 +212,18 @@ export class ProductRepository {
 				productSchedule: {
 					where: {
 						status: {
-							not: ProductScheduleStatusEnum.canceled,
+							in: [ProductScheduleStatusEnum.active, ProductScheduleStatusEnum.full, ProductScheduleStatusEnum.completed],
 						},
 					},
 				},
 				productRate: {
 					include: {
 						user: true,
+						infoBill: {
+							include: {
+								bill: true,
+							}
+						}
 					},
 				},
 				location: true,
@@ -320,7 +328,7 @@ export class ProductRepository {
 							infoDiscount: {
 								where: {
 									status: {
-										not: InfoDiscountStatusEnum.inactive,
+										in: [InfoDiscountStatusEnum.active],
 									},
 								},
 							},

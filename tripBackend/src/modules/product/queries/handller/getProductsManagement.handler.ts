@@ -48,6 +48,7 @@ export class GetProductsManagementHandler
 				},
 			}),
 		};
+		
 		const [products, totalRecords] = await this.productRepository.findProducts(
 			keyword,
 			page,
@@ -61,6 +62,8 @@ export class GetProductsManagementHandler
 			priceFromSearch,
 			priceToSearch,
 			citySearch,
+			undefined,
+			false,
 		);
 
 		const productInformation = products.map(

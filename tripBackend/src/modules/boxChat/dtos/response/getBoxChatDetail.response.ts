@@ -16,7 +16,7 @@ export class GetBoxChatDetailResponseDto extends GetBoxChatResponseDto {
 
 	constructor(boxChat: BoxChatEntity) {
 		super(boxChat);
-		this.messages = boxChat.message.map((msg) => ({
+		this.messages = boxChat.message?.map((msg) => ({
 			id: msg.id,
 			content: msg.content,
 			userId: msg.userId,

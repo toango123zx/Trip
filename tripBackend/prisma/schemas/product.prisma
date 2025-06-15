@@ -1,274 +1,279 @@
 enum ProductCategoryStatusEnum {
-    active
-    inactive
+  active
+  inactive
 
-    @@map("Product_Category_Status_Enum")
+  @@map("Product_Category_Status_Enum")
 }
 
 enum ProviderMapStatusEnum {
-    active
-    inactive
+  active
+  inactive
 
-    @@map("Provider_Map_Status_Enum")
+  @@map("Provider_Map_Status_Enum")
 }
 
 enum MapAddressStatusEnum {
-    active
-    inactive
+  active
+  inactive
 
-    @@map("Map_Address_Status_Enum")
+  @@map("Map_Address_Status_Enum")
 }
 
 enum LocationStatusEnum {
-    active
-    inactive
+  active
+  inactive
 
-    @@map("Location_Status_Enum")
+  @@map("Location_Status_Enum")
 }
 
 enum ProductStatusEnum {
-    active
-    warning
-    waiting
-    inactive
+  active
+  warning
+  waiting
+  inactive
 
-    @@map("Product_Status_Enum")
+  @@map("Product_Status_Enum")
 }
 
 enum ProductRateStatusEnum {
-    active
-    removed
+  active
+  removed
 
-    @@map("Product_Rate_Status_Enum")
+  @@map("Product_Rate_Status_Enum")
 }
 
 enum ProductScheduleStatusEnum {
-    active
-    full
-    completed
-    canceled
+  active
+  full
+  completed
+  canceled
 
-    @@map("Product_Schedule_Status_Enum")
+  @@map("Product_Schedule_Status_Enum")
 }
 
 model productCategory {
-    id          String            @id @default(cuid())
-    name        String
-    description String
-    createAt    DateTime          @default(now()) @map("create_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    updateAt    DateTime          @updatedAt @map("update_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    deletedAt   DateTime?         @map("deleted_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    status      ProductStatusEnum @default(active)
+  id          String            @id @default(cuid())
+  name        String
+  description String
+  createAt    DateTime          @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt    DateTime          @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt   DateTime?         @map("deleted_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  status      ProductStatusEnum @default(active)
 
-    product product[]
+  product product[]
 
-    @@map("Product_Category")
+  @@map("Product_Category")
 }
 
 model providerMap {
-    id          String                @id @default(cuid())
-    name        String
-    description String
-    createAt    DateTime              @default(now()) @map("create_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    updateAt    DateTime              @updatedAt @map("update_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    deletedAt   DateTime?             @map("deleted_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    status      ProviderMapStatusEnum @default(active)
+  id          String                @id @default(cuid())
+  name        String
+  description String
+  createAt    DateTime              @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt    DateTime              @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt   DateTime?             @map("deleted_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  status      ProviderMapStatusEnum @default(active)
 
-    mapAddress mapAddress[]
+  mapAddress mapAddress[]
 
-    @@map("Provider_Map")
+  @@map("Provider_Map")
 }
 
 model mapAddress {
-    id            String               @id @default(cuid())
-    urlMap        String               @map("url_map")
-    providerMapId String               @map("provider_map_id")
-    /// @DtoRelationCanConnectOnCreate
-    providerMap   providerMap          @relation(fields: [providerMapId], references: [id])
-    productId     String               @unique @map("product_id")
-    product       product              @relation(fields: [productId], references: [id])
-    createAt      DateTime             @default(now()) @map("create_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    updateAt      DateTime             @updatedAt @map("update_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    deletedAt     DateTime?            @map("deleted_at")
-    status        MapAddressStatusEnum @default(active)
+  id            String               @id @default(cuid())
+  urlMap        String               @map("url_map")
+  providerMapId String               @map("provider_map_id")
+  /// @DtoRelationCanConnectOnCreate
+  providerMap   providerMap          @relation(fields: [providerMapId], references: [id])
+  productId     String               @unique @map("product_id")
+  product       product              @relation(fields: [productId], references: [id])
+  createAt      DateTime             @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt      DateTime             @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt     DateTime?            @map("deleted_at")
+  status        MapAddressStatusEnum @default(active)
 
-    @@map("Map_Address")
+  @@map("Map_Address")
 }
 
 model location {
-    id          String             @id @default(cuid())
-    /// @DtoConnectHidden
-    systemName  String             @unique @map("system_name")
-    displayName String             @map("display_name")
-    country     CountryEnum       @map("country")
-    createAt    DateTime           @default(now()) @map("create_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    updateAt    DateTime           @updatedAt @map("update_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    deletedAt   DateTime?          @map("deleted_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    status      LocationStatusEnum @default(active)
+  id          String             @id @default(cuid())
+  /// @DtoConnectHidden
+  systemName  String             @unique @map("system_name")
+  displayName String             @map("display_name")
+  country     CountryEnum        @map("country")
+  createAt    DateTime           @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt    DateTime           @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt   DateTime?          @map("deleted_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  status      LocationStatusEnum @default(active)
 
-    product product[]
+  product product[]
 
-    @@map("Location")
+  @@map("Location")
 }
 
 model product {
-    id                String            @id @default(cuid())
-    name              String
-    posterImageUrl    String            @map("poster_image_url")
-    supplierId        String            @map("supplier_id")
-    /// @DtoRelationCanConnectOnCreate
-    supplier          supplier          @relation(fields: [supplierId], references: [id])
-    /// @minimum 0.01
-    time              Float
-    /// @minimum 1
-    quantityAvailable Int               @map("quantity_available")
-    /// @minimum 0
-    age               Int
-    quantityCompleted Int               @default(0) @map("quantity_completed")
-    description       String
-    quantityRate      Int               @default(0) @map("quantity_rate")
-    avgRate           Float             @default(0) @map("avg_rate")
-    locationId        String            @map("location_id")
-    /// @DtoRelationCanConnectOnCreate
-    location          location          @relation(fields: [locationId], references: [id])
-    productCategoryId String            @map("product_category_id")
-    /// @DtoRelationCanConnectOnCreate
-    productCategory   productCategory   @relation(fields: [productCategoryId], references: [id])
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    createAt          DateTime          @default(now()) @map("create_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    updateAt          DateTime          @updatedAt @map("update_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    deletedAt         DateTime?         @map("deleted_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    status            ProductStatusEnum @default(active)
+  id                String            @id @default(cuid())
+  name              String
+  posterImageUrl    String            @map("poster_image_url")
+  supplierId        String            @map("supplier_id")
+  /// @DtoRelationCanConnectOnCreate
+  supplier          supplier          @relation(fields: [supplierId], references: [id])
+  /// @minimum 0.01
+  time              Float
+  /// @minimum 1
+  quantityAvailable Int               @map("quantity_available")
+  /// @minimum 0
+  age               Int
+  quantityCompleted Int               @default(0) @map("quantity_completed")
+  description       String
+  quantityRate      Int               @default(0) @map("quantity_rate")
+  avgRate           Float             @default(0) @map("avg_rate")
+  locationId        String            @map("location_id")
+  /// @DtoRelationCanConnectOnCreate
+  location          location          @relation(fields: [locationId], references: [id])
+  productCategoryId String            @map("product_category_id")
+  /// @DtoRelationCanConnectOnCreate
+  productCategory   productCategory   @relation(fields: [productCategoryId], references: [id])
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  createAt          DateTime          @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt          DateTime          @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt         DateTime?         @map("deleted_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  status            ProductStatusEnum @default(active)
 
-    /// @DtoRelationCanCreateOnCreate
-    mapAddress      mapAddress?
-    /// @DtoRelationCanCreateOnCreate
-    productImage    productImage[]
-    productRate     productRate[]
-    productSchedule productSchedule[]
-    productViewLog  productViewLog[]
+  /// @DtoRelationCanCreateOnCreate
+  mapAddress mapAddress?
+  // embedding  Unsupported("vector")?
 
-    @@map("Product")
+  /// @DtoRelationCanCreateOnCreate
+  productImage    productImage[]
+  productRate     productRate[]
+  productSchedule productSchedule[]
+  productViewLog  productViewLog[]
+
+  @@map("Product")
 }
 
 model productImage {
-    id        String   @id @default(cuid())
-    /// @DtoUpdateHidden
-    productId String   @map("product_id")
-    /// @DtoRelationCanConnectOnCreate
-    product   product  @relation(fields: [productId], references: [id])
-    url       String
-    createdAt DateTime @default(now()) @map("create_at")
+  id        String   @id @default(cuid())
+  /// @DtoUpdateHidden
+  productId String   @map("product_id")
+  /// @DtoRelationCanConnectOnCreate
+  product   product  @relation(fields: [productId], references: [id])
+  url       String
+  createdAt DateTime @default(now()) @map("create_at")
 
-    @@map("Prodcut_Image")
+  @@map("Prodcut_Image")
 }
 
 model productRate {
-    id        String                @id @default(cuid())
-    /// @DtoUpdateHidden
-    productId String                @map("product_id")
-    /// @DtoRelationCanConnectOnCreate
-    /// @DtoRelationCanConnectOnCreate
-    /// @DtoRelationCanUpdateOnUpdate
-    product   product               @relation(fields: [productId], references: [id])
-    /// @DtoUpdateHidden
-    userId    String                @map("user_id")
-    /// @DtoRelationCanConnectOnCreate
-    user      user                  @relation(fields: [userId], references: [id])
-    /// @maximum 5
-    /// @minimum 0
-    star      Int
-    comment   String
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    createAt  DateTime              @default(now()) @map("create_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    updateAt  DateTime              @updatedAt @map("update_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    deletedAt DateTime?             @map("deleted_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    status    ProductRateStatusEnum @default(active)
+  id          String                @id @default(cuid())
+  /// @DtoUpdateHidden
+  productId   String                @map("product_id")
+  /// @DtoRelationCanConnectOnCreate
+  /// @DtoRelationCanConnectOnCreate
+  /// @DtoRelationCanUpdateOnUpdate
+  product     product               @relation(fields: [productId], references: [id])
+  /// @DtoUpdateHidden
+  userId      String                @map("user_id")
+  /// @DtoRelationCanConnectOnCreate
+  user        user                  @relation(fields: [userId], references: [id])
+  infoBillId String                @unique @map("info_bill_id")
+  /// @DtoRelationCanConnectOnCreate
+  infoBill   infoBill              @relation(fields: [infoBillId], references: [id])
+  /// @maximum 5
+  /// @minimum 0
+  star        Int
+  comment     String
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  createAt    DateTime              @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt    DateTime              @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt   DateTime?             @map("deleted_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  status      ProductRateStatusEnum @default(active)
 
-    @@map("Product_Rate")
+  @@map("Product_Rate")
 }
 
 model productSchedule {
-    id         String                    @id @default(cuid())
-    /// @DtoUpdateHidden
-    productId  String                    @map("product_id")
-    /// @DtoRelationCanConnectOnCreate
-    product    product                   @relation(fields: [productId], references: [id])
-    startTime  DateTime                  @map("start_time")
-    endTime    DateTime                  @map("end_time")
-    /// @minimum 1
-    price      Int
-    booked     Int                       @default(0)
-    startOrder DateTime                  @map("start_order")
-    endOrder   DateTime                  @map("end_order")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    createAt   DateTime                  @default(now()) @map("create_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    updateAt   DateTime                  @updatedAt @map("update_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    deletedAt  DateTime?                 @map("deleted_at")
-    /// @DtoCreateHidden
-    /// @DtoUpdateHidden
-    status     ProductScheduleStatusEnum @default(active)
+  id         String                    @id @default(cuid())
+  /// @DtoUpdateHidden
+  productId  String                    @map("product_id")
+  /// @DtoRelationCanConnectOnCreate
+  product    product                   @relation(fields: [productId], references: [id])
+  startTime  DateTime                  @map("start_time")
+  endTime    DateTime                  @map("end_time")
+  /// @minimum 1
+  price      Int
+  booked     Int                       @default(0)
+  startOrder DateTime                  @map("start_order")
+  endOrder   DateTime                  @map("end_order")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  createAt   DateTime                  @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt   DateTime                  @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt  DateTime?                 @map("deleted_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  status     ProductScheduleStatusEnum @default(active)
 
-    infoBill     infoBill[]
-    cart         cart[]
-    infoDiscount infoDiscount[]
+  infoBill     infoBill[]
+  cart         cart[]
+  infoDiscount infoDiscount[]
 
-    @@map("Product_Schedule")
+  @@map("Product_Schedule")
 }
 
 model productViewLog {
-    id        String   @id @default(cuid())
-    /// @DtoUpdateHidden
-    productId String   @map("product_id")
-    /// @DtoRelationCanConnectOnCreate
-    product   product  @relation(fields: [productId], references: [id])
-    productName String   @map("product_name")
-    /// @DtoUpdateHidden
-    userId    String   @map("user_id")
-    /// @DtoRelationCanConnectOnCreate
-    user      user     @relation(fields: [userId], references: [id])
-    createdAt DateTime @default(now()) @map("create_at")
+  id          String   @id @default(cuid())
+  /// @DtoUpdateHidden
+  productId   String   @map("product_id")
+  /// @DtoRelationCanConnectOnCreate
+  product     product  @relation(fields: [productId], references: [id])
+  productName String   @map("product_name")
+  /// @DtoUpdateHidden
+  userId      String   @map("user_id")
+  /// @DtoRelationCanConnectOnCreate
+  user        user     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now()) @map("create_at")
 
-    @@map("Product_View_Log")
+  @@map("Product_View_Log")
 }
