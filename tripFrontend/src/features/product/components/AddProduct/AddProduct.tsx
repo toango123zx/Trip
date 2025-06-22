@@ -74,9 +74,9 @@ Nội dung cần hấp dẫn, truyền cảm hứng, và nêu bật điểm đ�
 
 			setLocationDescription(description);
 			notificationUtils.success();
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Lỗi tạo mô tả:', error);
-			notificationUtils.error();
+			notificationUtils.error({message: error.response.data.message});
 		} finally {
 			setIsGeneratingDescription(false);
 		}

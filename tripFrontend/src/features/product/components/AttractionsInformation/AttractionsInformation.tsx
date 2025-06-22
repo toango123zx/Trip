@@ -385,7 +385,7 @@ export const AttractionsInformation: React.FC = () => {
 						))}
 					</Swiper>
 				</div>
-				<button onClick={handleContactClick}>Contact</button>
+				
 
 				{/* Description */}
 				<div className="mb-8 text-gray-700 leading-relaxed text-sm md:text-base">
@@ -399,7 +399,7 @@ export const AttractionsInformation: React.FC = () => {
 						</button>
 					)}
 				</div>
-
+					
 				{/* Detail Info */}
 				<div className="mb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 					{info.map(({ label, value }) => (
@@ -413,6 +413,7 @@ export const AttractionsInformation: React.FC = () => {
 						</div>
 					))}
 				</div>
+				
 
 				{/* Gallery */}
 				<div className="pt-8 border-t border-gray-200">

@@ -55,19 +55,33 @@ export const BillList = (): JSX.Element => {
 	const bills: TBillSumary[] = useSelector<TReduxStoreState, TBillSumary[]>(
 		(state) => state.bill.bills,
 	);
+	const loading: boolean = useSelector<TReduxStoreState, boolean>(
+		(state) => state.bill.loading,
+	);
 	const [tableData, setTableDate] = useState<TBillInTable[]>([]);
 	const LIMIT_BILL_HISTORY_CALL_API = 100;
 
 	useEffect(() => {
-		dispatch(
-			billThunk.getBillByUserId({
-				page: 1,
-				limit: LIMIT_BILL_HISTORY_CALL_API,
-			}),
-		);
+		if (localStorage.getItem('role') === 'admin') {
+			dispatch(
+				billThunk.getBillsManagement({
+					page: 1,
+					limit: LIMIT_BILL_HISTORY_CALL_API,
+				}),
+			);
+		} else {
+			dispatch(
+				billThunk.getBillByUserId({
+					page: 1,
+					limit: LIMIT_BILL_HISTORY_CALL_API,
+				}),
+			);
+		}
 	}, [dispatch]);
-
+	
 	useEffect(() => {
+		console.log(`🚀 ~ BillList.tsx:98 ~ loading:`, loading)
+		console.log(`🚀 ~ BillList.tsx:94 ~ bills:`, bills)
 		setTableDate(
 			bills.map((bill) => ({
 				id: bill.id,
@@ -81,7 +95,7 @@ export const BillList = (): JSX.Element => {
 				status: bill.status as EBillStatus, // Ensure status is of type EBillStatus
 			})),
 		);
-	}, [bills]);
+	}, [bills, loading]);
 
 	const handleViewDetail = (billId: string): void => {
 		console.log(`🚀 ~ BillList.tsx:76 ~ handleViewDetail ~ billId:`, billId)

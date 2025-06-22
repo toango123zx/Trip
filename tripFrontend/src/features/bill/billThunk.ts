@@ -14,6 +14,15 @@ const getBillByUserId = createAsyncThunk(
   },
 );
 
+
+const getBillsManagement = createAsyncThunk(
+  'bill/getBillsManagement',
+  async (query?: TRequestQueryGetBills): Promise<[TBillSumary[], TPagination?]> => {
+    const [data, pagination] = await billApi.getBillsManagement(query);
+    return [data, pagination];
+  },
+);
+
 const getBillByBillId = createAsyncThunk(
   'bill/getBillByBillId',
   async (billId: string): Promise<TBill> => {
@@ -38,6 +47,14 @@ const paymentBillByBillId = createAsyncThunk(
   },
 );
 
+const payConfirmWithdrawal = createAsyncThunk(
+  'bill/withdrawal/confirm',
+  async (billId: string): Promise<any> => {
+    const data = await billApi.payConfirmWithdrawal(billId);
+    return data;
+  },
+);
+
 const cancelBillByBillId = createAsyncThunk(
   'bill/cancel',
   async (billId: string): Promise<TBill> => {
@@ -48,8 +65,10 @@ const cancelBillByBillId = createAsyncThunk(
 
 export const billThunk = {
   getBillByUserId,
+  getBillsManagement,
   getBillByBillId,
   createBill,
   paymentBillByBillId,
+  payConfirmWithdrawal,
   cancelBillByBillId,
 };

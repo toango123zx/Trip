@@ -3,6 +3,7 @@ export * from './AddProduct';
 export * from './AttractionList';
 export * from './AttractionsInformation';
 export * from './AttractionsRate';
+export * from './AttractionsSupplier'
 export * from './Button';
 export * from './Card';
 export * from './ProductUpdate';

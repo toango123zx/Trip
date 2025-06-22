@@ -9,11 +9,15 @@ import {
 	FaEdit,
 	FaLock,
 	FaCamera,
+	FaRegAddressCard,
+	FaMoneyBillWave,
 } from 'react-icons/fa';
 import { userService } from '../services/userService';
 import { MainLayout } from '@/layouts';
 import { notificationUtils } from '@/utils/notificationUtils';
 import { cloudinaryService } from '@/services/cloudinaryService';
+import { ERoleName } from '@/features/users/user.type';
+import { useNavigate } from 'react-router-dom';
 
 interface UserProfile {
 	id: string;
@@ -22,17 +26,24 @@ interface UserProfile {
 	image: string;
 	gender: string | null;
 	email: string;
-	dateOfBirth: string | null;
+	dateOfBirth: string | Date | null;
 	phoneNumber: string | null;
 	address: string | null;
 	balance: number;
 	point: number;
 	status: string;
+	taxId?: string | null;
+	bankName?: string | null;
+	bankCode?: string | null;
+	amount?: number | null;
+
 }
 
 const AccountPage: React.FC = () => {
 	const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	const [editMode, setEditMode] = useState(false);
+	const [joinSupplierMode, setJoinSupplierMode] = useState(false);
+	const [withdrawalMode, setWithdrawalMode] = useState(false);
 	const [passwordMode, setPasswordMode] = useState(false);
 	const [formData, setFormData] = useState<Partial<UserProfile>>({});
 	const [passwordData, setPasswordData] = useState({
@@ -42,6 +53,7 @@ const AccountPage: React.FC = () => {
 	});
 	const [activeTab, setActiveTab] = useState<'profile' | 'password'>('profile');
 	const [isUploading, setIsUploading] = useState(false);
+	const nav = useNavigate();
 
 	useEffect(() => {
 		const fetchUserProfile = async () => {
@@ -55,8 +67,8 @@ const AccountPage: React.FC = () => {
 					phoneNumber: profile.phoneNumber,
 					address: profile.address,
 				});
-			} catch (err) {
-				notificationUtils.error();
+			} catch (err: any) {
+				notificationUtils.error({message: err.response.data.message});
 			}
 		};
 
@@ -75,19 +87,41 @@ const AccountPage: React.FC = () => {
 
 	const validateForm = () => {
 		const errors: string[] = [];
+		if (editMode && joinSupplierMode) {
 
-		if (formData.phoneNumber && !/^\d{10,11}$/.test(formData.phoneNumber)) {
-			errors.push('Số điện thoại không hợp lệ');
+			if (formData.phoneNumber && !/^\d{10,11}$/.test(formData.phoneNumber)) {
+				errors.push('Số điện thoại không hợp lệ');
+			}
+
+			if (formData.name && formData.name.trim().length < 2) {
+				errors.push('Tên phải có ít nhất 2 ký tự');
+			}
+
+			if (joinSupplierMode) {
+				formData.gender = 'other'
+				formData.dateOfBirth = new Date()
+				if (!formData.taxId || formData.taxId.trim().length < 13) {
+					errors.push('Mã số thuế phải có ít nhất 13 ký tự');
+				}
+			}
 		}
-
-		if (formData.name && formData.name.trim().length < 2) {
-			errors.push('Tên phải có ít nhất 2 ký tự');
+		if (withdrawalMode) {
+			if (!formData.bankName?.trim()) {
+				errors.push('Tên ngân hàng không hợp lệ');
+			}
+			if (!formData.bankCode?.trim()) {
+				errors.push('Mã ngân hàng không hợp lệ');
+			}
+			if (!formData.amount || isNaN(Number(formData.amount)) || Number(formData.amount) <= 0) {
+				errors.push('Số tiền rút không hợp lệ');
+			}
 		}
 
 		if (errors.length > 0) {
 			notificationUtils.error();
 			return false;
 		}
+		setJoinSupplierMode(false);
 		return true;
 	};
 
@@ -99,8 +133,37 @@ const AccountPage: React.FC = () => {
 			setUserProfile(updatedProfile);
 			setEditMode(false);
 			notificationUtils.success();
+			
 		} catch (err: any) {
-			notificationUtils.error();
+			notificationUtils.error({message: err.response.data.message});
+		}
+	};
+	const handleJoinSupplier = async () => {
+		if (!validateForm()) return;
+
+		try {
+			const updatedProfile = await userService.getJoinSupplier(formData);
+			setUserProfile(updatedProfile);
+			setEditMode(false);
+			notificationUtils.success();
+			nav('/account')
+		} catch (err: any) {
+			notificationUtils.error({message: err.response.data.message});
+		}
+	};
+
+	const handleWithdrawal = async () => {
+		if (!validateForm()) return;
+
+		try {
+			formData.amount = Number(formData.amount);
+			const updatedProfile = await userService.postWithdrawal(formData);
+			setUserProfile(updatedProfile);
+			setWithdrawalMode(false);
+			notificationUtils.success();
+			nav('/account')
+		} catch (err: any) {
+			notificationUtils.error({message: err.response.data.message});
 		}
 	};
 
@@ -132,7 +195,7 @@ const AccountPage: React.FC = () => {
 				confirmPassword: '',
 			});
 		} catch (err: any) {
-			notificationUtils.error();
+			notificationUtils.error({message: err.response.data.message});
 		}
 	};
 
@@ -154,12 +217,13 @@ const AccountPage: React.FC = () => {
 				message: 'Cập nhật ảnh thành công',
 				description: 'Ảnh đại diện đã được cập nhật',
 			});
-		} catch (error) {
-			notificationUtils.error();
+		} catch (error: any) {
+			notificationUtils.error({message: error.response.data.message});
 		} finally {
 			setIsUploading(false);
 		}
 	};
+
 
 	if (!userProfile) return <div className="loading">Đang tải...</div>;
 
@@ -169,10 +233,11 @@ const AccountPage: React.FC = () => {
 				<div className="account-page-header">
 					<div className="profile-avatar relative group">
 						<img
-							src={
-								userProfile.image ||
-								'https://www.strasys.uk/wp-content/uploads/2022/02/Depositphotos_484354208_S.jpg'
-							}
+							// src={
+							// 	userProfile.image ||
+							// 	'https://www.strasys.uk/wp-content/uploads/2022/02/Depositphotos_484354208_S.jpg'
+							// }
+							src='https://i.pinimg.com/736x/b6/45/a2/b645a23ca1d806f91aee90e02d31f258.jpg'
 							alt="Ảnh đại diện"
 							className="avatar-image w-32 h-32 rounded-full object-cover"
 						/>
@@ -229,19 +294,19 @@ const AccountPage: React.FC = () => {
 						className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`}
 						onClick={() => setActiveTab('profile')}
 					>
-						<FaUser /> Thông Tin Cá Nhân
+						<FaUser /> Information
 					</button>
 					<button
 						className={`tab-button ${activeTab === 'password' ? 'active' : ''}`}
 						onClick={() => setActiveTab('password')}
 					>
-						<FaLock /> Đổi Mật Khẩu
+						<FaLock /> Change password
 					</button>
 				</div>
 
 				{activeTab === 'profile' && (
 					<div className="profile-section">
-						{!editMode ? (
+						{(!editMode && !joinSupplierMode && !withdrawalMode) ? (
 							<div className="profile-info">
 								<div className="info-item">
 									<FaUser className="info-icon" />
@@ -273,69 +338,208 @@ const AccountPage: React.FC = () => {
 										Address: {userProfile.address || 'Chưa cập nhật'}
 									</span>
 								</div>
+								<div className="info-item">
+									<FaMapMarkerAlt className="info-icon" />
+									<span>
+										Balance: {`${userProfile.balance} VND` || 'Chưa cập nhật'}
+									</span>
+								</div>
 								<button
 									className="edit-button bg-[#ff7a22] hover:bg-[#ff7a22]/80 text-white border-none px-[15px] py-[10px] m-[5px] rounded cursor-pointer transition-colors duration-300 ease-in-out w-full flex items-center justify-center gap-[12px]"
 									onClick={() => setEditMode(true)}
 								>
-									<FaEdit /> Chỉnh sửa
+									<FaEdit /> Edit
 								</button>
+								{
+									userProfile.roleName === ERoleName.tourist && (
+										<button
+											className="edit-button bg-[#ff7a22] hover:bg-[#ff7a22]/80 text-white border-none px-[15px] py-[10px] m-[5px] rounded cursor-pointer transition-colors duration-300 ease-in-out w-full flex items-center justify-center gap-[12px]"
+											onClick={() => setJoinSupplierMode(true)}
+										>
+											<FaRegAddressCard /> Join Supplier
+										</button>
+									)
+								}
+								{
+									userProfile.balance >= 0 && (
+										<button
+											className="edit-button bg-[#ff7a22] hover:bg-[#ff7a22]/80 text-white border-none px-[15px] py-[10px] m-[5px] rounded cursor-pointer transition-colors duration-300 ease-in-out w-full flex items-center justify-center gap-[12px]"
+											onClick={() => setWithdrawalMode(true)}
+										>
+											<FaMoneyBillWave  /> Withdrawal
+										</button>
+									)
+								}
 							</div>
 						) : (
-							<div className="profile-edit">
-								<div className="input-group">
-									<label htmlFor="name">Name</label>
-									<input
-										type="text"
-										id="name"
-										name="name"
-										value={formData.name || ''}
-										onChange={handleInputChange}
-									/>
-								</div>
-								<div className="input-group">
-									<label htmlFor="gender">Gender</label>
-									<input
-										type="text"
-										id="gender"
-										name="gender"
-										value={formData.gender || ''}
-										onChange={handleInputChange}
-									/>
-								</div>
-								<div className="input-group">
-									<label htmlFor="phoneNumber">Phone Number</label>
-									<input
-										type="text"
-										id="phoneNumber"
-										name="phoneNumber"
-										value={formData.phoneNumber || ''}
-										onChange={handleInputChange}
-									/>
-								</div>
-								<div className="input-group">
-									<label htmlFor="address">Address</label>
-									<input
-										type="text"
-										id="address"
-										name="address"
-										value={formData.address || ''}
-										onChange={handleInputChange}
-									/>
-								</div>
-								<div className="edit-actions">
-									<button
-										className="save-button"
-										onClick={handleUpdateProfile}
-									>
-										Save
-									</button>
-									<button
-										className="cancel-button"
-										onClick={() => setEditMode(false)}
-									>
-										Cancel
-									</button>
-								</div>
+							<div>
+								{editMode && (
+									<div className="profile-edit">
+										<div className="input-group">
+											<label htmlFor="name">Name</label>
+											<input
+												type="text"
+												id="name"
+												name="name"
+												value={formData.name || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="input-group">
+											<label htmlFor="gender">Gender</label>
+											<input
+												type="text"
+												id="gender"
+												name="gender"
+												value={formData.gender || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="input-group">
+											<label htmlFor="phoneNumber">Phone Number</label>
+											<input
+												type="text"
+												id="phoneNumber"
+												name="phoneNumber"
+												value={formData.phoneNumber || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="input-group">
+											<label htmlFor="address">Address</label>
+											<input
+												type="text"
+												id="address"
+												name="address"
+												value={formData.address || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="edit-actions">
+											<button
+												className="save-button"
+												onClick={handleUpdateProfile}
+											>
+												Save
+											</button>
+											<button
+												className="cancel-button"
+												onClick={() => setEditMode(false)}
+											>
+												Cancel
+											</button>
+										</div>
+									</div>
+								)}
+								{joinSupplierMode && (
+									<div className="profile-edit">
+										<div className="input-group">
+											<label htmlFor="name">Name</label>
+											<input
+												type="text"
+												id="name"
+												name="name"
+												value={formData.name || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="input-group">
+											<label htmlFor="phoneNumber">Phone Number</label>
+											<input
+												type="text"
+												id="phoneNumber"
+												name="phoneNumber"
+												value={formData.phoneNumber || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="input-group">
+											<label htmlFor="address">Address</label>
+											<input
+												type="text"
+												id="address"
+												name="address"
+												value={formData.address || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="input-group">
+											<label htmlFor="address">TaxId</label>
+											<input
+												type="text"
+												id="taxId"
+												name="taxId"
+												value={formData.taxId || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="edit-actions">
+											<button
+												className="save-button"
+												onClick={handleJoinSupplier}
+											>
+												Save
+											</button>
+											<button
+												className="cancel-button"
+												onClick={() => setJoinSupplierMode(false)}
+											>
+												Cancel
+											</button>
+										</div>
+									</div>
+								)}
+								{(withdrawalMode) && (
+									<div className="profile-edit">
+										<div className="input-group">
+											<label htmlFor="name">Bank Name</label>
+											<input
+												type="text"
+												id="bankName"
+												name="bankName"
+												value={formData.bankName || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="input-group">
+											<label htmlFor="phoneNumber">Bank Code</label>
+											<input
+												type="text"
+												id="bankCode"
+												name="bankCode"
+												value={formData.bankCode || ''}
+												onChange={handleInputChange}
+											/>
+										</div>
+										<div className="input-group">
+											<label htmlFor="address">Amount</label>
+											<input
+												type="text"
+												id="amount"
+												name="amount"
+												value={formData.amount?.toLocaleString('vi-VN', {
+													style: 'currency',
+												})}
+												onChange={handleInputChange}
+											/>
+										</div>
+
+										<div className="edit-actions">
+											<button
+												className="save-button"
+												onClick={handleWithdrawal}
+											>
+												Confirm
+											</button>
+											<button
+												className="cancel-button"
+												onClick={() => setWithdrawalMode(false)}
+											>
+												Cancel
+											</button>
+										</div>
+									</div>
+								)}
 							</div>
 						)}
 					</div>

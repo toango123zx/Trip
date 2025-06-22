@@ -4,7 +4,7 @@ import { IoLocationOutline } from 'react-icons/io5';
 import { notification, Select } from 'antd';
 import { useSelector } from 'react-redux';
 import { cn } from '@/lib';
-import { TProductDetail, TProductRate } from '@/types';
+import { TBill, TProductDetail, TProductRate } from '@/types';
 import { TReduxStoreState } from '@/store';
 import { rateApi } from '@/features/product/rateApi';
 
@@ -54,6 +54,9 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 	const attraction = useSelector<TReduxStoreState, TProductDetail>(
 		(state) => state.product.productDetail
 	);
+	const bill = useSelector<TReduxStoreState, TBill>(
+		(state) => state.bill.billDetail
+	);
 	const REVIEWS_PER_PAGE = 8;
 
 	const [visibleCount, setVisibleCount] = useState(REVIEWS_PER_PAGE);
@@ -72,7 +75,7 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 
 	const fetchRates = async () => {
 		if (!attraction?.id) return;
-		
+
 		try {
 			setIsLoading(true);
 			const [ratesData, pagination] = await rateApi.getRates(attraction.id);
@@ -126,10 +129,15 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 	const handleSubmitReview = async (): Promise<void> => {
 		if (selectedStars > 0 && comment.trim()) {
 			try {
+				console.log(`🚀 ~ AttractionRate.tsx:60 ~ bill:`, bill)
+				console.log('a');
+				
+
 				setIsSubmitting(true);
 				const response = await rateApi.submitRate(attraction.id, {
 					star: selectedStars,
-					comment: comment.trim()
+					comment: comment.trim(),
+					billId: bill.id,
 				});
 
 				if (response.success) {
@@ -192,7 +200,7 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 				</div>
 
 				{/* Review Submission Section */}
-				<div className="bg-gray-50 rounded-lg p-6 mb-8 shadow-inner">
+				{/* <div className="bg-gray-50 rounded-lg p-6 mb-8 shadow-inner">
 					<div className="grid md:grid-cols-2 gap-6">
 						<div>
 							<h3 className="text-xl font-semibold text-gray-800 mb-4">
@@ -203,17 +211,16 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 									<Star
 										key={index}
 										onClick={() => handleStarClick(index + 1)}
-										className={`w-6 md:w-8 cursor-pointer transition-colors duration-200 ${
-											index < selectedStars 
-											? 'text-yellow-400 fill-yellow-400' 
-											: 'text-gray-300 hover:text-yellow-300'
-										}`}
+										className={`w-6 md:w-8 cursor-pointer transition-colors duration-200 ${index < selectedStars
+												? 'text-yellow-400 fill-yellow-400'
+												: 'text-gray-300 hover:text-yellow-300'
+											}`}
 									/>
 								))}
 							</div>
 							<p className="text-sm text-gray-500 mb-2">
-								{selectedStars > 0 
-									? `You selected ${selectedStars} star${selectedStars > 1 ? 's' : ''}` 
+								{selectedStars > 0
+									? `You selected ${selectedStars} star${selectedStars > 1 ? 's' : ''}`
 									: 'Select your rating'}
 							</p>
 						</div>
@@ -224,7 +231,7 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 								placeholder="Share your experience..."
 								className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-200 transition-all duration-150 min-h-[150px]"
 							/>
-							<button 
+							<button
 								onClick={handleSubmitReview}
 								disabled={selectedStars === 0 || !comment.trim() || isSubmitting}
 								className="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
@@ -234,7 +241,7 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 							</button>
 						</div>
 					</div>
-				</div>
+				</div> */}
 
 				{/* Reviews Grid */}
 				<div className="bg-gray-50 rounded-lg p-6">

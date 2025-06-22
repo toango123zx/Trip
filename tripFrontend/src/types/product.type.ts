@@ -1,11 +1,14 @@
 import { Url } from 'url';
 import { EUserStatus } from './user.type';
 
-type Supplier = {
+export type Supplier = {
 	id: string;
 	userId: string;
 	name: string;
 	image: string;
+	email: string,
+	phoneNumber: string,
+	address?: string;
 	status: keyof typeof EUserStatus;
 };
 

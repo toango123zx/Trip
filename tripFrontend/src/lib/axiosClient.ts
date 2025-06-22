@@ -35,11 +35,13 @@ interface IApiClients {
 
 // Helper function to handle and display errors
 const handleApiError = (error: AxiosError<IApiError>): void => {
+	console.log(`🚀 ~ axiosClient.ts:38 ~ handleApiError ~ error:`, error)
 	let errorMessage = 'An error occurred';
 
 	if (axios.isAxiosError(error)) {
 		// Get message from the response if available
 		const serverMessage = error.response?.data?.message;
+		console.log(`🚀 ~ axiosClient.ts:43 ~ handleApiError ~ serverMessage:`, serverMessage)
 
 		if (serverMessage) {
 			errorMessage = serverMessage;
@@ -47,7 +49,7 @@ const handleApiError = (error: AxiosError<IApiError>): void => {
 	}
 
 	// Display error message
-	notificationUtils.error();
+	notificationUtils.error({message: errorMessage });
 };
 
 // Factory function to create an API client with custom configurations
@@ -201,6 +203,7 @@ export const api = {
 				params: query,
 			})
 			.then((response) => {
+				console.log(`🚀 ~ axiosClient.ts:206 ~ .then ~ response:`, response)
 				if (response.data) {
 					if (response.data.success !== undefined) {
 						return response.data.data;

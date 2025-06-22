@@ -16,6 +16,17 @@ export const billApi = {
     return [response.data, response.pagination];
   },
 
+  async getBillsManagement(
+    query: TRequestQueryGetBills = {},
+  ): Promise<[TBillSumary[], TPagination?]> {
+    const response = await api.get<TBillSumary[], TRequestQueryGetBills>(
+      `/bill/management`,
+      query,
+      EServer.Backend,
+    );
+    return [response.data, response.pagination];
+  },
+
   async getBillByBillId(billId: string): Promise<TBill> {
     const response = await api.get<TBill>(
       `/bill/${billId}`,
@@ -37,6 +48,15 @@ export const billApi = {
 
   async paymentBillByBillId(billId: string): Promise<string> {
     const data = await api.post<string>(`/bill/${billId}/payment`,
+      {},
+      {},
+      EServer.Backend,
+    );
+    return data;
+  },
+
+  async payConfirmWithdrawal(billId: string): Promise<any> {
+    const data = await api.put(`/bill/${billId}/withdrawal/confirm`,
       {},
       {},
       EServer.Backend,

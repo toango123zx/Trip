@@ -3,6 +3,7 @@ import { JSX, useState } from 'react';
 import {
 	AttractionRate,
 	AttractionsInformation,
+	AttracttionsSupplier,
 	HeroAttractionsDetail,
 } from '@/features/product';
 import { MainLayout } from '@/layouts';
@@ -16,6 +17,8 @@ const AttractionsDetail = (): JSX.Element => {
 				return <AttractionsInformation />;
 			case 'rate':
 				return <AttractionRate />;
+			case 'supplier':
+				return <AttracttionsSupplier />;
 			default:
 				return <AttractionsInformation />;
 		}

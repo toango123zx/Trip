@@ -52,6 +52,11 @@ export type TBill = {
 	discountForBill: TDiscountForBillItem[];
 	paymentMethod: TPaymentMethod;
 	transaction: TTransaction;
+	withdrawal: {
+		bankName: string;
+		bankCode: string;
+		amount: number;
+	} | null;
 	user: {
 		id: string;
 		name: string;

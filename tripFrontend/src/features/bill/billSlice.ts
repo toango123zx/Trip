@@ -34,6 +34,20 @@ export const billSlice = createSlice({
         state.loading = false;
         state.error = String(action.error.message);
       })
+      .addCase(billThunk.getBillsManagement.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(billThunk.getBillsManagement.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.bills = action.payload[0];
+        state.pagination = action.payload[1] || ({} as TPagination);
+      })
+      .addCase(billThunk.getBillsManagement.rejected, (state, action) => {
+        state.loading = false;
+        state.error = String(action.error.message);
+      })
       .addCase(billThunk.getBillByBillId.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -70,6 +84,18 @@ export const billSlice = createSlice({
         state.error = null;
       })
       .addCase(billThunk.paymentBillByBillId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = String(action.error.message);
+      })
+       .addCase(billThunk.payConfirmWithdrawal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(billThunk.payConfirmWithdrawal.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(billThunk.payConfirmWithdrawal.rejected, (state, action) => {
         state.loading = false;
         state.error = String(action.error.message);
       })

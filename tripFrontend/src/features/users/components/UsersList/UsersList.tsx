@@ -217,8 +217,8 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 				page,
 				limit: PAGE_SIZE
 			}));
-		} catch (error) {
-			notificationUtils.error();
+		} catch (error :any) {
+			notificationUtils.error({message: error.response.data.message});
 		}
 	};
 
@@ -243,8 +243,8 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 				page,
 				limit: PAGE_SIZE
 			}));
-		} catch (error) {
-			notificationUtils.error();
+		} catch (error: any) {
+			notificationUtils.error({message: error.response.data.message});
 		}
 	};
 
@@ -255,8 +255,8 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 				page,
 				limit: PAGE_SIZE
 			}));
-		} catch (error) {
-			notificationUtils.error();
+		} catch (error: any) {
+			notificationUtils.error({message: error.response.data.message});
 		}
 	};
 
@@ -267,8 +267,8 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 				page,
 				limit: PAGE_SIZE
 			}));
-		} catch (error) {
-			notificationUtils.error();
+		} catch (error: any) {
+			notificationUtils.error({message: error.response.data.message});
 		}
 	};
 

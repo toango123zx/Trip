@@ -4,6 +4,7 @@ import { TProductRate, TPagination } from '@/types';
 export interface RateRequest {
   star: number;
   comment: string;
+  billId: string
 }
 
 export interface RateResponse {

@@ -11,12 +11,13 @@ interface UserProfile {
 	image: string;
 	gender: string | null;
 	email: string;
-	dateOfBirth: string | null;
+	dateOfBirth: string | Date | null;
 	phoneNumber: string | null;
 	address: string | null;
 	balance: number;
 	point: number;
 	status: string;
+	taxId?: string | null;
 }
 
 export const userService = {
@@ -45,6 +46,19 @@ export const userService = {
 		}
 	},
 
+	async getJoinSupplier(updateData: Partial<UserProfile>) {
+		try {
+			const response = await axios.post<{ success: boolean; data: any }>(
+				`${BASE_URL}/supplier`,
+				updateData,
+			);
+			return response.data.data;
+		} catch (error) {
+			console.error('Lỗi khi lấy thông tin nhà cung cấp:', error);
+			throw error;
+		}
+	},
+
 	async changePassword(currentPassword: string, newPassword: string) {
 		try {
 			const response = await axios.patch(`${BASE_URL}/user/change-password`, {
@@ -54,6 +68,19 @@ export const userService = {
 			return response.data;
 		} catch (error) {
 			console.error('Lỗi khi đổi mật khẩu:', error);
+			throw error;
+		}
+	},
+
+	async postWithdrawal(updateData: Partial<UserProfile>) {
+		try {
+			const response = await axios.post<{ success: boolean; data: any }>(
+				`${BASE_URL}/bill/withdrawal`,
+				updateData,
+			);
+			return response.data.data;
+		} catch (error) {
+			console.error('Lỗi khi lấy thông tin nhà cung cấp:', error);
 			throw error;
 		}
 	},

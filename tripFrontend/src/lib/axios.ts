@@ -12,7 +12,7 @@ axiosInstance.interceptors.request.use(
     (config) => {
         // Không cần thêm token thủ công vì cookies sẽ được gửi tự động
         return config;
-    },
+},
     (error) => {
         return Promise.reject(error);
     }

@@ -14,6 +14,10 @@ export default defineConfig({
       '@': resolve(__dirname, 'src')
     }
   },
+  define: {
+    'process.env': process.env,
+    global: 'globalThis',
+  },
   server: {
     host: true, // Cho phép truy cập từ bên ngoài
     port: 5173,

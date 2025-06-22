@@ -55,7 +55,7 @@ const createProduct = createAsyncThunk(
 			return data;
 		} catch (error) {
 			// Sử dụng notification lỗi tạo sản phẩm
-			notificationUtils.error()
+			notificationUtils.error({message: err.response.data.message})
 
 			return rejectWithValue(error);
 		}
@@ -78,9 +78,9 @@ const updateProductByProductId = createAsyncThunk(
 			notificationUtils.success();
 
 			return data;
-		} catch (error) {
+		} catch (error: any) {
 			// Sử dụng notification lỗi cho product
-			notificationUtils.error();
+			notificationUtils.error({message: error.response.data.message});
 
 			return rejectWithValue(error);
 		}

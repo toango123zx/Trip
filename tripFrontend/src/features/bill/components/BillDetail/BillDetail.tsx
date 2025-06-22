@@ -13,7 +13,7 @@ import {
     Button,
     Spin,
 } from 'antd';
-import { CalendarDays, MapPin, Users, CreditCard } from 'lucide-react';
+import { CalendarDays, MapPin, Users, CreditCard, Building, DollarSign } from 'lucide-react';
 import { JSX, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -122,26 +122,6 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
         setProductRateVisible(true);
     };
 
-    // ✅ Function để submit rating
-    // const handleSubmitRating = async (rating: number, comment: string) => {
-    //     try {
-    //         if (billDetail?.id) {
-    //             // Call API to submit rating
-    //             // await rateApi.submitRate(billDetail.id, { star: rating, comment });
-    //             console.log('Submitting rating:', { billId: billDetail.id, rating, comment });
-                
-    //             // Close popup after successful submission
-    //             setProductRateVisible(false);
-                
-    //             // Refresh bill detail to update rating status
-    //             dispatch(billThunk.getBillByBillId(billDetail.id));
-    //         }
-    //     } catch (error) {
-    //         console.error('Error submitting rating:', error);
-    //         throw error; // Let the popup handle the error
-    //     }
-    // };
-
     // ✅ Function để tạo footer buttons với unique keys
     const getFooterButtons = () => {
         const buttons = [
@@ -151,13 +131,13 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
         ];
 
         // Add Cancel button for specific statuses
-        if (billDetail?.status === EBillStatus.pending || 
-            billDetail?.status === EBillStatus.paid || 
+        if (billDetail?.status === EBillStatus.pending ||
+            billDetail?.status === EBillStatus.paid ||
             billDetail?.status === EBillStatus.waitingRefund) {
             buttons.push(
-                <Button 
+                <Button
                     key="cancel-payment" // ✅ Unique key
-                    onClick={handleCancelPayment} 
+                    onClick={handleCancelPayment}
                     className='!bg-red-500 !text-white hover:bg-red-600'
                 >
                     Cancel
@@ -167,40 +147,60 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
 
         // Add Checkout button for pending status
         if (billDetail?.status === EBillStatus.pending) {
-            buttons.push(
-                <Button 
-                    key="retry-checkout" // ✅ Unique key
-                    onClick={handleRetryPayment} 
-                    className='!bg-orange-500 !text-white hover:bg-orange-600'
-                >
-                    Checkout
-                </Button>
-            );
+            if (billDetail.transactionTargetId === 'pay') {
+                buttons.push(
+                    <Button
+                        key="retry-checkout" // ✅ Unique key
+                        onClick={handleRetryPayment}
+                        className='!bg-orange-500 !text-white hover:bg-orange-600'
+                    >
+                        Checkout
+                    </Button>
+                );
+            }
+            if (billDetail.transactionTargetId === 'withdrawal' && localStorage.getItem('role') === 'admin') {
+                buttons.push(
+                    <Button
+                        key="withdrawal" // ✅ Unique key
+                        onClick={() => {
+                            if (billDetail.id) {
+                                dispatch(billThunk.payConfirmWithdrawal(billDetail.id));
+                            }
+                            close();
+                        }}
+                        className='!bg-orange-500 !text-white hover:bg-orange-600'
+                    >
+                        Confirm
+                    </Button>
+                );
+            }
         }
 
         return buttons;
     };
 
-    // Safe access to infoBill data
+    // Safe access to infoBill data and withdrawal data
     const infoBillData = billDetail?.infoBill || [];
     const productData = infoBillData?.[0]?.product;
+    const withdrawalData = billDetail?.withdrawal;
+    const isWithdrawal = billDetail?.transactionTargetId === 'withdrawal';
 
     return (
         <Modal
             title={
                 <div className="flex items-center space-x-2">
-                    <CreditCard size={20} />
-                    <span>Chi tiết hóa đơn</span>
+                    {isWithdrawal ? <DollarSign size={20} /> : <CreditCard size={20} />}
+                    <span>{isWithdrawal ? 'Chi tiết rút tiền' : 'Chi tiết hóa đơn'}</span>
                 </div>
             }
             open={visible}
             onCancel={onClose}
-            footer={getFooterButtons()} // ✅ Sử dụng function với unique keys
+            footer={getFooterButtons()}
             width={1000}
-            styles={{ // ✅ Sử dụng styles thay vì style deprecated
-                body: { 
-                    maxHeight: '70vh', 
-                    overflowY: 'auto' 
+            styles={{
+                body: {
+                    maxHeight: '70vh',
+                    overflowY: 'auto'
                 }
             }}
         >
@@ -233,12 +233,12 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                     )}
 
                     {/* Bill Details */}
-                    <Card title="Chi tiết thanh toán" className="shadow-sm">
+                    <Card title={isWithdrawal ? "Chi tiết rút tiền" : "Chi tiết thanh toán"} className="shadow-sm">
                         <div className="space-y-4">
                             <Row gutter={[16, 16]}>
                                 <Col xs={24} sm={12}>
                                     <div className="space-y-2">
-                                        <Text strong>Mã hóa đơn:</Text>
+                                        <Text strong>Mã giao dịch:</Text>
                                         <div>
                                             <Text strong className='!mt-2'>#{billDetail.id}</Text>
                                         </div>
@@ -272,35 +272,77 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
 
                             <Divider />
 
-                            {/* Price Breakdown */}
-                            <div className="space-y-4">
-                                <div className="flex justify-between">
-                                    <Text strong>Giảm giá:</Text>
-                                    <Title level={5} className="!m-0 !text-orange-500">
-                                        - {(billDetail.reductionPrice)} VND
-                                    </Title>
+                            {/* Price Breakdown or Withdrawal Amount */}
+                            {isWithdrawal ? (
+                                <div className="space-y-4">
+                                    <div className="flex justify-between">
+                                        <Text strong>Số tiền rút:</Text>
+                                        <Title level={5} className="!m-0 text-orange-500">
+                                            {(withdrawalData?.amount || 0).toLocaleString('vi-VN')} VND
+                                        </Title>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between">
-                                    <Text strong>Tổng cộng:</Text>
-                                    <Title level={5} className="!m-0 text-orange-500">
-                                        {(billDetail.totalPrice - billDetail.reductionPrice).toLocaleString('vi-VN')} VND
-                                    </Title>
+                            ) : (
+                                <div className="space-y-4">
+                                    <div className="flex justify-between">
+                                        <Text strong>Giảm giá:</Text>
+                                        <Title level={5} className="!m-0 !text-orange-500">
+                                            - {(billDetail.reductionPrice)} VND
+                                        </Title>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <Text strong>Tổng cộng:</Text>
+                                        <Title level={5} className="!m-0 text-orange-500">
+                                            {(billDetail.totalPrice - billDetail.reductionPrice).toLocaleString('vi-VN')} VND
+                                        </Title>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </Card>
 
-                    {/* Trip Information */}
-                    <div className="flex flex-col gap-y-3.5 shadow-sm border rounded-lg border-gray-100 p-4">
-                        {(productData && infoBillData.length > 0) &&
-                            infoBillData.map((infoItem) => (
+                    {/* Withdrawal Information */}
+                    {isWithdrawal && withdrawalData && (
+                        <Card title="Thông tin ngân hàng" className="shadow-sm">
+                            <div className="space-y-4">
+                                <div className="flex items-center space-x-2">
+                                    <Building size={16} className="text-orange-500" />
+                                    <div>
+                                        <Text strong>Tên ngân hàng: </Text>
+                                        <Text>{withdrawalData.bankName}</Text>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <CreditCard size={16} className="text-orange-500" />
+                                    <div>
+                                        <Text strong>Mã ngân hàng/STK: </Text>
+                                        <Text>{withdrawalData.bankCode}</Text>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <DollarSign size={16} className="text-orange-500" />
+                                    <div>
+                                        <Text strong>Số tiền: </Text>
+                                        <Text type="danger" strong>
+                                            {withdrawalData.amount.toLocaleString('vi-VN')} VND
+                                        </Text>
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+                    )}
+
+                    {/* Trip Information - Only show if NOT withdrawal */}
+                    {!isWithdrawal && productData && infoBillData.length > 0 && (
+                        <div className="flex flex-col gap-y-3.5 shadow-sm border rounded-lg border-gray-100 p-4">
+                            {infoBillData.map((infoItem) => (
                                 <Card
-                                    key={infoItem.id || `info-item-${infoItem.productId}`} // ✅ Unique key
+                                    key={infoItem.id || `info-item-${infoItem.productId}`}
                                     title={
                                         <div className="flex justify-between items-center">
                                             <div className="flex items-center space-x-2">
                                                 <MapPin size={16} className="text-orange-500" />
-                                                <Text 
+                                                <Text
                                                     strong
                                                     onClick={() => redirectAttraction(infoItem.productId)}
                                                     className='cursor-pointer hover:underline hover:!text-orange-600'
@@ -308,7 +350,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                                                     {productData.name}
                                                 </Text>
                                             </div>
-                                            {billDetail.status === EBillStatus.done && ( // ✅ Chỉ hiển thị rating khi đã thanh toán
+                                            {billDetail.status === EBillStatus.done && (
                                                 <div onClick={handleOpenRatePopup} className="cursor-pointer">
                                                     <Tag color={getRatedColor(infoItem.isRated)} className="text-sm !px-2.5 !py-2 !mt-2">
                                                         {infoItem.isRated ? 'Rated' : 'Rate Now >'}
@@ -339,12 +381,13 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                                     </div>
                                 </Card>
                             ))}
-                    </div>
+                        </div>
+                    )}
 
-                    {/* Rating Popup */}
-                    {(productData && infoBillData.length > 0 && billDetail.status === EBillStatus.done) && (
+                    {/* Rating Popup - Only show if NOT withdrawal */}
+                    {!isWithdrawal && productData && infoBillData.length > 0 && billDetail.status === EBillStatus.done && (
                         <AddAttractionRatePopup
-                            attractionId={infoBillData[0]?.productId} // ✅ Sử dụng productId thay vì billId
+                            attractionId={infoBillData[0]?.productId}
                             isVisible={productRateVisible}
                             attractionName={productData.name}
                             onClose={handleCloseRatePopup}
@@ -353,7 +396,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                 </div>
             ) : (
                 <div className="flex justify-center items-center py-8">
-                    <Text>Không tìm thấy thông tin hóa đơn</Text>
+                    <Text>Không tìm thấy thông tin {isWithdrawal ? 'rút tiền' : 'hóa đơn'}</Text>
                 </div>
             )}
         </Modal>

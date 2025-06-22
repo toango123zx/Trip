@@ -17,7 +17,7 @@ const handleApiError = (error: any) => {
 	// Thông báo lỗi chi tiết
 	if (error.response) {
 		// Lỗi từ phía server
-		notificationUtils.error();
+		notificationUtils.error({message: error.response.data.message});
 	} 
 	
 	throw error;

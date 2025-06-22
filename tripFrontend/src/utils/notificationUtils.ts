@@ -15,8 +15,8 @@ const notify = (
   { message, description, duration }: TNotificationOptions = {},
 ): void => {
   notification[type]({
-    message: message || defaultMessages[type].message,
-    description: description || defaultMessages[type].description,
+    description: message || defaultMessages[type].message,
+    message: description || defaultMessages[type].description,
     duration: duration ?? DEFAULT_DURATION,
   });
 };
@@ -31,7 +31,7 @@ const defaultMessages: Record<
   },
   error: {
     message: 'An error occurred',
-    description: 'Unable to complete the request. Please try again.',
+    description: 'Unable to complete the request',
   },
   warning: {
     message: 'Warning',

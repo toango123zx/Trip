@@ -46,9 +46,9 @@ export const useProductForm = () => {
       notificationUtils.success();
 
       return description;
-    } catch (error) {
+    } catch (error:any) {
       
-      notificationUtils.error();
+      notificationUtils.error({message: error.response.data.message});
       throw error;
     } finally {
       setIsGeneratingDescription(false);

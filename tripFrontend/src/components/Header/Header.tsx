@@ -2,6 +2,7 @@ import { JSX, useEffect, useMemo, useRef, useState } from 'react';
 import { FaRegUser } from 'react-icons/fa';
 import { IoCartOutline } from 'react-icons/io5';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaRocketchat } from "react-icons/fa";
 
 import { logos } from '@/assets';
 import { cn } from '@/lib/cn';
@@ -253,6 +254,7 @@ export const Header = ({ className }: Props): JSX.Element => {
 				icon: StatisticsIcon,
 			},
 			{ id: 'setting', label: 'Setting', url: '/setting', icon: SettingsIcon },
+			{ id: 'setting', label: 'Chat', url: '/chats', icon: FaRocketchat },
 			{ id: 'logout', label: 'Log Out', url: '/', icon: LogoutIcon },
 		];
 

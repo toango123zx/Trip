@@ -226,6 +226,8 @@ export const BaNa: TProductDetail = {
 		userId: 'cm9m982yf0005e5h0hx1qblcl',
 		name: 'supplier1',
 		image: 'https://11',
+		email: "supplier1@gmail.com",
+		phoneNumber: '0971751122',
 		status: 'active',
 	},
 	createAt: '2025-04-18T04:09:33.384Z',

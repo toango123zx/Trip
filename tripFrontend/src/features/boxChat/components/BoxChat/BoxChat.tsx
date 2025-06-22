@@ -115,7 +115,7 @@ export const BoxChat = ({
     // Lắng nghe lỗi
     socket.on('error', (error: { message: string }) => {
       console.error('❌ Socket error:', error);
-      setIsConnected(false);
+      // setIsConnected(false);
       notificationUtils.error({
         message: error.message || 'Lỗi kết nối chat'
       });
