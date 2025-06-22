@@ -1,0 +1,205 @@
+@startuml
+actor User as U
+participant "BookingCart" as BC
+participant "PaymentMethodSelector" as PMS
+participant "billThunk" as BT
+participant "billApi" as BAPI
+participant "BillController" as BCtrl
+participant "AuthGuard" as AG
+participant "PaymentBillByBillIdHandler" as PBBH
+participant "BillRepository" as BR
+participant "TransactionSessionRepository" as TSR
+participant "VNPay" as VNPAY
+participant "Database" as DB
+participant "VNPay Gateway" as VGW
+participant "BillPaymentStatus" as BPS
+
+== Create Bill ==
+U -> BC: Click "Proceed to Payment"
+activate BC
+BC -> BC: Prepare CreateBillRequestDto with schedules and discounts
+BC -> BAPI: billApi.createBill(createBillData)
+activate BAPI
+BAPI -> BCtrl: POST /bill
+BCtrl -> BCtrl: Create bill successfully (previous sequence)
+BCtrl -> BAPI: HTTP 201 Created + billId
+deactivate BAPI
+BC -> BC: Store billId from response
+deactivate BC
+
+== Select Payment Method ==
+U -> PMS: Open payment method selector
+activate PMS
+PMS -> PMS: Display payment options (VNPay, Card, Bank, MoMo)
+U -> PMS: Select VNPay payment method
+PMS -> PMS: setSelectedMethod(PaymentMethod.VNPAY)
+PMS -> U: Show VNPay as selected with bank list
+deactivate PMS
+
+== Process Payment with VNPay ==
+U -> BC: Click "Pay Now"
+activate BC
+BC -> BT: dispatch(billThunk.paymentBillByBillId(billId))
+activate BT
+BT -> BAPI: billApi.paymentBillByBillId(billId)
+activate BAPI
+BAPI -> BCtrl: POST /bill/:billId/payment
+activate BCtrl
+
+== Check Authorization ==
+BCtrl -> AG: AuthGuard.canActivate()
+activate AG
+AG -> AG: Extract and verify JWT token
+AG -> AG: Get user information from token
+
+alt Token invalid or expired
+    AG -> BCtrl: UnauthorizedException
+    deactivate AG
+    BCtrl -> BAPI: HTTP 401 Unauthorized
+    deactivate BCtrl
+    BAPI -> BT: Return auth error
+    deactivate BAPI
+    BT -> BC: Update error state
+    deactivate BT
+    BC -> U: Show unauthorized notification
+    deactivate BC
+else Token valid and user authorized
+    AG -> BCtrl: Authorization successful with user info
+    deactivate AG
+    
+    BCtrl -> PBBH: PaymentBillByBillIdCommand
+    activate PBBH
+    
+    == Validate Bill ==
+    PBBH -> BR: findBillByBillId(billId)
+    activate BR
+    BR -> DB: SELECT bill WHERE id = billId AND status = 'pending'
+    activate DB
+    DB -> BR: Return bill data
+    deactivate DB
+    
+    alt Bill not found or not pending
+        BR -> PBBH: Return null or invalid status
+        deactivate BR
+        PBBH -> BCtrl: NotFoundException or ConflictException
+        deactivate PBBH
+        BCtrl -> BAPI: HTTP 404/409 Error
+        deactivate BCtrl
+        BAPI -> BT: Return error
+        deactivate BAPI
+        BT -> BC: Update error state
+        deactivate BT
+        BC -> U: Show error notification
+        deactivate BC
+    else Bill valid for payment
+        BR -> PBBH: Return BillEntity
+        deactivate BR
+        
+        == Create Transaction Session ==
+        PBBH -> TSR: createTransactionSession(bill, paymentMethod)
+        activate TSR
+        TSR -> DB: INSERT INTO transactionSession
+        activate DB
+        DB -> TSR: Return created session with sessionId
+        deactivate DB
+        TSR -> PBBH: Return TransactionSessionEntity
+        deactivate TSR
+        
+        == Generate VNPay Payment URL ==
+        PBBH -> VNPAY: vnpay.buildPaymentUrl(paymentParams)
+        activate VNPAY
+        PBBH -> PBBH: Prepare payment parameters
+        PBBH -> PBBH: vnp_TxnRef = transactionSession.id
+        PBBH -> PBBH: vnp_OrderInfo = "Pay order {billId} with amount {totalPrice - reductionPrice}"
+        PBBH -> PBBH: vnp_Amount = (bill.totalPrice - bill.reductionPrice) * 100
+        PBBH -> PBBH: vnp_OrderType = ProductCode.Hotel_Tourism
+        PBBH -> PBBH: vnp_ReturnUrl = vnpayConfig.vnp_ReturnUrl + "/transaction/vnpay-bill-payment"
+        PBBH -> PBBH: vnp_CreateDate = dateFormat(new Date())
+        PBBH -> PBBH: vnp_ExpireDate = dateFormat(expireDate)
+        
+        VNPAY -> VNPAY: Generate secure hash with SHA512
+        VNPAY -> PBBH: Return VNPay payment URL with parameters
+        deactivate VNPAY
+        
+        PBBH -> BCtrl: Return success with payment URL
+        deactivate PBBH
+        BCtrl -> BAPI: HTTP 200 Success + payment URL
+        deactivate BCtrl
+        BAPI -> BT: Return payment URL
+        deactivate BAPI
+        BT -> BC: Update Redux with payment URL
+        deactivate BT
+        
+        == Redirect to VNPay ==
+        BC -> BC: window.location.href = paymentUrl
+        BC -> VGW: Redirect user to VNPay Gateway
+        activate VGW
+        deactivate BC
+        
+        == User Payment Process ==
+        VGW -> U: Display VNPay payment interface
+        U -> VGW: Select bank and enter payment details
+        VGW -> VGW: Process payment with selected bank
+        
+        alt Payment successful
+            VGW -> VGW: Generate success response with vnp_ResponseCode = '00'
+            VGW -> BPS: Redirect to return URL with payment result
+            activate BPS
+            deactivate VGW
+            
+            == Verify Payment Result ==
+            BPS -> BPS: Extract payment parameters from URL
+            BPS -> BAPI: POST /transaction/vnpay-bill-payment (IPN verification)
+            activate BAPI
+            BAPI -> BCtrl: CheckBillPaymentByVnpayQuery
+            activate BCtrl
+            BCtrl -> BCtrl: Verify VNPay signature and response
+            BCtrl -> TSR: findTransactionSession(vnp_TxnRef, 'pending')
+            activate TSR
+            TSR -> DB: SELECT transactionSession WHERE id = vnp_TxnRef
+            activate DB
+            DB -> TSR: Return session with bill data
+            deactivate DB
+            TSR -> BCtrl: Return TransactionSessionEntity
+            deactivate TSR
+            
+            == Validate Payment Response ==
+            BCtrl -> BCtrl: Validate vnp_TmnCode === configured tmnCode
+            BCtrl -> BCtrl: Validate vnp_ResponseCode === '00'
+            BCtrl -> BCtrl: Validate vnp_TransactionStatus === '00'
+            BCtrl -> BCtrl: Validate vnp_Amount / 100 === bill.totalPrice - bill.reductionPrice
+            
+            == Create Transaction Record ==
+            BCtrl -> DB: BEGIN TRANSACTION
+            activate DB
+            BCtrl -> DB: INSERT INTO transaction (completed, amount, bankCode, etc.)
+            DB -> BCtrl: Return created transaction
+            BCtrl -> DB: UPDATE bill SET status = 'paid'
+            DB -> BCtrl: Return updated bill
+            BCtrl -> DB: COMMIT TRANSACTION
+            DB -> BCtrl: Transaction completed
+            deactivate DB
+            
+            BCtrl -> BAPI: HTTP 200 Success + updated bill
+            deactivate BCtrl
+            BAPI -> BPS: Return payment verification result
+            deactivate BAPI
+            
+            BPS -> U: Display payment success page with bill details
+            deactivate BPS
+            
+        else Payment failed
+            VGW -> VGW: Generate failure response with vnp_ResponseCode != '00'
+            VGW -> BPS: Redirect to return URL with failure result
+            activate BPS
+            deactivate VGW
+            
+            BPS -> BPS: Extract failure parameters from URL
+            BPS -> BPS: Parse error message from vnp_ResponseCode
+            BPS -> U: Display payment failure page with retry option
+            deactivate BPS
+        end
+    end
+end
+
+@enduml

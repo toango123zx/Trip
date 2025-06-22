@@ -13,7 +13,6 @@ import { HttpResponseBodySuccessDto, StatisticTimeUnitEnum } from 'src/common';
 import { GetStatisticResponseDto } from '../../dtos';
 import { StatisticRepository } from '../../statistic.repositroy';
 import { GetBookedByUserIdQuery, GetRevenueByUserIdQuery } from '../implements';
-import { stat } from 'fs';
 
 @QueryHandler(GetBookedByUserIdQuery)
 export class GetBookedByUserIdHandler implements IQueryHandler<GetBookedByUserIdQuery> {

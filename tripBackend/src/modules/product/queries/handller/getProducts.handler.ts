@@ -17,7 +17,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 	constructor(
 		private readonly recommendationService: ProductRecommendationsService,
 		private readonly productRepository: ProductRepository,
-	) { }
+	) {}
 
 	async execute(
 		query: GetProductsQuery,
@@ -53,11 +53,11 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			...productFilter,
 			...(locationName || city
 				? {
-					location: {
-						...(locationName && { displayName: locationName }),
-						...(city && { city: city }),
-					},
-				}
+						location: {
+							...(locationName && { displayName: locationName }),
+							...(city && { city: city }),
+						},
+					}
 				: {}),
 			...(productCategoryName && {
 				productCategory: {
@@ -84,7 +84,9 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 		);
 		let sortedProducts = [...products];
 		if (recommendations.length > 0 && products.length >= 0) {
-			const orderMap = new Map(recommendations.map((item, index) => [item.id, index]));
+			const orderMap = new Map(
+				recommendations.map((item, index) => [item.id, index]),
+			);
 			sortedProducts = [...products].sort((x, y) => {
 				return (orderMap.get(x.id) ?? 0) - (orderMap.get(y.id) ?? 0);
 			});

@@ -1,34 +1,25 @@
 import { HttpException } from '@nestjs/common';
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 
-import { TransactionTargetEnum } from '@prisma/client';
 import { HttpResponseBodySuccessDto, PaginationUtils } from 'src/common';
 import { BillEntity } from 'src/models';
 
 import { BillRepository } from '../../bill.repository';
-import { GetBillsByUserIdQuery } from '../implements';
+import { GetBillsManagementQuery } from '../implements';
 
-@QueryHandler(GetBillsByUserIdQuery)
-export class GetBillsByUserIdHandler implements IQueryHandler<GetBillsByUserIdQuery> {
+@QueryHandler(GetBillsManagementQuery)
+export class GetBillsManagementHandler implements IQueryHandler<GetBillsManagementQuery> {
 	constructor(private readonly billRepository: BillRepository) {}
 
 	async execute(
-		query: GetBillsByUserIdQuery,
+		query: GetBillsManagementQuery,
 	): Promise<HttpResponseBodySuccessDto<BillEntity[]> | HttpException> {
-		const { pagination, myInformation } = query;
+		const { pagination } = query;
 		const page = new PaginationUtils().extractSkipTakeFromPagination(pagination);
 		const { keyword, userIdSearch, statusSearch, ...billFilter } = query.filter;
-		const [bills, totalRecords] = await this.billRepository.findBillsByUserId(
+		const [bills, totalRecords] = await this.billRepository.findBillsManagement(
 			page,
-			myInformation.id,
-			userIdSearch,
-			undefined,
-			undefined,
-			statusSearch,
-			undefined,
-			keyword,
 			billFilter,
-			[TransactionTargetEnum.withdrawal, TransactionTargetEnum.pay],
 		);
 
 		return {

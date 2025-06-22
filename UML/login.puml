@@ -1,0 +1,100 @@
+@startuml
+actor User as U
+participant "LoginForm" as LF
+participant "AuthAPI" as API
+participant "Backend" as BE
+participant "Database" as DB
+participant "UserThunk" as UT
+participant "LocalStorage" as LS
+participant "Redux Store" as RS
+
+== Login Process ==
+U -> LF: Nhập username & password
+U -> LF: Click "Login" button
+activate LF
+
+LF -> LF: Validate form data
+LF -> LF: setIsSubmitting(true)
+LF -> LF: setLoginError(null)
+
+LF -> API: authApi.login(username, password)
+activate API
+
+API -> BE: POST /auth/login
+activate BE
+
+BE -> BE: Validate credentials
+BE -> DB: SELECT user WHERE username = ?
+activate DB
+DB -> BE: Return user data or null
+deactivate DB
+
+alt Invalid credentials
+    BE -> API: HTTP 401 Unauthorized
+    API -> LF: Login failed
+    LF -> LF: setLoginError("Invalid credentials")
+    LF -> U: Show error message
+    deactivate API
+    deactivate LF
+else Valid credentials
+    BE -> BE: Generate JWT token
+    BE -> API: HTTP 200 + accessToken
+    deactivate BE
+    
+    API -> LF: Return { accessToken }
+    deactivate API
+    
+    alt No accessToken received
+        LF -> LF: Show notification error
+        LF -> U: Display error notification
+        deactivate LF
+    else AccessToken received
+        == Store Token & Get User Info ==
+        LF -> LS: localStorage.setItem('token', accessToken)
+        LF -> LS: localStorage.setItem('logged', 'true')
+        
+        LF -> UT: dispatch(userThunk.getMe())
+        activate UT
+        
+        UT -> API: GET /user/me (with token)
+        activate API
+        API -> BE: GET /user/me
+        activate BE
+        
+        BE -> BE: Verify JWT token
+        BE -> DB: SELECT user details WHERE id = tokenUserId
+        activate DB
+        DB -> BE: Return complete user data
+        deactivate DB
+        
+        BE -> API: HTTP 200 + user data
+        deactivate BE
+        API -> UT: Return user information
+        deactivate API
+        
+        UT -> RS: Update user state in Redux
+        UT -> LF: Return userInfo
+        deactivate UT
+        
+        == Update Local Storage & Navigate ==
+        alt UserInfo has roleName
+            LF -> LS: localStorage.setItem('role', userInfo.roleName)
+            LF -> LS: localStorage.setItem('username', userInfo.name)
+            LF -> LS: localStorage.setItem('userId', userInfo.id)
+        else No roleName
+            LF -> LS: localStorage.setItem('role', 'UNKNOWN')
+        end
+        
+        LF -> LF: navigate('/')
+        LF -> U: Redirect to home page
+        deactivate LF
+    end
+end
+
+== Additional Redux Effects ==
+note over RS: useEffect watches 'logged' state
+RS -> UT: dispatch(userThunk.getMe()) if logged
+note over RS: useEffect watches userInformation
+RS -> LS: Update localStorage role when userInfo changes
+
+@enduml

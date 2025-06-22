@@ -11,22 +11,32 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { HttpResponseBodyDto, PaginationDto, PermissionEnum } from 'src/common';
+import { HttpResponseBodyDto, PaginationDto, PermissionEnum, RoleEnum } from 'src/common';
 import { BillEntity } from 'src/models';
 
-import { Auth, AuthPermission } from '../auth/decorators';
+import { Auth, AuthPermission, AuthRole } from '../auth/decorators';
 import { MyInformation } from '../user/decorators';
 import { UserInformationDto } from '../user/dtos';
 
 import {
 	CancelBillByBillIdCommand,
+	ConfirmWithdrawalBillCommand,
 	CreateBillCommand,
 	PaymentBillByBillIdCommand,
 	UpdatePaidBillCommand,
 } from './commands/implements';
-import { CreateBillRequest, BillDetailResponseDto } from './dtos';
+import { CreateWithdrawalBillByUserIdCommand } from './commands/implements/createWithdrawalBillByUserId.command';
+import {
+	CreateBillRequest,
+	BillDetailResponseDto,
+	CreateWithdrawalBillRequestDto,
+} from './dtos';
 import { BillFilterRequestDto } from './dtos/requests/billFilter.request';
-import { GetBillByBillIdQuery, GetBillsByUserIdQuery } from './queries/implements';
+import {
+	GetBillByBillIdQuery,
+	GetBillsByUserIdQuery,
+	GetBillsManagementQuery,
+} from './queries/implements';
 
 @Controller('bill')
 export class BillController {
@@ -45,6 +55,15 @@ export class BillController {
 		return this.queryBus.execute(
 			new GetBillsByUserIdQuery(pagination, myInformation, filter),
 		);
+	}
+
+	@Get('/management')
+	@AuthRole(RoleEnum.Admin)
+	async getBillsManagement(
+		@Query() pagination: PaginationDto,
+		@Query() filter?: BillFilterRequestDto,
+	): Promise<HttpResponseBodyDto<BillDetailResponseDto> | HttpException> {
+		return this.queryBus.execute(new GetBillsManagementQuery(pagination, filter));
 	}
 
 	@Get('/:billId')
@@ -75,6 +94,31 @@ export class BillController {
 	): Promise<HttpResponseBodyDto<BillDetailResponseDto | HttpException>> {
 		return this.commandBus.execute(
 			new PaymentBillByBillIdCommand(billId, myInformation),
+		);
+	}
+
+	@Post('/withdrawal')
+	@Auth()
+	async createWithdrawalBillByUserId(
+		@MyInformation() myInformation: UserInformationDto,
+		@Body() withDrawalBillInformation: CreateWithdrawalBillRequestDto,
+	): Promise<HttpResponseBodyDto<BillDetailResponseDto | HttpException>> {
+		return this.commandBus.execute(
+			new CreateWithdrawalBillByUserIdCommand(
+				myInformation,
+				withDrawalBillInformation,
+			),
+		);
+	}
+
+	@Put('/:billId/withdrawal/confirm')
+	@AuthRole(RoleEnum.Admin)
+	async confirmWithdrawalBill(
+		@Param('billId') billId: string,
+		@MyInformation() myInformation: UserInformationDto,
+	): Promise<HttpResponseBodyDto<BillEntity | HttpException>> {
+		return this.commandBus.execute(
+			new ConfirmWithdrawalBillCommand(billId, myInformation),
 		);
 	}
 

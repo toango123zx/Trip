@@ -1,0 +1,199 @@
+@startuml
+actor User as U
+participant "ScheduleDetail" as SD
+participant "scheduleApi" as SAPI
+participant "ProductScheduleController" as PSC
+participant "AuthGuard" as AG
+participant "UpdateCompletedProductScheduleHandler" as UCPSH
+participant "ProductScheduleRepository" as PSR
+participant "BillRepository" as BR
+participant "Database" as DB
+
+== Display Schedule Detail ==
+U -> SD: Click "Xem chi tiết" on schedule
+activate SD
+SD -> SAPI: scheduleApi.getScheduleByScheduleId(scheduleId)
+activate SAPI
+SAPI -> PSC: GET /schedule/:scheduleId
+PSC -> PSC: Return schedule detail
+PSC -> SAPI: HTTP 200 + schedule detail
+deactivate SAPI
+SAPI -> SD: Return schedule detail
+SD -> SD: Check if schedule can be completed
+SD -> SD: isComplete = new Date(schedule.endTime) < new Date()
+SD -> SD: Display schedule detail modal with Complete button
+SD -> U: Show schedule information with Complete action
+deactivate SD
+
+== Complete Schedule Process ==
+U -> SD: Click "Hoàn thành" button
+activate SD
+SD -> SD: Check schedule.status === 'active' || 'full'
+SD -> SD: handleComplete()
+SD -> SAPI: scheduleApi.completeSchedule(scheduleId)
+activate SAPI
+SAPI -> PSC: PUT /schedule/:scheduleId/completed
+activate PSC
+
+== Check Authorization ==
+PSC -> AG: AuthGuard.canActivate()
+activate AG
+AG -> AG: Extract and verify JWT token
+AG -> AG: Check UpdateCompletedProductSchedule permission
+
+alt Token invalid or not authorized
+    AG -> PSC: UnauthorizedException
+    deactivate AG
+    PSC -> SAPI: HTTP 401 Unauthorized
+    deactivate PSC
+    SAPI -> SD: Return auth error
+    deactivate SAPI
+    SD -> SD: notification.error("Unauthorized")
+    SD -> U: Show error notification
+    deactivate SD
+else Authorized with supplier permissions
+    AG -> PSC: Authorization successful with supplier info
+    deactivate AG
+    
+    PSC -> UCPSH: UpdateCompletedProductScheduleByProductScheduleCompleteCommand
+    activate UCPSH
+    
+    == Validate Schedule ==
+    UCPSH -> PSR: findProductScheduleByProductScheduleId(scheduleId)
+    activate PSR
+    PSR -> DB: SELECT productSchedule WHERE id = scheduleId
+    activate DB
+    DB -> PSR: Return schedule with product and supplier info
+    deactivate DB
+    
+    alt Schedule not found
+        PSR -> UCPSH: Return null
+        deactivate PSR
+        UCPSH -> PSC: NotFoundException("Product schedule not found")
+        deactivate UCPSH
+        PSC -> SAPI: HTTP 404 Not Found
+        deactivate PSC
+        SAPI -> SD: Return error
+        deactivate SAPI
+        SD -> SD: notification.error("Schedule not found")
+        SD -> U: Show error notification
+        deactivate SD
+    else Schedule found
+        PSR -> UCPSH: Return ProductScheduleEntity
+        deactivate PSR
+        
+        == Check Schedule Status ==
+        UCPSH -> UCPSH: Check if schedule.status === 'canceled' || 'completed'
+        alt Schedule already completed or canceled
+            UCPSH -> PSC: OptionalException("Product schedule canceled or completed")
+            deactivate UCPSH
+            PSC -> SAPI: HTTP 404 Not Found
+            deactivate PSC
+            SAPI -> SD: Return error
+            deactivate SAPI
+            SD -> SD: notification.error("Schedule already completed or canceled")
+            SD -> U: Show error notification
+            deactivate SD
+        else Schedule can be completed
+            == Check Supplier Permissions ==
+            UCPSH -> UCPSH: checkSupplierPermissions(supplierInfo, schedule)
+            alt Not schedule supplier
+                UCPSH -> PSC: OptionalException("You are not a product supplier")
+                deactivate UCPSH
+                PSC -> SAPI: HTTP 403 Forbidden
+                deactivate PSC
+                SAPI -> SD: Return error
+                deactivate SAPI
+                SD -> SD: notification.error("Forbidden")
+                SD -> U: Show error notification
+                deactivate SD
+            else Supplier authorized
+                == Complete Schedule & Process Bills ==
+                UCPSH -> PSR: updateCompletedProductScheduleByProductScheduleComplete(scheduleId)
+                activate PSR
+                
+                PSR -> DB: BEGIN TRANSACTION
+                activate DB
+                
+                == Update Schedule Status ==
+                PSR -> DB: UPDATE productSchedule SET status = 'completed' WHERE id = scheduleId
+                DB -> PSR: Return updated schedule with infoBill relations
+                
+                == Process Associated Bills ==
+                PSR -> PSR: Categorize bills by status from infoBill
+                PSR -> PSR: billIdsPaid = bills with status 'paid'
+                PSR -> PSR: billIdsCancel = bills with status 'pending'
+                
+                == Handle Canceled Bills ==
+                alt Has pending bills to cancel
+                    PSR -> DB: UPDATE bill SET status = 'cancel', deletedAt = NOW() WHERE id IN (billIdsCancel)
+                    DB -> PSR: Return canceled bills
+                    
+                    PSR -> DB: SELECT canceled bills with infoBill details
+                    DB -> PSR: Return bills with productSchedule info
+                    
+                    PSR -> PSR: For each canceled bill's infoBill
+                    PSR -> DB: UPDATE productSchedule SET booked = booked - quantity WHERE id = infoBill.productScheduleId
+                    DB -> PSR: Return success
+                end
+                
+                == Handle Paid Bills ==
+                alt Has paid bills to complete
+                    PSR -> DB: UPDATE bill SET status = 'done' WHERE id IN (billIdsPaid)
+                    DB -> PSR: Return updated bills
+                    
+                    == Update Product Completion Stats ==
+                    PSR -> DB: UPDATE product SET quantityCompleted = quantityCompleted + productSchedule.booked
+                    DB -> PSR: Return updated product
+                    
+                    == Calculate Revenue & Discounts ==
+                    PSR -> DB: SELECT bills WITH discount relations (infoBillDiscount, discountForBill)
+                    DB -> PSR: Return bills with full discount information
+                    
+                    PSR -> PSR: For each paid bill calculate revenue
+                    PSR -> PSR: price = productSchedule.price * quantity for this scheduleId
+                    PSR -> PSR: discountPrice = 0
+                    
+                    PSR -> PSR: For each discount applied to bill
+                    alt Discount type is Percentage
+                        PSR -> PSR: discountPrice += (price * discount.value) / 100
+                    else Discount type is FixedAmount
+                        PSR -> PSR: discountPrice += discount.value * quantity
+                    end
+                    
+                    PSR -> PSR: totalPrice += (price - discountPrice)
+                    
+                    == Update Supplier Balance ==
+                    alt totalPrice > 0
+                        PSR -> DB: UPDATE user SET balance = balance + totalPrice WHERE id = supplier.userId
+                        DB -> PSR: Return updated supplier balance
+                    end
+                end
+                
+                == Complete Transaction ==
+                PSR -> DB: COMMIT TRANSACTION
+                DB -> PSR: Transaction completed successfully
+                deactivate DB
+                
+                PSR -> UCPSH: Return completed ProductScheduleEntity
+                deactivate PSR
+                
+                == Return Success Response ==
+                UCPSH -> PSC: Return success with completed schedule
+                deactivate UCPSH
+                PSC -> SAPI: HTTP 200 Success + completed schedule data
+                deactivate PSC
+                SAPI -> SD: Return completion success
+                deactivate SAPI
+                
+                SD -> SD: notification.success("Schedule completed successfully")
+                SD -> SD: onCancel() to close modal
+                SD -> SD: Refresh schedule data if needed
+                SD -> U: Show success notification and close modal
+                deactivate SD
+            end
+        end
+    end
+end
+
+@enduml

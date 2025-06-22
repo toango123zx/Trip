@@ -18,12 +18,13 @@ import { DeleteProductSchedulesToDiscountCommand } from '../implements';
 
 @CommandHandler(DeleteProductSchedulesToDiscountCommand)
 export class DeleteProductSchedulesToDiscountHandler
-	implements ICommandHandler<DeleteProductSchedulesToDiscountCommand> {
+	implements ICommandHandler<DeleteProductSchedulesToDiscountCommand>
+{
 	constructor(
 		private readonly productScheduleRepository: ProductScheduleRepository,
 		private readonly infoDiscountRepository: InfoDiscountRepository,
 		private readonly discountRepository: DiscountRepository,
-	) { }
+	) {}
 
 	async execute(
 		command: DeleteProductSchedulesToDiscountCommand,
@@ -51,10 +52,10 @@ export class DeleteProductSchedulesToDiscountHandler
 			throw new NotFoundException('productScheduleId');
 		}
 		const infoSchedules =
-		await this.infoDiscountRepository.deleteInfoDiscountForProductSchedules(
-			discountId,
-			productScheduleIds,
-		);
+			await this.infoDiscountRepository.deleteInfoDiscountForProductSchedules(
+				discountId,
+				productScheduleIds,
+			);
 		const updateDiscount: DiscountEntity = {
 			...discount,
 			infoDiscount: infoSchedules,

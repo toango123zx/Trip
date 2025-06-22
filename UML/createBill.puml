@@ -1,0 +1,249 @@
+@startuml
+actor User as U
+participant "BillCheck" as BC
+participant "billThunk" as BT
+participant "billApi" as BAPI
+participant "BillController" as BCtrl
+participant "AuthGuard" as AG
+participant "CreateBillHandler" as CBH
+participant "ProductScheduleRepository" as PSR
+participant "DiscountRepository" as DR
+participant "BillRepository" as BR
+participant "Database" as DB
+
+== Load Payment Checkout ==
+U -> BC: Navigate to payment checkout
+activate BC
+BC -> BC: Initialize form with booking items
+BC -> BC: Calculate subtotal, discount, total
+BC -> U: Display payment form with order summary
+deactivate BC
+
+== Fill Payment Information ==
+U -> BC: Fill payment details
+activate BC
+U -> BC: Select schedules and discounts
+U -> BC: Set quantities for each schedule
+U -> BC: Click "Pay" button
+
+== Form Validation ==
+BC -> BC: Validate payment form
+BC -> BC: Prepare CreateBillRequestDto
+BC -> BT: dispatch(billThunk.createBill(billData))
+activate BT
+
+BT -> BAPI: billApi.createBill(bill)
+activate BAPI
+BAPI -> BCtrl: POST /bill
+activate BCtrl
+
+== Check Authorization ==
+BCtrl -> AG: AuthGuard.canActivate()
+activate AG
+AG -> AG: Extract and verify JWT token
+AG -> AG: Get user information from token
+
+alt Token invalid or expired
+    AG -> BCtrl: UnauthorizedException
+    deactivate AG
+    BCtrl -> BAPI: HTTP 401 Unauthorized
+    deactivate BCtrl
+    BAPI -> BT: Return auth error
+    deactivate BAPI
+    BT -> BC: Update error state
+    deactivate BT
+    BC -> U: Show unauthorized notification
+    deactivate BC
+else Token valid and user authorized
+    AG -> BCtrl: Authorization successful with user info
+    deactivate AG
+    
+    BCtrl -> CBH: CreateBillCommand with user and bill information
+    activate CBH
+    
+    == Backend Validation ==
+    CBH -> CBH: Validate duplicate discountIds
+    
+    == Validate Product Schedules ==
+    CBH -> PSR: findProductSchedulesByProductSchedulesId(scheduleIds)
+    activate PSR
+    PSR -> DB: SELECT productSchedule WHERE id IN (scheduleIds) AND status = 'active'
+    activate DB
+    DB -> PSR: Return schedule entities
+    deactivate DB
+    
+    alt Schedule validation fails
+        PSR -> CBH: Return incomplete schedules
+        deactivate PSR
+        CBH -> BCtrl: NotFoundException('productScheduleId')
+        deactivate CBH
+        BCtrl -> BAPI: HTTP 404 Not Found
+        deactivate BCtrl
+        BAPI -> BT: Return error
+        deactivate BAPI
+        BT -> BC: Update error state
+        deactivate BT
+        BC -> U: Show error notification
+        deactivate BC
+    else Schedules valid
+        PSR -> CBH: Return ProductScheduleEntity[]
+        deactivate PSR
+        
+        == Check Schedule Conflicts ==
+        CBH -> CBH: areProductSchedulesValid() - Check time overlaps and quantities
+        alt Schedule conflicts detected
+            CBH -> BCtrl: ConflictException('productScheduleId')
+            deactivate CBH
+            BCtrl -> BAPI: HTTP 409 Conflict
+            deactivate BCtrl
+            BAPI -> BT: Return error
+            deactivate BAPI
+            BT -> BC: Update error state
+            deactivate BT
+            BC -> U: Show error notification
+            deactivate BC
+        else No schedule conflicts
+            == Validate Discounts ==
+            CBH -> DR: findDiscountsByDiscountIds(discountIds)
+            activate DR
+            DR -> DB: SELECT discount WHERE id IN (discountIds) AND status = 'active'
+            activate DB
+            DB -> DR: Return discount entities
+            deactivate DB
+            
+            alt Discount validation fails
+                DR -> CBH: Return incomplete discounts
+                deactivate DR
+                CBH -> BCtrl: NotFoundException('discountId')
+                deactivate CBH
+                BCtrl -> BAPI: HTTP 404 Not Found
+                deactivate BCtrl
+                BAPI -> BT: Return error
+                deactivate BAPI
+                BT -> BC: Update error state
+                deactivate BT
+                BC -> U: Show error notification
+                deactivate BC
+            else Discounts valid
+                DR -> CBH: Return DiscountEntity[]
+                deactivate DR
+                
+                == Validate Discount Rules ==
+                CBH -> CBH: validateDiscounts() - Check stackable, bill scope rules
+                CBH -> CBH: validateTogetherDiscounts() - Check together eligibility
+                
+                alt Discount rules validation fails
+                    CBH -> BCtrl: ConflictException('discountId')
+                    deactivate CBH
+                    BCtrl -> BAPI: HTTP 409 Conflict
+                    deactivate BCtrl
+                    BAPI -> BT: Return error
+                    deactivate BAPI
+                    BT -> BC: Update error state
+                    deactivate BT
+                    BC -> U: Show error notification
+                    deactivate BC
+                else Discount rules valid
+                    == Calculate Bill ==
+                    CBH -> CBH: calculateBill() - Calculate totals and reductions
+                    CBH -> CBH: Separate schedule-level and bill-level discounts
+                    CBH -> CBH: Apply stackable and non-stackable discount logic
+                    CBH -> CBH: Build CreateBillDto with calculated amounts
+                    
+                    == Create Bill in Database ==
+                    CBH -> BR: createBill(bill, scheduleIds, discountForSchedule, discountForBill)
+                    activate BR
+                    
+                    BR -> DB: BEGIN TRANSACTION
+                    activate DB
+                    
+                    == Update Product Schedule Bookings ==
+                    BR -> DB: UPDATE productSchedule SET booked = booked + quantity
+                    DB -> BR: Return updated schedules
+                    
+                    == Check Schedule Availability ==
+                    BR -> BR: Check if schedules have sufficient quantity
+                    BR -> BR: Check if any schedules become full
+                    
+                    alt Insufficient quantity
+                        BR -> DB: ROLLBACK TRANSACTION
+                        DB -> BR: Transaction rolled back
+                        deactivate DB
+                        BR -> CBH: Throw Error('Insufficient quantity')
+                        deactivate BR
+                        CBH -> BCtrl: ConflictException
+                        deactivate CBH
+                        BCtrl -> BAPI: HTTP 409 Conflict
+                        deactivate BCtrl
+                        BAPI -> BT: Return error
+                        deactivate BAPI
+                        BT -> BC: Update error state
+                        deactivate BT
+                        BC -> U: Show error notification
+                        deactivate BC
+                    else Sufficient quantity
+                        == Update Schedule Status if Full ==
+                        alt Schedules become full
+                            BR -> DB: UPDATE productSchedule SET status = 'full'
+                            DB -> BR: Return success
+                        end
+                        
+                        == Process Discount Applications ==
+                        alt Has schedule discounts
+                            BR -> DB: UPDATE discount SET applited = applited + quantity
+                            DB -> BR: Return updated discounts
+                            BR -> BR: Check if discounts become full
+                            BR -> DB: UPDATE discount SET status = 'full' WHERE quantity <= applited
+                            DB -> BR: Return success
+                        end
+                        
+                        == Create Bill Record ==
+                        BR -> DB: INSERT INTO bill (user, totalPrice, reductionPrice, status='pending')
+                        DB -> BR: Return created bill
+                        
+                        == Create InfoBill Records ==
+                        BR -> DB: INSERT INTO infoBill (billId, productScheduleId, quantity)
+                        DB -> BR: Return created infoBill records
+                        
+                        == Create InfoBillDiscount Records ==
+                        alt Has discount assignments
+                            BR -> DB: INSERT INTO infoBillDiscount (billId, discountId)
+                            DB -> BR: Return created infoBillDiscount records
+                        end
+                        
+                        == Create DiscountForBill Record ==
+                        alt Has bill-level discount
+                            BR -> DB: INSERT INTO discountForBill (billId, discountId)
+                            DB -> BR: Return created discountForBill record
+                        end
+                        
+                        == Complete Transaction ==
+                        BR -> DB: COMMIT TRANSACTION
+                        DB -> BR: Transaction completed successfully
+                        deactivate DB
+                        
+                        BR -> CBH: Return BillEntity with full relations
+                        deactivate BR
+                        
+                        == Return Success Response ==
+                        CBH -> CBH: Create BillDetailResponseDto from created bill
+                        CBH -> BCtrl: Return success with bill detail
+                        deactivate CBH
+                        BCtrl -> BAPI: HTTP 201 Created + bill data
+                        deactivate BCtrl
+                        BAPI -> BT: Return created bill
+                        deactivate BAPI
+                        BT -> BC: Update Redux store with bill detail
+                        deactivate BT
+                        
+                        BC -> BC: Redirect to payment gateway or success page
+                        BC -> U: Show success and bill details
+                        deactivate BC
+                    end
+                end
+            end
+        end
+    end
+end
+
+@enduml

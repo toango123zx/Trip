@@ -1,0 +1,152 @@
+@startuml
+actor User as U
+participant "ScheduleDetail" as SD
+participant "scheduleApi" as SAPI
+participant "ProductScheduleController" as PSC
+participant "DeleteProductScheduleHandler" as DPSH
+participant "ProductScheduleRepository" as PSR
+participant "BillRepository" as BR
+participant "Database" as DB
+
+== Load Schedule Detail ==
+U -> SD: Click "Xem chi tiết" on schedule
+activate SD
+SD -> SAPI: scheduleApi.getScheduleByScheduleId(scheduleId)
+activate SAPI
+SAPI -> PSC: GET /schedule/:scheduleId
+activate PSC
+PSC -> PSR: findProductScheduleByProductScheduleId(scheduleId)
+activate PSR
+PSR -> DB: SELECT productSchedule WHERE id = scheduleId
+activate DB
+DB -> PSR: Return schedule with product details
+deactivate DB
+PSR -> PSC: Return ProductScheduleEntity with product relations
+deactivate PSR
+PSC -> SAPI: HTTP 200 + schedule detail
+deactivate PSC
+SAPI -> SD: Return schedule detail
+deactivate SAPI
+SD -> SD: setSelectedSchedule(response)
+SD -> SD: setIsDetailOpen(true)
+SD -> U: Display schedule detail modal
+deactivate SD
+
+== Delete Schedule Process ==
+U -> SD: Click "Xóa" button
+activate SD
+SD -> SD: handleDelete()
+SD -> SAPI: scheduleApi.deleteSchedule(scheduleId)
+activate SAPI
+SAPI -> PSC: DELETE /schedule/:scheduleId
+activate PSC
+PSC -> DPSH: DeleteProductScheduleByProductScheduleIdCommand
+activate DPSH
+
+== Check Authorization ==
+DPSH -> DPSH: checkSupplierPermissions(supplierInfo, scheduleId)
+alt Not authorized supplier
+    DPSH -> PSC: ForbiddenException
+    deactivate DPSH
+    PSC -> SAPI: HTTP 403 Forbidden
+    deactivate PSC
+    SAPI -> SD: Return authorization error
+    deactivate SAPI
+    SD -> SD: notification.error("Unauthorized")
+    SD -> U: Show error notification
+    deactivate SD
+else Authorized supplier
+    == Backend Validation ==
+    DPSH -> PSR: findProductScheduleByProductScheduleId(scheduleId)
+    activate PSR
+    PSR -> DB: SELECT productSchedule WHERE id = scheduleId AND status != 'inactive'
+    activate DB
+    DB -> PSR: Return schedule data or null
+    deactivate DB
+
+    alt Schedule not found or already inactive
+        PSR -> DPSH: Return null
+        deactivate PSR
+        DPSH -> PSC: NotFoundException
+        deactivate DPSH
+        PSC -> SAPI: HTTP 404 Not Found
+        deactivate PSC
+        SAPI -> SD: Return error
+        deactivate SAPI
+        SD -> SD: notification.error("Schedule not found")
+        SD -> U: Show error notification
+        deactivate SD
+    else Schedule found and active
+        PSR -> DPSH: Return ProductScheduleEntity
+        deactivate PSR
+        
+        == Soft Delete Schedule & Handle Bills ==
+        DPSH -> PSR: deleteProductScheduleByProductScheduleId(scheduleId)
+        activate PSR
+        
+        PSR -> DB: BEGIN TRANSACTION
+        activate DB
+        
+        == Get Associated Bills ==
+        PSR -> DB: SELECT bills FROM infoBill WHERE productScheduleId = scheduleId
+        DB -> PSR: Return bills array with status information
+        
+        == Categorize Bills by Status ==
+        PSR -> PSR: Separate bills into paid and unpaid categories
+        
+        == Update Schedule Status ==
+        PSR -> DB: UPDATE productSchedule SET status = 'inactive', deletedAt = NOW()
+        DB -> PSR: Return updated schedule
+        
+        == Handle Paid Bills for Refund ==
+        alt Has paid bills
+            PSR -> BR: Process paid bills
+            activate BR
+            BR -> DB: UPDATE bill SET status = 'waitingRefund' WHERE status = 'paid'
+            DB -> BR: Return success
+            deactivate BR
+        end
+        
+        == Handle Unpaid Bills for Cancellation ==
+        alt Has unpaid bills
+            PSR -> BR: Cancel unpaid bills
+            activate BR
+            BR -> DB: UPDATE bill SET status = 'canceled' WHERE status IN ('pending', 'processing')
+            DB -> BR: Return success
+            deactivate BR
+        end
+        
+        == Update Product Availability ==
+        PSR -> DB: Recalculate product.quantityAvailable based on remaining active schedules
+        DB -> PSR: Return success
+        
+        == Complete Transaction ==
+        PSR -> DB: COMMIT TRANSACTION
+        DB -> PSR: Transaction completed successfully
+        deactivate DB
+        
+        PSR -> DPSH: Return [updatedSchedule, paidBills, unpaidBills]
+        deactivate PSR
+        
+        == Notification and Logging ==
+        DPSH -> DPSH: Send notifications to affected users about cancellation
+        DPSH -> DPSH: Log schedule deletion for audit trail
+        
+        == Return Success Response ==
+        DPSH -> PSC: Return success with deletion summary
+        deactivate DPSH
+        PSC -> SAPI: HTTP 200 Success with summary data
+        deactivate PSC
+        
+        SAPI -> SD: Return deletion success
+        deactivate SAPI
+        
+        SD -> SD: notification.success("Schedule deleted successfully")
+        SD -> SD: onCancel()
+        SD -> SD: onDeleteSuccess?.()
+        SD -> U: Show success notification and close modal
+        deactivate SD
+    end
+end
+
+@enduml

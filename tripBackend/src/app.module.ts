@@ -1,7 +1,6 @@
 import { Module, NestModule } from '@nestjs/common';
 
 // import { LoggerMiddleware } from './middlewares/logger.middleware';
-import { ConfigModule } from '@nestjs/config';
 
 import { Modules } from './modules';
 import { PrismaService } from './modules/database/services';

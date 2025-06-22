@@ -1,0 +1,106 @@
+@startuml
+actor Frontend as FE
+participant "ProductController" as PC
+participant "ProductService" as PS
+participant "ProductRepository" as PR
+participant "Database" as DB
+participant "ProductRecommendationsService" as PRS
+participant "AI Server" as AI
+
+== Upload Images (Frontend) ==
+FE -> FE: Upload images to cloud storage
+note right: FE tự xử lý upload\nvà nhận về image URLs
+
+== Tạo Product Mới ==
+FE -> PC: POST /product (product data + image URLs)
+activate PC
+
+PC -> PC: Validate request data
+alt Dữ liệu không hợp lệ
+    PC -> FE: HTTP 400 Bad Request
+    deactivate PC
+else Dữ liệu hợp lệ
+    PC -> PS: createProduct(productData)
+    activate PS
+    
+    == Validation & Database Operations ==
+    PS -> PR: checkProductExists(name/slug)
+    activate PR
+    PR -> DB: SELECT * FROM product WHERE name/slug = ?
+    activate DB
+    DB -> PR: Return existing product or null
+    deactivate DB
+    
+    alt Sản phẩm đã tồn tại
+        PR -> PS: Throw ConflictException
+        deactivate PR
+        PS -> PC: ConflictException
+        deactivate PS
+        PC -> FE: HTTP 409 Conflict
+        deactivate PC
+    else Sản phẩm chưa tồn tại
+        PR -> DB: BEGIN TRANSACTION
+        activate DB
+        
+        == Lưu Product ==
+        PR -> DB: INSERT INTO product (...)
+        DB -> PR: Return product with ID
+        
+        == Lưu Product Images ==
+        alt Có image URLs
+            PR -> DB: INSERT INTO productImage (image URLs)
+            DB -> PR: Return success
+        end
+        
+        == Lưu Product Schedules ==
+        alt Có schedules
+            PR -> DB: INSERT INTO productSchedule (...)
+            DB -> PR: Return success
+        end
+        
+        PR -> DB: COMMIT TRANSACTION
+        DB -> PR: Transaction completed
+        deactivate PR
+        
+        == Trigger AI Embedding Processing ==
+        PS -> PRS: triggerEmbeddingUpdate(productId)
+        activate PRS
+        
+        PRS -> AI: POST /update-embeddings (chỉ gửi productId)
+        note right: Chỉ gửi trigger request:\n- productId\n- action: "create"
+        activate AI
+        
+        AI -> DB: SELECT product data WHERE id = productId
+        activate DB
+        DB -> AI: Return product data (name, description, category)
+        deactivate DB
+        
+        AI -> AI: Process text embedding và generate vectors
+        note right: AI Server xử lý:\n1. Text preprocessing\n2. Generate embeddings\n3. Create vectors
+        
+        AI -> DB: INSERT INTO ai_embeddings (productId, vectors)
+        activate DB
+        DB -> AI: Return success
+        deactivate DB
+        
+        alt Lỗi xử lý embedding
+            AI -> PRS: HTTP 500 Error + error message
+            PRS -> PS: Log warning (không fail transaction)
+            note left: Embedding failure không\nảnh hưởng tạo product
+        else Embedding thành công
+            AI -> PRS: HTTP 200 Success + confirmation
+            PRS -> PS: Embedding processing completed
+        end
+        deactivate AI
+        deactivate PRS
+        
+        == Trả về kết quả ==
+        PS -> PC: Return created product
+        deactivate PS
+        PC -> FE: HTTP 201 Created (product data)
+        deactivate PC
+    end
+    deactivate DB
+end
+
+@enduml

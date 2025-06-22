@@ -1,0 +1,371 @@
+@startuml
+actor User as U
+participant "ProductUpdate" as PU
+participant "ProductForm" as PF
+participant "CloudinaryService" as CS
+participant "ProductThunk" as PT
+participant "ProductAPI" as API
+participant "Backend" as BE
+participant "Database" as DB
+participant "ProductRecommendationsService" as PRS
+participant "AI Server" as AI
+
+== Load Product Data ==
+U -> PU: Click "Edit Product"
+activate PU
+
+PU -> PT: dispatch(productThunk.getProductDetail(productId))
+activate PT
+PT -> API: productApi.getProductDetail(productId)
+activate API
+API -> BE: GET /product/:productId
+activate BE
+BE -> DB: SELECT product data with relations
+activate DB
+DB -> BE: Return product with images, schedules, etc.
+deactivate DB
+BE -> API: HTTP 200 + product data
+deactivate BE
+API -> PT: Return product detail
+deactivate API
+PT -> PU: Update Redux store with product detail
+deactivate PT
+
+PU -> PF: Load product data into form
+activate PF
+PF -> PF: form.reset(initialValues)
+PF -> U: Display populated form
+deactivate PF
+deactivate PU
+
+== Update Product Process ==
+U -> PF: Modify product information
+activate PF
+U -> PF: Upload/Remove images (optional)
+
+alt Upload new images
+    PF -> CS: cloudinaryService.uploadImages(files)
+    activate CS
+    CS -> CS: Upload to Cloudinary
+    CS -> PF: Return image URLs
+    deactivate CS
+    PF -> PF: setValue('productImageUrls', newUrls)
+end
+
+U -> PF: Click "Save"
+PF -> PF: Validate form data
+
+alt Form validation fails
+    PF -> U: Show validation errors
+    deactivate PF
+else Form validation success
+    PF -> PU: onSubmit(formData)
+    activate PU
+    
+    PU -> PU: Compare current data with initial values
+    alt No changes detected AND no new schedules
+        PU -> U: Show "No changes detected" error
+        deactivate PU
+        deactivate PF
+    else Changes detected
+        PU -> PT: dispatch(updateProductByProductId)
+        activate PT
+        
+        PT -> API: productApi.updateProductByProductId(productId, product)
+        activate API
+        
+        API -> BE: PUT /product/:productId
+        activate BE
+        
+        == Backend Validation ==
+        BE -> BE: Validate request data
+        BE -> DB: findProductByProductId(productId)
+        activate DB
+        DB -> BE: Return product data
+        deactivate DB
+        
+        alt Product not found
+            BE -> API: HTTP 404 Not Found
+            API -> PT: Return error
+            PT -> PU: Update error state
+            PU -> U: Show error notification
+            deactivate BE
+            deactivate API
+            deactivate PT
+            deactivate PU
+            deactivate PF
+        else Product found
+            BE -> BE: Check supplier permission
+            alt Not product supplier
+                BE -> API: HTTP 403 Forbidden
+                API -> PT: Return error
+                PT -> PU: Update error state
+                PU -> U: Show error notification
+                deactivate BE
+                deactivate API
+                deactivate PT
+                deactivate PU
+                deactivate PF
+            else Authorized
+                == Process Image Changes ==
+                BE -> BE: Compare existing vs new images
+                BE -> BE: Identify images to add/remove
+                
+                == Update Database ==
+                BE -> DB: BEGIN TRANSACTION
+                activate DB
+                
+                BE -> DB: UPDATE product SET (name, description, etc.)
+                DB -> BE: Return updated product
+                
+                alt Add new images
+                    BE -> DB: INSERT INTO productImage (new URLs)
+                    DB -> BE: Return success
+                end
+                
+                alt Remove old images
+                    BE -> DB: DELETE FROM productImage (removed URLs)
+                    DB -> BE: Return success
+                end
+                
+                BE -> DB: COMMIT TRANSACTION
+                DB -> BE: Transaction completed
+                deactivate DB
+                
+                == Trigger AI Embedding Update ==
+                BE -> PRS: updateProductVector()
+                activate PRS
+                
+                PRS -> AI: POST /update-embeddings (productId)
+                activate AI
+                AI -> DB: SELECT updated product data
+                activate DB
+                DB -> AI: Return product data
+                deactivate DB
+                
+                AI -> AI: Process text embedding
+                AI -> DB: UPDATE ai_embeddings SET vectors
+                activate DB
+                DB -> AI: Return success
+                deactivate DB
+                
+                alt Embedding update success
+                    AI -> PRS: HTTP 200 Success
+                else Embedding update failed
+                    AI -> PRS: HTTP 500 Error
+                    note right: Log warning, don't fail update
+                end
+                deactivate AI
+                deactivate PRS
+                
+                == Return Success ==
+                BE -> API: HTTP 200 + updated product
+                deactivate BE
+                
+                API -> PT: Return updated product
+                deactivate API
+                
+                PT -> PT: notificationUtils.success()
+                PT -> PU: Update Redux store
+                deactivate PT
+                
+                == Handle New Schedules ==
+                alt Has new schedules to add
+                    PU -> PU: Process new schedules
+                    note right: Create schedules for product
+                end
+                
+                PU -> U: Close form & show success
+                deactivate PU
+            end
+        end
+    end
+end
+deactivate PF
+
+@enduml@startuml
+actor User as U
+participant "ProductUpdate" as PU
+participant "ProductForm" as PF
+participant "CloudinaryService" as CS
+participant "ProductThunk" as PT
+participant "ProductAPI" as API
+participant "Backend" as BE
+participant "Database" as DB
+participant "ProductRecommendationsService" as PRS
+participant "AI Server" as AI
+
+== Load Product Data ==
+U -> PU: Click "Edit Product"
+activate PU
+
+PU -> PT: dispatch(productThunk.getProductDetail(productId))
+activate PT
+PT -> API: productApi.getProductDetail(productId)
+activate API
+API -> BE: GET /product/:productId
+activate BE
+BE -> DB: SELECT product data with relations
+activate DB
+DB -> BE: Return product with images, schedules, etc.
+deactivate DB
+BE -> API: HTTP 200 + product data
+deactivate BE
+API -> PT: Return product detail
+deactivate API
+PT -> PU: Update Redux store with product detail
+deactivate PT
+
+PU -> PF: Load product data into form
+activate PF
+PF -> PF: form.reset(initialValues)
+PF -> U: Display populated form
+deactivate PF
+deactivate PU
+
+== Update Product Process ==
+U -> PF: Modify product information
+activate PF
+U -> PF: Upload/Remove images (optional)
+
+alt Upload new images
+    PF -> CS: cloudinaryService.uploadImages(files)
+    activate CS
+    CS -> CS: Upload to Cloudinary
+    CS -> PF: Return image URLs
+    deactivate CS
+    PF -> PF: setValue('productImageUrls', newUrls)
+end
+
+U -> PF: Click "Save"
+PF -> PF: Validate form data
+
+alt Form validation fails
+    PF -> U: Show validation errors
+    deactivate PF
+else Form validation success
+    PF -> PU: onSubmit(formData)
+    activate PU
+    
+    PU -> PU: Compare current data with initial values
+    alt No changes detected AND no new schedules
+        PU -> U: Show "No changes detected" error
+        deactivate PU
+        deactivate PF
+    else Changes detected
+        PU -> PT: dispatch(updateProductByProductId)
+        activate PT
+        
+        PT -> API: productApi.updateProductByProductId(productId, product)
+        activate API
+        
+        API -> BE: PUT /product/:productId
+        activate BE
+        
+        == Backend Validation ==
+        BE -> BE: Validate request data
+        BE -> DB: findProductByProductId(productId)
+        activate DB
+        DB -> BE: Return product data
+        deactivate DB
+        
+        alt Product not found
+            BE -> API: HTTP 404 Not Found
+            API -> PT: Return error
+            PT -> PU: Update error state
+            PU -> U: Show error notification
+            deactivate BE
+            deactivate API
+            deactivate PT
+            deactivate PU
+            deactivate PF
+        else Product found
+            BE -> BE: Check supplier permission
+            alt Not product supplier
+                BE -> API: HTTP 403 Forbidden
+                API -> PT: Return error
+                PT -> PU: Update error state
+                PU -> U: Show error notification
+                deactivate BE
+                deactivate API
+                deactivate PT
+                deactivate PU
+                deactivate PF
+            else Authorized
+                == Process Image Changes ==
+                BE -> BE: Compare existing vs new images
+                BE -> BE: Identify images to add/remove
+                
+                == Update Database ==
+                BE -> DB: BEGIN TRANSACTION
+                activate DB
+                
+                BE -> DB: UPDATE product SET (name, description, etc.)
+                DB -> BE: Return updated product
+                
+                alt Add new images
+                    BE -> DB: INSERT INTO productImage (new URLs)
+                    DB -> BE: Return success
+                end
+                
+                alt Remove old images
+                    BE -> DB: DELETE FROM productImage (removed URLs)
+                    DB -> BE: Return success
+                end
+                
+                BE -> DB: COMMIT TRANSACTION
+                DB -> BE: Transaction completed
+                deactivate DB
+                
+                == Trigger AI Embedding Update ==
+                BE -> PRS: updateProductVector()
+                activate PRS
+                
+                PRS -> AI: POST /update-embeddings (productId)
+                activate AI
+                AI -> DB: SELECT updated product data
+                activate DB
+                DB -> AI: Return product data
+                deactivate DB
+                
+                AI -> AI: Process text embedding
+                AI -> DB: UPDATE ai_embeddings SET vectors
+                activate DB
+                DB -> AI: Return success
+                deactivate DB
+                
+                alt Embedding update success
+                    AI -> PRS: HTTP 200 Success
+                else Embedding update failed
+                    AI -> PRS: HTTP 500 Error
+                    note right: Log warning, don't fail update
+                end
+                deactivate AI
+                deactivate PRS
+                
+                == Return Success ==
+                BE -> API: HTTP 200 + updated product
+                deactivate BE
+                
+                API -> PT: Return updated product
+                deactivate API
+                
+                PT -> PT: notificationUtils.success()
+                PT -> PU: Update Redux store
+                deactivate PT
+                
+                == Handle New Schedules ==
+                alt Has new schedules to add
+                    PU -> PU: Process new schedules
+                    note right: Create schedules for product
+                end
+                
+                PU -> U: Close form & show success
+                deactivate PU
+            end
+        end
+    end
+end
+deactivate PF
+
+@enduml

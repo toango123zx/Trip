@@ -48,7 +48,7 @@ export class GetProductsManagementHandler
 				},
 			}),
 		};
-		
+
 		const [products, totalRecords] = await this.productRepository.findProducts(
 			keyword,
 			page,

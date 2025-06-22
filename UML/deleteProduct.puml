@@ -1,0 +1,157 @@
+@startuml
+actor User as U
+participant "ProductManagement" as PM
+participant "ProductThunk" as PT
+participant "ProductAPI" as API
+participant "ProductController" as PC
+participant "ProductService" as PS
+participant "ProductRepository" as PR
+participant "Database" as DB
+participant "BillRepository" as BR
+participant "DiscountRepository" as DR
+
+== Remove Product Process ==
+U -> PM: Click "Remove Product"
+activate PM
+
+PM -> PM: Show confirmation dialog
+U -> PM: Confirm removal
+
+PM -> PT: dispatch(deleteProductByProductId(productId))
+activate PT
+
+PT -> API: productApi.deleteProductByProductId(productId)
+activate API
+
+API -> PC: DELETE /product/:productId
+activate PC
+
+== Backend Validation ==
+PC -> PS: deleteProductByProductId(productId)
+activate PS
+
+PS -> PR: findProductByProductId(productId)
+activate PR
+PR -> DB: SELECT product WHERE id = productId AND status != 'inactive'
+activate DB
+DB -> PR: Return product data or null
+deactivate DB
+
+alt Product not found or already inactive
+    PR -> PS: Throw NotFoundException
+    deactivate PR
+    PS -> PC: NotFoundException
+    deactivate PS
+    PC -> API: HTTP 404 Not Found
+    deactivate PC
+    API -> PT: Return error
+    deactivate API
+    PT -> PM: Update error state
+    deactivate PT
+    PM -> U: Show error notification
+    deactivate PM
+else Product found and active
+    == Check Authorization ==
+    PS -> PS: Check if user is product supplier
+    alt Not authorized
+        PS -> PC: Throw ForbiddenException
+        deactivate PS
+        PC -> API: HTTP 403 Forbidden
+        deactivate PC
+        API -> PT: Return error
+        deactivate API
+        PT -> PM: Update error state
+        deactivate PT
+        PM -> U: Show error notification
+        deactivate PM
+    else Authorized to remove
+        == Soft Delete Product & Related Data ==
+        PR -> DB: BEGIN TRANSACTION
+        activate DB
+        
+        == Update Product Status ==
+        PR -> DB: UPDATE product SET status='inactive', deletedAt=NOW()
+        DB -> PR: Return updated product
+        
+        == Cancel Active Schedules ==
+        PR -> DB: UPDATE productSchedule SET status='canceled', deletedAt=NOW()
+        note right: Cancel all active schedules\nfor this product
+        DB -> PR: Return success
+        
+        == Process Bills & Refunds ==
+        PR -> PR: Get all bills from canceled schedules
+        PR -> DB: SELECT bills FROM infoBill WHERE scheduleId IN (canceled schedules)
+        DB -> PR: Return bills data
+        
+        PR -> PR: Categorize bills by status
+        note right: - Paid bills → refund queue\n- Unpaid bills → cancel\n- Processing bills → handle appropriately
+        
+        alt Has paid bills requiring refund
+            PR -> BR: Add bills to refund queue
+            activate BR
+            BR -> DB: UPDATE bill SET status='waitingRefund'
+            DB -> BR: Return success
+            deactivate BR
+        end
+        
+        alt Has unpaid bills to cancel
+            PR -> BR: Cancel unpaid bills
+            activate BR
+            BR -> DB: UPDATE bill SET status='canceled'
+            DB -> BR: Return success
+            deactivate BR
+        end
+        
+        == Handle Discount Conflicts ==
+        PR -> PR: Get discount assignments for canceled schedules
+        PR -> DB: SELECT infoDiscount WHERE scheduleId IN (canceled schedules)
+        DB -> PR: Return discount assignments
+        
+        alt Has discount assignments
+            PR -> DR: Remove product schedule assignments
+            activate DR
+            DR -> DB: DELETE FROM infoDiscount WHERE scheduleId IN (...)
+            DB -> DR: Return success
+            
+            DR -> DR: Check discount validity after removal
+            DR -> DB: SELECT discounts that might become invalid
+            DB -> DR: Return potentially invalid discounts
+            
+            DR -> DB: UPDATE invalid discounts SET status='inactive'
+            DB -> DR: Return success
+            deactivate DR
+        end
+        
+        == Complete Transaction ==
+        PR -> DB: COMMIT TRANSACTION
+        DB -> PR: Transaction completed successfully
+        deactivate PR
+        deactivate DB
+        
+        == Trigger Cleanup & Notifications ==
+        PS -> PS: Notify affected customers
+        note right: Send notifications to users\nwith canceled bookings
+        
+        PS -> PS: Log removal action
+        note right: Log for audit trail
+        
+        == Return Success ==
+        PS -> PC: Return success with affected data
+        deactivate PS
+        PC -> API: HTTP 200 Success + summary
+        deactivate PC
+        
+        API -> PT: Return deletion summary
+        deactivate API
+        
+        PT -> PT: notificationUtils.success()
+        PT -> PM: Update Redux store
+        deactivate PT
+        
+        PM -> PM: Refresh product list
+        PM -> U: Show success message & summary
+        deactivate PM
+    end
+end
+
+@enduml

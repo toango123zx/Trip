@@ -130,6 +130,7 @@ model bill {
     discountForBill    discountForBill[]
     transaction        transaction[]
     transactionSession transactionSession[]
+    BillWithdrawalInfo BillWithdrawalInfo[]
 
     @@map("Bill")
 }
@@ -185,4 +186,19 @@ model cart {
     productSchedule   productSchedule @relation(fields: [productScheduleId], references: [id])
 
     @@map("Cart")
+}
+
+model BillWithdrawalInfo {
+    id        String    @id @default(cuid())
+    billId    String    @map("bill_id")
+    /// @DtoRelationCanConnectOnCreate
+    bill      bill      @relation(fields: [billId], references: [id])
+    bankName  String    @map("bank_name")
+    bankCode  String    @map("bank_code")
+    amount    BigInt    @map("amount")
+    createAt  DateTime  @default(now()) @map("create_at")
+    updateAt  DateTime  @updatedAt @map("update_at")
+    deletedAt DateTime? @map("deleted_at")
+
+    @@map("Bill_Withdrawal_Info")
 }

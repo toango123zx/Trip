@@ -225,6 +225,11 @@ export class BillDetailResponseDto {
 		point: number;
 		status: UserStatusEnum;
 	};
+	withdrawal: {
+		bankName: string;
+		bankCode: string;
+		amount: number;
+	} | null;
 
 	constructor(bill: BillEntity) {
 		const s = bill.infoBill.map((item) => ({
@@ -428,5 +433,12 @@ export class BillDetailResponseDto {
 			point: bill.user.point,
 			status: bill.user.status,
 		};
+		this.withdrawal = bill.BillWithdrawalInfo
+			? {
+					bankName: bill.BillWithdrawalInfo[0]?.bankName,
+					bankCode: bill.BillWithdrawalInfo[0]?.bankCode,
+					amount: Number(bill.BillWithdrawalInfo[0]?.amount),
+				}
+			: null;
 	}
 }

@@ -1,0 +1,55 @@
+@startuml
+!theme plain
+skinparam defaultFontSize 8
+skinparam participantFontSize 8
+skinparam arrowFontSize 7
+skinparam noteTextAlignment center
+skinparam maxMessageSize 80
+
+actor User as U
+participant "AttractionRate" as AR
+participant "rateApi" as RAPI
+participant "BillController" as BC
+participant "CreateHandler" as CBH
+participant "Repositories" as REPO
+participant "AI Server" as AIS
+participant "Database" as DB
+
+== Submit Product Rate ==
+U -> AR: Select stars & enter comment
+AR -> AR: Validate form
+AR -> RAPI: submitRate(productId, {star, comment, billId})
+RAPI -> BC: POST /product/:productId/rate
+
+== Authorization & Validation ==
+BC -> BC: AuthGuard.canActivate()
+BC -> CBH: CreateProductRateCommand
+CBH -> REPO: Validate Product, Bill & Ownership
+alt Validation fails
+    REPO -> CBH: NotFoundException/ForbiddenException
+    CBH -> BC: Return error
+    BC -> RAPI: HTTP 4xx
+    RAPI -> AR: Show error
+else Validation success
+    == Create Rate & Update Stats ==
+    CBH -> CBH: Calculate new avgRate
+    CBH -> REPO: createProductRate(data)
+    REPO -> DB: BEGIN TRANSACTION
+    REPO -> DB: UPDATE product SET avgRate, quantityRate
+    REPO -> DB: INSERT productRate
+    REPO -> DB: COMMIT TRANSACTION
+    
+    == Update AI Embeddings ==
+    CBH -> AIS: POST /update-embeddings
+    AIS -> DB: Fetch updated product data
+    AIS -> AIS: Calculate embeddings & similarity
+    AIS -> DB: Update AI database
+    AIS -> CBH: Return success
+    
+    == Return Success ==
+    CBH -> BC: Return ProductRateEntity
+    BC -> RAPI: HTTP 201 + rate data
+    RAPI -> AR: Show success & reset form
+end
+
+@enduml

@@ -24,7 +24,6 @@ export class GetBillByBillIdHandler implements IQueryHandler<GetBillByBillIdQuer
 		if (!bill) {
 			throw new NotFoundException('billId');
 		}
-
 		if (bill.userId !== myInformation.id) {
 			const condition = bill.infoBill.map((infoBill) => {
 				return (

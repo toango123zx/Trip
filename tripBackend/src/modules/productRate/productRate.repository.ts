@@ -31,7 +31,7 @@ export class ProductRateRepository {
 					infoBill: {
 						include: {
 							bill: true,
-						}
+						},
 					},
 				},
 				where: {

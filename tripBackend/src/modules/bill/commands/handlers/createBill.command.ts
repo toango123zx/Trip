@@ -328,7 +328,8 @@ export class CreateBillHandler implements ICommandHandler<CreateBillCommand> {
 				},
 			},
 			totalPrice: totalPrice,
-			reductionPrice: reductionPrice >= totalPrice ? (totalPrice - 10000) : reductionPrice,
+			reductionPrice:
+				reductionPrice >= totalPrice ? totalPrice - 10000 : reductionPrice,
 			transactionTargetId: TransactionTargetEnum.pay,
 			infoBill: {
 				create: infoBill.map((info) => ({

@@ -1,4 +1,4 @@
 export const recommendProductConfig = {
 	serviceUrl:
-		String(process.env.SERVICE_RECOMMEND_PRODUCT_URL) || 'http://localhost:5000/',
+		String(process.env.SERVICE_RECOMMEND_PRODUCT_URL) || 'http://172.29.86.161:5000/',
 };

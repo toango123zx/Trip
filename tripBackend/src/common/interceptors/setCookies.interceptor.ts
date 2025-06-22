@@ -23,7 +23,7 @@ export class SetCookieInterceptor implements NestInterceptor {
 
 				if (data.cookie) {
 					const { cookie, ...restData } = data;
-					
+
 					Object.keys(cookie).forEach((name) => {
 						response.cookie(name, String(cookie[name]), {
 							httpOnly: true,

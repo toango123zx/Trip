@@ -18,11 +18,12 @@ import { GetUsersByProductScheduleIdQuery } from '../implements';
 
 @QueryHandler(GetUsersByProductScheduleIdQuery)
 export class GetUsersByProductScheduleIdHandler
-	implements IQueryHandler<GetUsersByProductScheduleIdQuery> {
+	implements IQueryHandler<GetUsersByProductScheduleIdQuery>
+{
 	constructor(
 		private readonly productScheduleRepository: ProductScheduleRepository,
 		private readonly userRepository: UserRepository,
-	) { }
+	) {}
 
 	async execute(
 		query: GetUsersByProductScheduleIdQuery,
@@ -54,7 +55,12 @@ export class GetUsersByProductScheduleIdHandler
 			await this.userRepository.findUsersInProductSchedulebyProductScheduleId(
 				productScheduleId,
 				undefined,
-				[BillStatusEnum.refunded, BillStatusEnum.pending, BillStatusEnum.paid, BillStatusEnum.done],
+				[
+					BillStatusEnum.refunded,
+					BillStatusEnum.pending,
+					BillStatusEnum.paid,
+					BillStatusEnum.done,
+				],
 				[UserStatusEnum.active],
 				page,
 				filter,
@@ -63,7 +69,13 @@ export class GetUsersByProductScheduleIdHandler
 			.map((user) => {
 				if (user.bill.length > 0) {
 					return user.bill.map((bill) => {
-						if (bill.infoBill.length > 0 && (bill.status === BillStatusEnum.paid || bill.status === BillStatusEnum.done || bill.status === BillStatusEnum.refunded || bill.status === BillStatusEnum.pending)) {
+						if (
+							bill.infoBill.length > 0 &&
+							(bill.status === BillStatusEnum.paid ||
+								bill.status === BillStatusEnum.done ||
+								bill.status === BillStatusEnum.refunded ||
+								bill.status === BillStatusEnum.pending)
+						) {
 							return new GetUsersByProductScheduleIdResponseDto({
 								...user,
 								bill: [bill],
@@ -73,9 +85,8 @@ export class GetUsersByProductScheduleIdHandler
 				}
 				return new GetUsersByProductScheduleIdResponseDto(user);
 			})
-			.flat().filter(
-				(userInfo) => userInfo !== undefined
-			);
+			.flat()
+			.filter((userInfo) => userInfo !== undefined);
 
 		return {
 			success: true,

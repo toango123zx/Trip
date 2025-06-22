@@ -1,0 +1,178 @@
+@startuml
+actor User as U
+participant "DiscountForm" as DF
+participant "SchedulesBoardInDiscount" as SBD
+participant "discountThunk" as DT
+participant "discountApi" as DAPI
+participant "DiscountController" as DC
+participant "AuthGuard" as AG
+participant "DeleteProductSchedulesToDiscountHandler" as DPSDH
+participant "DiscountRepository" as DR
+participant "InfoDiscountRepository" as IDR
+participant "Database" as DB
+
+== Display Schedules in Discount ==
+U -> DF: View discount detail with schedules
+activate DF
+DF -> DF: Load discount.infoDiscount schedules
+DF -> SBD: Render SchedulesBoardInDiscount with schedules
+activate SBD
+SBD -> U: Display schedules table with Remove action buttons
+deactivate SBD
+deactivate DF
+
+== Remove Schedule from Discount ==
+U -> SBD: Click "Remove" button on schedule row
+activate SBD
+SBD -> DF: onRemove(scheduleId)
+activate DF
+DF -> DF: handRemoveScheduleInDiscount(scheduleId)
+
+alt Schedule in addScheduleIds (Local only)
+    DF -> DF: setAddScheduleIds(prev => prev.filter(id => id !== scheduleId))
+    DF -> DF: setSchedules(prev => prev.filter(s => s.schedulesId !== scheduleId))
+    DF -> SBD: Update local state
+    SBD -> U: Remove schedule from display
+    deactivate SBD
+    deactivate DF
+else Schedule exists in discount
+    DF -> DF: setRemoveScheduleIds(prev => [...prev, scheduleId])
+    DF -> DF: setSchedules(prev => prev.map(s => s.schedulesId === scheduleId ? {...s, status: 'inactive'} : s))
+    DF -> SBD: Update schedule status to inactive
+    SBD -> U: Show schedule as inactive/pending removal
+    deactivate SBD
+    deactivate DF
+end
+
+== Save Changes (Remove Schedules) ==
+U -> DF: Click "Save Changes"
+activate DF
+DF -> DF: handleChangeInfoDiscount()
+DF -> DF: Check if removeScheduleIds.length > 0
+
+alt Has schedules to remove
+    DF -> DT: dispatch(deleteProductSchedulesToDiscount())
+    activate DT
+    DT -> DAPI: discountApi.deleteProductSchedulesToDiscount(discountId, {scheduleIds})
+    activate DAPI
+    DAPI -> DC: DELETE /discount/:discountId/delete-schedules
+    activate DC
+    
+    == Check Authorization ==
+    DC -> AG: AuthGuard.canActivate()
+    activate AG
+    AG -> AG: Extract and verify JWT token
+    AG -> AG: Check DeleteProductSchedulesToDiscount permission
+    
+    alt Not authorized
+        AG -> DC: UnauthorizedException
+        deactivate AG
+        DC -> DAPI: HTTP 401 Unauthorized
+        deactivate DC
+        DAPI -> DT: Return auth error
+        deactivate DAPI
+        DT -> DF: Update error state
+        deactivate DT
+        DF -> U: Show unauthorized notification
+        deactivate DF
+    else Authorized
+        AG -> DC: Authorization successful
+        deactivate AG
+        
+        DC -> DPSDH: DeleteProductSchedulesToDiscountCommand
+        activate DPSDH
+        
+        == Validate Discount Ownership ==
+        DPSDH -> DR: findDiscountByDiscountId(discountId)
+        activate DR
+        DR -> DB: SELECT discount WHERE id = discountId AND status = 'active'
+        activate DB
+        DB -> DR: Return discount with infoDiscount relations
+        deactivate DB
+        
+        alt Discount not found
+            DR -> DPSDH: Return null
+            deactivate DR
+            DPSDH -> DC: NotFoundException('discountId')
+            deactivate DPSDH
+            DC -> DAPI: HTTP 404 Not Found
+            deactivate DC
+            DAPI -> DT: Return error
+            deactivate DAPI
+            DT -> DF: Update error state
+            deactivate DT
+            DF -> U: Show error notification
+            deactivate DF
+        else Discount found
+            DR -> DPSDH: Return DiscountEntity with infoDiscount
+            deactivate DR
+            
+            DPSDH -> DPSDH: Check if discount.userId === myInformation.id
+            alt Not discount owner
+                DPSDH -> DC: OptionalException(403, 'You are not the owner of this discount')
+                deactivate DPSDH
+                DC -> DAPI: HTTP 403 Forbidden
+                deactivate DC
+                DAPI -> DT: Return error
+                deactivate DAPI
+                DT -> DF: Update error state
+                deactivate DT
+                DF -> U: Show error notification
+                deactivate DF
+            else Owner authorized
+                == Validate Schedule Assignments ==
+                DPSDH -> DPSDH: Filter infoDiscount by productScheduleIds
+                DPSDH -> DPSDH: discount.infoDiscount.filter(item => productScheduleIds.includes(item.productScheduleId))
+                
+                alt Schedule assignments validation fails
+                    DPSDH -> DC: NotFoundException('productScheduleId')
+                    deactivate DPSDH
+                    DC -> DAPI: HTTP 404 Not Found
+                    deactivate DC
+                    DAPI -> DT: Return error
+                    deactivate DAPI
+                    DT -> DF: Update error state
+                    deactivate DT
+                    DF -> U: Show error notification
+                    deactivate DF
+                else Assignments valid
+                    == Remove InfoDiscount Records ==
+                    DPSDH -> IDR: deleteInfoDiscountForProductSchedules(discountId, productScheduleIds)
+                    activate IDR
+                    IDR -> DB: BEGIN TRANSACTION
+                    activate DB
+                    
+                    IDR -> DB: DELETE FROM infoDiscount WHERE discountId = ? AND productScheduleId IN (?)
+                    DB -> IDR: Return deleted records count
+                    
+                    IDR -> DB: COMMIT TRANSACTION
+                    DB -> IDR: Transaction completed
+                    deactivate DB
+                    IDR -> DPSDH: Return remaining InfoDiscountEntity[]
+                    deactivate IDR
+                    
+                    == Update Discount Entity ==
+                    DPSDH -> DPSDH: Create updateDiscount with remaining infoDiscount
+                    DPSDH -> DPSDH: updateDiscount = {...discount, infoDiscount: remainingInfoSchedules}
+                    
+                    == Return Success Response ==
+                    DPSDH -> DC: Return success with GetDiscountByDiscountIdResponseDto
+                    deactivate DPSDH
+                    DC -> DAPI: HTTP 200 Success + updated discount
+                    deactivate DC
+                    DAPI -> DT: Return updated discount
+                    deactivate DAPI
+                    DT -> DF: Update Redux store with updated discount
+                    deactivate DT
+                    
+                    DF -> DF: Clear removeScheduleIds array
+                    DF -> DF: Refresh schedules list from updated discount
+                    DF -> U: Show success notification
+                    deactivate DF
+                end
+            end
+        end
+    end
+end
+
+@enduml

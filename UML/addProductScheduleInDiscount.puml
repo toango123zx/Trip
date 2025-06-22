@@ -1,0 +1,213 @@
+@startuml
+actor User as U
+participant "DiscountForm" as DF
+participant "discountThunk" as DT
+participant "discountApi" as DAPI
+participant "DiscountController" as DC
+participant "AuthGuard" as AG
+participant "AssignProductSchedulesToDiscountHandler" as APSDH
+participant "DiscountRepository" as DR
+participant "ProductScheduleRepository" as PSR
+participant "InfoDiscountRepository" as IDR
+participant "Database" as DB
+
+== Load Available Schedules ==
+U -> DF: Click on product dropdown
+activate DF
+DF -> DF: handleProductChange(productId)
+DF -> DF: setValue('productId', productId)
+DF -> DT: dispatch(getNonDiscountableSchedules())
+activate DT
+DT -> DAPI: discountApi.getNonDiscountableSchedules(discountId, productId)
+activate DAPI
+DAPI -> DC: GET /discount/:discountId/:productId/nonDiscountableSchedules
+activate DC
+DC -> AG: AuthGuard.canActivate()
+activate AG
+AG -> AG: Verify JWT token and permissions
+AG -> DC: Authorization successful
+deactivate AG
+DC -> DC: Execute GetNonDiscountableSchedulesQuery
+DC -> DAPI: HTTP 200 + available schedules
+deactivate DC
+DAPI -> DT: Return non-discountable schedules
+deactivate DAPI
+DT -> DF: Update discountsNonDiscountable in Redux
+deactivate DT
+DF -> DF: setScheduleOption(filtered schedules)
+DF -> U: Display available schedules in dropdown
+deactivate DF
+
+== Add Schedule to Discount ==
+U -> DF: Select schedule from dropdown
+activate DF
+U -> DF: Click "Add Schedule" button
+DF -> DF: handAddScheduleInDiscount()
+DF -> DF: Validate productId and scheduleId
+DF -> DF: Check if schedule already in addScheduleIds
+
+alt Schedule already added
+    DF -> U: No action taken (schedule already exists)
+    deactivate DF
+else Schedule can be added
+    DF -> DF: Create newSchedule object with schedule details
+    DF -> DF: setAddScheduleIds(prev => [...prev, scheduleId])
+    DF -> DF: setSchedules(prev => [newSchedule, ...prev])
+    DF -> U: Display schedule in schedules list
+    deactivate DF
+end
+
+== Save Changes (Assign Schedules) ==
+U -> DF: Click "Save Changes"
+activate DF
+DF -> DF: handleChangeInfoDiscount()
+DF -> DF: Check if addScheduleIds.length > 0
+
+alt Has schedules to add
+    DF -> DT: dispatch(assignProductSchedulesToDiscount())
+    activate DT
+    DT -> DAPI: discountApi.asignProductSchedulesToDiscount(discountId, {scheduleIds})
+    activate DAPI
+    DAPI -> DC: POST /discount/:discountId/assign-schedules
+    activate DC
+    
+    == Check Authorization ==
+    DC -> AG: AuthGuard.canActivate()
+    activate AG
+    AG -> AG: Extract and verify JWT token
+    AG -> AG: Check AssignProductSchedulesToDiscount permission
+    
+    alt Not authorized
+        AG -> DC: UnauthorizedException
+        deactivate AG
+        DC -> DAPI: HTTP 401 Unauthorized
+        deactivate DC
+        DAPI -> DT: Return auth error
+        deactivate DAPI
+        DT -> DF: Update error state
+        deactivate DT
+        DF -> U: Show unauthorized notification
+        deactivate DF
+    else Authorized
+        AG -> DC: Authorization successful
+        deactivate AG
+        
+        DC -> APSDH: AssignProductSchedulesToDiscountCommand
+        activate APSDH
+        
+        == Validate Discount Ownership ==
+        APSDH -> DR: findDiscountByDiscountId(discountId)
+        activate DR
+        DR -> DB: SELECT discount WHERE id = discountId AND status = 'active'
+        activate DB
+        DB -> DR: Return discount data
+        deactivate DB
+        
+        alt Discount not found
+            DR -> APSDH: Return null
+            deactivate DR
+            APSDH -> DC: NotFoundException('discountId')
+            deactivate APSDH
+            DC -> DAPI: HTTP 404 Not Found
+            deactivate DC
+            DAPI -> DT: Return error
+            deactivate DAPI
+            DT -> DF: Update error state
+            deactivate DT
+            DF -> U: Show error notification
+            deactivate DF
+        else Discount found
+            DR -> APSDH: Return DiscountEntity
+            deactivate DR
+            
+            APSDH -> APSDH: Check if discount.userId === myInformation.id
+            alt Not discount owner
+                APSDH -> DC: OptionalException(403, 'You are not the owner of this discount')
+                deactivate APSDH
+                DC -> DAPI: HTTP 403 Forbidden
+                deactivate DC
+                DAPI -> DT: Return error
+                deactivate DAPI
+                DT -> DF: Update error state
+                deactivate DT
+                DF -> U: Show error notification
+                deactivate DF
+            else Owner authorized
+                == Validate Product Schedules ==
+                APSDH -> PSR: findProductSchedulesByProductSchedulesId(scheduleIds)
+                activate PSR
+                PSR -> DB: SELECT productSchedule WHERE id IN (scheduleIds) AND status = 'active'
+                activate DB
+                DB -> PSR: Return schedule entities
+                deactivate DB
+                
+                alt Schedule validation fails
+                    PSR -> APSDH: Return incomplete schedules
+                    deactivate PSR
+                    APSDH -> DC: NotFoundException('productScheduleId')
+                    deactivate APSDH
+                    DC -> DAPI: HTTP 404 Not Found
+                    deactivate DC
+                    DAPI -> DT: Return error
+                    deactivate DAPI
+                    DT -> DF: Update error state
+                    deactivate DT
+                    DF -> U: Show error notification
+                    deactivate DF
+                else Schedules valid
+                    PSR -> APSDH: Return validated ProductScheduleEntity[]
+                    deactivate PSR
+                    
+                    == Check Schedule Conflicts ==
+                    APSDH -> APSDH: Check if schedules already assigned to discount
+                    APSDH -> APSDH: discount.infoDiscount.find(existing schedules)
+                    
+                    alt Schedule already assigned
+                        APSDH -> DC: ConflictException('productScheduleId')
+                        deactivate APSDH
+                        DC -> DAPI: HTTP 409 Conflict
+                        deactivate DC
+                        DAPI -> DT: Return error
+                        deactivate DAPI
+                        DT -> DF: Update error state
+                        deactivate DT
+                        DF -> U: Show error notification
+                        deactivate DF
+                    else No conflicts
+                        == Create InfoDiscount Records ==
+                        APSDH -> IDR: createInfoDiscountForProductSchedules(discountId, scheduleIds)
+                        activate IDR
+                        IDR -> DB: BEGIN TRANSACTION
+                        activate DB
+                        
+                        IDR -> DB: INSERT INTO infoDiscount (discountId, productScheduleId) for each schedule
+                        DB -> IDR: Return created InfoDiscountEntity[]
+                        
+                        IDR -> DB: COMMIT TRANSACTION
+                        DB -> IDR: Transaction completed
+                        deactivate DB
+                        IDR -> APSDH: Return InfoDiscountEntity[]
+                        deactivate IDR
+                        
+                        == Return Success ==
+                        APSDH -> DC: Return success with InfoDiscountEntity[]
+                        deactivate APSDH
+                        DC -> DAPI: HTTP 200 Success + created records
+                        deactivate DC
+                        DAPI -> DT: Return assignment success
+                        deactivate DAPI
+                        DT -> DF: Update Redux store
+                        deactivate DT
+                        
+                        DF -> DF: Clear addScheduleIds array
+                        DF -> DF: Refresh schedules list
+                        DF -> U: Show success notification
+                        deactivate DF
+                    end
+                end
+            end
+        end
+    end
+end
+
+@enduml

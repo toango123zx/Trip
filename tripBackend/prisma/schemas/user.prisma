@@ -148,15 +148,15 @@ model user {
     ///@DtoRelationCanCreateOnCreate
     supplier supplier?
 
-    productRate     productRate[]
-    accountExternal accountExternal?
-    account         account?
-    bill            bill[]
-    cart            cart[]
-    discount        discount[]
-    boxChatMember   boxChatMember[]
-    message         message[]
-    productViewLog  productViewLog[]
+    productRate        productRate[]
+    accountExternal    accountExternal?
+    account            account?
+    bill               bill[]
+    cart               cart[]
+    discount           discount[]
+    boxChatMember      boxChatMember[]
+    message            message[]
+    productViewLog     productViewLog[]
 
     @@map("User")
 }

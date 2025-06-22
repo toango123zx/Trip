@@ -1,0 +1,156 @@
+@startuml
+actor User as U
+participant "ProductForm" as PF
+participant "ScheduleForm" as SF
+participant "ScheduleThunk" as ST
+participant "ScheduleAPI" as API
+participant "ProductController" as PC
+participant "CreateProductScheduleHandler" as CPSH
+participant "ProductRepository" as PR
+participant "ProductScheduleRepository" as PSR
+participant "Database" as DB
+
+== Open Schedule Form ==
+U -> PF: Click "ADD SCHEDULES" button
+activate PF
+
+PF -> PF: handleAddScheduleOnClick()
+PF -> PF: setNewSchedule(defaultValues)
+note right: Set default values:\n- id: cuid()\n- price: 0\n- startTime: new Date()\n- endTime: new Date()\n- startOrder: new Date()\n- endOrder: new Date()\n- status: waitingAdd
+
+PF -> PF: setIsCreateSchedule(true)
+PF -> PF: setIsOpenPopupScheduleUpdate(true)
+
+PF -> SF: Open ScheduleForm popup
+activate SF
+SF -> U: Display schedule form
+deactivate PF
+
+== Fill Schedule Information ==
+U -> SF: Enter schedule data
+note right: - Start time\n- End time\n- Price\n- Start order\n- End order
+
+U -> SF: Click "Save"
+SF -> SF: Validate form data
+
+alt Form validation fails
+    SF -> U: Show validation errors
+else Form validation success
+    SF -> PF: handlerAddScheduleInPopup(schedule)
+    activate PF
+    PF -> PF: Add schedule to local state
+    note right: setSchedules(prev => [schedule, ...prev])
+    PF -> SF: Close popup
+    deactivate SF
+    PF -> U: Show schedule in list
+    deactivate PF
+end
+
+== Submit Product with Schedules ==
+U -> PF: Click "Save Product"
+activate PF
+
+PF -> PF: onSubmit(productData)
+note right: Product creation/update\nwith schedules array
+
+PF -> ST: After product created/updated
+activate ST
+
+== Create Each Schedule ==
+loop For each schedule in schedules array
+    ST -> API: scheduleApi.createSchedule(productId, schedule)
+    activate API
+    
+    API -> PC: POST /product/:productId/schedule
+    activate PC
+    
+    PC -> CPSH: CreateProductScheduleByProductIdCommand
+    activate CPSH
+    
+    == Backend Validation ==
+    CPSH -> CPSH: Validate time constraints
+    note right: - endTime > startTime\n- endOrder > startOrder\n- Dates are after today
+    
+    alt Time validation fails
+        CPSH -> PC: ValidationException
+        PC -> API: HTTP 400 Bad Request
+        API -> ST: Return error
+        ST -> PF: Update error state
+        PF -> U: Show error notification
+        deactivate CPSH
+        deactivate PC
+        deactivate API
+        deactivate ST
+        deactivate PF
+    else Time validation success
+        == Check Product & Permissions ==
+        CPSH -> PR: findProductByProductId(productId)
+        activate PR
+        PR -> DB: SELECT product WHERE id = productId AND status = 'active'
+        activate DB
+        DB -> PR: Return product data
+        deactivate DB
+        
+        alt Product not found
+            PR -> CPSH: Return null
+            deactivate PR
+            CPSH -> PC: NotFoundException
+            PC -> API: HTTP 404 Not Found
+            API -> ST: Return error
+            ST -> PF: Update error state
+            PF -> U: Show error notification
+            deactivate CPSH
+            deactivate PC
+            deactivate API
+            deactivate ST
+            deactivate PF
+        else Product found
+            PR -> CPSH: Return product
+            deactivate PR
+            
+            CPSH -> CPSH: checkSupplierPermissions()
+            note right: Verify user is product supplier
+            
+            alt Not authorized
+                CPSH -> PC: ForbiddenException
+                PC -> API: HTTP 403 Forbidden
+                API -> ST: Return error
+                ST -> PF: Update error state
+                PF -> U: Show error notification
+                deactivate CPSH
+                deactivate PC
+                deactivate API
+                deactivate ST
+                deactivate PF
+            else Authorized
+                == Create Schedule ==
+                CPSH -> CPSH: Prepare CreateProductScheduleDto
+                note right: Convert request data to DTO\nwith product connection
+                
+                CPSH -> PSR: createProductScheduleByProductId(scheduleDto)
+                activate PSR
+                PSR -> DB: INSERT INTO productSchedule
+                activate DB
+                DB -> PSR: Return created schedule
+                deactivate DB
+                PSR -> CPSH: Return ProductScheduleEntity
+                deactivate PSR
+                
+                CPSH -> PC: Return success with schedule data
+                deactivate CPSH
+                PC -> API: HTTP 201 Created + schedule data
+                deactivate PC
+                API -> ST: Return created schedule
+                deactivate API
+            end
+        end
+    end
+end
+
+ST -> PF: All schedules created successfully
+deactivate ST
+PF -> PF: Clear schedules array
+PF -> U: Show success notification & close form
+deactivate PF
+
+@enduml

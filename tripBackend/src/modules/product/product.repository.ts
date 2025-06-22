@@ -212,7 +212,11 @@ export class ProductRepository {
 				productSchedule: {
 					where: {
 						status: {
-							in: [ProductScheduleStatusEnum.active, ProductScheduleStatusEnum.full, ProductScheduleStatusEnum.completed],
+							in: [
+								ProductScheduleStatusEnum.active,
+								ProductScheduleStatusEnum.full,
+								ProductScheduleStatusEnum.completed,
+							],
 						},
 					},
 				},
@@ -222,8 +226,8 @@ export class ProductRepository {
 						infoBill: {
 							include: {
 								bill: true,
-							}
-						}
+							},
+						},
 					},
 				},
 				location: true,

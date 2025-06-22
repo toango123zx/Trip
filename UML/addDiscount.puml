@@ -1,0 +1,240 @@
+@startuml
+actor User as U
+participant "AddDiscount" as AD
+participant "DiscountForm" as DF
+participant "discountThunk" as DT
+participant "discountApi" as DAPI
+participant "DiscountController" as DC
+participant "AuthGuard" as AG
+participant "CreateDiscountHandler" as CDH
+participant "DiscountTypeRepository" as DTR
+participant "DiscountEligibilityRepository" as DER
+participant "DiscountApplicationScopeRepository" as DASR
+participant "ProductScheduleRepository" as PSR
+participant "DiscountRepository" as DR
+participant "Database" as DB
+
+== Load Create Discount Form ==
+U -> AD: Click "Create New Discount"
+activate AD
+AD -> AD: useForm with defaultValues
+AD -> DF: Render DiscountForm with form props
+activate DF
+DF -> DF: useEffect - Load master data
+DF -> DT: dispatch(discountTypeThunk.getDiscountTypes())
+DF -> DT: dispatch(discountEligibilityThunk.getDiscountEligibilities())
+DF -> DT: dispatch(discountApplicationScopeThunk.getDiscountApplicationScopes())
+DF -> DT: dispatch(productThunk.getProductsManagement())
+DF -> U: Display form with loaded options
+deactivate DF
+deactivate AD
+
+== Fill Discount Information ==
+U -> DF: Enter discount details
+activate DF
+U -> DF: Fill basic info (name, description, value, quantity, point)
+U -> DF: Select discount type, eligibility, application scope
+U -> DF: Set start time and end time
+U -> DF: Select products and schedules
+U -> DF: Click "Save"
+
+== Form Validation ==
+DF -> DF: handleSaveOnClick(formData)
+DF -> DF: Validate start time not null
+DF -> DF: Validate end time > start time
+DF -> DF: Convert numeric fields to integers
+DF -> DF: Set scheduleIds from addScheduleIds
+
+alt Form validation fails
+    DF -> DF: setError with validation flags
+    DF -> U: Show validation errors
+    deactivate DF
+else Form validation success
+    DF -> AD: onSave(formData)
+    activate AD
+    AD -> DT: dispatch(discountThunk.createDiscount({discount: data}))
+    activate DT
+    
+    DT -> DAPI: discountApi.createDiscount(discount)
+    activate DAPI
+    DAPI -> DC: POST /discount
+    activate DC
+    
+    == Check Authorization ==
+    DC -> AG: AuthGuard.canActivate()
+    activate AG
+    AG -> AG: Extract accessToken from cookies
+    AG -> AG: Verify JWT token with secret
+    AG -> AG: Get user information from token payload
+    
+    alt Token invalid or expired
+        AG -> DC: UnauthorizedException
+        deactivate AG
+        DC -> DAPI: HTTP 401 Unauthorized
+        deactivate DC
+        DAPI -> DT: Return auth error
+        deactivate DAPI
+        DT -> AD: Update error state
+        deactivate DT
+        AD -> U: Show unauthorized notification
+        deactivate AD
+        deactivate DF
+    else Token valid and user authorized
+        AG -> DC: Authorization successful (user + supplier info)
+        deactivate AG
+        
+        DC -> CDH: CreateDiscountCommand with authorized user
+        activate CDH
+        
+        == Backend Validation ==
+        CDH -> DTR: findDiscountTypeByDiscountTypeId(discountTypeId)
+        activate DTR
+        DTR -> DB: SELECT discountType WHERE id = discountTypeId
+        activate DB
+        DB -> DTR: Return discount type data
+        deactivate DB
+        
+        alt Discount type not found
+            DTR -> CDH: Return null
+            deactivate DTR
+            CDH -> DC: NotFoundException("discount type")
+            deactivate CDH
+            DC -> DAPI: HTTP 404 Not Found
+            deactivate DC
+            DAPI -> DT: Return error
+            deactivate DAPI
+            DT -> AD: Update error state
+            deactivate DT
+            AD -> U: Show error notification
+            deactivate AD
+            deactivate DF
+        else Discount type found
+            DTR -> CDH: Return DiscountTypeEntity
+            deactivate DTR
+            
+            CDH -> DER: findDiscountEligibilityByDiscountEligibilityId(eligibilityId)
+            activate DER
+            DER -> DB: SELECT discountEligibility WHERE id = eligibilityId
+            activate DB
+            DB -> DER: Return eligibility data
+            deactivate DB
+            
+            alt Eligibility not found
+                DER -> CDH: Return null
+                deactivate DER
+                CDH -> DC: NotFoundException("discount eligibility")
+                deactivate CDH
+                DC -> DAPI: HTTP 404 Not Found
+                deactivate DC
+                DAPI -> DT: Return error
+                deactivate DAPI
+                DT -> AD: Update error state
+                deactivate DT
+                AD -> U: Show error notification
+                deactivate AD
+                deactivate DF
+            else Eligibility found
+                DER -> CDH: Return DiscountEligibilityEntity
+                deactivate DER
+                
+                CDH -> DASR: findDiscountApplicationScopeByDiscountApplicationScopeId(scopeId)
+                activate DASR
+                DASR -> DB: SELECT discountApplicationScope WHERE id = scopeId
+                activate DB
+                DB -> DASR: Return scope data
+                deactivate DB
+                
+                alt Scope not found
+                    DASR -> CDH: Return null
+                    deactivate DASR
+                    CDH -> DC: NotFoundException("discount application scope")
+                    deactivate CDH
+                    DC -> DAPI: HTTP 404 Not Found
+                    deactivate DC
+                    DAPI -> DT: Return error
+                    deactivate DAPI
+                    DT -> AD: Update error state
+                    deactivate DT
+                    AD -> U: Show error notification
+                    deactivate AD
+                    deactivate DF
+                else Scope found
+                    DASR -> CDH: Return DiscountApplicationScopeEntity
+                    deactivate DASR
+                    
+                    == Validate Product Schedules ==
+                    alt Has scheduleIds
+                        CDH -> PSR: findProductScheduleByProductScheduleId for each scheduleId
+                        activate PSR
+                        PSR -> DB: SELECT productSchedule WHERE id IN (scheduleIds)
+                        activate DB
+                        DB -> PSR: Return schedule entities
+                        deactivate DB
+                        
+                        alt Schedule validation fails
+                            PSR -> CDH: Return incomplete schedules
+                            deactivate PSR
+                            CDH -> DC: NotFoundException("schedule Id")
+                            deactivate CDH
+                            DC -> DAPI: HTTP 404 Not Found
+                            deactivate DC
+                            DAPI -> DT: Return error
+                            deactivate DAPI
+                            DT -> AD: Update error state
+                            deactivate DT
+                            AD -> U: Show error notification
+                            deactivate AD
+                            deactivate DF
+                        else Schedules valid
+                            PSR -> CDH: Return validated schedules
+                            deactivate PSR
+                        end
+                    end
+                    
+                    == Create Discount ==
+                    CDH -> CDH: Build CreateDiscountDto with user info
+                    CDH -> CDH: Set discountProviderType based on user role
+                    CDH -> DR: createDiscount(discountDto, scheduleIds)
+                    activate DR
+                    
+                    DR -> DB: BEGIN TRANSACTION
+                    activate DB
+                    
+                    DR -> DB: INSERT INTO discount
+                    DB -> DR: Return created discount
+                    
+                    alt Has scheduleIds
+                        DR -> DB: INSERT INTO infoDiscount for each scheduleId
+                        DB -> DR: Return success
+                    end
+                    
+                    DR -> DB: COMMIT TRANSACTION
+                    DB -> DR: Transaction completed
+                    deactivate DB
+                    
+                    DR -> CDH: Return DiscountEntity with relations
+                    deactivate DR
+                    
+                    CDH -> DC: Return GetDiscountByDiscountIdResponseDto
+                    deactivate CDH
+                    DC -> DAPI: HTTP 201 Created + discount data
+                    deactivate DC
+                    DAPI -> DT: Return created discount
+                    deactivate DAPI
+                    DT -> AD: Update Redux store
+                    deactivate DT
+                    
+                    == Success Handling ==
+                    AD -> AD: setHasSubmitted(true)
+                    AD -> AD: useEffect - check success condition
+                    AD -> AD: onCancel() to close form
+                    AD -> U: Show success notification and close form
+                    deactivate AD
+                end
+            end
+        end
+    end
+end
+deactivate DF
+
+@enduml

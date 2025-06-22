@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 
 import {
 	BillStatusEnum,
+	BillWithdrawalInfo,
 	DiscountStatusEnum,
 	ProductScheduleStatusEnum,
 	TransactionStatusEnum,
+	TransactionTargetEnum,
 } from '@prisma/client';
 import { DiscountTypeEnum, IPaginationQuery } from 'src/common';
 import { BillEntity, CreateBillDto, DiscountEntity } from 'src/models';
@@ -27,6 +29,7 @@ export class BillRepository {
 		productScheduleStatus?: ProductScheduleStatusEnum,
 		keyword?: string,
 		filter?: BillOrderByDto,
+		targerts?: TransactionTargetEnum[],
 	): Promise<[BillEntity[], number]> {
 		const orderBy = Object.entries(filter || {})
 			.filter(([_, value]) => Boolean(value))
@@ -35,58 +38,152 @@ export class BillRepository {
 		const [discounts, totalRecords] = await Promise.all([
 			this.prismaService.bill.findMany({
 				where: {
-					id: {
-						contains: keyword,
-						mode: 'insensitive',
-					},
-					userId: userIdTourist,
-					status: billstatus,
-					infoBill: {
-						some: {
-							productSchedule: {
-								id: productScheduleId,
-								product: {
-									id: productId,
-									supplier: {
-										userId: userIdSupplier,
+					OR: [
+						{
+							id: {
+								contains: keyword,
+								mode: 'insensitive',
+							},
+							userId: userIdTourist,
+							status: billstatus,
+							infoBill: {
+								some: {
+									productSchedule: {
+										id: productScheduleId,
+										product: {
+											id: productId,
+											supplier: {
+												userId: userIdSupplier,
+											},
+										},
+										status: productScheduleStatus,
 									},
 								},
-								status: productScheduleStatus,
 							},
 						},
-					},
+						targerts.includes(TransactionTargetEnum.withdrawal)
+							? {
+									id: {
+										contains: keyword,
+										mode: 'insensitive',
+									},
+									userId: userIdTourist,
+									status: billstatus,
+									transactionTargetId: TransactionTargetEnum.withdrawal,
+								}
+							: undefined,
+					],
 				},
 				take: pagination.take,
 				skip: pagination.skip,
-				orderBy: orderBy,
+				orderBy: [
+					...orderBy,
+					{ createAt: 'desc' }, // Default order by createdAt if no other order is specified
+				],
 			}),
 			this.prismaService.bill.count({
 				where: {
-					id: {
-						contains: keyword,
-						mode: 'insensitive',
-					},
-					userId: userIdTourist,
-					status: billstatus,
-					infoBill: {
-						some: {
-							productSchedule: {
-								id: productScheduleId,
-								product: {
-									id: productId,
-									supplier: {
-										userId: userIdSupplier,
+					OR: [
+						{
+							id: {
+								contains: keyword,
+								mode: 'insensitive',
+							},
+							userId: userIdTourist,
+							status: billstatus,
+							infoBill: {
+								some: {
+									productSchedule: {
+										id: productScheduleId,
+										product: {
+											id: productId,
+											supplier: {
+												userId: userIdSupplier,
+											},
+										},
+										status: productScheduleStatus,
 									},
 								},
-								status: productScheduleStatus,
 							},
 						},
-					},
+						targerts.includes(TransactionTargetEnum.withdrawal)
+							? {
+									id: {
+										contains: keyword,
+										mode: 'insensitive',
+									},
+									userId: userIdTourist,
+									status: billstatus,
+									transactionTargetId: TransactionTargetEnum.withdrawal,
+								}
+							: undefined,
+					],
 				},
 			}),
 		]);
 
 		return [discounts, totalRecords];
+	}
+
+	async findBillsManagement(
+		pagination: IPaginationQuery = {} as IPaginationQuery,
+		filter?: BillOrderByDto,
+	): Promise<[BillEntity[], number]> {
+		const orderBy = Object.entries(filter || {})
+			.filter(([_, value]) => Boolean(value))
+			.map(([key, value]) => ({ [key]: value }));
+		const [bills, totalRecords] = await Promise.all([
+			this.prismaService.bill.findMany({
+				include: {
+					infoBill: {
+						include: {
+							productSchedule: {
+								include: {
+									product: {
+										include: {
+											supplier: {
+												include: {
+													user: true,
+												},
+											},
+											productCategory: true,
+											location: true,
+										},
+									},
+								},
+							},
+						},
+					},
+					infoBillDiscount: {
+						include: {
+							discount: {
+								include: {
+									infoDiscount: true,
+									discountEligibility: true,
+									discountApplicationScope: true,
+									discountType: true,
+								},
+							},
+						},
+					},
+					transaction: true,
+					user: true,
+				},
+				where: {
+					transactionTargetId: TransactionTargetEnum.withdrawal,
+				},
+				take: pagination.take,
+				skip: pagination.skip,
+				orderBy: [{ createAt: 'desc' }, ...orderBy],
+			}),
+			this.prismaService.bill.count({
+				where: {
+					transactionTargetId: TransactionTargetEnum.withdrawal,
+				},
+			}),
+		]);
+
+		return [bills, totalRecords];
 	}
 
 	async findBillByBillId(billId: string): Promise<BillEntity | null> {
@@ -142,6 +239,7 @@ export class BillRepository {
 				},
 				transaction: true,
 				user: true,
+				BillWithdrawalInfo: true,
 			},
 			where: {
 				id: billId,
@@ -409,6 +507,71 @@ export class BillRepository {
 							},
 				},
 			});
+		});
+	}
+
+	async findWithdrawalBillByBillId(billId: string): Promise<BillWithdrawalInfo> {
+		return this.prismaService.billWithdrawalInfo.findFirst({
+			include: {
+				bill: {
+					include: {
+						user: true,
+					},
+				},
+			},
+			where: {
+				billId: billId,
+			},
+		});
+	}
+
+	async createWithdrawalBill(
+		bankName: string,
+		bankCode: string,
+		amount: number,
+		userId: string,
+	): Promise<BillWithdrawalInfo> {
+		return this.prismaService.billWithdrawalInfo.create({
+			data: {
+				bankName: bankName,
+				bankCode: bankCode,
+				amount: BigInt(amount),
+				bill: {
+					create: {
+						reductionPrice: 0,
+						totalPrice: 0,
+						status: BillStatusEnum.pending,
+						user: {
+							connect: {
+								id: userId,
+							},
+						},
+						transactionTargetId: TransactionTargetEnum.withdrawal,
+					},
+				},
+			},
+		});
+	}
+	async updateConfirmWithdrawalBill(
+		billId: string,
+		amount: number,
+	): Promise<BillEntity> {
+		return this.prismaService.bill.update({
+			where: {
+				id: billId,
+				transactionTargetId: TransactionTargetEnum.withdrawal,
+				status: BillStatusEnum.pending,
+			},
+			data: {
+				status: BillStatusEnum.done,
+				user: {
+					update: {
+						balance: {
+							decrement: amount,
+						},
+					},
+				},
+			},
 		});
 	}
 

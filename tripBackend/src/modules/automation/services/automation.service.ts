@@ -9,12 +9,12 @@ export class AutomationService {
 	constructor(private commandBus: CommandBus) {}
 
 	@Cron('0 */4 * * *')
-	async checkBill() {
+	async checkBill(): Promise<void> {
 		await this.commandBus.execute(new CheckBillCommand());
 	}
 
 	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-	async checkDiscount() {
+	async checkDiscount(): Promise<void> {
 		await this.commandBus.execute(new CheckDiscountCommand());
 	}
 }

@@ -1,5 +1,3 @@
-import { ScheduleModule } from '@nestjs/schedule';
-
 import { AuthModule } from './auth/auth.module';
 import { AutomationModule } from './automation/automation.module';
 import { BillModule } from './bill/bill.module';

@@ -1,0 +1,103 @@
+@startuml
+actor User as U
+participant "RegisterForm" as RF
+participant "AuthAPI" as API
+participant "RegisterHandler" as RH
+participant "UserRepository" as UR
+participant "AuthRepository" as AR
+participant "RoleRepository" as RR
+participant "Database" as DB
+
+== Register Process ==
+U -> RF: Nhập thông tin đăng ký
+activate RF
+note right: username, password,\nemail, name, confirmPassword
+
+U -> RF: Click "Register" button
+RF -> RF: Validate form data
+note right: - Check required fields\n- Validate email format\n- Check password pattern\n- Confirm password match
+
+alt Form validation fails
+    RF -> U: Show validation errors
+    deactivate RF
+else Form validation success
+    RF -> RF: setIsSubmitting(true)
+    
+    RF -> API: authApi.register(registerData)
+    activate API
+    
+    API -> RH: POST /auth/register
+    activate RH
+    
+    == Backend Validation & Check Conflicts ==
+    RH -> UR: findUserByEmail(email)
+    activate UR
+    UR -> DB: SELECT user WHERE email = ?
+    activate DB
+    DB -> UR: Return user or null
+    deactivate DB
+    deactivate UR
+    
+    RH -> AR: findAccountByUsername(username)
+    activate AR
+    AR -> DB: SELECT account WHERE username = ?
+    activate DB
+    DB -> AR: Return account or null
+    deactivate DB
+    deactivate AR
+    
+    alt User or Account exists
+        RH -> API: HTTP 409 Conflict
+        deactivate RH
+        API -> RF: Registration failed
+        deactivate API
+        RF -> RF: notification.error("Username or email already exists")
+        RF -> U: Show error notification
+        deactivate RF
+    else User and Account not exist
+        == Get Tourist Role ==
+        RH -> RR: findRoleByName('tourist')
+        activate RR
+        RR -> DB: SELECT role WHERE name = 'tourist'
+        activate DB
+        DB -> RR: Return tourist role
+        deactivate DB
+        deactivate RR
+        
+        == Hash Password ==
+        RH -> RH: Generate salt and hash password
+        note right: - genSalt(10)\n- hash(password, salt)
+        
+        == Create Account & User ==
+        RH -> AR: createAccount(accountData)
+        activate AR
+        AR -> DB: BEGIN TRANSACTION
+        activate DB
+        
+        AR -> DB: INSERT INTO account (username, password, salt)
+        DB -> AR: Return account with ID
+        
+        AR -> DB: INSERT INTO user (name, email, roleId, accountId)
+        DB -> AR: Return user data
+        
+        AR -> DB: COMMIT TRANSACTION
+        DB -> AR: Transaction completed
+        deactivate AR
+        
+        == Return Success Response ==
+        RH -> RH: Remove sensitive data (password, salt)
+        RH -> API: HTTP 201 Created + user data
+        deactivate RH
+        deactivate DB
+        
+        API -> RF: Registration successful
+        deactivate API
+        
+        RF -> RF: notification.success("Registration successful")
+        RF -> RF: navigate('/login')
+        RF -> U: Redirect to login page
+        deactivate RF
+    end
+end
+
+@enduml

@@ -19,12 +19,13 @@ import { CreateProductRateByProductIdCommand } from '../implements';
 
 @CommandHandler(CreateProductRateByProductIdCommand)
 export class CreateProductRateByProductIdHandler
-	implements ICommandHandler<CreateProductRateByProductIdCommand> {
+	implements ICommandHandler<CreateProductRateByProductIdCommand>
+{
 	constructor(
 		private readonly productRepository: ProductRepository,
 		private readonly billRepository: BillRepository,
 		private readonly productRateRepository: ProductRateRepository,
-	) { }
+	) {}
 
 	async execute(
 		command: CreateProductRateByProductIdCommand,
@@ -50,7 +51,7 @@ export class CreateProductRateByProductIdHandler
 		// }
 
 		const bill = await this.billRepository.findBillByBillId(
-			productRateInformation.billId
+			productRateInformation.billId,
 		);
 
 		if (!bill) {
@@ -58,7 +59,7 @@ export class CreateProductRateByProductIdHandler
 		}
 
 		if (bill.userId !== myInformation.id) {
-			throw new ForbiddenException()
+			throw new ForbiddenException();
 		}
 
 		if (bill.status !== BillStatusEnum.done) {
@@ -69,7 +70,10 @@ export class CreateProductRateByProductIdHandler
 		}
 
 		const infoBillExistProductRate = bill.infoBill.find((infoBill) => {
-			return infoBill.productSchedule.productId === productId && infoBill.productSchedule.status === ProductScheduleStatusEnum.completed;
+			return (
+				infoBill.productSchedule.productId === productId &&
+				infoBill.productSchedule.status === ProductScheduleStatusEnum.completed
+			);
 		});
 
 		if (!infoBillExistProductRate) {
@@ -134,7 +138,7 @@ export class CreateProductRateByProductIdHandler
 				connect: {
 					id: infoBillExistProductRate.id,
 				},
-			}
+			},
 		};
 		const productRateCreated = await this.productRateRepository.createProductRate(
 			productRate,

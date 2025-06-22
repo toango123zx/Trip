@@ -5,7 +5,6 @@ import { InternalServerErrorException } from '../exceptions';
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
 	catch(exception: HttpException | Error, host: ArgumentsHost): Promise<void> {
-		console.log(`🚀 ~ exception.filter.ts:8 ~ HttpExceptionFilter ~ exception:`, exception)
 		const ctx = host.switchToHttp();
 		const response = ctx.getResponse();
 

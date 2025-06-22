@@ -18,6 +18,9 @@ export class GetProductsResponseDto {
 		id: string;
 		userId: string;
 		name: string;
+		email?: string;
+		phoneNumber?: string;
+		address?: string;
 		image: string;
 		status: string;
 	};
@@ -74,6 +77,9 @@ export class GetProductsResponseDto {
 			id: product.supplier.id,
 			userId: product.supplier.user.id,
 			name: product.supplier.user.name,
+			email: product.supplier?.user?.email,
+			phoneNumber: product.supplier?.user?.phoneNumber,
+			address: product.supplier?.user?.address,
 			image: product.supplier.user.image,
 			status: product.supplier.user.status,
 		};

@@ -1,0 +1,206 @@
+@startuml
+actor User as U
+participant "BillDetail" as BD
+participant "billThunk" as BT
+participant "billApi" as BAPI
+participant "BillController" as BC
+participant "AuthGuard" as AG
+participant "CancelBillHandler" as CBH
+participant "BillRepository" as BR
+participant "ProductScheduleRepository" as PSR
+participant "DiscountRepository" as DR
+participant "Database" as DB
+
+== Display Bill Detail ==
+U -> BD: Click "View Bill Detail"
+activate BD
+BD -> BT: dispatch(billThunk.getBillByBillId(billId))
+activate BT
+BT -> BAPI: billApi.getBillByBillId(billId)
+activate BAPI
+BAPI -> BC: GET /bill/:billId
+BC -> BC: Return bill detail with relations
+BC -> BAPI: HTTP 200 + bill detail
+deactivate BAPI
+BAPI -> BT: Return bill detail
+deactivate BT
+BT -> BD: Update Redux store with bill detail
+BD -> BD: Display bill detail modal
+BD -> U: Show bill information with Cancel option
+deactivate BD
+
+== Cancel Bill Process ==
+U -> BD: Click "Cancel Bill" button
+activate BD
+BD -> BD: Check if bill.status === EBillStatus.pending || EBillStatus.processing
+alt Bill not cancellable
+    BD -> U: Hide cancel button or show disabled state
+    deactivate BD
+else Bill can be cancelled
+    BD -> BT: dispatch(billThunk.cancelBillByBillId(billId))
+    activate BT
+    
+    BT -> BAPI: billApi.cancelBillByBillId(billId)
+    activate BAPI
+    BAPI -> BC: POST /bill/:billId/cancel
+    activate BC
+    
+    == Check Authorization ==
+    BC -> AG: AuthGuard.canActivate()
+    activate AG
+    AG -> AG: Extract and verify JWT token
+    AG -> AG: Get user information from token
+    
+    alt Token invalid or expired
+        AG -> BC: UnauthorizedException
+        deactivate AG
+        BC -> BAPI: HTTP 401 Unauthorized
+        deactivate BC
+        BAPI -> BT: Return auth error
+        deactivate BAPI
+        BT -> BD: Update error state
+        deactivate BT
+        BD -> U: Show unauthorized notification
+        deactivate BD
+    else Token valid and user authorized
+        AG -> BC: Authorization successful with user info
+        deactivate AG
+        
+        BC -> CBH: CancelBillByBillIdCommand
+        activate CBH
+        
+        == Validate Bill for Cancellation ==
+        CBH -> BR: findBillByBillId(billId)
+        activate BR
+        BR -> DB: SELECT bill WHERE id = billId
+        activate DB
+        DB -> BR: Return bill with full relations
+        deactivate DB
+        
+        alt Bill not found
+            BR -> CBH: Return null
+            deactivate BR
+            CBH -> BC: NotFoundException('Bill not found')
+            deactivate CBH
+            BC -> BAPI: HTTP 404 Not Found
+            deactivate BC
+            BAPI -> BT: Return error
+            deactivate BAPI
+            BT -> BD: Update error state
+            deactivate BT
+            BD -> U: Show error notification
+            deactivate BD
+        else Bill found
+            BR -> CBH: Return BillEntity with infoBill and discounts
+            deactivate BR
+            
+            == Check Bill Ownership ==
+            CBH -> CBH: Check if bill.user.id === currentUser.id
+            alt Not bill owner
+                CBH -> BC: ForbiddenException('You are not the owner of this bill')
+                deactivate CBH
+                BC -> BAPI: HTTP 403 Forbidden
+                deactivate BC
+                BAPI -> BT: Return error
+                deactivate BAPI
+                BT -> BD: Update error state
+                deactivate BT
+                BD -> U: Show error notification
+                deactivate BD
+            else Owner authorized
+                == Check Bill Status ==
+                CBH -> CBH: Validate bill.status IN ('pending', 'processing')
+                alt Bill not cancellable
+                    CBH -> BC: ConflictException('Bill cannot be cancelled in current status')
+                    deactivate CBH
+                    BC -> BAPI: HTTP 409 Conflict
+                    deactivate BC
+                    BAPI -> BT: Return error
+                    deactivate BAPI
+                    BT -> BD: Update error state
+                    deactivate BT
+                    BD -> U: Show error notification
+                    deactivate BD
+                else Bill can be cancelled
+                    == Reverse Bill Operations ==
+                    CBH -> BR: cancelBill(billId)
+                    activate BR
+                    
+                    BR -> DB: BEGIN TRANSACTION
+                    activate DB
+                    
+                    == Restore Product Schedule Bookings ==
+                    BR -> PSR: Restore booked quantities for each infoBill
+                    activate PSR
+                    PSR -> DB: UPDATE productSchedule SET booked = booked - quantity WHERE id IN (scheduleIds)
+                    DB -> PSR: Return updated schedules
+                    
+                    == Check and Update Schedule Status ==
+                    PSR -> DB: SELECT schedules that were 'full' and now have available quantity
+                    DB -> PSR: Return schedules to reactivate
+                    PSR -> DB: UPDATE productSchedule SET status = 'active' WHERE status = 'full' AND booked < quantityAvailable
+                    DB -> PSR: Return success
+                    deactivate PSR
+                    
+                    == Restore Discount Applications ==
+                    alt Bill has schedule-level discounts
+                        BR -> DR: Restore discount application counts
+                        activate DR
+                        DR -> DB: UPDATE discount SET applited = applited - quantity WHERE id IN (discountIds)
+                        DB -> DR: Return updated discounts
+                        
+                        == Reactivate Full Discounts ==
+                        DR -> DB: SELECT discounts that were 'full' and now have available quantity
+                        DB -> DR: Return discounts to reactivate
+                        DR -> DB: UPDATE discount SET status = 'active' WHERE status = 'full' AND applited < quantity
+                        DB -> DR: Return success
+                        deactivate DR
+                    end
+                    
+                    alt Bill has bill-level discount
+                        BR -> DR: Restore bill-level discount application
+                        activate DR
+                        DR -> DB: UPDATE discount SET applited = applited - 1 WHERE id = billLevelDiscountId
+                        DB -> DR: Return success
+                        DR -> DB: UPDATE discount SET status = 'active' WHERE id = billLevelDiscountId AND status = 'full' AND applited < quantity
+                        DB -> DR: Return success
+                        deactivate DR
+                    end
+                    
+                    == Update Bill Status ==
+                    BR -> DB: UPDATE bill SET status = 'canceled', deletedAt = NOW() WHERE id = billId
+                    DB -> BR: Return updated bill
+                    
+                    == Complete Transaction ==
+                    BR -> DB: COMMIT TRANSACTION
+                    DB -> BR: Transaction completed successfully
+                    deactivate DB
+                    
+                    BR -> CBH: Return updated BillEntity
+                    deactivate BR
+                    
+                    == Trigger Notifications ==
+                    CBH -> CBH: Send cancellation notification to user
+                    CBH -> CBH: Log cancellation action for audit
+                    
+                    == Return Success Response ==
+                    CBH -> BC: Return success with updated bill
+                    deactivate CBH
+                    BC -> BAPI: HTTP 200 Success + updated bill
+                    deactivate BC
+                    BAPI -> BT: Return cancellation success
+                    deactivate BAPI
+                    BT -> BD: Update Redux store with cancelled bill
+                    deactivate BT
+                    
+                    BD -> BD: Close bill detail modal
+                    BD -> BD: Refresh bill list if needed
+                    BD -> U: Show success notification
+                    deactivate BD
+                end
+            end
+        end
+    end
+end
+
+@enduml
