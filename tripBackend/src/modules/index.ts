@@ -1,5 +1,7 @@
+import { AmenityModule } from './amenity/amenity.module';
 import { AuthModule } from './auth/auth.module';
 import { AutomationModule } from './automation/automation.module';
+import { BedTypeModule } from './bedType/bedType.module';
 import { BillModule } from './bill/bill.module';
 import { BoxChatModule } from './boxChat/boxChat.module';
 import { CartModule } from './cart/cart.module';
@@ -18,6 +20,7 @@ import { ProductModule } from './product/product.module';
 import { ProductRateModule } from './productRate/productRate.module';
 import { ProductScheduleModule } from './productSchedule/productSchedule.module';
 import { ProductViewLogModule } from './productViewLog/productViewLog.module';
+import { RoomTypeModule } from './roomType/roomtype.module';
 import { StatisticModule } from './statistic/statistic.module';
 import { SupplierModule } from './supplier/supplier.module';
 import { TransactionModule } from './transaction/transaction.module';
@@ -50,5 +53,8 @@ export const Modules = [
 	ChatModule,
 	AutomationModule,
 	StatisticModule,
+	BedTypeModule,
+	AmenityModule,
+	RoomTypeModule,
 	// ScheduleModule.forRoot(),
 ];

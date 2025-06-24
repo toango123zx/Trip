@@ -1,3 +1,5 @@
+import { AmenityStatusEnum } from '@prisma/client';
+import { ProductCategoryEnum } from 'src/common';
 import { ProductEntity } from 'src/models';
 
 export class GetProductsResponseDto {
@@ -24,7 +26,7 @@ export class GetProductsResponseDto {
 		image: string;
 		status: string;
 	};
-	schedule: {
+	schedule?: {
 		id: string;
 		startTime: Date;
 		endTime: Date;
@@ -37,7 +39,7 @@ export class GetProductsResponseDto {
 		deletedAt: Date;
 		status: string;
 	};
-	discount: {
+	discount?: {
 		id: string;
 		name: string;
 		code: string;
@@ -54,6 +56,27 @@ export class GetProductsResponseDto {
 		deletedAt: Date;
 		status: string;
 	};
+	roomType?: {
+		id: string;
+		name: string;
+		description: string;
+		maxOccupancy: number;
+		quantity: number;
+		price: number;
+		amenities?: {
+			id: string;
+			name: string;
+			description: string;
+			status: AmenityStatusEnum;
+		}[];
+		bedTypes: {
+			id: string;
+			name: string;
+			description: string;
+			quantity: number;
+			status: string;
+		}[];
+	}[];
 	createAt: Date;
 	updateAt: Date;
 	deletedAt: Date;
@@ -84,7 +107,9 @@ export class GetProductsResponseDto {
 			status: product.supplier.user.status,
 		};
 		this.schedule =
-			product.productSchedule && product.productSchedule.length > 0
+			product.productCategory.name === ProductCategoryEnum.accommodation &&
+			product.productSchedule &&
+			product.productSchedule.length > 0
 				? {
 						id: product.productSchedule[0].id,
 						startTime: product.productSchedule[0].startTime,
@@ -100,6 +125,7 @@ export class GetProductsResponseDto {
 					}
 				: undefined;
 		this.discount =
+			product.productCategory.name === ProductCategoryEnum.accommodation &&
 			product.productSchedule &&
 			product.productSchedule.length > 0 &&
 			product.productSchedule[0].infoDiscount &&
@@ -132,6 +158,35 @@ export class GetProductsResponseDto {
 						status: product.productSchedule[0].infoDiscount[0].discount
 							.status,
 					}
+				: undefined;
+		this.roomType =
+			product.productCategory.name === ProductCategoryEnum.accommodation &&
+			product.roomType.length > 0
+				? product.roomType.map((roomType) => ({
+						id: roomType.id,
+						name: roomType.name,
+						description: roomType.description,
+						maxOccupancy: roomType.maxOccupancy,
+						quantity: roomType.quantity,
+						price: roomType.price,
+						amenities: roomType.infoRoomTypeAmenity
+							? roomType.infoRoomTypeAmenity.map((infoRoomTypeAmenity) => ({
+									id: infoRoomTypeAmenity.amenity?.id,
+									name: infoRoomTypeAmenity.amenity?.name,
+									description: infoRoomTypeAmenity.amenity?.description,
+									status: infoRoomTypeAmenity.amenity?.status,
+								}))
+							: [],
+						bedTypes: roomType.infoRoomTypeBedType
+							? roomType.infoRoomTypeBedType.map((infoRoomTypeBedType) => ({
+									id: infoRoomTypeBedType.bedType?.id,
+									name: infoRoomTypeBedType.bedType?.name,
+									description: infoRoomTypeBedType.bedType?.description,
+									quantity: infoRoomTypeBedType?.quantity,
+									status: infoRoomTypeBedType.bedType?.status,
+								}))
+							: [],
+					}))
 				: undefined;
 		this.createAt = product.createAt;
 		this.updateAt = product.updateAt;

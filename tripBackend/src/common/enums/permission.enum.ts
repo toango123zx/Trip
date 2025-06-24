@@ -9,6 +9,7 @@ export enum PermissionEnum {
 	FindProductsForRole = 'find_products_for_role',
 	CreateProduct = 'create_product',
 	CreateProductSchedule = 'create_product_schedule',
+	CreateRoomTypeForAccommodation = 'create_room_type_for_accommodation',
 	UpdateProductInformation = 'update_product_information',
 	FindProductScheduleBySupplierId = 'find_product_schedule_by_supplier_id',
 	FindUsersInProductScheduleByProductScheduleId = 'find_users_in_product_schedule_by_product_schedule_id',

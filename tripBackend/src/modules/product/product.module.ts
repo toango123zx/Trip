@@ -3,7 +3,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 
+import { AmenityRepository } from '../amenity/amenity.repository';
 import { AuthModule } from '../auth/auth.module';
+import { BedTypeRepository } from '../bedType/bedType.repository';
 import { BillRepository } from '../bill/bill.repository';
 import { DatabaseModule } from '../database/database.module';
 import { DiscountRepository } from '../discount/discount.repository';
@@ -13,6 +15,7 @@ import { ProductRateRepository } from '../productRate/productRate.repository';
 import { ProductScheduleRepository } from '../productSchedule/productSchedule.repository';
 import { ProductViewLogRepository } from '../productViewLog/productViewLog.repository';
 import { ProviderMapRepository } from '../providerMap/providerMap.repository';
+import { RoomTypeRepository } from '../roomType/roomType.repository';
 import { SupplierRepository } from '../supplier/supplier.repository';
 import { UserRepository } from '../user/user.repository';
 
@@ -43,6 +46,9 @@ import { ProductRecommendationsService } from './services';
 		ProductCategoryRepository,
 		ProductRateRepository,
 		ProductScheduleRepository,
+		BedTypeRepository,
+		AmenityRepository,
+		RoomTypeRepository,
 		DiscountRepository,
 		BillRepository,
 		ProductViewLogRepository,

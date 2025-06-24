@@ -12,7 +12,7 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { HttpResponseBodyDto, PaginationDto, PermissionEnum, RoleEnum } from 'src/common';
-import { ProductEntity, ProductScheduleEntity } from 'src/models';
+import { ProductEntity, ProductScheduleEntity, RoomTypeEntity } from 'src/models';
 
 import { Auth, AuthPermission, AuthRole, OptionalAuth } from '../auth/decorators';
 import { DiscountFilterRequestDto, GetDiscountsResponseDto } from '../discount/dtos';
@@ -30,6 +30,7 @@ import {
 	CreateProductCommand,
 	CreateProductRateByProductIdCommand,
 	CreateProductScheduleByProductIdCommand,
+	CreateRoomTypeByProductIdCommand,
 	DeleteProductByProductIdCommand,
 	UpdateProductInformationByProductIdCommand,
 } from './commands/implements';
@@ -41,6 +42,7 @@ import {
 	ProductFilterRequestDto,
 	UpdateProductInformationByProductIdRequestDto,
 	CreateProductRateByProductIdRequestDto,
+	CreateRoomTypeRequestDto,
 } from './dtos';
 import { GetProductByProductIdResponseDto } from './dtos/responses/getProductBByProductId.response';
 import {
@@ -135,6 +137,22 @@ export class ProductController {
 			new CreateProductScheduleByProductIdCommand(
 				productId,
 				productScheduleInformation,
+				supplierInformation,
+			),
+		);
+	}
+
+	@Post('/:productId/room-type')
+	@AuthPermission(PermissionEnum.CreateRoomTypeForAccommodation)
+	async createRoomTypeByProductId(
+		@Param('productId') productId: string,
+		@Body() createRoomTypeRequestDto: CreateRoomTypeRequestDto,
+		@SupplierInformation() supplierInformation: SupplierInformationDto,
+	): Promise<HttpResponseBodyDto<RoomTypeEntity | HttpException>> {
+		return this.commandBus.execute(
+			new CreateRoomTypeByProductIdCommand(
+				productId,
+				createRoomTypeRequestDto,
 				supplierInformation,
 			),
 		);

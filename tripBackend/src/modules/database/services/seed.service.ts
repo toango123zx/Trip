@@ -1,12 +1,15 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 
 import {
+	AmenityEnum,
+	BedTypeEnum,
 	DiscountApplicationScopeEnum,
 	DiscountEligibilityEnum,
 	DiscountTypeEnum,
 	PaymentMethodEnum,
 	PermissionForAdminEnum,
 	PermissionForSupplierEnum,
+	ProductCategoryEnum,
 	RoleEnum,
 } from 'src/common';
 import { ProviderMapEnum } from 'src/common/enums/providerMap.enum';
@@ -27,6 +30,9 @@ export class SeedService implements OnModuleInit {
 		// await this.seedDiscountApplicationScopes();
 		// await this.seedPaymentMethod();
 		// await this.seedProviderMap();
+		await this.seedBedType();
+		await this.seedAmenity();
+		await this.seedProductCategory();
 	}
 
 	private async seedRoles(): Promise<void> {
@@ -289,6 +295,72 @@ export class SeedService implements OnModuleInit {
 		}));
 		await this.prisma.providerMap.createMany({
 			data: providerMapData,
+		});
+
+		return;
+	}
+
+	private async seedBedType(): Promise<void> {
+		const BED_TYPES: string[] = Object.values(BedTypeEnum);
+
+		const bedTypes = await this.prisma.bedType.findMany();
+		const bedTypeNamesDB = bedTypes.map((bedType) => bedType.name);
+		const bedTypeNames = BED_TYPES.filter((bedTypeName) => {
+			return !bedTypeNamesDB.includes(bedTypeName);
+		});
+		if (bedTypeNames.length === 0) {
+			return;
+		}
+		const bedTypeData = bedTypeNames.map((bedTypeName) => ({
+			name: bedTypeName,
+			description: bedTypeName.replaceAll('_', ' '),
+		}));
+		await this.prisma.bedType.createMany({
+			data: bedTypeData,
+		});
+
+		return;
+	}
+	private async seedAmenity(): Promise<void> {
+		const AMENITIES: string[] = Object.values(AmenityEnum);
+
+		const amenities = await this.prisma.amenity.findMany();
+		const amenityNamesDB = amenities.map((amenity) => amenity.name);
+		const amenityNames = AMENITIES.filter((amenityName) => {
+			return !amenityNamesDB.includes(amenityName);
+		});
+		if (amenityNames.length === 0) {
+			return;
+		}
+		const amenityData = amenityNames.map((amenityName) => ({
+			name: amenityName,
+			description: amenityName.replaceAll('_', ' '),
+		}));
+		await this.prisma.amenity.createMany({
+			data: amenityData,
+		});
+
+		return;
+	}
+	private async seedProductCategory(): Promise<void> {
+		const PRODUCT_CATEGORIES: string[] = Object.values(ProductCategoryEnum);
+
+		const productCategories = await this.prisma.productCategory.findMany();
+		const productCategoryNamesDB = productCategories.map(
+			(productCategory) => productCategory.name,
+		);
+		const productCategoryNames = PRODUCT_CATEGORIES.filter((productCategoryName) => {
+			return !productCategoryNamesDB.includes(productCategoryName);
+		});
+		if (productCategoryNames.length === 0) {
+			return;
+		}
+		const productCategoryData = productCategoryNames.map((productCategoryName) => ({
+			name: productCategoryName,
+			description: productCategoryName.replaceAll('_', ' '),
+		}));
+		await this.prisma.productCategory.createMany({
+			data: productCategoryData,
 		});
 
 		return;

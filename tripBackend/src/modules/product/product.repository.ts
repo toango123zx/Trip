@@ -7,6 +7,7 @@ import {
 	InfoDiscountStatusEnum,
 	ProductScheduleStatusEnum,
 	ProductStatusEnum,
+	RoomTypeStatusEnum,
 } from '@prisma/client';
 import { IPaginationQuery } from 'src/common';
 import { CreateProductDto, ProductEntity, UpdateProductDto } from 'src/models';
@@ -105,6 +106,23 @@ export class ProductRepository {
 					},
 					location: true,
 					productCategory: true,
+					roomType: {
+						include: {
+							infoRoomTypeAmenity: {
+								include: {
+									amenity: true,
+								},
+							},
+							infoRoomTypeBedType: {
+								include: {
+									bedType: true,
+								},
+							},
+						},
+						where: {
+							status: RoomTypeStatusEnum.active,
+						},
+					},
 					productSchedule: schedule
 						? {
 								include: {
@@ -209,6 +227,23 @@ export class ProductRepository {
 					},
 				},
 				productImage: true,
+				roomType: {
+					include: {
+						infoRoomTypeAmenity: {
+							include: {
+								amenity: true,
+							},
+						},
+						infoRoomTypeBedType: {
+							include: {
+								bedType: true,
+							},
+						},
+					},
+					where: {
+						status: RoomTypeStatusEnum.active,
+					},
+				},
 				productSchedule: {
 					where: {
 						status: {

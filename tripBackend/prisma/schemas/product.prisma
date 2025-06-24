@@ -51,6 +51,27 @@ enum ProductScheduleStatusEnum {
   @@map("Product_Schedule_Status_Enum")
 }
 
+enum RoomTypeStatusEnum {
+  active
+  inactive
+
+  @@map("Room_Type_Enum")
+}
+
+enum BedTypeStatusEnum {
+  active
+  inactive
+
+  @@map("Bed_Type_Enum")
+}
+
+enum AmenityStatusEnum {
+  active
+  inactive
+
+  @@map("Amenity_Status_Enum")
+}
+
 model productCategory {
   id          String            @id @default(cuid())
   name        String
@@ -178,6 +199,7 @@ model product {
   productRate     productRate[]
   productSchedule productSchedule[]
   productViewLog  productViewLog[]
+  roomType        roomType[]
 
   @@map("Product")
 }
@@ -195,36 +217,36 @@ model productImage {
 }
 
 model productRate {
-  id          String                @id @default(cuid())
+  id         String                @id @default(cuid())
   /// @DtoUpdateHidden
-  productId   String                @map("product_id")
+  productId  String                @map("product_id")
   /// @DtoRelationCanConnectOnCreate
   /// @DtoRelationCanConnectOnCreate
   /// @DtoRelationCanUpdateOnUpdate
-  product     product               @relation(fields: [productId], references: [id])
+  product    product               @relation(fields: [productId], references: [id])
   /// @DtoUpdateHidden
-  userId      String                @map("user_id")
+  userId     String                @map("user_id")
   /// @DtoRelationCanConnectOnCreate
-  user        user                  @relation(fields: [userId], references: [id])
+  user       user                  @relation(fields: [userId], references: [id])
   infoBillId String                @unique @map("info_bill_id")
   /// @DtoRelationCanConnectOnCreate
   infoBill   infoBill              @relation(fields: [infoBillId], references: [id])
   /// @maximum 5
   /// @minimum 0
-  star        Int
-  comment     String
+  star       Int
+  comment    String
   /// @DtoCreateHidden
   /// @DtoUpdateHidden
-  createAt    DateTime              @default(now()) @map("create_at")
+  createAt   DateTime              @default(now()) @map("create_at")
   /// @DtoCreateHidden
   /// @DtoUpdateHidden
-  updateAt    DateTime              @updatedAt @map("update_at")
+  updateAt   DateTime              @updatedAt @map("update_at")
   /// @DtoCreateHidden
   /// @DtoUpdateHidden
-  deletedAt   DateTime?             @map("deleted_at")
+  deletedAt  DateTime?             @map("deleted_at")
   /// @DtoCreateHidden
   /// @DtoUpdateHidden
-  status      ProductRateStatusEnum @default(active)
+  status     ProductRateStatusEnum @default(active)
 
   @@map("Product_Rate")
 }
@@ -276,4 +298,96 @@ model productViewLog {
   createdAt   DateTime @default(now()) @map("create_at")
 
   @@map("Product_View_Log")
+}
+
+model roomType {
+  id           String             @id @default(cuid())
+  name         String
+  description  String
+  productId    String             @map("product_id")
+  /// @DtoRelationCanConnectOnCreate
+  product      product            @relation(fields: [productId], references: [id])
+  quantity     Int
+  maxOccupancy Int
+  price        Int
+  createAt     DateTime           @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt     DateTime           @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt    DateTime?          @map("deleted_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  status       RoomTypeStatusEnum @default(active)
+
+  /// @DtoRelationCanCreateOnCreate
+  infoRoomTypeBedType infoRoomTypeBedType[]
+  /// @DtoRelationCanCreateOnCreate
+  infoRoomTypeAmenity infoRoomTypeAmenity[]
+
+  @@map("Room_Type")
+}
+
+model bedType {
+  id          String             @id @default(cuid())
+  name        String
+  description String
+  createAt    DateTime           @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt    DateTime           @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt   DateTime?          @map("deleted_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  status      RoomTypeStatusEnum @default(active)
+
+  infoRoomTypeBedType infoRoomTypeBedType[]
+
+  @@map("Bed_Type")
+}
+
+model infoRoomTypeBedType {
+  id         String   @id @default(cuid())
+  roomTypeId String   @map("room_type_id")
+  roomType   roomType @relation(fields: [roomTypeId], references: [id])
+  bedTypeId  String   @map("bed_type_id")
+  /// @DtoRelationCanConnectOnCreate
+  bedType    bedType  @relation(fields: [bedTypeId], references: [id])
+  quantity   Int
+
+  @@map("Info_Room_Type_Bed_Type")
+}
+
+model amenity {
+  id          String            @id @default(cuid())
+  name        String
+  description String
+  createAt    DateTime          @default(now()) @map("create_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  updateAt    DateTime          @updatedAt @map("update_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  deletedAt   DateTime?         @map("deleted_at")
+  /// @DtoCreateHidden
+  /// @DtoUpdateHidden
+  status      AmenityStatusEnum @default(active)
+
+  infoRoomTypeAmenity infoRoomTypeAmenity[]
+
+  @@map("Amenity")
+}
+
+model infoRoomTypeAmenity {
+  id         String   @id @default(cuid())
+  roomTypeId String   @map("room_type_id")
+  roomType   roomType @relation(fields: [roomTypeId], references: [id])
+  amenityId  String   @map("amenity_id")
+  /// @DtoRelationCanConnectOnCreate
+  amenity    amenity  @relation(fields: [amenityId], references: [id])
+
+  @@map("Info_Room_Type_Amenity")
 }
