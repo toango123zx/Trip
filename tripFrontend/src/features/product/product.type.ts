@@ -1,5 +1,6 @@
 import {
 	EArrange,
+	EProductScheduleStatus,
 	EProductStatus,
 	TPagination,
 	TProductDetail,
@@ -42,6 +43,7 @@ export type TRequestQueryGetProducts = {
 
 export type TRequestBodyCreateProduct = {
 	name: string;
+	categoryId?: string;
 	posterImageUrl: string;
 	time: number;
 	quantityAvailable: number;
@@ -70,3 +72,19 @@ export type TSearchAttraction = {
 	minPrice?: number;
 	maxPrice?: number;
 } & TRequestQueryGetProducts;
+
+
+export type TRequestBodyCreateRoomType = {
+	id: string;
+	name: string;
+	description: string;
+	maxOccupancy: number;
+	quantity: number;
+	price: number;
+	amenityIds: string[];
+	bedTypes: {
+		id: string;
+		quantity: number;
+	}[]
+	status?: EProductScheduleStatus;
+}

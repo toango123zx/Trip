@@ -38,10 +38,10 @@ export const FormInput = <T extends FieldValues>({
           )}
           <Input
             {...props}
-            type={type}
+            type={'text'}
             {...field}
             status={fieldState.invalid ? 'error' : undefined}
-            value={field.value ? ((field.value)) : field.value}
+            value={field.value ? (type === 'number' ? (Number(String(field.value).replace(/\D/g, '')).toLocaleString('vi-VN')) : field.value) : field.value}
           />
           {fieldState.error?.message && (
             <div className="text-red-500 text-sm mt-1">

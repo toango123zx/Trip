@@ -9,125 +9,166 @@ import { ProductForm, scheduleThunk, TRequestBodyCreateSchedule } from '@/featur
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TProductDetail } from '@/types';
 
-import { TRequestBodyCreateProduct } from '../../product.type';
+import { TRequestBodyCreateProduct, TRequestBodyCreateRoomType } from '../../product.type';
 import { productThunk } from '../../productThunk';
 import { notificationUtils } from '@/utils/notificationUtils';
+// Import roomType API - bạn cần tạo file này
+// import { roomTypeApi } from '../../roomTypeApi'; // Giả sử bạn có API này
 
 type TAddProductProps = {
-	onCancel?: () => void;
+    onCancel?: () => void;
 };
 
 // Thêm cấu hình Gemini AI
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
 export const AddProduct = ({
-	onCancel = (): void => {},
+    onCancel = (): void => {},
 }: TAddProductProps): JSX.Element => {
-	const [hasSubmitted, setHasSubmitted] = useState(false);
-	const [locationDescription, setLocationDescription] = useState<string>('');
-	const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
-	const form = useForm<TRequestBodyCreateProduct>({});
+    const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [locationDescription, setLocationDescription] = useState<string>('');
+    const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+    const form = useForm<TRequestBodyCreateProduct>({});
 
-	const dispatch = useDispatch<TReduxStoreDispatch>();
+    const dispatch = useDispatch<TReduxStoreDispatch>();
 
-	const loadingApi = useSelector((s: TReduxStoreState) => s.product.loading);
-	const errorApi = useSelector((s: TReduxStoreState) => s.product.error);
-	const [schedules, setSchedules] = useState<TRequestBodyCreateSchedule[]>([]);
-	const productDetail = useSelector<TReduxStoreState, TProductDetail>(
-		(s: TReduxStoreState) => s.product.productDetail,
-	);
+    const loadingApi = useSelector((s: TReduxStoreState) => s.product.loading);
+    const errorApi = useSelector((s: TReduxStoreState) => s.product.error);
+    const [schedules, setSchedules] = useState<TRequestBodyCreateSchedule[]>([]);
+    const [roomTypes, setRoomTypes] = useState<TRequestBodyCreateRoomType[]>([]);
+    const productDetail = useSelector<TReduxStoreState, TProductDetail>(
+        (s: TReduxStoreState) => s.product.productDetail,
+    );
 
-	const onSubmit: SubmitHandler<TRequestBodyCreateProduct> = (data) => {
-		const formattedData = {
-			...data,
-			time: Number(data.time),
-			quantityAvailable: Number(data.quantityAvailable),
-			age: Number(data.age),
-		};
+    const onSubmit: SubmitHandler<TRequestBodyCreateProduct> = (data) => {
+        const formattedData = {
+            ...data,
+            time: Number(data.time),
+            quantityAvailable: Number(data.quantityAvailable),
+            age: Number(data.age),
+        };
 
-		setHasSubmitted(true);
-		dispatch(productThunk.createProduct(formattedData));
-	};
+        setHasSubmitted(true);
+        dispatch(productThunk.createProduct(formattedData));
+    };
 
-	const generateLocationDescription = async (locationName: string) => {
-		if (!locationName) {
-			notificationUtils.warning();
-			return;
-		}
+    const generateLocationDescription = async (locationName: string) => {
+        if (!locationName) {
+            notificationUtils.warning();
+            return;
+        }
 
-		setIsGeneratingDescription(true);
+        setIsGeneratingDescription(true);
 
-		const prompt = `
+        const prompt = `
 Hãy viết một mô tả ngắn (50–100 từ) để giới thiệu địa điểm du lịch "${locationName}" tại Việt Nam. 
 Nội dung cần hấp dẫn, truyền cảm hứng, và nêu bật điểm đặc sắc của địa danh này.
 `;
 
-		try {
-			const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-			const result = await model.generateContent(prompt);
-			const description = result.response.text();
-			form.setValue('description', description, {
-				shouldValidate: true,
-				shouldDirty: true,
-				shouldTouch: true,
-			});
+        try {
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+            const result = await model.generateContent(prompt);
+            const description = result.response.text();
+            form.setValue('description', description, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true,
+            });
 
-			setLocationDescription(description);
-			notificationUtils.success();
-		} catch (error: any) {
-			console.error('Lỗi tạo mô tả:', error);
-			notificationUtils.error({message: error.response.data.message});
-		} finally {
-			setIsGeneratingDescription(false);
-		}
-	};
+            setLocationDescription(description);
+            notificationUtils.success();
+        } catch (error: any) {
+            console.error('Lỗi tạo mô tả:', error);
+            notificationUtils.error({message: error.response?.data?.message || 'Error generating description'});
+        } finally {
+            setIsGeneratingDescription(false);
+        }
+    };
 
-	useEffect(() => {
-		if (
-			schedules.length > 0 &&
-			hasSubmitted &&
-			!loadingApi &&
-			!errorApi &&
-			productDetail?.id
-		) {
-			schedules.forEach((schedule) => {
-				dispatch(
-					scheduleThunk.createSchedule({
-						productId: productDetail.id,
-						schedule,
-					}),
-				);
-			});
+    // Function để tạo room types
+    const createRoomTypes = async (productId: string, roomTypesToCreate: TRequestBodyCreateRoomType[]) => {
+        try {
+            for (const roomType of roomTypesToCreate) {
+                // Loại bỏ status và các field không cần thiết trước khi gửi API
+                const { status, ...roomTypeData } = roomType;
+                
+                // await roomTypeApi.createRoomType({
+                //     ...roomTypeData,
+                //     productId: productId
+                // });
+            }
+            
+            notificationUtils.success({ message: 'Room types created successfully' });
+        } catch (error: any) {
+            console.error('Error creating room types:', error);
+            notificationUtils.error({ 
+                message: error.response?.data?.message || 'Failed to create room types'
+            });
+        }
+    };
 
-			setSchedules([]);
-		}
-		if (hasSubmitted && !loadingApi && !errorApi) {
-			onCancel();
-		}
-	}, [
-		dispatch,
-		hasSubmitted,
-		loadingApi,
-		errorApi,
-		onCancel,
-		schedules,
-		productDetail.id,
-	]);
+    useEffect(() => {
+        const handlePostProductCreation = async () => {
+            if (!hasSubmitted || loadingApi || errorApi || !productDetail?.id) {
+                return;
+            }
 
-	return (
-		<div>
-			<ProductForm
-				form={form}
-				isRemove={false}
-				schedules={schedules}
-				setSchedules={setSchedules}
-				isCreate={true}
-				onSubmit={onSubmit}
-				onCancel={onCancel}
-				generateLocationDescription={generateLocationDescription}
-				locationDescription={locationDescription}
-				isGeneratingDescription={isGeneratingDescription}
-			/>
-		</div>
-	);
+            try {
+                // Tạo schedules nếu có
+                if (schedules.length > 0) {
+                    for (const schedule of schedules) {
+                        await dispatch(
+                            scheduleThunk.createSchedule({
+                                productId: productDetail.id,
+                                schedule,
+                            }),
+                        );
+                    }
+                    setSchedules([]);
+                }
+
+                // Tạo room types nếu có
+                if (roomTypes.length > 0) {
+                    await createRoomTypes(productDetail.id, roomTypes);
+                    setRoomTypes([]);
+                }
+
+                // Đóng form sau khi hoàn thành
+                onCancel();
+            } catch (error) {
+                console.error('Error in post-product creation:', error);
+                notificationUtils.error({ message: 'Some items failed to create' });
+            }
+        };
+
+        handlePostProductCreation();
+    }, [
+        dispatch,
+        hasSubmitted,
+        loadingApi,
+        errorApi,
+        onCancel,
+        schedules,
+        roomTypes,
+        productDetail?.id,
+    ]);
+
+    return (
+        <div>
+            <ProductForm
+                form={form}
+                isRemove={false}
+                schedules={schedules}
+                setSchedules={setSchedules}
+                roomTypes={roomTypes}
+                setRoomTypes={setRoomTypes}
+                isCreate={true}
+                onSubmit={onSubmit}
+                onCancel={onCancel}
+                generateLocationDescription={generateLocationDescription}
+                locationDescription={locationDescription}
+                isGeneratingDescription={isGeneratingDescription}
+            />
+        </div>
+    );
 };

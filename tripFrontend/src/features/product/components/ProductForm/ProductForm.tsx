@@ -20,10 +20,12 @@ import {
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TProductSchedule } from '@/types';
 
-import { TRequestBodyCreateProduct } from '../../product.type';
+import { TRequestBodyCreateProduct, TRequestBodyCreateRoomType } from '../../product.type';
 import { EProductScheduleStatus } from '@/types/product.type';
 import { cloudinaryService } from '@/services/cloudinaryService';
 import { notificationUtils } from '@/utils/notificationUtils';
+import { RoomTypeBoard } from '../RoomTypeBoard';
+import { RoomTypeForm } from '../RooomTypeForm';
 
 interface ProductImage {
 	id: string;
@@ -33,6 +35,10 @@ interface ProductImage {
 type TProductFormProps = {
 	form: UseFormReturn<TRequestBodyCreateProduct>;
 	schedules?: TProductSchedule[] | TRequestBodyCreateSchedule[];
+	roomTypes?: TRequestBodyCreateRoomType[];
+	setRoomTypes?: React.Dispatch<
+		React.SetStateAction<TRequestBodyCreateRoomType[]>
+	>;
 	setSchedules?: React.Dispatch<
 		React.SetStateAction<TProductSchedule[] | TRequestBodyCreateSchedule[]>
 	>;
@@ -54,15 +60,17 @@ type TProductFormProps = {
 export const ProductForm = ({
 	form,
 	schedules,
-	setSchedules = (): void => {},
+	roomTypes = [],
+	setRoomTypes = (): void => { },
+	setSchedules = (): void => { },
 	// discounts = [],
 	isCreate = false,
 	isRemove = true,
 	disabled = false,
 	open = true,
 	onSubmit,
-	onRemove = (): void => {},
-	onCancel = (): void => {},
+	onRemove = (): void => { },
+	onCancel = (): void => { },
 	generateLocationDescription,
 	locationDescription,
 	isGeneratingDescription = false,
@@ -71,6 +79,7 @@ export const ProductForm = ({
 }: TProductFormProps): JSX.Element => {
 	const {
 		register,
+		getValues,
 		setValue,
 		watch,
 		handleSubmit,
@@ -81,6 +90,7 @@ export const ProductForm = ({
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const locations = useSelector((s: TReduxStoreState) => s.location.locations);
 	const [isOpenPopupScheduleUpdate, setIsOpenPopupScheduleUpdate] = useState(false);
+	const [isOpenPopupRoomTypeUpdate, setIsOpenPopupRoomTypeUpdate] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 
 	useEffect(() => {
@@ -96,6 +106,14 @@ export const ProductForm = ({
 				city: l.city,
 			})),
 		[locations],
+	);
+
+	const optionCategories = useMemo(
+		() => [
+			{ id: 'clv2my35m0000t8z5h4xetnxu', value: 'clv2my35m0000t8z5h4xetnxu', label: 'Tourist destination' },
+			{ id: 'cmc933r000001e5hoffrr3msc', value: 'cmc933r000001e5hoffrr3msc', label: 'Accommodation' },
+		],
+		[],
 	);
 
 	const locationId = watch('locationId');
@@ -127,8 +145,12 @@ export const ProductForm = ({
 	};
 
 	const [isCreateSchedule, setIsCreateSchedule] = useState(false);
+	const [isCreateRoomType, setIsCreateRoomType] = useState(false);
 	const [newSchedule, setNewSchedule] = useState<TRequestBodyCreateSchedule>(
 		{} as TRequestBodyCreateSchedule,
+	);
+	const [newRoomType, setNewRoomType] = useState<TRequestBodyCreateRoomType>(
+		{} as TRequestBodyCreateRoomType,
 	);
 
 	const handleAddScheduleOnClick = (): void => {
@@ -149,6 +171,10 @@ export const ProductForm = ({
 		setSchedules((prev = []) => [schedule, ...prev]);
 		setIsOpenPopupScheduleUpdate(false);
 	};
+	const handlerAddRoomTypeInPopup = (roomType: TRequestBodyCreateRoomType): void => {
+		setRoomTypes((prev = []) => [roomType, ...prev]);
+		setIsOpenPopupRoomTypeUpdate(false);
+	};
 
 	const handleClosePopupScheduleUpdate = (): void => {
 		setIsOpenPopupScheduleUpdate(false);
@@ -160,6 +186,13 @@ export const ProductForm = ({
 		setIsCreateSchedule(false);
 		setNewSchedule(schedule);
 		setIsOpenPopupScheduleUpdate(true);
+	};
+	const handleViewRoomTypeDetailOnClick = (
+		roomType: TRequestBodyCreateRoomType,
+	): void => {
+		setIsCreateRoomType(false);
+		setNewRoomType(roomType);
+		setIsOpenPopupRoomTypeUpdate(true);
 	};
 
 	const handleRemoveSchedule = (): void => {
@@ -179,19 +212,31 @@ export const ProductForm = ({
 
 	const handleSaveOnClick = (data: TRequestBodyCreateProduct): void => {
 		if (onSubmit) {
-			const submitData = {
-				...data,
-				productCategoryId: 'clv2my35m0000t8z5h4xetnxu',
-				posterImageUrl: data.posterImageUrl || '',
-				productImageUrls: data.productImageUrls || [],
-				urlMap: data.urlMap || '',
-			};
-			onSubmit(submitData);
+			if (data.productCategoryId === 'clv2my35m0000t8z5h4xetnxu') {
+				const submitData = {
+					...data,
+					productCategoryId: 'clv2my35m0000t8z5h4xetnxu',
+					posterImageUrl: data.posterImageUrl || '',
+					productImageUrls: data.productImageUrls || [],
+					urlMap: data.urlMap || '',
+				};
+				onSubmit(submitData);
+			}
+			if (data.productCategoryId === 'cmc933r000001e5hoffrr3msc') {
+				const submitData = {
+					...data,
+					productCategoryId: 'cmc933r000001e5hoffrr3msc',
+					posterImageUrl: data.posterImageUrl || '',
+					productImageUrls: data.productImageUrls || [],
+					urlMap: data.urlMap || '',
+				};
+				onSubmit(submitData);
+			}
 		}
 	};
 
 	const description = watch('description');
-	useEffect(() => {}, [description]);
+	useEffect(() => { }, [description]);
 
 	const handleGenerateDescription = (): void => {
 		const selectedLocation = locations.find((l) => l.id === locationId);
@@ -222,7 +267,7 @@ export const ProductForm = ({
 
 		try {
 			setIsUploading(true);
-			
+
 			// Upload single image
 			const [imageUrl] = await cloudinaryService.uploadImages(files);
 
@@ -260,7 +305,7 @@ export const ProductForm = ({
 		const maxFileSize = 5 * 1024 * 1024; // 5MB
 
 		// Validate files
-		const invalidFiles = Array.from(files).filter((file) => 
+		const invalidFiles = Array.from(files).filter((file) =>
 			!validImageTypes.includes(file.type) || file.size > maxFileSize
 		);
 
@@ -284,13 +329,13 @@ export const ProductForm = ({
 
 		try {
 			setIsUploading(true);
-			
+
 			// Get existing images to append to
 			const existingImages = watch('productImageUrls') || [];
-			
+
 			// Upload new images
 			const newImageUrls = await cloudinaryService.uploadImages(files);
-			
+
 			// Combine existing and new images (no limit)
 			const combinedImages = [...existingImages, ...newImageUrls];
 
@@ -360,7 +405,7 @@ export const ProductForm = ({
 		>
 			{/* --- Product Info --- */}
 			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
-				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+				{/* <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
 					<svg
 						className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
 						fill="none"
@@ -377,7 +422,7 @@ export const ProductForm = ({
 					<span className="text-sm sm:text-base font-medium text-gray-800">
 						Basic Information
 					</span>
-				</div>
+				</div> */}
 
 				<FormInput
 					control={control}
@@ -422,11 +467,23 @@ export const ProductForm = ({
 						) : null
 					}
 				/>
+
+				<FormSelect
+					control={control}
+					name="categoryId"
+					label="Category"
+					options={optionCategories}
+					rules={{ required: 'Category is required' }}
+					disabled={disabled}
+					search={true}
+				/>
 			</div>
 
 			{/* --- Destination Info --- */}
-			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
-				<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+			{
+				watch('categoryId') === 'clv2my35m0000t8z5h4xetnxu' && (
+					<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+						{/* <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
 					<svg
 						className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
 						fill="none"
@@ -443,46 +500,50 @@ export const ProductForm = ({
 					<span className="text-sm sm:text-base font-medium text-gray-800">
 						Destination & Attributes
 					</span>
-				</div>
+				</div> */}
 
-				<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
-					<FormInput
-						control={control}
-						name="time"
-						label="Time (Hour)"
-						type="number"
-						rules={{
-							required: 'Time is required',
-							validate: validateGreaterThanZero,
-						}}
-						disabled={disabled}
-					/>
 
-					<FormInput
-						control={control}
-						name="quantityAvailable"
-						label="Quantity (Person)"
-						type="number"
-						rules={{
-							required: 'Quantity is required',
-							validate: validateGreaterThanZero,
-						}}
-						disabled={disabled}
-					/>
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+							<FormInput
+								control={control}
+								name="time"
+								label="Time (Hour)"
+								type="number"
+								rules={{
+									required: 'Time is required',
+									validate: validateGreaterThanZero,
+								}}
+								disabled={disabled}
+							/>
 
-					<FormInput
-						control={control}
-						name="age"
-						label="Age"
-						type="number"
-						rules={{
-							required: 'Age is required',
-							validate: validateGreaterThanZero,
-						}}
-						disabled={disabled}
-					/>
-				</div>
-			</div>
+							<FormInput
+								control={control}
+								name="quantityAvailable"
+								label="Quantity (Person)"
+								type="number"
+								rules={{
+									required: 'Quantity is required',
+									validate: validateGreaterThanZero,
+								}}
+								disabled={disabled}
+							/>
+
+							<FormInput
+								control={control}
+								name="age"
+								label="Age"
+								type="number"
+								rules={{
+									required: 'Age is required',
+									validate: validateGreaterThanZero,
+								}}
+								disabled={disabled}
+							/>
+						</div>
+					</div>
+
+				)
+			}
 
 			{/* --- Location on Map --- */}
 			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
@@ -510,11 +571,10 @@ export const ProductForm = ({
 					type="text"
 					placeholder="Enter Coordinates or Select on Map"
 					disabled={disabled}
-					className={`h-9 sm:h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${
-						disabled
-							? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop'
-							: 'bg-white'
-					}`}
+					className={`h-9 sm:h-10 w-full border-b border-gray-300 focus:border-gray-500 focus:outline-none ${disabled
+						? 'bg-gray-100 border-none pl-2.5 hover:cursor-no-drop'
+						: 'bg-white'
+						}`}
 					{...register('urlMap')}
 				/>
 			</div>
@@ -536,7 +596,7 @@ export const ProductForm = ({
 						/>
 					</svg>
 					<span className="text-sm sm:text-base font-medium text-gray-800">
-						Gallery
+						Poster
 					</span>
 				</div>
 
@@ -699,51 +759,105 @@ export const ProductForm = ({
 			</div>
 
 			{/* --- Schedules --- */}
-			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
-				<div className="flex items-center justify-between mb-2 sm:mb-3">
-					<div className="flex items-center gap-2 sm:gap-3">
-						<svg
-							className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+			{
+				watch('categoryId') === 'clv2my35m0000t8z5h4xetnxu' && (
+					<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
+						<div className="flex items-center justify-between mb-2 sm:mb-3">
+							<div className="flex items-center gap-2 sm:gap-3">
+								<svg
+									className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+									/>
+								</svg>
+								<span className="text-sm sm:text-base font-medium text-gray-800">
+									Schedules
+								</span>
+							</div>
+
+							{!disabled && (
+								<button
+									type="button"
+									onClick={handleAddScheduleOnClick}
+									className="flex h-8 sm:h-10 items-center gap-1 rounded-full bg-orange-500 px-2 sm:px-4 py-1 sm:py-2 text-white text-xs sm:text-sm hover:bg-orange-600"
+								>
+									<Plus className="h-3 w-3 sm:h-4 sm:w-4" /> ADD SCHEDULES
+								</button>
+							)}
+						</div>
+
+						<div className="rounded-md bg-white p-1 sm:p-2 border border-gray-200 text-gray-700 overflow-x-auto">
+							<SchedulesBoard
+								data={schedules}
+								pageSize={5}
+								disabled={disabled}
+								onViewDetailSchedule={handleViewScheduleDetailOnClick}
+								handleClosePopup={handleClosePopupScheduleUpdate}
+								onDeleteSuccess={onScheduleDelete}
 							/>
-						</svg>
-						<span className="text-sm sm:text-base font-medium text-gray-800">
-							Schedules
-						</span>
+						</div>
 					</div>
+				)
+			}
+			{/* --- RoomType --- */}
+			{
+				watch('categoryId') === 'cmc933r000001e5hoffrr3msc' && (
+					<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
+						<div className="flex items-center justify-between mb-2 sm:mb-3">
+							<div className="flex items-center gap-2 sm:gap-3">
+								<svg
+									className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+									/>
+								</svg>
+								<span className="text-sm sm:text-base font-medium text-gray-800">
+									Room Type
+								</span>
+							</div>
 
-					{!disabled && (
-						<button
-							type="button"
-							onClick={handleAddScheduleOnClick}
-							className="flex h-8 sm:h-10 items-center gap-1 rounded-full bg-orange-500 px-2 sm:px-4 py-1 sm:py-2 text-white text-xs sm:text-sm hover:bg-orange-600"
-						>
-							<Plus className="h-3 w-3 sm:h-4 sm:w-4" /> ADD SCHEDULES
-						</button>
-					)}
-				</div>
+							{!disabled && (
+								<button
+									type="button"
+									onClick={handleAddScheduleOnClick}
+									className="flex h-8 sm:h-10 items-center gap-1 rounded-full bg-orange-500 px-2 sm:px-4 py-1 sm:py-2 text-white text-xs sm:text-sm hover:bg-orange-600"
+								>
+									<Plus className="h-3 w-3 sm:h-4 sm:w-4" /> ADD ROOM TYPE
+								</button>
+							)}
+						</div>
 
-				<div className="rounded-md bg-white p-1 sm:p-2 border border-gray-200 text-gray-700 overflow-x-auto">
-					<SchedulesBoard
-						data={schedules}
-						pageSize={5}
-						disabled={disabled}
-						onViewDetailSchedule={handleViewScheduleDetailOnClick}
-						handleClosePopup={handleClosePopupScheduleUpdate}
-						onDeleteSuccess={onScheduleDelete}
-					/>
-				</div>
-			</div>
+						<div className="rounded-md bg-white p-1 sm:p-2 border border-gray-200 text-gray-700 overflow-x-auto">
+							<RoomTypeBoard
+								data={roomTypes}
+								pageSize={5}
+								disabled={disabled}
+								onViewDetailSchedule={handleViewRoomTypeDetailOnClick}
+								handleClosePopup={handleClosePopupScheduleUpdate}
+								onDeleteSuccess={onScheduleDelete}
+							/>
+						</div>
+					</div>
+				)
+			}
 
-			{isOpenPopupScheduleUpdate && (
+
+
+			{(isOpenPopupScheduleUpdate && watch('categoryId') === 'clv2my35m0000t8z5h4xetnxu') && (
 				<ScheduleForm
 					productName={watch('name')}
 					data={newSchedule}
@@ -751,6 +865,19 @@ export const ProductForm = ({
 					isCreate={isCreateSchedule}
 					isRemove={isCreateSchedule}
 					onSave={handlerAddScheduleInPopup}
+					onRemove={handleRemoveSchedule}
+					onCancel={handleClosePopupScheduleUpdate}
+					onDeleteSuccess={onScheduleDelete}
+				/>
+			)}
+			{(isOpenPopupScheduleUpdate && watch('categoryId') === 'cmc933r000001e5hoffrr3msc') && (
+				<RoomTypeForm
+					productName={watch('name')}
+					data={newRoomType}
+					setData={setNewRoomType}
+					isCreate={isCreateRoomType}
+					isRemove={isCreateRoomType}
+					onSave={handlerAddRoomTypeInPopup}
 					onRemove={handleRemoveSchedule}
 					onCancel={handleClosePopupScheduleUpdate}
 					onDeleteSuccess={onScheduleDelete}
