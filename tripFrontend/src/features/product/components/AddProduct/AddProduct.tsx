@@ -49,8 +49,8 @@ export const AddProduct = ({
 		dispatch(productThunk.createProduct(formattedData));
 	};
 
-	const generateLocationDescription = async (locationName: string) => {
-		if (!locationName) {
+	const generateLocationDescription = async (name: string, description?: string, location?: string) => {
+		if (!name) {
 			notificationUtils.warning();
 			return;
 		}
@@ -58,12 +58,13 @@ export const AddProduct = ({
 		setIsGeneratingDescription(true);
 
 		const prompt = `
-Hãy viết một mô tả ngắn (50–100 từ) để giới thiệu địa điểm du lịch "${locationName}" tại Việt Nam. 
-Nội dung cần hấp dẫn, truyền cảm hứng, và nêu bật điểm đặc sắc của địa danh này.
+Hãy viết một mô tả chi tiết hơn (100- 150 từ) để giới thiệu địa điểm du lịch "${name}" ${location && `tại ${location}`} ${description && `và với nôi dung mô tả cơ bản là ${description}`}. 
+Nội dung cần hấp dẫn, truyền cảm hứng, và nêu bật điểm đặc sắc của địa danh này
+Kết quả môt là một đoạn văn mô tả duy nhất
 `;
 
 		try {
-			const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+			const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite-preview-06-17' });
 			const result = await model.generateContent(prompt);
 			const description = result.response.text();
 			form.setValue('description', description, {

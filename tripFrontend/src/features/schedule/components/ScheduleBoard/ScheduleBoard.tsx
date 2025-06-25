@@ -14,6 +14,10 @@ import { scheduleApi } from '../../scheduleApi';
 
 import { TRequestBodyCreateSchedule } from '../../schedule.type';
 import { ScheduleForm } from '../ScheduleForm';
+import { scheduleThunk } from '../../scheduleThunk';
+import { isCuid } from 'cuid';
+import { useDispatch } from 'react-redux';
+import { TReduxStoreDispatch } from '@/store';
 
 type TSchedulesBoard = {
 	productId?: string;
@@ -28,6 +32,7 @@ type TSchedulesBoard = {
 	className?: string;
 	setPage?: (page: number) => void;
 	onDeleteSuccess?: () => void;
+	onScheduleDelete?: () => void;
 	pagination?: {
 		totalItems: number;
 	};
@@ -48,13 +53,15 @@ export const SchedulesBoard = ({
 	className,
 	setPage,
 	handleClosePopup,
+	onViewDetailSchedule,
 	onDeleteSuccess,
+	onScheduleDelete,
 	pagination,
 }: TSchedulesBoard): JSX.Element => {
 	const [localData, setLocalData] = useState<TProductSchedule[] | TRequestBodyCreateSchedule[]>(data || []);
 	const [selectedSchedule, setSelectedSchedule] = useState<TProductSchedule | null | TRequestBodyCreateSchedule>(null);
 	const [isDetailOpen, setIsDetailOpen] = useState(false);
-
+	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const fetchData = async () => {
 		try {
 			const response = await scheduleApi.getSchedules();
@@ -67,20 +74,42 @@ export const SchedulesBoard = ({
 			});
 		}
 	};
+	useEffect(() => {
+	}, [selectedSchedule])
 
 	useEffect(() => {
 		setLocalData(data || []);
 	}, [data]);
+
+	const handleRemoveSchedule = (): void => {
+		if (selectedSchedule) {
+			setLocalData((prev) =>
+				prev.filter((schedule) => selectedSchedule.id !== schedule.id),
+			);
+		}
+		if (!selectedSchedule?.id || !isCuid(selectedSchedule.id)) {
+			setIsDetailOpen(false);
+			return;
+		}
+		dispatch(scheduleThunk.deleteSchedule(String(selectedSchedule.id)));
+		setIsDetailOpen(false);
+		onScheduleDelete?.();
+	};
 
 	const handleViewDetail = async (schedule: TProductSchedule) => {
 		try {
 			if (schedule.status !== EProductScheduleStatus.waitingAdd) {
 				const response = await scheduleApi.getScheduleByScheduleId(schedule.id);
 				setSelectedSchedule(response);
+				onViewDetailSchedule?.(response);
 			} else {
 				setSelectedSchedule(schedule);
+				onViewDetailSchedule?.(schedule);
 			}
-			setIsDetailOpen(true);
+			console.log(`🚀 ~ ScheduleBoard.tsx:110 ~ handleViewDetail ~ onViewDetailSchedule:`, onViewDetailSchedule)
+			if (!onViewDetailSchedule) {
+				setIsDetailOpen(true);
+			}
 		} catch (error) {
 			notification.error({
 				message: 'Lỗi',
@@ -150,12 +179,12 @@ export const SchedulesBoard = ({
 				<div className="flex gap-2 items-center">
 					<button
 						type="button"
-						onClick={() =>
+						onClick={() => {
 							!disabled ? handleViewDetail(schedule as TProductSchedule) : (): void => { }
-						}
+						}}
 						className={`text-blue-500 flex gap-2.5 items-center`}
 					>
-						<span>Xem chi tiết </span>
+						<span>View</span>
 						<span className="h-fit">
 							<IoIosArrowRoundForward />
 						</span>
@@ -189,7 +218,7 @@ export const SchedulesBoard = ({
 				}}
 				size="middle"
 			/>
-			{(selectedSchedule && selectedSchedule.status !== EProductScheduleStatus.waitingAdd) && (
+			{(isDetailOpen && selectedSchedule && selectedSchedule.status !== EProductScheduleStatus.waitingAdd) && (
 				<ScheduleDetail
 					schedule={selectedSchedule as TProductSchedule}
 					open={isDetailOpen}
@@ -203,18 +232,18 @@ export const SchedulesBoard = ({
 				/>
 			)}
 
-			{
+			{/* {
 				(isDetailOpen && selectedSchedule && selectedSchedule.status === EProductScheduleStatus.waitingAdd) && (
 					<ScheduleForm
 						productName={'a'}
 						data={data?.filter((item) => item.id === selectedSchedule.id)[0] as TRequestBodyCreateSchedule}
 						setData={(newData) => setSelectedSchedule(newData as TProductSchedule | TRequestBodyCreateSchedule | null)}
 						isCreate={false}
-						isRemove={false}
+						isRemove={true}
 						onCancel={() => setIsDetailOpen(false)}
 					/>
 				)
-			}
+			} */}
 		</>
 	);
 };

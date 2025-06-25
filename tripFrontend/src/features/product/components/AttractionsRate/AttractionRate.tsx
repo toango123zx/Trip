@@ -178,7 +178,7 @@ export const AttractionRate = ({ className }: TAttractionRateProps): JSX.Element
 					<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 						<div>
 							<h1 className="text-2xl md:text-4xl font-bold text-gray-900">
-								Ratings & Reviews
+								{attraction.name}
 							</h1>
 							<div className="flex items-center gap-2 text-gray-500 mt-2">
 								<IoLocationOutline className="text-orange-500" />

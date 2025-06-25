@@ -29,6 +29,7 @@ export enum EProductScheduleStatus {
 	full = 'full',
 	canceled = 'canceled',
 	waitingAdd = 'waitingAdd',
+	waitingRemove = 'waitingRemove',
 }
 
 export type TProductImage = {

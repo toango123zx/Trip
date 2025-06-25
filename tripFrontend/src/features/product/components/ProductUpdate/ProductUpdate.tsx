@@ -26,7 +26,7 @@ export const ProductUpdate = ({
 	disabled = false,
 	isCreate = false,
 	isRemove = false,
-	onCancel = (): void => {},
+	onCancel = (): void => { },
 }: TProductUpdateProps): JSX.Element => {
 	const dispatch = useDispatch<TReduxStoreDispatch>();
 	const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -42,6 +42,7 @@ export const ProductUpdate = ({
 	const [schedules, setSchedules] = useState<
 		TRequestBodyCreateSchedule[] | TProductSchedule[]
 	>([]);
+	const [schedulesRemove, setSchedulesRemove] = useState<TRequestBodyCreateSchedule[] | TProductSchedule[]>([]);
 
 	const form = useForm<TRequestBodyCreateProduct>({
 	});
@@ -112,7 +113,18 @@ export const ProductUpdate = ({
 					);
 				}
 			});
+			if (schedulesRemove.length > 0) {
+				schedulesRemove.forEach((schedule) => {
+					if (isCuid(schedule.id)) {
+						dispatch(
+							scheduleThunk.deleteSchedule(String(schedule.id)),
+						);
+						
+					}
+				});
+			}
 			setSchedules([]);
+			setSchedulesRemove([]);
 			setHasSubmitted(true);
 
 			return;
@@ -124,7 +136,7 @@ export const ProductUpdate = ({
 			age: Number(data.age),
 			productImageUrls: data.productImageUrls || []
 		};
-		
+
 		dispatch(productThunk.updateProductByProductId({ productId, product: formattedData }));
 		setHasSubmitted(true);
 	};
@@ -161,6 +173,7 @@ export const ProductUpdate = ({
 			onRemove={onRemove}
 			schedules={schedules}
 			setSchedules={setSchedules}
+			setSchedulesRemove={setSchedulesRemove}
 			disabled={disabled}
 			// discounts={discounts}
 			onSubmit={onSubmit}

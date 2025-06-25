@@ -24,7 +24,6 @@ import { EStatisticTimeUnit } from '@/types';
 import { TProductSumary } from '@/types';
 
 const { Title } = Typography;
-const { RangePicker } = DatePicker;
 const { Option } = Select;
 
 type ChartType = 'revenue' | 'booked' | 'both';
@@ -41,7 +40,7 @@ interface ProductSelectorProps {
 const ProductSelector: React.FC<ProductSelectorProps> = ({
     value,
     onChange,
-    placeholder = "Chọn sản phẩm",
+    placeholder = "Select product",
     allowClear = true,
     disabled = false,
     className
@@ -76,17 +75,20 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
             className={className}
             style={{ width: '100%' }}
             showSearch
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-                (option?.children as unknown as string).toLowerCase().includes(input.toLowerCase())
-            }
-            notFoundContent={loading ? <Spin size="small" /> : 'Không có sản phẩm nào'}
+            optionFilterProp="label"
+            filterOption={(input, option) => {
+                const productName = option?.label?.toString() || '';
+                const productLocation = products.find(p => p.id === option?.value)?.locationName || '';
+                const searchText = `${productName} ${productLocation}`.toLowerCase();
+                return searchText.includes(input.toLowerCase());
+            }}
+            notFoundContent={loading ? <Spin size="small" /> : 'No products available'}
         >
             {products.map(p => (
-                <Option key={p.id} value={p.id}>
+                <Option key={p.id} value={p.id} label={p.name}>
                     <div className="flex items-center justify-between">
                         <span className="font-medium">{p.name}</span>
-                        <span className="text-gray-500 text-sm ml-2">{p.city}</span>
+                        <span className="text-gray-500 text-sm ml-2">{p.locationName}</span>
                     </div>
                 </Option>
             ))}
@@ -133,14 +135,14 @@ const fillMissingData = (
     label: string,
     category: string
 ) => {
-    // Map từ timestamp -> value
+    // Map from timestamp -> value
     const map = new Map<number, number>();
     data.forEach(item => {
         const ts = dayjs(item.timePoint).valueOf();
         map.set(ts, Number(item.value) || 0);
     });
 
-    // Sinh đủ điểm, nếu thiếu thì value = 0
+    // Generate all points, fill missing values with 0
     return allPoints.map(point => ({
         date: dayjs(point).format(
             timeUnit === EStatisticTimeUnit.hour
@@ -149,8 +151,8 @@ const fillMissingData = (
                     ? 'DD/MM/YYYY'
                     : timeUnit === EStatisticTimeUnit.month
                         ? 'MM/YYYY'
-                        : 'YYYY',),                          // là Date object
-        value: map.get(point.valueOf()) ?? 0, // tìm theo timestamp
+                        : 'YYYY',),
+        value: map.get(point.valueOf()) ?? 0,
         type: label,
         category
     }));
@@ -162,15 +164,17 @@ export const StatisticsChart: React.FC = () => {
 
     const [timeUnit, setTimeUnit] = useState<EStatisticTimeUnit>(EStatisticTimeUnit.day);
     const [chartType, setChartType] = useState<ChartType>('both');
-    const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([dayjs().subtract(30, 'day'), dayjs()]);
+    // Tách thành 2 state riêng biệt
+    const [startDate, setStartDate] = useState<Dayjs>(dayjs().subtract(30, 'day'));
+    const [endDate, setEndDate] = useState<Dayjs>(dayjs());
 
     const { selectedProductId, handleProductChange, getApiParams } = useProductSelector();
 
     const fetchData = async () => {
         const query: TRequestQueryQueryStatistic = {
             timeUnit,
-            startTimeSearch: dateRange[0].toDate(),
-            endTimeSearch: dateRange[1].toDate(),
+            startTimeSearch: startDate.toDate(),
+            endTimeSearch: endDate.toDate(),
             ...getApiParams()
         };
         try {
@@ -185,9 +189,9 @@ export const StatisticsChart: React.FC = () => {
         }
     };
 
-    useEffect(() => { fetchData(); }, [timeUnit, chartType, dateRange, selectedProductId]);
+    useEffect(() => { fetchData(); }, [timeUnit, chartType, startDate, endDate, selectedProductId]);
 
-    const allPoints = generateTimeRange(dateRange[0], dateRange[1], timeUnit);
+    const allPoints = generateTimeRange(startDate, endDate, timeUnit);
     const allPointsISO = allPoints.map(date => dayjs(date).format(
         timeUnit === EStatisticTimeUnit.hour
             ? 'HH:mm DD/MM/YYYY'
@@ -198,24 +202,12 @@ export const StatisticsChart: React.FC = () => {
                     : 'YYYY',
     ));
 
-
-
     const raw: any[] = [];
-    if (chartType !== 'booked') raw.push(...fillMissingData(revenueData || [], allPoints, timeUnit, 'Thu nhập', 'revenue'));
-    if (chartType !== 'revenue') raw.push(...fillMissingData(bookedData || [], allPoints, timeUnit, 'Lượt đặt', 'booked'));
+    if (chartType !== 'booked') raw.push(...fillMissingData(revenueData || [], allPoints, timeUnit, 'Revenue', 'revenue'));
+    if (chartType !== 'revenue') raw.push(...fillMissingData(bookedData || [], allPoints, timeUnit, 'Bookings', 'booked'));
     const chartData = raw.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    // const chartData = [
-    //     ...(chartType !== 'booked'
-    //         ? fillMissingData(revenueData || [], allPoints, 'Thu nhập', 'revenue')
-    //         : []),
-    //     ...(chartType !== 'revenue'
-    //         ? fillMissingData(bookedData || [], allPoints, 'Lượt đặt', 'booked')
-    //         : []),
-    // ].sort((a, b) => a.date.getTime() - b.date.getTime());
-
 
     const isValid = chartData.every(d => d.date && typeof d.value === 'number');
-
 
     const formatDateDisplay = (dateStr: string) => {
         const d = dayjs(dateStr);
@@ -257,35 +249,21 @@ export const StatisticsChart: React.FC = () => {
             nice: true,
             label: {
                 formatter: (v: number) =>
-                    chartType !== 'booked' && v > 1000 ? v.toLocaleString('vi-VN') : `${v}`
+                    chartType !== 'booked' && v > 1000 ? v.toLocaleString('en-US') : `${v}`
             }
         },
         tooltip: {
-            // Format tiêu đề ngày tháng
-            // title: (date: string) => dayjs(date).format('DD/MM/YYYY'),
-            // Chỉ định các trường hiển thị
             fields: ['date', 'type', 'value'],
             title: (d: any) => {
-                // G2Plot will usually pass you an object { date: <rawDate>, type, value }
                 const raw = typeof d === 'object' && d?.date != null ? d.date : d;
-                // return dayjs(raw).format(
-                //     timeUnit === EStatisticTimeUnit.hour
-                //         ? 'HH:mm DD/MM/YYYY'
-                //         : timeUnit === EStatisticTimeUnit.day
-                //             ? 'DD/MM/YYYY'
-                //             : timeUnit === EStatisticTimeUnit.month
-                //                 ? 'MM/YYYY'
-                //                 : 'YYYY'
-                // );
                 return d.date
             },
-            // Trả về đúng name và value, không kèm title ở đây
             formatter: (datum: any) => ({
                 name: datum.type,
                 value:
                     datum.category === 'revenue'
-                        ? `${Number(datum.value).toLocaleString('vi-VN')} VND`
-                        : `${datum.value} lượt`
+                        ? `${Number(datum.value).toLocaleString('en-US')} VND`
+                        : `${datum.value} bookings`
             })
         },
         interactions: [{ type: 'marker-active' }],
@@ -294,7 +272,6 @@ export const StatisticsChart: React.FC = () => {
         meta: {
             value: { min: 0 }, date: {
                 type: 'time',
-                // pick the right mask based on the unit
                 mask:
                     timeUnit === EStatisticTimeUnit.hour
                         ? 'DD/MM HH:mm'
@@ -318,81 +295,137 @@ export const StatisticsChart: React.FC = () => {
         return 'YYYY-MM-DD';
     };
 
+    // Validation để đảm bảo startDate không lớn hơn endDate
+    const handleStartDateChange = (date: Dayjs | null) => {
+        if (date) {
+            setStartDate(date);
+            // Nếu startDate > endDate, tự động set endDate = startDate
+            if (date.isAfter(endDate)) {
+                setEndDate(date);
+            }
+        }
+    };
+
+    const handleEndDateChange = (date: Dayjs | null) => {
+        if (date) {
+            setEndDate(date);
+            // Nếu endDate < startDate, tự động set startDate = endDate
+            if (date.isBefore(startDate)) {
+                setStartDate(date);
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-6">
-                    <Title level={2} className="mb-2">📊 Thống kê doanh thu & đặt hàng</Title>
+                    <Title level={2} className="mb-2">📊 Revenue & Booking Statistics</Title>
                 </div>
 
-                <Card className="shadow-sm mb-6">
-                    <Row gutter={[16, 16]} align="middle">
+                <Card className="shadow-sm !mb-6">
+                    <Row gutter={[16, 16]} align="bottom">
                         {/* Product selector */}
                         <Col xs={24} sm={12} md={5}>
                             <Space direction="vertical" size="small" className="w-full">
-                                <span className="text-sm font-medium text-gray-700">Sản phẩm: <span className="text-gray-400">(Tùy chọn)</span></span>
+                                <span className="text-sm font-medium text-gray-700">Product: <span className="text-gray-400">(Optional)</span></span>
                                 <ProductSelector
                                     value={selectedProductId}
                                     onChange={handleProductChange}
-                                    placeholder="Tất cả sản phẩm"
+                                    placeholder="All products"
                                 />
                             </Space>
                         </Col>
+
                         {/* Time unit */}
                         <Col xs={24} sm={12} md={5}>
                             <Space direction="vertical" size="small" className="w-full">
-                                <span className="text-sm font-medium text-gray-700">Đơn vị thời gian:</span>
+                                <span className="text-sm font-medium text-gray-700">Time Unit:</span>
                                 <Segmented
                                     options={[
-                                        { label: 'Giờ', value: EStatisticTimeUnit.hour },
-                                        { label: 'Ngày', value: EStatisticTimeUnit.day },
-                                        { label: 'Tháng', value: EStatisticTimeUnit.month },
-                                        { label: 'Năm', value: EStatisticTimeUnit.year }
+                                        { label: 'Hour', value: EStatisticTimeUnit.hour },
+                                        { label: 'Day', value: EStatisticTimeUnit.day },
+                                        { label: 'Month', value: EStatisticTimeUnit.month },
+                                        { label: 'Year', value: EStatisticTimeUnit.year }
                                     ]}
                                     value={timeUnit}
                                     onChange={val => setTimeUnit(val as EStatisticTimeUnit)}
                                 />
                             </Space>
                         </Col>
+
                         {/* Chart type */}
                         <Col xs={24} sm={12} md={5}>
                             <Space direction="vertical" size="small" className="w-full">
-                                <span className="text-sm font-medium text-gray-700">Loại biểu đồ:</span>
+                                <span className="text-sm font-medium text-gray-700">Chart Type:</span>
                                 <Segmented
                                     options={[
-                                        { label: 'Thu nhập', value: 'revenue' },
-                                        { label: 'Lượt đặt', value: 'booked' },
-                                        { label: 'Cả hai', value: 'both' }
+                                        { label: 'Revenue', value: 'revenue' },
+                                        { label: 'Bookings', value: 'booked' },
+                                        { label: 'Both', value: 'both' }
                                     ]}
                                     value={chartType}
                                     onChange={val => setChartType(val as ChartType)}
                                 />
                             </Space>
                         </Col>
-                        {/* Date range */}
-                        <Col xs={24} sm={12} md={6}>
+
+                        {/* Start Date */}
+                        <Col xs={24} sm={12} md={7}>
+                            <div className='flex flex-row gap-2'>
+                                <Space direction="vertical" size="small" className="w-full">
+                                    <span className="text-sm font-medium text-gray-700">Start Date:</span>
+                                    <DatePicker
+                                        value={startDate}
+                                        onChange={handleStartDateChange}
+                                        format={getDateFormat()}
+                                        suffixIcon={<CalendarOutlined />}
+                                        className="w-full"
+                                        disabledDate={(current) => current && current.isAfter(endDate, 'day')}
+                                    />
+                                </Space>
+                                <Space direction="vertical" size="small" className="w-full">
+                                    <span className="text-sm font-medium text-gray-700">End Date:</span>
+                                    <DatePicker
+                                        value={endDate}
+                                        onChange={handleEndDateChange}
+                                        format={getDateFormat()}
+                                        suffixIcon={<CalendarOutlined />}
+                                        className="w-full"
+                                        disabledDate={(current) => current && current.isBefore(startDate, 'day')}
+                                    />
+                                </Space>
+                            </div>
+                        </Col>
+
+                        {/* End Date */}
+                        {/* <Col xs={24} sm={12} md={3}>
                             <Space direction="vertical" size="small" className="w-full">
-                                <span className="text-sm font-medium text-gray-700">Khoảng thời gian:</span>
-                                <RangePicker
-                                    value={dateRange}
-                                    onChange={dates => dates && dates[0] && dates[1] && setDateRange([dates[0], dates[1]])}
+                                <span className="text-sm font-medium text-gray-700">End Date:</span>
+                                <DatePicker
+                                    value={endDate}
+                                    onChange={handleEndDateChange}
                                     format={getDateFormat()}
                                     suffixIcon={<CalendarOutlined />}
                                     className="w-full"
+                                    disabledDate={(current) => current && current.isBefore(startDate, 'day')}
                                 />
                             </Space>
-                        </Col>
+                        </Col> */}
+
                         {/* Refresh button */}
-                        <Col xs={24} sm={12} md={3}>
-                            <Button
-                                type="primary"
-                                icon={<ReloadOutlined />}
-                                onClick={fetchData}
-                                loading={loading}
-                                className="w-full"
-                            >
-                                Làm mới
-                            </Button>
+                        <Col xs={24} sm={12} md={2}>
+                            <div className="flex items-end h-full">
+                                <Button
+                                    type="primary"
+                                    icon={<ReloadOutlined />}
+                                    onClick={fetchData}
+                                    loading={loading}
+                                    className="w-full"
+                                >
+                                    Reload
+                                </Button>
+                            </div>
                         </Col>
                     </Row>
                 </Card>
@@ -402,33 +435,33 @@ export const StatisticsChart: React.FC = () => {
                     <Col xs={24} sm={12}>
                         <Card className="shadow-sm">
                             <Statistic
-                                title={`Tổng doanh thu${selectedProductId ? ' (Sản phẩm đã chọn)' : ''}`}
+                                title={`Total Revenue${selectedProductId ? ' (Selected Product)' : ''}`}
                                 value={totalRevenue}
                                 precision={0}
                                 prefix={<DollarOutlined />}
-                                formatter={val => Number(val).toLocaleString('vi-VN')}
+                                formatter={val => Number(val).toLocaleString('en-US')}
                             />
                         </Card>
                     </Col>
                     <Col xs={24} sm={12}>
                         <Card className="shadow-sm">
                             <Statistic
-                                title={`Tổng lượt đặt hàng${selectedProductId ? ' (Sản phẩm đã chọn)' : ''}`}
+                                title={`Total Bookings${selectedProductId ? ' (Selected Product)' : ''}`}
                                 value={totalBooked}
                                 prefix={<ShoppingCartOutlined />}
-                                suffix=" lượt"
+                                suffix=" bookings"
                             />
                         </Card>
                     </Col>
                 </Row>
 
                 {/* Chart */}
-                <Card title={<Space>📈 Biểu đồ thống kê - {['Giờ', 'Ngày', 'Tháng', 'Năm'][timeUnit as unknown as number]}</Space>} className="shadow-sm">
-                    <Spin spinning={loading} tip="Đang tải dữ liệu...">
+                <Card title={<Space>📈 Statistics Chart - {['Hour', 'Day', 'Month', 'Year'][timeUnit as unknown as number]}</Space>} className="shadow-sm">
+                    <Spin spinning={loading} tip="Loading data...">
                         {chartData.length > 0 && isValid
                             ? <Line {...chartConfig} />
                             : <div className="text-center p-10 text-gray-500">
-                                {loading ? 'Đang tải...' : 'Không có dữ liệu để hiển thị'}
+                                {loading ? 'Loading...' : 'No data to display'}
                             </div>
                         }
                     </Spin>

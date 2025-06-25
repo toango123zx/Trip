@@ -74,7 +74,7 @@ export const AttracttionsSupplier: React.FC<ServiceProviderProps> = ({
         <div className="container mx-auto bg-white rounded-lg shadow-sm p-6 md:p-8 pl-10">
             <Card className={`shadow-sm bg-white ${className}`}>
                 <div className="mb-6 flex flex-col gap-4">
-                    <Title level={3} className="!mb-0 !text-gray-900 font-semibold">
+                    <Title level={3} className="!mb-0 !text-gray-900 font-semibold !text-3xl">
                         Providing This Service
                     </Title>
                     <button
@@ -85,16 +85,16 @@ export const AttracttionsSupplier: React.FC<ServiceProviderProps> = ({
                     </button>
                 </div>
 
-                <div className="space-y-5">
+                <div className="space-y-5 bg-gray-50 rounded-lg p-6">
                     {infoItems.map((item) => (
                         <div key={item.key} className="sm:items-start gap-2 sm:gap-8 grid grid-cols-2">
                             <div className="sm:w-40 flex-shrink-0">
-                                <Text className="font-semibold text-[#FF7A22] text-base">
+                                <Text className="font-semibold text-[#FF7A22] !text-lg">
                                     {item.label}
                                 </Text>
                             </div>
                             <div className="flex-1">
-                                <Text className="text-gray-800 text-base">
+                                <Text className="text-gray-800 !text-lg">
                                     {item.value}
                                 </Text>
                             </div>

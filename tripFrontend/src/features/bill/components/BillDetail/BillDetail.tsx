@@ -87,7 +87,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
     };
 
     const formatDate = (date: Date | string): string => {
-        return new Date(date).toLocaleDateString('vi-VN', {
+        return new Date(date).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
@@ -122,7 +122,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
         setProductRateVisible(true);
     };
 
-    // ✅ Function để tạo footer buttons với unique keys
+    // ✅ Function to create footer buttons with unique keys
     const getFooterButtons = () => {
         const buttons = [
             <Button key="close" onClick={onClose}>
@@ -166,7 +166,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                             if (billDetail.id) {
                                 dispatch(billThunk.payConfirmWithdrawal(billDetail.id));
                             }
-                            close();
+                            onClose();
                         }}
                         className='!bg-orange-500 !text-white hover:bg-orange-600'
                     >
@@ -190,7 +190,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
             title={
                 <div className="flex items-center space-x-2">
                     {isWithdrawal ? <DollarSign size={20} /> : <CreditCard size={20} />}
-                    <span>{isWithdrawal ? 'Chi tiết rút tiền' : 'Chi tiết hóa đơn'}</span>
+                    <span>{isWithdrawal ? 'Withdrawal Details' : 'Bill Details'}</span>
                 </div>
             }
             open={visible}
@@ -212,10 +212,10 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                 <div className="flex flex-col gap-y-3.5">
                     {/* User Information */}
                     {billDetail.user && (
-                        <Card title="Thông tin khách hàng" className="shadow-sm">
+                        <Card title="Customer Information" className="shadow-sm">
                             <div className="space-y-2">
                                 <div className="flex justify-between">
-                                    <Text strong>Tên:</Text>
+                                    <Text strong>Name:</Text>
                                     <Text>{billDetail.user.name}</Text>
                                 </div>
                                 <div className="flex justify-between">
@@ -224,7 +224,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                                 </div>
                                 {billDetail.user.phoneNumber && (
                                     <div className="flex justify-between">
-                                        <Text strong>Số điện thoại:</Text>
+                                        <Text strong>Phone Number:</Text>
                                         <Text>{billDetail.user.phoneNumber}</Text>
                                     </div>
                                 )}
@@ -233,12 +233,12 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                     )}
 
                     {/* Bill Details */}
-                    <Card title={isWithdrawal ? "Chi tiết rút tiền" : "Chi tiết thanh toán"} className="shadow-sm">
+                    <Card title={isWithdrawal ? "Withdrawal Details" : "Payment Details"} className="shadow-sm">
                         <div className="space-y-4">
                             <Row gutter={[16, 16]}>
                                 <Col xs={24} sm={12}>
                                     <div className="space-y-2">
-                                        <Text strong>Mã giao dịch:</Text>
+                                        <Text strong>Transaction ID:</Text>
                                         <div>
                                             <Text strong className='!mt-2'>#{billDetail.id}</Text>
                                         </div>
@@ -246,7 +246,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                                 </Col>
                                 <Col xs={24} sm={12}>
                                     <div className="space-y-2">
-                                        <Text strong>Trạng thái:</Text>
+                                        <Text strong>Status:</Text>
                                         <div>
                                             <Tag color={getStatusColor(billDetail.status)} className="text-sm !px-2.5 !py-2 !mt-2">
                                                 {billDetail.status}
@@ -258,13 +258,13 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                             <Row gutter={[16, 16]}>
                                 <Col xs={24} sm={12}>
                                     <div>
-                                        <Text strong>Ngày tạo:</Text>
+                                        <Text strong>Created Date:</Text>
                                         <div>{formatDate(billDetail.createAt)}</div>
                                     </div>
                                 </Col>
                                 <Col xs={24} sm={12}>
                                     <div>
-                                        <Text strong>Ngày cập nhật:</Text>
+                                        <Text strong>Updated Date:</Text>
                                         <div>{formatDate(billDetail.updateAt)}</div>
                                     </div>
                                 </Col>
@@ -276,7 +276,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                             {isWithdrawal ? (
                                 <div className="space-y-4">
                                     <div className="flex justify-between">
-                                        <Text strong>Số tiền rút:</Text>
+                                        <Text strong>Withdrawal Amount:</Text>
                                         <Title level={5} className="!m-0 text-orange-500">
                                             {(withdrawalData?.amount || 0).toLocaleString('vi-VN')} VND
                                         </Title>
@@ -285,15 +285,15 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                             ) : (
                                 <div className="space-y-4">
                                     <div className="flex justify-between">
-                                        <Text strong>Giảm giá:</Text>
+                                        <Text strong>Discount:</Text>
                                         <Title level={5} className="!m-0 !text-orange-500">
-                                            - {(billDetail.reductionPrice)} VND
+                                            - {(billDetail.reductionPrice || 0).toLocaleString('vi-VN')} VND
                                         </Title>
                                     </div>
                                     <div className="flex justify-between">
-                                        <Text strong>Tổng cộng:</Text>
+                                        <Text strong>Total Amount:</Text>
                                         <Title level={5} className="!m-0 text-orange-500">
-                                            {(billDetail.totalPrice - billDetail.reductionPrice).toLocaleString('vi-VN')} VND
+                                            {((billDetail.totalPrice || 0) - (billDetail.reductionPrice || 0)).toLocaleString('vi-VN')} VND
                                         </Title>
                                     </div>
                                 </div>
@@ -303,26 +303,26 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
 
                     {/* Withdrawal Information */}
                     {isWithdrawal && withdrawalData && (
-                        <Card title="Thông tin ngân hàng" className="shadow-sm">
+                        <Card title="Bank Information" className="shadow-sm">
                             <div className="space-y-4">
                                 <div className="flex items-center space-x-2">
                                     <Building size={16} className="text-orange-500" />
                                     <div>
-                                        <Text strong>Tên ngân hàng: </Text>
+                                        <Text strong>Bank Name: </Text>
                                         <Text>{withdrawalData.bankName}</Text>
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <CreditCard size={16} className="text-orange-500" />
                                     <div>
-                                        <Text strong>Mã ngân hàng/STK: </Text>
+                                        <Text strong>Bank Code/Account: </Text>
                                         <Text>{withdrawalData.bankCode}</Text>
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                     <DollarSign size={16} className="text-orange-500" />
                                     <div>
-                                        <Text strong>Số tiền: </Text>
+                                        <Text strong>Amount: </Text>
                                         <Text type="danger" strong>
                                             {withdrawalData.amount.toLocaleString('vi-VN')} VND
                                         </Text>
@@ -372,11 +372,11 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                                         )}
                                         <div className="flex items-center space-x-2">
                                             <Users size={16} className="text-orange-500" />
-                                            <Text>Số người tham gia: {infoItem.quantity || 0}</Text>
+                                            <Text>Participants: {infoItem.quantity || 0}</Text>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <CreditCard size={16} className="text-orange-500" />
-                                            <Text>Giá: {(infoItem.price || 0).toLocaleString('vi-VN')} VND</Text>
+                                            <Text>Price: {(infoItem.price || 0).toLocaleString('vi-VN')} VND</Text>
                                         </div>
                                     </div>
                                 </Card>
@@ -396,7 +396,7 @@ export const BillDetail = ({ visible, onClose, billId }: TBillDetailProps): JSX.
                 </div>
             ) : (
                 <div className="flex justify-center items-center py-8">
-                    <Text>Không tìm thấy thông tin {isWithdrawal ? 'rút tiền' : 'hóa đơn'}</Text>
+                    <Text>No {isWithdrawal ? 'withdrawal' : 'bill'} information found</Text>
                 </div>
             )}
         </Modal>

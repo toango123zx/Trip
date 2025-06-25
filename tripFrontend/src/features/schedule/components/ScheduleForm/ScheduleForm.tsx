@@ -65,6 +65,8 @@ export const ScheduleForm = ({
 	onCancel = (): void => { },
 	onDeleteSuccess = (): void => { },
 }: TScheduleFormProps): JSX.Element => {
+	console.log(`🚀 ~ ScheduleForm.tsx:68 ~ productName:`, productName)
+	console.log(`🚀 ~ ScheduleForm.tsx:71 ~ data:`, data)
 	const form = useForm<TRequestBodyCreateSchedule>({
 		defaultValues: data,
 	});
@@ -162,7 +164,7 @@ export const ScheduleForm = ({
 			disabled={!isCreate || disabled}
 			open={true}
 			onSave={isCreate ? handleSaveOnClick : undefined}
-			onRemove={isCreate ? onRemove : undefined}
+			onRemove={isRemove ? onRemove : undefined}
 			onCancel={onCancel}
 		>
 			<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-3 sm:mb-6">

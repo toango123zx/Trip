@@ -190,8 +190,8 @@ export const DiscountForm = ({
 					id: s.id,
 					label:
 						s.startTime instanceof Date
-							? s.startTime.toString()
-							: String(s.startTime),
+							? s.startTime.toLocaleString()
+							: new Date(s.startTime).toLocaleString(),
 					value: s.id,
 				})),
 		);
@@ -426,7 +426,7 @@ export const DiscountForm = ({
 			// ]}
 			>
 				{/* --- Basic Information --- */}
-				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-2 sm:gap-3">
+				<div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 grid gap-3 sm:gap-4">
 					<div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
 						<svg
 							className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600"
@@ -442,7 +442,7 @@ export const DiscountForm = ({
 							/>
 						</svg>
 						<span className="text-sm sm:text-base font-medium text-gray-800">
-							Basic Information
+							Information
 						</span>
 					</div>
 

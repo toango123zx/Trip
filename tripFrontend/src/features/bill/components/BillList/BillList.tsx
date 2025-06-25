@@ -209,7 +209,7 @@ export const BillList = (): JSX.Element => {
 					style={{ padding: 0 }}
 					onClick={() => handleViewDetail(record.id)}
 				>
-					<span>View Details</span>
+					<span>View Detail</span>
 					<ChevronRight size={16} className="ml-1" />
 				</Button>
 			),
@@ -305,7 +305,7 @@ export const BillList = (): JSX.Element => {
 														style={{ padding: 0 }}
 														onClick={() => handleViewDetail(order.id)}
 													>
-														<span>View Details</span>
+														<span>View Detail</span>
 														<ChevronRight
 															size={16}
 															className="ml-1"

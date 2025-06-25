@@ -27,8 +27,8 @@ export const DateTimeField = <T, K extends keyof T>({
 		<div className="form-control">
 			<div className="flex flex-col md:flex-row md:items-center gap-4">
 				<div className="flex flex-col w-full">
-					<label className="label">
-						<span className="label-text">{label} Date</span>
+					<label className="label flex flex-col gap-2">
+						<span className="label-text text-[16px] font-semibold">{label} Date</span>
 					</label>
 					<DatePicker
 						value={dayjs(value)}
@@ -41,9 +41,9 @@ export const DateTimeField = <T, K extends keyof T>({
 						status={error ? 'error' : undefined}
 					/>
 				</div>
-				<div className="flex flex-col w-full">
+				<div className="w-full flex flex-col gap-2">
 					<label className="label">
-						<span className="label-text">{label} Time</span>
+						<span className="label-text text-[16px] font-semibold">{label} Time</span>
 					</label>
 					<TimePicker
 						value={dayjs(value)}

@@ -31,10 +31,10 @@ export const FormSelect = <T extends FieldValues>({
       rules={rules}
     >
       {({ field, fieldState }) => (
-        <div className="form-control w-full">
+        <div className="form-control w-full flex flex-col gap-2">
           {label && (
             <label className="label">
-              <span className="label-text">{label}</span>
+              <span className="label-text text-[16px] font-semibold">{label}</span>
             </label>
           )}
           <Select

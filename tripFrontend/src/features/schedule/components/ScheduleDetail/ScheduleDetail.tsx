@@ -8,6 +8,9 @@ import { formatDateTime } from '@/components/BaseTable/BaseTable';
 import { scheduleApi } from '../../scheduleApi';
 import { notification, Button, Table, Avatar } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import { fromPairs } from 'lodash';
+import { getFromContainer } from 'class-validator';
+import { start } from 'repl';
 
 type ScheduleDetailProps = {
 	schedule: TProductSchedule;
@@ -22,6 +25,8 @@ type ScheduleFormValues = {
 	id: string;
 	startTime: string;
 	endTime: string;
+	startOrder?: string;
+	endOrder?: string;
 	price: number;
 	booked: number;
 	status: string;
@@ -51,7 +56,7 @@ export const ScheduleDetail = ({ schedule, open, isComplete = true, isRemove = f
 	const [users, setUsers] = useState<User[]>([]);
 	const [loading, setLoading] = useState(false);
 
-	const form = useForm<ScheduleFormValues>({
+	let form = useForm<ScheduleFormValues>({
 		defaultValues: {
 			id: schedule.id,
 			startTime: formatDateTime(schedule.startTime),
@@ -65,10 +70,29 @@ export const ScheduleDetail = ({ schedule, open, isComplete = true, isRemove = f
 			avgRate: schedule.product?.avgRate,
 			productTime: schedule.product?.time,
 			location: schedule.product?.locationId,
+			startOrder: schedule.startOrder ? formatDateTime(schedule.startOrder) : undefined,
+			endOrder: schedule.endOrder ? formatDateTime(schedule.endOrder) : undefined,
 		}
 	});
-	const { control } = form;
-
+	let { control } = form;
+	useEffect(() => {
+		form.reset({
+			id: schedule.id,
+			startTime: formatDateTime(schedule.startTime),
+			endTime: formatDateTime(schedule.endTime),
+			price: schedule.price,
+			booked: schedule.booked,
+			status: schedule.status,
+			productName: schedule.product?.name,
+			productDescription: schedule.product?.description,
+			quantityAvailable: schedule.product?.quantityAvailable,
+			avgRate: schedule.product?.avgRate,
+			productTime: schedule.product?.time,
+			location: schedule.product?.locationId,
+			startOrder: schedule.startOrder ? formatDateTime(schedule.startOrder) : undefined,
+			endOrder: schedule.endOrder ? formatDateTime(schedule.endOrder) : undefined,
+		});
+	}, [schedule])
 	useEffect(() => {
 		const fetchUsers = async () => {
 			try {
@@ -178,17 +202,17 @@ export const ScheduleDetail = ({ schedule, open, isComplete = true, isRemove = f
 			isCreate={false}
 			footer={
 				[
-					<Button key="cancel" onClick={onCancel}>
-						Hủy
+					<Button key="cancel" onClick={onCancel} className='hover:!bg-gray-300 hover:!border-gray-400 hover:!text-black'>
+						Close
 					</Button>,
 					isRemove && (
-						<Button key="remove" danger onClick={handleDelete}>
-							Xóa
+						<Button key="remove" danger onClick={handleDelete} className='hover:!bg-red-500 hover:!text-white'>
+							Cancel
 						</Button>
 					),
 					(schedule.status === EProductScheduleStatus.active || schedule.status === EProductScheduleStatus.full) && isComplete && (
 						<Button key="complete" type="primary" onClick={handleComplete}>
-							Hoàn thành
+							Complete
 						</Button>
 					),
 				]
@@ -238,6 +262,18 @@ export const ScheduleDetail = ({ schedule, open, isComplete = true, isRemove = f
 						control={control as any}
 						name="price"
 						label="Price"
+						disabled
+					/>
+					<FormInput
+						control={control as any}
+						name="startOrder"
+						label="Start Order"
+						disabled
+					/>
+					<FormInput
+						control={control as any}
+						name="endOrder"
+						label="End Order"
 						disabled
 					/>
 					<FormInput

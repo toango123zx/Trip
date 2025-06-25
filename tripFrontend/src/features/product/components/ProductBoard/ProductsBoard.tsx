@@ -66,13 +66,13 @@ export const ProductsBoard = ({
 
 	const columnTable: TableColumnsType<TProductSumary> = [
 		{
-			title: 'Mã sản phẩm',
+			title: 'Product ID',
 			dataIndex: 'id',
 			key: 'id',
 			className: 'hidden',
 		},
 		{
-			title: 'Tên',
+			title: 'Name',
 			dataIndex: 'name',
 			key: 'name',
 			...getColumnSearchProps<TProductSumary>(
@@ -87,7 +87,7 @@ export const ProductsBoard = ({
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
-			title: 'Thành phố',
+			title: 'City',
 			dataIndex: 'city',
 			key: 'city',
 			sorter: (a, b) => a.city.length - b.city.length,
@@ -102,19 +102,19 @@ export const ProductsBoard = ({
 		// 	render: (value: string) => formatDateTime(value),
 		// },
 		{
-			title: 'Số lượng',
+			title: 'Available Quantity',
 			dataIndex: 'quantityAvailable',
 			sorter: (a, b) => a.quantityAvailable - b.quantityAvailable,
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
-			title: 'Hoàn thành',
+			title: 'Completed',
 			dataIndex: 'quantityCompleted',
 			sorter: (a, b) => a.quantityCompleted - b.quantityCompleted,
 			sortDirections: ['descend', 'ascend'],
 		},
 		{
-			title: 'Trạng thái',
+			title: 'Status',
 			dataIndex: 'status',
 			key: 'status',
 			sorter: (a, b) => a.status.length - b.status.length,
@@ -122,7 +122,7 @@ export const ProductsBoard = ({
 			render: (text: string) => renderStatusBadge(text, STATUS_MAP),
 		},
 		{
-			title: 'Thao tác',
+			title: 'Action',
 			key: 'action',
 			render: (_, record: TProductSumary) => (
 				<button
@@ -135,7 +135,7 @@ export const ProductsBoard = ({
 					}
 					className="text-blue-500 flex gap-1 items-center"
 				>
-					<span>Xem chi tiết</span>
+					<span>View Detail</span>
 					<span className="h-fit">
 						<IoIosArrowRoundForward />
 					</span>

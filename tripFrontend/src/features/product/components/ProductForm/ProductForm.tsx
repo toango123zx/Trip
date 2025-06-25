@@ -36,6 +36,7 @@ type TProductFormProps = {
 	setSchedules?: React.Dispatch<
 		React.SetStateAction<TProductSchedule[] | TRequestBodyCreateSchedule[]>
 	>;
+	setSchedulesRemove?: React.Dispatch<React.SetStateAction<TProductSchedule[] | TRequestBodyCreateSchedule[]>>;
 	// discounts?: TDiscountDetail[];
 	isCreate?: boolean;
 	isRemove?: boolean;
@@ -44,7 +45,7 @@ type TProductFormProps = {
 	onCancel?: () => void;
 	disabled?: boolean;
 	open?: boolean;
-	generateLocationDescription?: (locationName: string) => Promise<void>;
+	generateLocationDescription?: (name: string, description?: string, location?: string) => Promise<void>;
 	locationDescription?: string;
 	isGeneratingDescription?: boolean;
 	productImageUrls?: string[];
@@ -55,6 +56,7 @@ export const ProductForm = ({
 	form,
 	schedules,
 	setSchedules = (): void => {},
+	setSchedulesRemove = (): void => {},
 	// discounts = [],
 	isCreate = false,
 	isRemove = true,
@@ -163,18 +165,33 @@ export const ProductForm = ({
 	};
 
 	const handleRemoveSchedule = (): void => {
-		if (schedules) {
+		if (schedules && newSchedule.status === EProductScheduleStatus.waitingAdd) {
 			setSchedules((prev) =>
 				prev.filter((schedule) => newSchedule.id !== schedule.id),
+			);
+		}
+		if (schedules && newSchedule.status == EProductScheduleStatus.active) {
+			
+			setSchedules((prev) =>
+				prev.map((schedule) => {
+					if (schedule.id === newSchedule.id) {
+						return {
+							...schedule,
+							status: EProductScheduleStatus.waitingRemove,
+						};
+					}
+					return schedule;
+				}),
 			);
 		}
 		if (!isCuid(newSchedule.id)) {
 			setIsOpenPopupScheduleUpdate(false);
 			return;
 		}
-		dispatch(scheduleThunk.deleteSchedule(String(newSchedule.id)));
+		setSchedulesRemove((prev) => [...prev, newSchedule]);
+		// dispatch(scheduleThunk.deleteSchedule(String(newSchedule.id)));
 		setIsOpenPopupScheduleUpdate(false);
-		onScheduleDelete?.();
+		// onScheduleDelete?.();
 	};
 
 	const handleSaveOnClick = (data: TRequestBodyCreateProduct): void => {
@@ -195,8 +212,8 @@ export const ProductForm = ({
 
 	const handleGenerateDescription = (): void => {
 		const selectedLocation = locations.find((l) => l.id === locationId);
-		if (selectedLocation && generateLocationDescription) {
-			generateLocationDescription(selectedLocation.displayName);
+		if (form.watch('name') !== '' && generateLocationDescription) {
+			generateLocationDescription(form.watch('name'), form.watch('description'), selectedLocation?.displayName);
 		}
 	};
 
@@ -417,7 +434,7 @@ export const ProductForm = ({
 								disabled={isGeneratingDescription}
 								className="ml-2 px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
 							>
-								{isGeneratingDescription ? 'Đang tạo...' : 'Tạo mô tả AI'}
+								{isGeneratingDescription ? 'Creating...' : 'Create Description for AI'}
 							</button>
 						) : null
 					}
@@ -749,7 +766,7 @@ export const ProductForm = ({
 					data={newSchedule}
 					setData={setNewSchedule}
 					isCreate={isCreateSchedule}
-					isRemove={isCreateSchedule}
+					isRemove={!isCreateSchedule}
 					onSave={handlerAddScheduleInPopup}
 					onRemove={handleRemoveSchedule}
 					onCancel={handleClosePopupScheduleUpdate}
