@@ -125,6 +125,5 @@ This project aims to design and implement a specialized e-commerce website syste
 ---
 
 ## 📁 Additional Documents
-- Report [(pdf)](https://drive.google.com/file/d/1WgH0HnGFBu9ACYM6vK0CJs2HRywgyIKA/view?usp=sharing)
 - Use Case Diagram [(Use Case)](https://drive.google.com/file/d/13nLpEL-cHyBhUTQtYIpo7za319RYbELM/view?usp=sharing)
 - System Architecture Documentation [(Link)](https://drive.google.com/file/d/1xeEKeIxrzmaFro-pkrCgSymNQ_N4wPjU/view?usp=sharing)
