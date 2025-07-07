@@ -1,4 +1,4 @@
 export enum EArrange {
-	asc,
-	desc,
+	asc = 'asc',
+	desc = 'desc',
 }

@@ -223,11 +223,17 @@ export const StatisticsChart: React.FC = () => {
         xField: 'date',
         yField: 'value',
         seriesField: 'type',
-        smooth: true,
+        smooth: false, // Đường thẳng
         height: 400,
         autoFit: true,
         point: { size: 4, shape: 'circle' },
         legend: { position: 'top' as const },
+        // Cấu hình màu sắc: Bookings màu xanh lá, Revenue màu xanh dương
+        color: (datum: any) => {
+            if (datum.type === 'Bookings') return '#10B981'; // Green cho Bookings
+            if (datum.type === 'Revenue') return '#3B82F6'; // Blue cho Revenue
+            return '#6B7280'; // Gray fallback
+        },
         xAxis: {
             type: 'time',
             tickCount: Math.min(10, allPoints.length),
@@ -255,8 +261,7 @@ export const StatisticsChart: React.FC = () => {
         tooltip: {
             fields: ['date', 'type', 'value'],
             title: (d: any) => {
-                const raw = typeof d === 'object' && d?.date != null ? d.date : d;
-                return d.date
+                return d.date;
             },
             formatter: (datum: any) => ({
                 name: datum.type,
@@ -270,7 +275,8 @@ export const StatisticsChart: React.FC = () => {
         connectNulls: false,
         animation: { appear: { animation: 'path-in', duration: 1000 } },
         meta: {
-            value: { min: 0 }, date: {
+            value: { min: 0 }, 
+            date: {
                 type: 'time',
                 mask:
                     timeUnit === EStatisticTimeUnit.hour
@@ -370,7 +376,7 @@ export const StatisticsChart: React.FC = () => {
                             </Space>
                         </Col>
 
-                        {/* Start Date */}
+                        {/* Start Date & End Date */}
                         <Col xs={24} sm={12} md={7}>
                             <div className='flex flex-row gap-2'>
                                 <Space direction="vertical" size="small" className="w-full">
@@ -398,21 +404,6 @@ export const StatisticsChart: React.FC = () => {
                             </div>
                         </Col>
 
-                        {/* End Date */}
-                        {/* <Col xs={24} sm={12} md={3}>
-                            <Space direction="vertical" size="small" className="w-full">
-                                <span className="text-sm font-medium text-gray-700">End Date:</span>
-                                <DatePicker
-                                    value={endDate}
-                                    onChange={handleEndDateChange}
-                                    format={getDateFormat()}
-                                    suffixIcon={<CalendarOutlined />}
-                                    className="w-full"
-                                    disabledDate={(current) => current && current.isBefore(startDate, 'day')}
-                                />
-                            </Space>
-                        </Col> */}
-
                         {/* Refresh button */}
                         <Col xs={24} sm={12} md={2}>
                             <div className="flex items-end h-full">
@@ -438,8 +429,9 @@ export const StatisticsChart: React.FC = () => {
                                 title={`Total Revenue${selectedProductId ? ' (Selected Product)' : ''}`}
                                 value={totalRevenue}
                                 precision={0}
-                                prefix={<DollarOutlined />}
+                                prefix={<DollarOutlined style={{ color: '#3B82F6' }} />}
                                 formatter={val => Number(val).toLocaleString('en-US')}
+                                valueStyle={{ color: '#3B82F6' }}
                             />
                         </Card>
                     </Col>
@@ -448,15 +440,16 @@ export const StatisticsChart: React.FC = () => {
                             <Statistic
                                 title={`Total Bookings${selectedProductId ? ' (Selected Product)' : ''}`}
                                 value={totalBooked}
-                                prefix={<ShoppingCartOutlined />}
+                                prefix={<ShoppingCartOutlined style={{ color: '#10B981' }} />}
                                 suffix=" bookings"
+                                valueStyle={{ color: '#10B981' }}
                             />
                         </Card>
                     </Col>
                 </Row>
 
                 {/* Chart */}
-                <Card title={<Space>📈 Statistics Chart - {['Hour', 'Day', 'Month', 'Year'][timeUnit as unknown as number]}</Space>} className="shadow-sm">
+                <Card title={<Space>📈 Statistics Chart {['Hour', 'Day', 'Month', 'Year'][timeUnit as unknown as number]}</Space>} className="shadow-sm">
                     <Spin spinning={loading} tip="Loading data...">
                         {chartData.length > 0 && isValid
                             ? <Line {...chartConfig} />

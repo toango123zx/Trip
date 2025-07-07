@@ -1,4 +1,4 @@
-import { EArrange, TUser } from '@/types';
+import { EArrange, TPagination, TUser } from '@/types';
 
 export enum ERoleName {
 	admin = 'admin',
@@ -9,6 +9,7 @@ export enum ERoleName {
 export type TUserState = {
 	users: TUser[];
 	userDetail: TUser;
+	pagination: TPagination;
 	loading: boolean;
 	error: string | null;
 };

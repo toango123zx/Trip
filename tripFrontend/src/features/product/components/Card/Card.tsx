@@ -1,4 +1,4 @@
-import { Eye, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import React, { JSX } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';

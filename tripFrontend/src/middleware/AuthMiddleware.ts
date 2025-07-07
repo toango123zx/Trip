@@ -44,5 +44,5 @@ export const AuthMiddleware = (options: AuthMiddlewareOptions = {}) => {
 
 // Hàm kiểm tra quyền truy cập
 export const checkAccess = (requiredRoles: string[]) => {
-  return authMiddleware({ requiredRoles });
+  return AuthMiddleware({ requiredRoles });
 }; 

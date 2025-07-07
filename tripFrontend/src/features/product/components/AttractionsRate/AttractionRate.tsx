@@ -1,5 +1,5 @@
-import React, { JSX, useMemo, useState, useEffect } from 'react';
-import { Star, Send, CheckCircle } from 'lucide-react';
+import { JSX, useMemo, useState, useEffect } from 'react';
+import { Star } from 'lucide-react';
 import { IoLocationOutline } from 'react-icons/io5';
 import { notification, Select } from 'antd';
 import { useSelector } from 'react-redux';

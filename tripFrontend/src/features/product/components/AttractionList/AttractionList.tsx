@@ -1,15 +1,11 @@
-import { Segmented } from 'antd';
 import React, { JSX, useEffect, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { HiOutlineArrowNarrowDown, HiOutlineArrowNarrowUp } from 'react-icons/hi';
 import { MdExpandMore } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { SelectBox } from '@/components';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { TProductSumary, TPagination } from '@/types';
-import { locations, optionSortAttraction } from '@/utils';
 import { EArrange } from '@/types';
 
 import { TSearchAttraction } from '../../product.type';

@@ -3,7 +3,7 @@ import React, { JSX, useState, useRef, useEffect } from 'react';
 import { IoIosArrowRoundForward } from 'react-icons/io';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { BaseTable, renderStatusBadge, formatDateTime } from '@/components/BaseTable/BaseTable';
+import { BaseTable, renderStatusBadge } from '@/components/BaseTable/BaseTable';
 import { getColumnSearchProps } from '@/components';
 import { cn } from '@/lib';
 import { TReduxStoreDispatch, TReduxStoreState } from '@/store';

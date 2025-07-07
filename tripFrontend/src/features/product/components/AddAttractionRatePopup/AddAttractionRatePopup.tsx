@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Star, Send } from 'lucide-react';
 import { Modal, notification } from 'antd';
 import { rateApi } from '../../rateApi';
-import { billApi } from '@/features/bill/billApi';
 import { TReduxStoreState } from '@/store';
 import { TBill } from '@/types';
 import { useSelector } from 'react-redux';

@@ -10,12 +10,18 @@ export enum EUserRole {
 	tourist = 'tourist',
 }
 
+export enum EUserGender {
+	male = 'male',
+	female = 'female',
+	other = 'other',
+}
+
 export type TUser = {
 	id: string;
 	name: string;
 	roleName: EUserRole;
 	image: string;
-	gender: string | null;
+	gender: EUserGender | null;
 	email: string;
 	dateOfBirth: Date | null;
 	phoneNumber: string | null;

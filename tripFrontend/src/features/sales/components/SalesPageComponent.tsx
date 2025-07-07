@@ -24,6 +24,7 @@ const TEXT = {
   DISCOUNT_VALUE: 'Discount Value (%)',
   COPY_SUCCESS: 'Promotion code copied!',
   USE_NOW: 'Use Now',
+  VIEW_DETAIL: 'View Details',
   LOAD_MORE: 'Load More',
   ERROR_MESSAGE: 'Error',
   NO_DATA: 'No promotions available.',
@@ -163,14 +164,14 @@ const SaleCard: React.FC<{ sale: Sale }> = ({ sale }) => {
           <strong>{sale.code}</strong>
         </div> */}
         <div className="flex items-center gap-2 text-gray-500">
-          📅 {formatDateTime(sale.startTime)} - {formatDateTime(sale.endTime)}
+          📅 {new Date(sale.startTime).toLocaleString()} - {new Date(sale.endTime).toLocaleString()}
         </div>
         <div className="flex justify-between flex-col items-start gap-2">
-          <div>🎯 Discount {sale.value / 1000}%</div>
+          {/* <div>🎯 Discount {sale.value} {sale.discountType.name === 'Percentage' ? '%' : 'đ'}</div> */}
           <div>🧍 {sale.quantity - sale.applited} codes remaining</div>
         </div>
         <Button type="primary" block className="mt-3">
-          {TEXT.USE_NOW}
+          {TEXT.VIEW_DETAIL}
         </Button>
       </div>
     </Card>

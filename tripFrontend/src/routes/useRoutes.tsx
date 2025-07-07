@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 
-import { AuthMiddleware } from '@/middleware/authMiddleware';
+// import { AuthMiddleware } from '@/middleware/authMiddleware';
 
 const AuthMiddlewareWrapper = ({ children, requireAuth }: { children: React.ReactNode, requireAuth: boolean }) => {
 	// Implement the authentication logic here

@@ -8,8 +8,8 @@ export interface Sale {
   name: string;
   code: string;
   description: string;
-  startTime: string;
-  endTime: string;
+  startTime: Date;
+  endTime: Date;
   value: number;
   quantity: number;
   applited: number;

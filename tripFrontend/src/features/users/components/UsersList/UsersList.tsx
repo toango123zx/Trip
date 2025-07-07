@@ -27,6 +27,7 @@ import { userThunk } from '../../userThunk';
 import { Popover } from 'antd';
 import { notificationUtils } from '@/utils/notificationUtils';
 import './style.scss';
+import { TPagination } from '@/types/pagination.type';
 
 type TUsersListProps = {
 	className?: string;
@@ -77,6 +78,9 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 	const [filteredUsers, setFilteredUsers] = useState<TUser[]>([]);
 	const users: TUser[] = useSelector<TReduxStoreState, TUser[]>(
 		(state: TReduxStoreState) => state.user.users,
+	);
+	const pagination: TPagination = useSelector<TReduxStoreState, TPagination>(
+		(state: TReduxStoreState) => state.user.pagination,
 	);
 	const [isOpenAddUserModal, setIsOpenAddUserModal] = useState(false);
 	const [isOpenEditUserModal, setIsOpenEditUserModal] = useState(false);
@@ -217,8 +221,8 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 				page,
 				limit: PAGE_SIZE
 			}));
-		} catch (error :any) {
-			notificationUtils.error({message: error.response.data.message});
+		} catch (error: any) {
+			notificationUtils.error({ message: error.response.data.message });
 		}
 	};
 
@@ -244,7 +248,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 				limit: PAGE_SIZE
 			}));
 		} catch (error: any) {
-			notificationUtils.error({message: error.response.data.message});
+			notificationUtils.error({ message: error.response.data.message });
 		}
 	};
 
@@ -256,7 +260,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 				limit: PAGE_SIZE
 			}));
 		} catch (error: any) {
-			notificationUtils.error({message: error.response.data.message});
+			notificationUtils.error({ message: error.response.data.message });
 		}
 	};
 
@@ -268,7 +272,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 				limit: PAGE_SIZE
 			}));
 		} catch (error: any) {
-			notificationUtils.error({message: error.response.data.message});
+			notificationUtils.error({ message: error.response.data.message });
 		}
 	};
 
@@ -318,7 +322,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 			render: (_, record) => (
 				<div className="flex gap-2">
 					<Popover content="Edit user" trigger="hover">
-						<button
+						{/* <button
 							type="button"
 							className="text-blue-500 flex gap-2.5 items-center"
 							onClick={() => {
@@ -332,7 +336,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 							}}
 						>
 							<FaEdit className="h-5 w-5" />
-						</button>
+						</button> */}
 					</Popover>
 					{record.status === 'active' && (
 						<Popover content="Lock user" trigger="hover">
@@ -373,8 +377,8 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 					<div className="flex flex-row md:flex-col flex-wrap justify-center md:justify-start gap-2 md:gap-4 md:w-1/4 lg:w-1/5 font-Montserrat md:sticky md:top-0 md:h-screen">
 						<button
 							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${activeTab === EUserRole.tourist
-									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
-									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
+								? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
+								: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
 								}`}
 							onClick={() => handleChangeTab(EUserRole.tourist)}
 						>
@@ -383,15 +387,15 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 						</button>
 						<button
 							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${activeTab === EUserRole.supplier
-									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
-									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
+								? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
+								: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
 								}`}
 							onClick={() => handleChangeTab(EUserRole.supplier)}
 						>
 							<FaUserTie className="text-lg md:text-xl" />
 							<span className="text-xs sm:text-sm md:text-base">Suppliers</span>
 						</button>
-						<button
+						{/* <button
 							className={`rounded-xl px-3 py-2 md:py-3.5 md:px-4 lg:px-6 text-center md:text-left font-medium transition-all duration-300 flex-1 md:flex-none md:w-full flex flex-col md:flex-row items-center md:items-center gap-1 md:gap-3 ${activeTab === EUserRole.admin
 									? 'bg-gradient-to-r from-orange-500 to-orange-400 text-white md:transform md:translate-x-2'
 									: 'bg-white text-gray-600 hover:bg-gray-50 hover:text-orange-500'
@@ -400,7 +404,7 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 						>
 							<FaUserShield className="text-lg md:text-xl" />
 							<span className="text-xs sm:text-sm md:text-base">Admins</span>
-						</button>
+						</button> */}
 					</div>
 
 					{/* Content Area */}
@@ -446,12 +450,22 @@ export const UsersList = ({ className }: TUsersListProps): JSX.Element => {
 								columns={columnTable}
 								dataSource={filteredUsers}
 								className="w-full"
-								pagination={{
-									current: page,
-									pageSize: PAGE_SIZE,
-									total: totalUsers,
-									onChange: (newPage) => setPage(newPage)
-								}}
+								// pagination={{
+								// 	current: page,
+								// 	pageSize: PAGE_SIZE,
+								// 	total: totalUsers,
+								// 	onChange: (newPage) => setPage(newPage)
+								// }}
+								pagination={
+									pagination?.totalItems > PAGE_SIZE
+										? {
+											current: page,
+											pageSize: PAGE_SIZE,
+											total: pagination.totalItems,
+											onChange: (newPage) => setPage(newPage)
+										}
+										: false
+								}
 							/>
 						</div>
 					</div>

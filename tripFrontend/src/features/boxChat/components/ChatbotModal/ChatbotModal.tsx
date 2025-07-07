@@ -75,7 +75,9 @@ export const ChatbotModal: React.FC<ChatbotModalProps> = ({
             myInformationId={myInformationId}
             userId={myInformationId}
             boxChat={chatbotBoxChat}
-            wsUrl="http://10.10.30.205:8001"
+            // wsUrl="http://10.10.30.205:8001"
+            // wsUrl="https://bc96-42-1-94-74.ngrok-free.app"
+            wsUrl="http://localhost:8001/" 
             isChatBot={true}
           />
         </div>

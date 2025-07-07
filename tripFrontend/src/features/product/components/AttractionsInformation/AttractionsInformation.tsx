@@ -1,6 +1,6 @@
 import React, { JSX, useEffect, useMemo, useRef, useState } from 'react';
-import { BsBookmarkCheck, BsCalendar, BsClock } from 'react-icons/bs';
-import { FaStar, FaRegStar, FaCheck } from 'react-icons/fa';
+import { BsBookmarkCheck, BsClock } from 'react-icons/bs';
+import { FaStar, FaRegStar } from 'react-icons/fa';
 import { IoLocationOutline } from 'react-icons/io5';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { RiCalendarScheduleLine } from 'react-icons/ri';
@@ -18,7 +18,6 @@ import { TReduxStoreDispatch, TReduxStoreState } from '@/store';
 import { EProductScheduleStatus, TProductSchedule } from '@/types';
 
 import { productThunk } from '../../productThunk';
-import { ImageFallback } from '@/components/ImageFallback';
 import { boxChatThunk } from '@/features/boxChat';
 
 type TStarIconProps = { filled: boolean };
@@ -94,12 +93,10 @@ const ScheduleCard = ({
 		};
 	};
 
-	const startDateTime = formatDateTime(schedule.startTime);
-	const endDateTime = formatDateTime(schedule.endTime);
-	const startOrderDateTime = formatDateTime(schedule.startOrder);
-	const endOrderDateTime = formatDateTime(schedule.endOrder);
-
-	const bookingPercentage = schedule.booked;
+	const startDateTime = formatDateTime(schedule.startTime.toLocaleString());
+	const endDateTime = formatDateTime(schedule.endTime.toLocaleString());
+	const startOrderDateTime = formatDateTime(schedule.startOrder.toLocaleString());
+	const endOrderDateTime = formatDateTime(schedule.endOrder.toLocaleString());
 
 	return (
 		<section
@@ -120,7 +117,7 @@ const ScheduleCard = ({
 							{startDateTime.date} - {endDateTime.date}
 						</h3>
 					</div>
-					{inCart && (
+					{(inCart || isAddedToCart) && (
 						<div className='bg-[#ff7921] py-4 px-8 rounded-2xl '>
 							<p className='text-xs font-medium text-white uppercase tracking-wider'>In Cart</p>
 						</div>
@@ -137,7 +134,7 @@ const ScheduleCard = ({
 							<span className="text-xs font-medium">Start Time</span>
 						</div>
 						<p className="text-sm font-semibold text-gray-800">
-							{startDateTime.time}
+							{startDateTime.date} {startDateTime.time}
 						</p>
 					</div>
 
@@ -147,7 +144,7 @@ const ScheduleCard = ({
 							<span className="text-xs font-medium">End Time</span>
 						</div>
 						<p className="text-sm font-semibold text-gray-800">
-							{endDateTime.time}
+							{endDateTime.date} {endDateTime.time}
 						</p>
 					</div>
 
@@ -191,11 +188,11 @@ const ScheduleCard = ({
 								</p>
 							</div>
 						</div>
-						<div className="text-sm text-gray-500">
+						{/* <div className="text-sm text-gray-500">
 							{schedule.capacity && (
 								<span>of {schedule.capacity} total</span>
 							)}
-						</div>
+						</div> */}
 					</div>
 				</div>
 
@@ -220,7 +217,7 @@ const ScheduleCard = ({
 
 						<button
 							onClick={addScheduleInCart}
-							disabled={isAddedToCart || disabled}
+							disabled={isAddedToCart || disabled || inCart}
 							className={cn(
 								'px-6 py-2 rounded-lg text-sm font-semibold transition-colors bg-orange-500 text-white hover:bg-orange-600',
 								'flex items-center gap-2',
@@ -231,7 +228,7 @@ const ScheduleCard = ({
 					</div>
 				</div>
 			</div>
-			{disabled || inCart &&
+			{(disabled || isAddedToCart ||  inCart) &&
 				<div className="absolute inset-0 bg-gray-100 opacity-50 z-20 cursor-not-allowed rounded-lg" />
 			}
 		</section>
@@ -527,7 +524,7 @@ export const AttractionsInformation: React.FC = () => {
 			)}
 
 			{/* Thêm CSS tùy chỉnh */}
-			<style jsx global>{`
+			<style>{`
 				.custom-gallery .image-gallery-slide {
 					background: transparent;
 				}

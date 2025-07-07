@@ -38,6 +38,7 @@ export type TRequestQueryGetProducts = {
 	startTimeSearch?: string;
 	endTimeSearch?: string;
 	citySearch?: string;
+	locationNameSearch?: string;
 };
 
 export type TRequestBodyCreateProduct = {

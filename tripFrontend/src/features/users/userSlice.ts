@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { TUser } from '@/types';
+import { TPagination, TUser } from '@/types';
 
 import { TUserState } from './user.type';
 import { userThunk } from './userThunk';
@@ -8,6 +8,7 @@ import { userThunk } from './userThunk';
 const initialState: TUserState = {
 	users: [],
 	userDetail: {} as TUser,
+	pagination: {} as TPagination,
 	loading: false,
 	error: null,
 };
@@ -36,6 +37,7 @@ export const userSlice = createSlice({
 			})
 			.addCase(userThunk.getUsers.fulfilled, (state, action) => {
 				state.loading = false;
+				state.pagination = action.payload[1] || {} as TPagination;
 				state.users = action.payload[0];
 			})
 			.addCase(userThunk.getUsers.rejected, (state, action) => {
