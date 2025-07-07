@@ -13,7 +13,18 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
 	app.enableCors({
-		origin: ['http://localhost:5173', 'http://10.10.23.103:3000', 'http://10.10.23.103:5173', 'http://172.15.194.134:5173', 'http://192.168.1.4:5173', 'http://192.168.1.4:5173', 'http://10.10.30.205:5173', 'http://192.168.137.1:5173'],
+		origin: ['http://localhost:5173', 
+			'http://10.10.23.103:3000', 
+			'http://10.10.23.103:5173', 
+			'http://172.15.194.134:5173', 
+			'http://192.168.1.4:5173', 
+			'http://192.168.1.4:5173', 
+			'http://10.10.30.205:5173', 
+			'http://192.168.137.1:5173',
+			'http://172.29.80.1:5173',
+			'https://5173-firebase-tripfrontend-1750838895749.cluster-6dx7corvpngoivimwvvljgokdw.cloudworkstations.dev',
+			/^https:\/\/.*\.cloudworkstations\.dev$/
+		],
 		credentials: true,
 	});
 	app.useGlobalPipes(

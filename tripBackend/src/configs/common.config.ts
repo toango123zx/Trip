@@ -9,4 +9,5 @@ export const commonAppConfig = {
 			return 'dev-secret';
 		})(),
 	corsOrigin: process.env.NODE_ENV === 'production' ? process.env.CORS_ORIGIN : '*',
+	fontendUrl: process.env.FRONT_END_URL || 'https://5173-firebase-tripfrontend-1750838895749.cluster-6dx7corvpngoivimwvvljgokdw.cloudworkstations.dev',
 };

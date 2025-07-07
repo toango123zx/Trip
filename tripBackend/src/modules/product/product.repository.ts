@@ -34,6 +34,8 @@ export class ProductRepository {
 		countrySearch?: CountryEnum,
 		productIds?: string[],
 		timeAvailable: boolean = true,
+		count: boolean = true,
+		locationId?: string,
 	): Promise<[ProductEntity[], number]> {
 		const orderBy = [];
 		if (filter.location?.displayName && filter.location?.country) {
@@ -157,6 +159,7 @@ export class ProductRepository {
 						userId: userId,
 					},
 					location: {
+						id: locationId,
 						country: countrySearch,
 					},
 					productSchedule:
@@ -167,15 +170,15 @@ export class ProductRepository {
 							: undefined,
 					status: status,
 				},
-				skip: pagination.skip,
+				skip: count ? pagination.skip : 0,
 				take: pagination.take,
 				orderBy: orderBy,
 			}),
 			this.prismaService.product.count({
 				where: {
-					id: {
+					id: count ? {
 						in: productIds,
-					},
+					} : undefined,
 					name: {
 						contains: keyword,
 						mode: 'insensitive',

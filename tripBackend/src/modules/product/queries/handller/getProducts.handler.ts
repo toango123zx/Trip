@@ -32,6 +32,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			priceFromSearch,
 			priceToSearch,
 			locationName,
+			locationNameSearch,
 			citySearch,
 			city,
 			productCategoryName,
@@ -81,6 +82,9 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 			productIdRecommendations && productIdRecommendations.length > 0
 				? productIdRecommendations
 				: undefined,
+			undefined,
+			false,
+			locationNameSearch,
 		);
 		let sortedProducts = [...products];
 		if (recommendations.length > 0 && products.length >= 0) {
@@ -94,7 +98,6 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 		const productInformation = sortedProducts.map(
 			(product) => new GetProductsResponseDto(product),
 		);
-
 		return {
 			success: true,
 			data: productInformation,

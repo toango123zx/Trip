@@ -7,6 +7,7 @@ import { BillEntity } from 'src/models';
 import { VerifyIpnCall } from 'vnpay';
 
 import { CheckBillPaymentByVnpayQuery } from './queries/implements';
+import { commonAppConfig } from 'src/configs/common.config';
 
 @Controller('transaction')
 export class TransactionController {
@@ -22,11 +23,11 @@ export class TransactionController {
 				await this.queryBus.execute(new CheckBillPaymentByVnpayQuery(verifyIpn));
 			const bill: BillEntity = response.data;
 			return res.redirect(
-				`http://10.10.30.205:5173/bills/payment?status=success&billId=${bill.id}&amount=${bill.totalPrice - bill.reductionPrice}&createAt=${bill.createAt.toString()}`,
+				`${commonAppConfig.fontendUrl}/bills/payment?status=success&billId=${bill.id}&amount=${bill.totalPrice - bill.reductionPrice}&createAt=${bill.createAt.toString()}`,
 			);
 		} catch (error) {
 			return res.redirect(
-				`http://10.10.30.205:5173/bills/payment?status=fail&billId=${error.data.bill.id}&amount=${error.data.bill.totalPrice - error.data.bill.reductionPrice}&createAt=${error.data.bill.createAt.toString()}`,
+				`${commonAppConfig.fontendUrl}/bills/payment?status=fail&billId=${error.data.bill.id}&amount=${error.data.bill.totalPrice - error.data.bill.reductionPrice}&createAt=${error.data.bill.createAt.toString()}`,
 			);
 		}
 	}

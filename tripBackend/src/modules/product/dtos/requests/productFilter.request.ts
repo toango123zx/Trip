@@ -100,6 +100,13 @@ export class ProductFilterRequestDto extends SearchDto {
 	locationName?: OrderByEnum;
 	@ApiProperty({
 		type: 'string',
+		required: false,
+	})
+	@IsOptional()
+	@IsString()
+	locationNameSearch?: string;
+	@ApiProperty({
+		type: 'string',
 		enum: CountryEnum,
 		required: false,
 	})
